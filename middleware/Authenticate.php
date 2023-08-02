@@ -31,7 +31,7 @@ class Authenticate
             if(in_array($request->path(),$authPage) && $request->isMethod("get")){
                 $auth = ['/login','/register','/password/reset','/verify/password','/verify/email','/auth/redirect','/auth/google','/'];
                 if (in_array('/'.ltrim($path,'/'), $authPage)) {
-                    $response = redirect('/page/dashboard');
+                    $response = header('Location: /page/dashboard');
                 } else {
                     $response = redirect($path);
                 }
