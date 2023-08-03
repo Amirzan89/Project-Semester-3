@@ -8,7 +8,7 @@ if(!defined('APP')){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="view/css/login.css">
+    <link rel="stylesheet" href="public/css/login.css">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +37,7 @@ if(!defined('APP')){
                 </div>
                 <input type="submit" name='submit' value='Login'>
                 <!-- <img src="" alt=""> -->
-                <a href="/gabutt" id="google"><img src="view/img/icon/search.png" alt=""> Sig in with Google</a>
+                <a href="/gabutt" id="google"><img src="public/img/icon/search.png" alt=""> Sig in with Google</a>
                 <span id="register">Don't have account ? <a href="/register">Signup</a></span>
             </form>
             <div class="wm"></div>

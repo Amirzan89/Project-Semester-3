@@ -1,7 +1,7 @@
 <?php
-namespace Controllers\Auth;
+// namespace Controllers\Auth;
 use Database\Database;
-use Exception;
+// use Exception;
 class LoginController{ 
     public function Login($data){
         try{
@@ -55,24 +55,102 @@ class LoginController{
                 }else{
                     $stmt->close();
                     throw new Exception(json_encode(['status'=>'error','message'=>'Email tidak ditemukan','code'=>400]));
-                    exit();
+                    // exit();
                 }
                 $stmt->close();
             }
         }catch(Exception $e){
-            $error = json_decode($e->getMessage());
-            $responseData = array(
-                'status' => 'error',
-                'message' => $error['message'],
-                'code' => !empty($error['code']) ? $error['code'] : 400
-            );
+            $error = $e->getMessage();
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                if($erorr['message']){
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $erorr['message'],
+                    );
+                }else{
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $erorr->message,
+                    );
+                }
+            }
             $jsonResponse = json_encode($responseData);
             header('Content-Type: application/json');
-            http_response_code(500);
-            // $stmt->close();
+            http_response_code(!empty($error['code']) ? $error['code'] : 400);
             echo $jsonResponse;
-            exit();
-            // return $e->getMessage();
+        }
+    }
+    // $client_id = 'your_google_client_id';
+    // $client_secret = 'your_google_client_sec/ret';
+    // $redirect_uri = 'your_redirect_uri';
+    // Function to redirect user to Google's authorization page
+    function redirectToProvider(){
+        global $client_id, $redirect_uri;
+    
+        $auth_url = "https://accounts.google.com/o/oauth2/auth?" .
+            "client_id={$client_id}&" .
+            "redirect_uri={$redirect_uri}&" .
+            "response_type=code&" .
+            "scope=email profile";
+    
+        header("Location: {$auth_url}");
+        exit();
+    }
+    
+    // Function to handle the callback after user grants permission
+    public function handleProviderCallback(){
+        global $client_id, $client_secret, $redirect_uri;
+    
+        if (isset($_GET['code'])) {
+            $code = $_GET['code'];
+        
+            // Exchange the authorization code for an access token
+            $token_url = "https://accounts.google.com/o/oauth2/token";
+            $params = [
+                'code' => $code,
+                'client_id' => $client_id,
+                'client_secret' => $client_secret,
+                'redirect_uri' => $redirect_uri,
+                'grant_type' => 'authorization_code'
+            ];
+        
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $token_url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $response = curl_exec($ch);
+            curl_close($ch);
+        
+            $access_token_data = json_decode($response, true);
+        
+            if (isset($access_token_data['access_token'])) {
+                // Use the access token to fetch user information
+                $access_token = $access_token_data['access_token'];
+                $user_info_url = "https://www.googleapis.com/oauth2/v2/userinfo";
+                $headers = [
+                    "Authorization: Bearer {$access_token}"
+                ];
+            
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $user_info_url);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $user_info_response = curl_exec($ch);
+                curl_close($ch);
+            
+                $user_info = json_decode($user_info_response, true);
+            
+                // Now you have the user's information in $user_info
+                // You can save this information in your application's database
+                // or use it to log the user in, etc.
+            }
         }
     }
     // public function redirectToProvider(){

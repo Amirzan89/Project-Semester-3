@@ -2,8 +2,7 @@
 namespace Controllers;
 use Database\Database;
 use Controllers\Mail\MailController;
-use Exception;
-// require_once 'Database/Database.php';
+// use Exception;
 class UserController{
     private static $database;
     private static $con;
@@ -13,76 +12,58 @@ class UserController{
     }
     public function createUser($data, MailController $mailController){
         try{
-            $errors = [];
             if (!isset($data['email']) || empty($data['email'])) {
-                // $errors['email'] = 'Email wajib di isi';
-                throw new Exception(json_encode(['status'=>'error','message'=>'Email wajib di isi','code'=>400]));
+                throw new \Exception(json_encode(['status'=>'error','message'=>'Email wajib di isi','code'=>400]));
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                // $errors['email'] = 'Email yang anda masukkan invalid';
-                throw new Exception(json_encode(['status'=>'error','message'=>'Email invalid','code'=>400]));
+                throw new \Exception(json_encode(['status'=>'error','message'=>'Email invalid','code'=>400]));
             }
             if (!isset($data['password']) || empty($data['password'])) {
-                // $errors['password'] = 'Password wajib di isi';
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password wajib di isi','code'=>400]));
+                throw new \Exception(json_encode(['status'=>'error','message'=>'Password wajib di isi00','code'=>400]));
             } elseif (strlen($data['password']) < 8) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400]));
-                // $errors['password'] = 'Password minimal 8 karakter';
+                throw new \Exception(json_encode(['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400]));
             } elseif (strlen($data['password']) > 25) {
-                // $errors['password'] = 'Password maksimal 25 karakter';
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400]));
+                throw new \Exception(json_encode(['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400]));
             } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Password harus mengandung setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
+                throw new \Exception(json_encode(['status' => 'error', 'message' => 'Password harus mengandung setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
             }
             // Validate 'nama' field
             if (!isset($data['nama']) || empty($data['nama'])) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400]));
+                throw new \Exception(json_encode(['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400]));
             }
             // Check if there are any validation errors
             $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
-            $query = "INSERT INTO users VALUES(?,?,?,?)";
+            $query = "INSERT INTO users (email,password, nama, email_verified) VALUES (?, ?, ?, ?)";
             $verified = false;
             $stmt = self::$con->prepare($query);
             $stmt->bind_param("sssb", $data['email'], $hashedPassword, $data['nama'],$verified);
             $stmt->execute();
             if ($stmt->affected_rows > 0) {
                 $email = $mailController->createVerifyEmail($data);
-                //send email verification
+                $stmt->close();
                 if($email['status'] == 'error'){
                     return ['status'=>'error','message'=>$email['message']];
                 }else{
                     return ['status'=>'success','message'=>$email['message'],'data'=>$email['data']];
                 }
-                // $responseData = array('status' => 'error', 'message' => $errors);
-                // $jsonResponse = json_encode($responseData);
-                // header('Content-Type: application/json');
-                // http_response_code(500);
-                // $stmt->close();
-                // echo $jsonResponse;
-                // exit();
-                // echo "User inserted successfully with ID: " . $stmt->insert_id;
             } else {
-                return ['status'=>'error','message'=>'Akun Gagal Dibuat'];
-                $responseData = array('status' => 'error', 'message' => $errors);
-                $jsonResponse = json_encode($responseData);
-                header('Content-Type: application/json');
-                http_response_code(500);
                 $stmt->close();
-                echo $jsonResponse;
-                exit();
-                // echo "Failed to insert user.";
+                return ['status'=>'error','message'=>'Akun Gagal Dibuat'];
             }
-        }catch(Exception $e){
-            $error = json_decode($e->getMessage());
-            $responseData = array(
-                'status' => 'error',
-                'message' => $error['message'],
-                // 'code' => !empty($error['code']) ? $error['code'] : 400
-            );
-            $jsonResponse = json_encode($responseData);
-            header('Content-Type: application/json');
-            http_response_code(!empty($error['code']) ? $error['code'] : 400);
-            echo $jsonResponse;
-            exit();
+        }catch(\Exception $e){
+            $error = $e->getMessage();
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $erorr->message,
+                );
+            }
+            return $responseData;
         }
     }
 //      public function getUser($email, $data, $where){

@@ -34,8 +34,10 @@ Route::add('/forgot/password','GET',function(){
 });
 Route::add('/email', 'GET', 'MailController@send',[],[$_SERVER['REQUEST_URI']]);
 Route::add('/dashboard', 'GET', 'DashboardController@index');
-Route::add('/users/register','POST','RegisterController@register()');
+Route::add('/users/register','POST','RegisterController@register');
 Route::add('/users/login','POST','LoginController@login()');
+Route::add('/auth/redirect','GET','LoginController@redirectToProvider');
+Route::add('/auth/google','GET','LoginController@handleProviderCallback');
 // Dispatch the request
 Route::dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 class Route{
@@ -50,9 +52,44 @@ class Route{
             'parameter'=>$parameter
         ];
     }
-    public static function dispatch($uri, $method){
+    public static function dispatch($uri, $method, $data=null, $uriData=null){
         $uri = ltrim($uri, '/');
         $routeFound = false;
+        $headers = getallheaders();
+        // Get request body
+        $body = file_get_contents('php://input');
+        // Check if the request method is POST
+        if (in_array($_SERVER['REQUEST_METHOD'], ['POST','PUT','DELETE'])) {
+            // Check if the request data is provided as JSON
+            if ($_SERVER['CONTENT_TYPE'] === 'application/json') {
+                // Decode the JSON data from the request body
+                $requestData = json_decode($body, true);
+                // If the JSON is not valid or not provided, default to an empty array
+                if ($requestData === null) {
+                    $requestData = [];
+                }
+            } elseif (strpos($_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded') !== false) {
+                // Check if the content type is application/x-www-form-urlencoded
+                // Parse form data from the request body
+                parse_str($body, $requestData);
+            } else {
+                // For other types of data, treat the request data as an empty array
+                $requestData = [];
+            }
+            // Check if there is any regular form data (not file uploads)
+            if (empty($requestData) && !empty($_POST)) {
+                // echo 'data ';
+                // Regular form data (not file uploads) will be available in $_POST
+                $requestData = $_POST;
+            }
+            // Check if there are uploaded files
+            if (!empty($_FILES)) {
+                // Process uploaded files here, if needed
+            }
+        } else {
+            $requestData = [];
+        }
+        $cookies = $_COOKIE;
         // echo 'ganbutttt';
         foreach (self::$routes as $route) {
             if ($route['uri'] === $uri && $route['method'] === $method) {
@@ -77,19 +114,14 @@ class Route{
                     $controllerName = $parts[0];
                     $methodName = $parts[1];
                     $controller = new $controllerName();
-                    // $params = [];
-                    // foreach ($route['parameter'] as $paramName) {
-                    //     $params[] = $_REQUEST[$paramName];
-                    // }
-                    call_user_func_array([$controller, $methodName], [$_REQUEST, $_SERVER['REQUEST_URI']]);
-                    // call_user_func([$controller, $methodName]);
+                    call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI']]);
                 }
             }
         }
         if (!$routeFound) {
             http_response_code(404);
-            // echo 'Page not found.';
             include('view/page/PageNotFound.php');
+            exit();
         }
     }
 }

@@ -29,17 +29,18 @@ class MailController{
 
     public function send($data){
         try {
-            $this->mail->setFrom('terserah@gmail.com', 'gabutt');
-            // $this->mail->addAddress('amirzanfikri5@gmail.com', 'gabut tersrah');
-            $this->mail->addAddress($data['email'], $data['nama']);
-            // Email content
+            $this->mail->setFrom($_SERVER['MAIL_FROM_ADDRESS'], 'gabutt');
+            $this->mail->addAddress($data['email'], $data['name']);
             $this->mail->isHTML(true);
-            // $this->mail->Subject = 'Test Email from PHPMailer';
             $this->mail->Subject = $data['description'];
             if($data['description'] == 'verifyEmail'){
-                $this->mail->Body = include 'view/mail/verifyEmail.php';
+                $filePath = __DIR__ . '/../../view/mail/verifyEmail.php';
+                $emailBody = file_get_contents($filePath);
+                $this->mail->Body = $emailBody;
             }else if($data['description'] == 'forgotPassword'){
-                $this->mail->Body = include 'view/mail/forgotPassword.php';
+                $filePath = __DIR__ . '/../../view/mail/forgotPassword.php';
+                $emailBody = file_get_contents($filePath);
+                $this->mail->Body = $emailBody;
             }
             $this->mail->send();
             echo 'Email sent successfully!';
@@ -71,53 +72,54 @@ class MailController{
         try{
             $email = $data['email'];
             if(empty($email) || is_null($email)){
-                return ['status'=>'error','message'=>'email empty'];
-                // throw new Exception(json_encode(['status'=>'error','message'=>'Email wajib di isi','code'=>400]));
+                return ['status'=>'error','message'=>'Email wajib di isi'];
             }else{
                 //checking if email exist in table user
-                $query = "SELECT nama FROM users WHERE BINARY email LIKE CONCAT('%', ?, '%') LIMIT 1";
+                $query = "SELECT nama FROM users WHERE BINARY email LIKE ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
-                $email = '%' . $email . '%';
-                $stmt[0]->bind_param('s', $email);
+                $email1 = '%' . $email . '%';
+                $stmt[0]->bind_param('s', $email1);
                 $result = '';
                 $stmt[0]->bind_result($result);
+                $stmt[0]->execute();
                 //check email exist in table user
                 if ($stmt[0]->fetch()) {
-                    $query = "SELECT updated_at FROM verify WHERE BINARY email LIKE CONCAT('%', ?, '%') AND description = ? LIMIT 1";
+                    $stmt[0]->close();
+                    $query = "SELECT updated_at FROM verify WHERE BINARY email LIKE ? AND description = ? LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
-                    $email = '%' . $email . '%';
                     $description = 'verifyEmail';
-                    $stmt[1]->bind_param('ss', $email, $description);
+                    $stmt[1]->bind_param('ss', $email1, $description);
+                    $stmt[1]->execute();
                     //checking if email exist in table verify
                     if ($stmt[1]->fetch()) {
+                        $stmt[1]->close();
                         $currentDateTime = Carbon::now();
-                        $stmt[0]->close();
-                        $query = "SELECT updated_at FROM verify WHERE BINARY email LIKE CONCAT('%', ?, '%') AND description = ? AND updated_at >= ".$currentDateTime->subMinutes(15). " LIMIT 1";
+                        $query = "SELECT updated_at FROM verify WHERE BINARY email LIKE ? AND description = ? AND updated_at >= ? LIMIT 1";
                         $stmt[2] = self::$con->prepare($query);
-                        $email = '%' . $email . '%';
-                        $stmt[2]->bind_param('ss', $email, $description);
+                        $subminute = $currentDateTime->subMinutes(15);
+                        $stmt[2]->bind_param('sss', $email1, $description, $subminute);
+                        $stmt[2]->execute();
                         //checking if user have create verify email
                         if ($stmt[2]->fetch()) {
-                            $stmt[1]->close();
-                        // if (DB::table('verify')->whereRaw("BINARY email LIKE '%".$email."%' AND description = 'verifyEmail'")->where('updated_at', '>=', $currentDateTime->subMinutes(15))->exists()) {
+                            $stmt[2]->close();
                             //if after 15 minute then update code
                             $verificationCode = mt_rand(100000, 999999);
                             $linkPath = bin2hex(random_bytes(50 / 2));
-                            $baseURL = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
-                            $verificationLink = $baseURL.'/verify/email/'.$linkPath;
-                            $query = "UPDATE link = ?, code = ? updated_at = NOW() FROM verify WHERE BINARY email LIKE CONCAT('%', ?, '%') LIMIT 1";
+                            $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+                            $host = $_SERVER['HTTP_HOST'];
+                            $baseURL = $protocol . '://' . $host;
+                            $verificationLink = $baseURL . '/verify/email/' . $linkPath;
+                            $query = "UPDATE verify SET link = ?, code = ? updated_at = ? FROM verify WHERE BINARY email LIKE ? LIMIT 1";
                             $stmt[3] = self::$con->prepare($query);
-                            $email = '%' . $email . '%';
-                            $stmt[3]->bind_param('sss',$verificationLink, $verificationCode, $email);
+                            $now = Carbon::now();
+                            $stmt[3]->bind_param('ssss',$verificationLink, $verificationCode, $email1, $now, $email1);
+                            $stmt[3]->execute();
                             //update link
                             if ($stmt[3]->fetch()) {
-                                $stmt[2]->close();
-                                $data = ['name'=>$result,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink)];
-                                // return response()->json('link '.$verificationLink);
+                                $stmt[3]->close();
+                                $data = ['name'=>$result,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink),'description'=>'verifyEmail'];
                                 //resend email
                                 $this->send($data);
-                                // Mail::to($email)->send(new VerifyEmail($data));
-                                $stmt[3]->close();
                                 return ['status'=>'success','message'=>'success send verify email','data'=>['waktu'=>Carbon::now()->addMinutes(15)]];
                             }else{
                                 return ['status'=>'error','message'=>'fail create verify email'];
@@ -128,14 +130,11 @@ class MailController{
                     }else{
                         $verificationCode = mt_rand(100000, 999999);
                         $linkPath = bin2hex(random_bytes(50 / 2));
-                        $baseURL = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
-                        $verificationLink = $baseURL.'/verify/email/'.$linkPath;
-                        // $verify->email = $email;
-                        // $verify->code = $verificationCode;
-                        // $verify->link = $linkPath;
-                        // $verify->description = 'verifyEmail';
-                        $query = "INSERT INTO users VALUES(?,?,?,?)";
-                        $verified = false;
+                        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+                        $host = $_SERVER['HTTP_HOST'];
+                        $baseURL = $protocol . '://' . $host;
+                        $verificationLink = $baseURL . '/verify/email/' . $linkPath;
+                        $query = "INSERT INTO verify (email, code, link, description, created_at, updated_at) VALUES(?,?,?,?,?,?)";
                         $stmt = self::$con->prepare($query);
                         $description = 'verifyEmail';
                         $currentDateTime = new \DateTime();
@@ -143,9 +142,8 @@ class MailController{
                         $stmt->bind_param("ssssss", $data['email'], $verificationCode, $linkPath, $description, $formattedDateTime, $formattedDateTime);
                         $stmt->execute();
                         if ($stmt->affected_rows > 0) {
-                            $data = ['name'=>$result,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink)];
+                            $data = ['name'=>$result,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink),'description'=>'verifyEmail'];
                             $this->send($data);
-                            // Mail::to($email)->send(new VerifyEmail($data));
                             return ['status'=>'Success','message'=>'Akun Berhasil Dibuat Silahkan verifikasi email','code'=>200,'data'=>['waktu'=>Carbon::now()->addMinutes(15)]];
                         }else{
                             return ['status'=>'error','message'=>'fail create verify email','code'=>400];
@@ -161,16 +159,6 @@ class MailController{
             }
         }catch(Exception $e){
             return $e;
-            // $error = json_decode($e->getMessage());
-            // $responseData = array(
-            //     'status' => 'error',
-            //     'message' => $error['message'],
-            // );
-            // $jsonResponse = json_encode($responseData);
-            // header('Content-Type: application/json');
-            // http_response_code(!empty($error['code']) ? $error['code'] : 400);
-            // echo $jsonResponse;
-            // exit();
         }
     }
     //send email forgot password
