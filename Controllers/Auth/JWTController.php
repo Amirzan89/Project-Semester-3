@@ -21,7 +21,6 @@ namespace Controllers\Auth;
 // // use DomainException;
 // // use InvalidArgumentException;
 // // use UnexpectedValueException;
-// // use Carbon\Carbon;
 // // Use Closure;
 class JwtController{
 //     //cek jumlah login di database

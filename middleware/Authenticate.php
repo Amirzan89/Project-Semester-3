@@ -1,20 +1,22 @@
 <?php
-namespace App\Http\Middleware;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\Auth\JWTController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Cookie;
-use Illuminate\Http\Response;
-use App\Models\User;
-use Closure;
+// namespace App\Http\Middleware;
+// use App\Http\Controllers\UserController;
+// use App\Http\Controllers\Auth\JWTController;
+// use Illuminate\Http\Request;
+// use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\URL;
+// use Illuminate\Support\Facades\Hash;
+// use Illuminate\Support\Facades\Cookie;
+// use Illuminate\Http\Response;
+// use App\Models\User;
+// use Closure;
+use Controllers\UserController;
+use controllers\Auth\JwtController;
 class Authenticate
 {
-    public function handle(Request $request, Closure $next){
-        $userController = app()->make(UserController::class);
-        $jwtController = app()->make(JWTController::class);
+    public function handle($request){
+        $userController = new UserController();
+        $jwtController = new JwtController();
         $pathh = $request->path();
         $previousUrl = url()->previous();
         // echo PHP_URL_PATH;

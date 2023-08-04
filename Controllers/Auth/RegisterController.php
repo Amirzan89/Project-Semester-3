@@ -1,7 +1,6 @@
 <?php
 // namespace Controllers\Auth;
 use Database\DATABASE;
-use Controllers\Mail\MailController;
 use Controllers\UserController;
 class RegisterController{
     private static $database;
@@ -14,7 +13,6 @@ class RegisterController{
     public function Register($data, $uri = null){
         try{
             $userController = new UserController();
-            $mailController = new MailController();
             if (!isset($data['email']) || empty($data['email'])) {
                 throw new Exception(json_encode(['status'=>'error','message'=>'Email wajib di isi','code'=>400]));
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
@@ -27,7 +25,7 @@ class RegisterController{
             } elseif (strlen($data['password']) > 25) {
                 throw new Exception(json_encode(['status'=>'error','message'=>'Password maksimal 25 karakter','code'=>400]));
             } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Password harus mengandung setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
             }
             if (!isset($data['password_confirm']) || empty($data['password_confirm'])) {
                 throw new Exception(json_encode(['status'=>'error','message'=>'Password wajib di isi','code'=>400]));
@@ -36,7 +34,7 @@ class RegisterController{
             } elseif (strlen($data['password_confirm']) > 25) {
                 throw new Exception(json_encode(['status'=>'error','message'=>'Password maksimal 25 karakter','code'=>400]));
             } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password_confirm'])) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Password confirm harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
             }
             // Validate 'nama' field
             if (!isset($data['nama']) || empty($data['nama'])) {
@@ -57,7 +55,7 @@ class RegisterController{
                 if($pass !== $pass1){
                     throw new Exception(json_encode(['status'=>'error','message'=>'Password harus sama','code'=>400]));
                 }else{
-                    $user = $userController->createUser($data, $mailController);
+                    $user = $userController->createUser($data,'register');
                     if($user['status'] == 'error'){
                         throw new Exception(json_encode($user));
                     }else{

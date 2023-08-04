@@ -6,11 +6,13 @@ use Controllers\Mail\MailController;
 class UserController{
     private static $database;
     private static $con;
+    private static $mailController;
     public function __construct(){
         self::$database = Database::getInstance();
         self::$con = self::$database->getConnection();
+        self::$mailController = new MailController();
     }
-    public function createUser($data, MailController $mailController){
+    public function createUser($data, $opt){
         try{
             if (!isset($data['email']) || empty($data['email'])) {
                 throw new \Exception(json_encode(['status'=>'error','message'=>'Email wajib di isi','code'=>400]));
@@ -24,30 +26,50 @@ class UserController{
             } elseif (strlen($data['password']) > 25) {
                 throw new \Exception(json_encode(['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400]));
             } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
-                throw new \Exception(json_encode(['status' => 'error', 'message' => 'Password harus mengandung setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
+                throw new \Exception(json_encode(['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
             }
             // Validate 'nama' field
             if (!isset($data['nama']) || empty($data['nama'])) {
                 throw new \Exception(json_encode(['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400]));
             }
-            // Check if there are any validation errors
-            $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
-            $query = "INSERT INTO users (email,password, nama, email_verified) VALUES (?, ?, ?, ?)";
-            $verified = false;
-            $stmt = self::$con->prepare($query);
-            $stmt->bind_param("sssb", $data['email'], $hashedPassword, $data['nama'],$verified);
-            $stmt->execute();
-            if ($stmt->affected_rows > 0) {
-                $email = $mailController->createVerifyEmail($data);
-                $stmt->close();
-                if($email['status'] == 'error'){
-                    return ['status'=>'error','message'=>$email['message']];
-                }else{
-                    return ['status'=>'success','message'=>$email['message'],'data'=>$email['data']];
+            if($opt == 'register'){
+                $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
+                $query = "INSERT INTO users (email,password, nama, email_verified) VALUES (?, ?, ?, ?)";
+                $verified = false;
+                $stmt = self::$con->prepare($query);
+                $stmt->bind_param("sssb", $data['email'], $hashedPassword, $data['nama'],$verified);
+                $stmt->execute();
+                if ($stmt->affected_rows > 0) {
+                    $email = self::$mailController->createVerifyEmail($data);
+                    $stmt->close();
+                    if($email['status'] == 'error'){
+                        return ['status'=>'error','message'=>$email['message']];
+                    }else{
+                        return ['status'=>'success','message'=>$email['message'],'data'=>$email['data']];
+                    }
+                } else {
+                    $stmt->close();
+                    return ['status'=>'error','message'=>'Akun Gagal Dibuat'];
                 }
-            } else {
-                $stmt->close();
-                return ['status'=>'error','message'=>'Akun Gagal Dibuat'];
+            }else if('google'){
+                $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
+                $query = "INSERT INTO users (email,password, nama, email_verified) VALUES (?, ?, ?, ?)";
+                $verified = false;
+                $stmt = self::$con->prepare($query);
+                $stmt->bind_param("sssb", $data['email'], $hashedPassword, $data['nama'],$verified);
+                $stmt->execute();
+                if ($stmt->affected_rows > 0) {
+                    $email = self::$mailController->createVerifyEmail($data);
+                    $stmt->close();
+                    if($email['status'] == 'error'){
+                        return ['status'=>'error','message'=>$email['message']];
+                    }else{
+                        return ['status'=>'success','message'=>$email['message'],'data'=>$email['data']];
+                    }
+                } else {
+                    $stmt->close();
+                    return ['status'=>'error','message'=>'Akun Gagal Dibuat'];
+                }
             }
         }catch(\Exception $e){
             $error = $e->getMessage();
