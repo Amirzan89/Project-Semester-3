@@ -1,0 +1,148 @@
+body{
+    margin:0;
+    height: 100vh;
+}
+div#popup{
+    background-color: transparent;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+}
+div#popup .bg{
+    background-color: rgba(0, 0, 0, 0.15);
+    width: 100%;
+    height: 100%;
+}
+div#popup .content{
+    box-sizing: content-box;
+    position: absolute;
+    width: 350px;
+    /* width: fit-content; */
+    /* height: fit-content; */
+    /* max-width: 600px; */
+    height: 150px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background-color: red;
+    background-color: #118B3E;
+    border-radius: 15px;
+    overflow: hidden;
+}
+div#popup .content p{
+    position: absolute;
+    margin:0;
+    top: 5%;
+    width: 90%;
+    left:5%;
+    color: #fff;
+    /* font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; */
+    font-weight: 500;
+    letter-spacing: 1px;
+    font-size: 20px;
+    line-height: fit-content;
+    text-transform: capitalize;
+    /* overflow-wrap: break-word;
+    word-wrap:break-word; */
+    word-break: break-all;
+    white-space: normal;
+}
+div#popup .content button.cancel{
+    background-color: #FF0000;
+    position: absolute;
+    left:10%;
+    bottom:10%;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    width: 100px;
+    height: 25px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 16px;
+}
+div#popup .content button.success{
+    /* background-color: #157347; */
+    background-color: white;
+    position: absolute;
+    right: 10%;
+    bottom:10%;
+    border: none;
+    outline: none;
+    width: 100px;
+    height: 25px;
+    border-radius: 40px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 16px;
+}
+div#popup .content button.single{
+    /* background-color: #157347; */
+    background-color: #fff;
+    border: none;
+    outline: none;
+    position: absolute;
+    bottom:8%;
+    left:50%;
+    transform: translateX(-50%);
+    border-radius: 40px;
+    width: 100px;
+    max-width: 150px;
+    height: 25px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 18px;
+}   
+@media (min-width: 500px) and (max-width: 1000px) {
+    div#popup .content{
+        width: 300px;
+        height: 100px;
+    }
+    div#popup .content p{
+        font-size: 14px;
+        font-weight: 450;
+    }
+    div#popup .content button.single {
+        width: 29%;
+        font-size: 15px;
+    }    
+    div#popup .content button.cancel {
+        width: 26%;
+        font-size: 14px;
+    }
+    div#popup .content button.success {
+        width: 26%;
+        font-size: 14px;
+    }
+}
+@media (max-width:500px){
+    div#popup .content{
+        border-radius: 10px;
+        width: 150px;
+        height: 80px;
+    }
+    div#popup .content p{
+        font-size: 10px;
+        font-weight: 400;
+    }
+    div#popup .content button.single {
+        width: 29%;
+        font-size: 8px;
+        height:20%;
+    }
+    div#popup .content button.cancel {
+        width: 26%;
+        height:18%;
+        font-size: 7px;
+    }
+    div#popup .content button.success {
+        width: 26%;
+        height:18%;
+        font-size: 7px;
+    }
+
+}

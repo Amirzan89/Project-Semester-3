@@ -1,314 +1,527 @@
 <?php
-namespace Controllers\Auth;
-// // use App\Http\Controllers\Controller;
-// // use App\Models\RefreshToken;
-// // use App\Models\User;
-// // use Illuminate\Http\Request;
-// // use Illuminate\Http\Response;
-// // use Tymon\JWTAuth\Facades\JWTAuth;
-// // use Illuminate\Support\Facades\DB;
-// // use Illuminate\Support\Facades\Hash;
-// // use Firebase\JWT\JWT;
-// // use Firebase\JWT\Key;
-// // use Firebase\JWT\SignatureInvalidException;
-// // use Firebase\JWT\BeforeValidException;
-// // use Firebase\JWT\ExpiredException;
-// // use UnexpectedValueException;
-// // use Firebase\JWT\JWT;
-// // use Firebase\JWT\SignatureInvalidException;
-// // use Firebase\JWT\BeforeValidException;
-// // use Firebase\JWT\ExpiredException;
-// // use DomainException;
-// // use InvalidArgumentException;
-// // use UnexpectedValueException;
-// // Use Closure;
+// namespace Controllers\Auth;
+use Database\Database;
+use Illuminate\Support\Facades\Hash;
+// use Firebase\JWT\JWT;
+// use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Builder as JwtBuilder;
+use Lcobucci\JWT\Signer\Key;
+use lcobucci\JWT\Signer\Hmac\Sha512;
+use Lcobucci\JWT\Encoding\ChainedFormatter;
+use Lcobucci\JWT\Encoding\JoseEncoder;
+use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\Token\Builder;
+use Lcobucci\JWT\Token\Parser;
+use Lcobucci\JWT\ValidationData;
+use Lcobucci\jwt\Validation\Validator;
+// use Lcobucci\JWT\Signer\Hmac\Sha512;
+// use Firebase\JWT\Key;
+// use Firebase\JWT\SignatureInvalidException;
+// use Firebase\JWT\BeforeValidException;
+// use Firebase\JWT\ExpiredException;
+// use UnexpectedValueException;
+use Carbon\Carbon;
 class JwtController{
-//     //cek jumlah login di database
-//     // public function checkTotalLoginWebsite($data){
-//         //     $email = $data['email'];
-//         //     if(empty($email) || is_null($email)){
-//     //         return ['status'=>'error','message'=>'email empty'];
-//     //     }else{
-//     //         if(RefreshToken::select("email")->whereRaw("BINARY email LIKE '%$email%' AND device = 'website'")->limit(1)->exists()){
-//         //             $Iresult = RefreshToken::whereRaw("BINARY email LIKE '%$email%' AND device = 'website'")->count();
-//     //             $result = json_decode(json_encode($Iresult));
-//     //             // return response()->json('hasiull '.$result);
-//     //             if(is_null($result) || empty($result) || $result <= 0){
-//     //                 return ['status'=>'success','data'=>0];
-//     //             }else{
-//     //                 return ['status'=>'success','data'=>$result];
-//     //             }
-//     //         }else{
-//         //             return ['status'=>'error','message'=>'belum login','data'=>0];
-//         //         }
-//         //     }
-//         // }
-//         //cek jumlah login di database
-//     // public function checkTotalLoginMobile($data){
-//     //     $email = $data['email'];
-//     //     if(empty($email) || is_null($email)){
-//     //         return ['status'=>'error','message'=>'email empty'];
-//     //     }else{
-//     //         if(RefreshToken::select("email")->whereRaw("BINARY email LIKE '%$email%' AND device = 'mobile'")->limit(1)->exists()){
-//     //             $Iresult = RefreshToken::whereRaw("BINARY email LIKE '%$email%' AND device = 'mobile'")->count();
-//     //             $result = json_decode(json_encode($Iresult));
-//     //             if(is_null($result) || empty($result) || $result <= 0){
-//     //                 return ['status'=>'error','message'=>'email empty'];
-//     //             }else{
-//     //                 return ['status'=>'success','data'=>$result];
-//     //             }
-//     //         }else{
-//     //             return ['status'=>'error','message'=>'belum login'];
-//     //         }
-//     //     }
-//     // }
-//     //check token in database is exist 
-//     public function checkExistRefreshWebsite($data){
-//         $email = $data['email'];
-//         $number = $data['number'];
-//         if(empty($email) || is_null($email)){
-//             return ['status'=>'error','message'=>'email empty'];
-//         }else if(empty($number) || is_null($number)){
-//             return ['status'=>'error','message'=>'token empty'];
-//         }else{
-//             // return response()->json(['status'=>'errorrr','data'=>RefreshToken::select("email")->whereRaw("BINARY email LIKE '%$email%' AND device = 'website' AND number = $number")->limit(1)->exists()]);
-//             return RefreshToken::select("email")->whereRaw("BINARY email LIKE '%$email%' AND device = 'website' AND number = $number")->limit(1)->exists();
-//         }
-//     }
-//     public function checkExistRefreshWebsiteNew($data){
-//         $token = $data['token'];
-//         // $number = $data['number'];
-//         if(empty($token) || is_null($token)){
-//             return ['status'=>'error','message'=>'email empty'];
-//         }else{
-//             // return response()->json(['status'=>'errorrr','data'=>RefreshToken::select("email")->whereRaw("BINARY email LIKE '%$email%' AND device = 'website' AND number = $number")->limit(1)->exists()]);
-//             return RefreshToken::select("email")->whereRaw("BINARY token LIKE '%$token%' AND device = 'website'")->limit(1)->exists();
-//         }
-//     }
+    private static $database;
+    private static $con;
+    private static $userColumns;
+    private static $exp; 
+    private static $expRefresh;
+    private static $secretKey;
+    private static $secretKeyMobile;
+    private static $secretRefreshKey;
+    private static $secretRefreshKeyMobile;
+    private static $key;
+    private static $keyRefresh; 
+    private static $algorithm;
+    public function __construct(){
+        self::$userColumns = ['id_user','email', 'password','nama','email_verified','level','created_at','updated_at'];
+        self::$database = Database::getInstance();
+        self::$con = self::$database->getConnection();
+        self::$exp = intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']);
+        self::$expRefresh = intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']);
+        self::$secretKey = InMemory::plainText($_SERVER['JWT_SECRET']);
+        self::$secretRefreshKey = InMemory::plainText($_SERVER['JWT_SECRET_REFRESH_TOKEN']);
+        self::$secretKeyMobile = InMemory::plainText($_SERVER['JWT_SECRET_ANDROID']);
+        self::$secretRefreshKeyMobile = InMemory::plainText($_SERVER['JWT_SECRET_REFRESH_TOKEN_ANDROID']);
+        self::$algorithm = new Sha256();
+        // self::$key = new Key(self::$secretKey,'HS512');
+        // self::$keyRefresh = new Key(self::$secretKey,'HS512');
+    }
+    //cek jumlah login di database
+    public function checkTotalLoginWebsite($data){
+        // $data = $data['request'];
+        $email = $data['email'];
+        if(empty($email) || is_null($email)){
+            return ['status'=>'error','message'=>'email empty'];
+        }else{
+            $query = "SELECT COUNT(*) AS total FROM refresh_token WHERE BINARY email LIKE ? AND device = 'website'";
+            $email = '%' . $email . '%';
+            $stmt = self::$con->prepare($query);
+            $stmt->bind_param('s', $email);
+            $stmt->execute();
+            $result = '';
+            $stmt->bind_result($result);
+            if ($stmt->fetch()) {
+                $stmt->close();
+                if(is_null($result) || empty($result) || $result <= 0){
+                    return ['status'=>'success','data'=>0];
+                }else{
+                    return ['status'=>'success','data'=>$result];
+                }
+            }else{
+                    return ['status'=>'error','message'=>'belum login','data'=>0];
+                }
+            }
+        }
+    //cek jumlah login di database
+    public function checkTotalLoginMobile($data){
+        $data = $data['request'];
+        $email = $data['email'];
+        if(empty($email) || is_null($email)){
+            return ['status'=>'error','message'=>'email empty'];
+        }else{
+            $query = "SELECT COUNT(*) AS total FROM refresh_token WHERE BINARY email LIKE ? AND device = 'mobile'";
+            $email = '%' . $email . '%';
+            $stmt = self::$con->prepare($query);
+            $stmt->bind_param('s', $email);
+            $stmt->execute();
+            $result = '';
+            $stmt->bind_result($result);
+            if ($stmt->fetch()) {
+                $stmt->close();
+                if(is_null($result) || empty($result) || $result <= 0){
+                    return ['status'=>'error','message'=>'email empty'];
+                }else{
+                    return ['status'=>'success','data'=>$result];
+                }
+            }else{
+                return ['status'=>'error','message'=>'belum login'];
+            }
+        }
+    }
+    //check token in database is exist 
+    public function checkExistRefreshWebsite($data){
+        // $data = $data['request'];
+        $email = $data['email'];
+        $number = $data['number'];
+        $token = $data['token'];
+        if(!empty($token) || !is_null($token)){
+            $query = "SELECT COUNT(*) AS total FROM refresh_token WHERE BINARY token LIKE ? AND device = 'website'";
+            $email = '%' . $email . '%';
+            $stmt = self::$con->prepare($query);
+            $stmt->bind_param('s', $token);
+            $stmt->execute();
+            $result = '';
+            $stmt->bind_result($result);
+            if ($stmt->fetch()) {
+                $stmt->close();
+                return true;
+            }else{
+                $stmt->close();
+                return false;
+            }
+        }else{
+            if(empty($email) || is_null($email)){
+                return ['status'=>'error','message'=>'email empty'];
+            }else if(empty($number) || is_null($number)){
+                return ['status'=>'error','message'=>'number empty'];
+            }else{
+                $query = "SELECT COUNT(*) AS total FROM refresh_token WHERE BINARY email LIKE ? AND number = ? AND device = 'website'";
+                $email = '%' . $email . '%';
+                $stmt = self::$con->prepare($query);
+                $stmt->bind_param('si', $email,$number);
+                $stmt->execute();
+                $result = '';
+                $stmt->bind_result($result);
+                if ($stmt->fetch()) {
+                    $stmt->close();
+                    return true;
+                }else{
+                    $stmt->close();
+                    return false;
+                }
+            }
+        }
+    }
+    public function checkExistRefreshWebsiteNew($data){
+        // $data = $data['request'];
+        $token = $data['token'];
+        if(empty($token) || is_null($token)){
+            return ['status'=>'error','message'=>'token empty'];
+        }else{
+            $query = "SELECT number FROM refresh_token WHERE BINARY token LIKE ? AND device = 'website' LIMIT 1";
+            $stmt = self::$con->prepare($query);
+            $stmt->bind_param('s', $token);
+            $stmt->execute();
+            $result = '';
+            $stmt->bind_result($result);
+            if ($stmt->fetch()) {
+                $stmt->close();
+                return true;
+            }else{
+                $stmt->close();
+                return false;
+            }
+            // return RefreshToken::select("email")->whereRaw("BINARY token = ? AND device = 'website'",[$token])->limit(1)->exists();
+        }
+    }
+    //get refresh token from database
+    public function getRefreshWebsite($data){
+        try{
+            $data = $data['request'];
+            $email = $data['email'];
+            if(empty($email) || is_null($email)){
+                throw new \Exception(json_encode(['status'=>'error','message'=>'Email tidak boleh kosong', 'code'=>400]));
+            }else{
+                $query = "SELECT token FROM refresh_token WHERE BINARY email LIKE ? AND number = ? AND device = 'website'";
+                $email = '%' . $email . '%';
+                $stmt = self::$con->prepare($query);
+                $number = 1;
+                $stmt->bind_param('si', $email,$number);
+                $stmt->execute();
+                $token = '';
+                $stmt->bind_result($token);
+                if ($stmt->fetch()) {
+                    $stmt->close();
+                    header('Content-Type: application/json');
+                    return json_encode($token);
+                }else{
+                    throw new \Exception(json_encode(['status'=>'error','message'=>'Email tidak ditemukan']));
+                }
+            }
+        }catch(\Exception $e){
+            $error = $e->getMessage();
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                if($erorr['message']){
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $erorr['message'],
+                    );
+                }else{
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $erorr->message,
+                    );
+                }
+            }
+            $jsonResponse = json_encode($responseData);
+            header('Content-Type: application/json');
+            http_response_code(!empty($error['code']) ? $error['code'] : 400);
+            echo $jsonResponse;
+            exit();
+        }
+    }
 
-//     //check total refresh token website
-//     public function checkTotalRefreshWebsite($data){
-//         $email = $data['email'];
-//         if(empty($email) || is_null($email)){
-//             return ['status'=>'error','message'=>'email empty'];
-//         }else{
-//             if(RefreshToken::select("email")->where('email','LIKE','%'.$email.'%')->limit(1)->exists()){
-//                 if(RefreshToken::select("email")->where('email','LIKE','%'.$email.'%')->limit(1)->exists()){
-//                 }else{
-//                     //
-//                 }
-//                 return ['status'=>'success','data'=>true];
-//             }else{
-//                 return ['status'=>'success','data'=>false];
-//             }
-//         }
-//     }
-//     //get refresh token from database
-//     public function getRefreshWebsite(Request $request,Response $response){
-//         $email = $request->input('email');
-//         if(empty($email) || is_null($email)){
-//             return response()->json('email empty',404);
-//         }else{
-//             $Itoken = RefreshToken::select('refresh_token')->where('email','=',$email)->limit(1)->get();
-//             $token = json_decode(json_encode($Itoken));
-//             if(is_null($token)){
-//                 return response()->json('email not found',404);
-//             }else{
-//                 return response()->json($token);
-//             }
-//         }
-//     }
-
-//     //save token refresh to database 
-//     public function saveRefreshWebsite(Request $request, RefreshToken $refreshToken){
-//         $email = $request->input('email');
-//         $token = $request->input('refresh_token');
-//         if(empty($email) || is_null($email)){
-//             return response()->json('email empty',404);
-//         }
-//         if(empty($token) || is_null($token)){
-//             return response()->json('token empty',404);
-//         }
-//         $refreshToken->email = $email;
-//         $refreshToken->token= $token;
-//         if($refreshToken->save()){
-//             return response()->json('saving token success1');
-//         }else{
-//             return response()->json('error saving token1',401);
-//         }
-//     }
+    //save token refresh to database 
+    public function saveRefreshWebsite($data, $opt){
+        try{
+            $data = $data['request'];
+            $email = $data['email'];
+            $token = $data['refresh_token'];
+            if(empty($email) || is_null($email)){
+                throw new \Exception(json_encode(['status'=>'error','message'=>'Email kosong']));
+            }
+            if(empty($token) || is_null($token)){
+                throw new \Exception(json_encode(['status'=>'error','message'=>'token kosong']));
+            }
+            if($opt == 'website'){
+                $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+                $number = false;
+                $stmt = self::$con->prepare($query);
+                $now = Carbon::now('Asia/Jakarta');
+                $device = 'website';
+                $stmt->bind_param("sssbss", $email,$token, $device,$number, $now, $now);
+                $stmt->execute();
+                if ($stmt->affected_rows > 0) {
+                    $stmt->close();
+                    header('Content-Type: application/json');
+                    return json_encode(['status'=>'success','message'=>'saving token success website']);
+                }else{
+                    throw new \Exception(json_encode(['status'=>'error','message'=>'error saving token','code'=>500]));
+                }
+            }
+        }catch(\Exception $e){
+            $error = $e->getMessage();
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                if($erorr['message']){
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $erorr['message'],
+                    );
+                }else{
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $erorr->message,
+                    );
+                }
+            }
+            $jsonResponse = json_encode($responseData);
+            header('Content-Type: application/json');
+            http_response_code(!empty($error['code']) ? $error['code'] : 400);
+            echo $jsonResponse;
+        }
+    }
     
 //     //create token and refresh token 
-//     public function createJWTWebsite($email, RefreshToken $refreshToken){
-//         try{
-//             // $email = $request->input('email');
-//             if(empty($email) || is_null($email)){
-//                 return ['status'=>'error','message'=>'email empty'];
-//             }else{
-//                 //check email is exist on database
-//                 if(User::select("email")->whereRaw("BINARY email LIKE '%$email%'")->limit(1)->exists()){
-//                     //check total login on website
-//                     // return $this->checkTotalLoginWebsite(['email'=>$email]);
-//                     $number = $this->checkTotalLoginWebsite(['email'=>$email]);
-//                     if($number['data'] >= 3){
-//                         $dataDb = User::select()->whereRaw("BINARY email LIKE '%$email%'")->limit(1)->get();
-//                         $data = json_decode(json_encode($dataDb));
-//                         $exp = time() + intval(env('JWT_ACCESS_TOKEN_EXPIRED'));
-//                         $expRefresh = time() + intval(env('JWT_REFRESH_TOKEN_EXPIRED'));
-//                         $payloadRefresh = [ 'data'=>$data, 'exp'=>$expRefresh];
-//                         $secretKey = env('JWT_SECRET');
-//                         $secretRefreshKey = env('JWT_SECRET_REFRESH_TOKEN');
-//                         $Rtoken = JWT::encode($payloadRefresh, $secretRefreshKey, 'HS512');
-//                         if(DB::table('refresh_token')->whereRaw("BINARY email LIKE '%$email%' AND device = 'website' AND number = 1")->delete()){
-//                             for($i = 1; $i <= 3; $i++){
-//                                 DB::table('refresh_token')->whereRaw("BINARY email LIKE '%$email%' AND device = 'website' AND number = $i")->update(['number'=>$i-1]);
-//                             }
-//                             $payload = ['data'=>$data, 'number'=> 3, 'exp'=>$exp];
-//                             $token = JWT::encode($payload, $secretKey,'HS512');
-//                             $refreshToken->email = $email;
-//                             $refreshToken->token = $Rtoken;
-//                             $refreshToken->device = 'website';
-//                             $refreshToken->number = 3;
-//                             if($refreshToken->save()){
-//                                 return [
-//                                     'status'=>'success',
-//                                         'data'=>
-//                                         [
-//                                             'token'=>json_decode(json_encode($token),true),
-//                                             'refresh'=>json_decode(json_encode($Rtoken),true)
-//                                         ],
-//                                         'number'=>3];
-//                             }else{
-//                                 return ['status'=>'error','message'=>'error saving token','code'=>500];
-//                             }
-//                         }else{
-//                             return ['status'=>'error','message'=>'error delete old refresh token', 'code'=>500];
-//                         }
-//                     //if user has not login 
-//                     }else{
-//                         $dataDb = User::select()->whereRaw("BINARY email LIKE '%$email%'")->limit(1)->get();
-//                         $data = json_decode(json_encode($dataDb));
-//                         $exp = time() + intval(env('JWT_ACCESS_TOKEN_EXPIRED'));
-//                         $expRefresh = time() + intval(env('JWT_REFRESH_TOKEN_EXPIRED'));
-//                         $payloadRefresh = [ 'data'=>$data, 'exp'=>$expRefresh];
-//                         $secretKey = env('JWT_SECRET');
-//                         $secretRefreshKey = env('JWT_SECRET_REFRESH_TOKEN');
-//                         $Rtoken = JWT::encode($payloadRefresh, $secretRefreshKey, 'HS512');
-//                         $refreshToken->email = $email;
-//                         $refreshToken->token = $Rtoken;
-//                         $refreshToken->device = 'website';
-//                         $number = $this->checkTotalLoginWebsite(['email'=>$email]);
-//                         if($number['status'] == 'error'){
-//                             $refreshToken->number = 1;
-//                             $payload = [ 'data'=>$data, 'number'=> 1,'exp'=>$exp];
-//                             $token = JWT::encode($payload, $secretKey,'HS512');
-//                             $json = [
-//                                 'status'=>'success',
-//                                 'data'=>
-//                                 [
-//                                     'token'=>json_decode(json_encode($token),true),
-//                                     'refresh'=>json_decode(json_encode($Rtoken),true)
-//                                 ],
-//                                 'number' => 1];
-//                             }else{
-//                                 $payload = [ 'data'=>$data, 'number'=> $number['data']+1,'exp'=>$exp];
-//                                 $token = JWT::encode($payload, $secretKey,'HS512');
-//                                 $refreshToken->number = $number['data']+1;
-//                                 $json = [
-//                                     'status'=>'success',
-//                                     'data'=>
-//                                     [
-//                                         'token'=>json_decode(json_encode($token),true),
-//                                         'refresh'=>json_decode(json_encode($Rtoken),true)
-//                                     ],
-//                                     'number' => $number['data']+1];
-//                             // $json = ['status'=>'success','data'=>json_decode(json_encode($token),true),'number'=>$number['data']+1];
-//                         }
-//                         if($refreshToken->save()){
-//                             return $json;
-//                         }else{
-//                             return ['status'=>'error','message'=>'error saving token','code'=>500];
-//                         }
-//                     }
-//                 }else{
-//                     return ['status'=>'error','messsage'=>'email not found','code'=>400];
-//                 }
-//             }
-//         }catch(UnexpectedValueException  $e){
-//             return ['status'=>'error','message'=>$e->getMessage()];
-//         }
-//     }
-//     //decode token
-//     public function decode($data){
-//         try{
-//             $email = $data['email'];
-//             $token = $data['token'];
-//             $opt = $data['opt'];
-//             if(empty($email) || is_null($email)){
-//                 return ['status'=>'error','message'=>'email empty'];
-//             }else if(empty($token) || is_null($token)){
-//                 return ['status'=>'error','message'=>'token empty'];
-//             }else if(empty($opt) || is_null($opt)){
-//                 return ['status'=>'error','message'=>'option empty'];
-//             }else{
-//                 if($opt == 'token'){
-//                     $decode = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS512'));
-//                     $decoded = json_decode(json_encode($decode), true);
-//                     return ['status'=>'success','data'=>json_decode(json_encode($decode), true)];
-
-//                     if(strcmp($email,$decoded['data'][0]['email'] ?? null) === 0){
-//                         return ['status'=>'success','data'=>json_decode(json_encode($decode), true)];
-//                     }else{
-//                         return ['status'=>'error','message'=>'invalid email'];
-//                     }
-//                 }else if($opt == 'refresh'){
-//                     $decode = JWT::decode($token, new Key(env('JWT_SECRET_REFRESH_TOKEN'), 'HS512'));
-//                     $decoded = json_decode(json_encode($decode), true);
-//                     if(strcmp($email,$decoded['data'][0]['email'] ?? null) === 0){
-//                         return ['status'=>'success','data'=>json_decode(json_encode($decode), true)];
-//                     }else{
-//                         return ['status'=>'error','message'=>'invalid email'];
-//                     }
-//                 }else{
-//                     return ['status'=>'error','message'=>'invalid data'];
-//                 }
-//             }
-//         }catch(ExpiredException $e){
-//             return ['status'=>'error','message'=>$e->getMessage()];
-//         } catch (SignatureInvalidException $e) {
-//             return ['status'=>'error','message'=>$e->getMessage()];
-//         } catch (BeforeValidException $e) {
-//             return ['status'=>'error','message'=>$e->getMessage()];
-//         }catch(UnexpectedValueException $e){
-//             return ['status'=>'error','message'=>$e->getMessage()];
-//         } catch (InvalidArgumentException $e) {
-//             return ['status'=>'error','message'=>$e->getMessage()];
-//         } catch (DomainException $e) {
-//             return ['status'=>'error','message'=>$e->getMessage()];
-//         // } catch (LogicException $e) {
-//             // return ['status'=>'error','message'=>$e->getMessage()];
-//         } catch (\Exception $e) {
-//             return ['status'=>'error','message'=>$e->getMessage()];
-//         }
-//     }
-//     public function updateTokenWebsite($data){
-//         try{
-//             if(empty($data) || is_null($data)){
-//                 return ['status'=>'error','message'=>'data empty'];
-//             }else{
-//                 // return $data;
-//                 // $dataDb = User::select()->whereRaw("BINARY email LIKE '%".$email."%'")->limit(1)->get();
-//                 // $data = json_decode(json_encode($dataDb));
-//                 $exp = time() + intval(env('JWT_ACCESS_TOKEN_EXPIRED'));
-//                 $payload = ['data'=>$data, 'exp'=>$exp];
-//                 $secretKey = env('JWT_SECRET');
-//                 $token = JWT::encode($payload, $secretKey,'HS512');
-//                 return ['status'=>'success','data'=>json_decode(json_encode($token),true)];
-//             }
-//         }catch(UnexpectedValueException $e){
-//             return ['status'=>'error','message'=>$e->getMessage()];
-//         }
-//     }
+    public function createJWTWebsite($data, $uri = null){
+        try{
+            // $data = $data['request'];
+            // $algorithm = new Sha256();
+            $email = $data['email'];
+            if(empty($email) || is_null($email)){
+                return ['status'=>'error','message'=>'email empty'];
+            }else{
+                $email1 = '%' . $email . '%';
+                //check email is exist on database
+                $query = "SELECT * FROM users WHERE BINARY email LIKE ? LIMIT 1";
+                $stmt[0] = self::$con->prepare($query);
+                $email = '%' . $email . '%';
+                $stmt[0]->bind_param('s', $email);
+                $stmt[0]->execute();
+                $bindResultArray = [];
+                foreach (self::$userColumns as $column) {
+                    $bindResultArray[] = &$$column;
+                }
+                
+                call_user_func_array([$stmt[0], 'bind_result'], $bindResultArray);
+                $resultDb = [];
+                if ($stmt[0]->fetch()) {
+                    foreach (self::$userColumns as $column) {
+                        $resultDb[$column] = $$column;
+                    }
+                    $stmt[0]->close();
+                    $now1 = Carbon::now('Asia/Jakarta');
+                    $now   = new DateTimeImmutable();
+                    //check total login on website
+                    $number = $this->checkTotalLoginWebsite(['email'=>$email]);
+                    $device = 'website';
+                    if($number['data'] >= 3){
+                        $payloadRefresh = [ 'data'=>$resultDb, 'exp'=>self::$expRefresh];
+                        $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
+                        $Rtoken = $tokenBuilder->issuedBy('http://localhost')->permittedFor('http://localhost')->issuedAt($now)->canOnlyBeUsedAfter($now)->expiresAt($now->modify("+". self::$expRefresh ." seconds"))->withClaim('data', $payloadRefresh)->getToken(self::$algorithm, self::$secretRefreshKey)->toString();
+                        $query = "DELETE FROM refresh_token WHERE BINARY email LIKE ? AND device = 'website' AND number = 1";
+                        $stmt[1] = self::$con->prepare($query);
+                        $email1 = '%' . $email . '%';
+                        $stmt[1]->bind_param('s', $email1);
+                        $result = '';
+                        $stmt[1]->execute();
+                        if ($stmt[1]->fetch()) {
+                            $stmt[1]->close();
+                            $query = "UPDATE refresh_token SET number = number - 1 WHERE BINARY email LIKE ? AND device = 'website' AND number BETWEEN 1 AND 3";
+                            $stmt[2] = self::$con->prepare($query);
+                            $email1 = '%' . $email . '%';
+                            $stmt[2]->bind_param('s', $email1);
+                            $result = '';
+                            $stmt[2]->bind_result($result);
+                            $stmt[2]->execute();
+                            $stmt[2]->fetch();
+                            $stmt[2]->close();
+                            $payload = ['data'=>$resultDb, 'number'=> 3, 'exp'=>self::$exp];
+                            $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
+                            $token = $tokenBuilder->issuedBy('http://localhost')->permittedFor('http://localhost')->issuedAt($now)->canOnlyBeUsedAfter($now)->expiresAt($now->modify("+". self::$exp ." seconds"))->withClaim('data', $payload)->getToken(self::$algorithm, self::$secretKey)->toString();
+                            $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+                            $stmt[3] = self::$con->prepare($query);
+                            $number['data'] = 3;
+                            $stmt[3]->bind_param("sssiss", $email, $Rtoken,$device, $number['data'], $now1, $now1);
+                            $stmt[3]->execute();
+                            if ($stmt[3]->affected_rows > 0) {
+                                $stmt[3]->close();
+                                return [
+                                    'status'=>'success',
+                                    'data'=>
+                                    [
+                                        'token'=>json_decode(json_encode($token),true),
+                                        'refresh'=>json_decode(json_encode($Rtoken),true)
+                                    ],
+                                    'number'=>3];
+                            }else{
+                                $stmt[3]->close();
+                                throw new \Exception(json_encode(['status'=>'error','message'=>'error saving token','code'=>500]));
+                            }
+                        }else{
+                            $stmt[1]->close();
+                            throw new \Exception(json_encode(['status'=>'error','message'=>'error delete old refresh token','code'=>500]));
+                        }
+                    //if user has not login 
+                    }else{
+                        $payloadRefresh = [ 'data'=>$resultDb, 'exp'=>self::$expRefresh];
+                        $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
+                        $Rtoken = $tokenBuilder->issuedBy('http://localhost')->permittedFor('http://localhost')->issuedAt($now)->canOnlyBeUsedAfter($now)->expiresAt($now->modify("+". self::$expRefresh ." seconds"))->withClaim('data', $payloadRefresh)->getToken(self::$algorithm, self::$secretRefreshKey)->toString();
+                        $number = $this->checkTotalLoginWebsite(['email'=>$email]);
+                        if($number['status'] == 'error'){
+                            $number['data'] = 1;
+                            $payload = [ 'data'=>$resultDb, 'number'=> 1,'exp'=>self::$exp];
+                            $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
+                            $token = $tokenBuilder->issuedBy('http://localhost')->permittedFor('http://localhost')->issuedAt($now)->canOnlyBeUsedAfter($now)->expiresAt($now->modify("+". self::$exp ." seconds"))->withClaim('data', $payload)->getToken(self::$algorithm, self::$secretKey)->toString();
+                            $json = [
+                                'status'=>'success',
+                                'data'=>
+                                [
+                                    'token'=>json_decode(json_encode($token),true),
+                                    'refresh'=>json_decode(json_encode($Rtoken),true)
+                                ],
+                                'number' => 1];
+                        }else{
+                            $payload = [ 'data'=>$resultDb, 'number'=> $number['data']+1,'exp'=>self::$exp];
+                            $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
+                            $token = $tokenBuilder->issuedBy('http://localhost')->permittedFor('http://localhost')->issuedAt($now)->canOnlyBeUsedAfter($now)->expiresAt($now->modify("+". self::$exp ." seconds"))->withClaim('data', $payload)->getToken(self::$algorithm, self::$secretKey)->toString();
+                            $number['data']+= 1;
+                            $json = [
+                                'status'=>'success',
+                                'data'=>
+                                [
+                                    'token'=>json_decode(json_encode($token),true),
+                                    'refresh'=>json_decode(json_encode($Rtoken),true),
+                                ],
+                                'number' => $number['data']];
+                        }
+                        $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+                        $stmt[1] = self::$con->prepare($query);
+                        $stmt[1]->bind_param("sssiss", $email, $Rtoken, $device, $number, $now1, $now1);
+                        $stmt[1]->execute();
+                        if ($stmt[1]->affected_rows > 0) {
+                                $stmt[1]->close();
+                                header('Content-Type: application/json');
+                                echo json_encode($json);
+                                return $json;
+                            }else{
+                                $stmt[1]->close();
+                                throw new \Exception(json_encode(['status'=>'error','message'=>'Error saving token','code'=>500]));
+                        }
+                    }
+                }else{
+                    $stmt[0]->close();
+                    throw new \Exception(json_encode(['status'=>'error','message'=>'Email tidak ditemukan']));
+                }
+            }
+        }catch(\Exception $e){
+            $error = $e->getMessage();
+            echo $error;
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                if($erorr['message']){
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $erorr['message'],
+                    );
+                }else{
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $erorr->message,
+                    );
+                }
+            }
+            return $responseData;
+        }
+    }
+    //decode token
+    public function decode($data){
+        try{
+            $email = $data['email'];
+            $tokenValue = $data['token'];
+            $opt = $data['opt'];
+            if(empty($email) || is_null($email)){
+                return ['status'=>'error','message'=>'email empty'];
+            }else if(empty($tokenValue) || is_null($tokenValue)){
+                return ['status'=>'error','message'=>'token empty'];
+            }else if(empty($opt) || is_null($opt)){
+                return ['status'=>'error','message'=>'option empty'];
+            }else{
+                $token = (new Parser(new JoseEncoder()))->parse($tokenValue);
+                if($opt == 'token'){
+                    if ($token->isExpired(new DateTimeImmutable())) {
+                        throw new Exception(json_encode(['status'=>'error','message'=>'Expired token']));
+                    }
+                    $decoded = $token->claims()->get('data');
+                    if(isset($decoded['data']['email'])){
+                        if($email == $decoded['data']['email']){
+                            return ['status'=>'success','data'=>$decoded, true];
+                        }else{
+                            return ['status'=>'error','message'=>'invalid email'];
+                        }
+                    }else{
+                        return ['status'=>'error','message'=>'invalid email'];
+                    }
+                    exit();
+                }else if($opt == 'refresh'){
+                    if ($token->isExpired(new DateTimeImmutable())) {
+                        throw new Exception(json_encode(['status'=>'error','message'=>'Expired token']));
+                    }
+                    $decoded = $token->claims()->get('data');
+                    if(isset($decoded['data']['email'])){
+                        if($email == $decoded['data']['email']){
+                            return ['status'=>'success','data'=>$decoded, true];
+                        }else{
+                            return ['status'=>'error','message'=>'invalid email'];
+                        }
+                    }else{
+                        return ['status'=>'error','message'=>'invalid email'];
+                    }
+                    // exit();
+                }else{
+                    return ['status'=>'error','message'=>'invalid data'];
+                }
+            }
+        }catch(\Exception $e){
+            $error = $e->getMessage();
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                if($erorr['message']){
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $erorr['message'],
+                    );
+                }else{
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $erorr->message,
+                    );
+                }
+            }
+            echo json_encode($responseData);
+            return $responseData;
+        }
+    }
+    public function updateTokenWebsite($data){
+        try{
+            if(empty($data) || is_null($data)){
+                return ['status'=>'error','message'=>'data empty'];
+            }else{
+                $payload = ['data'=>$data, 'exp'=>self::$exp];
+                $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
+                $now   = new DateTimeImmutable();
+                $token = $tokenBuilder->issuedBy('http://localhost')->permittedFor('http://example.org')->issuedAt($now)->canOnlyBeUsedAfter($now)->expiresAt($now->modify("+". self::$exp ." seconds"))->withClaim('data', $payload)->getToken(self::$algorithm, self::$secretKey)->toString();
+                // $token = JWT::encode($payload, $secretKey,'HS512');
+                return ['status'=>'success','data'=>json_decode(json_encode($token),true)];
+            }
+        }catch(UnexpectedValueException $e){
+            return ['status'=>'error','message'=>$e->getMessage()];
+        }
+    }
 //     //update refresh token website
 //     public function updateRefreshWebsite($email){
 //         try{
@@ -350,33 +563,43 @@ class JwtController{
 //         //     return ['status'=>'error','message'=>$e->getMessage()];
 //         // }
 //     }
-//     //delete refresh token website 
-//     public function deleteRefreshWebsite($email,$number = null){
-//         try{
-//             if(empty($email) || is_null($email)){
-//                 return ['status'=>'error','message'=>'email empty','code'=>400];
-//             // }else if(empty($number) || is_null($number)){
-//             //     return ['status'=>'error','message'=>'token empty','code'=>400];
-//             }else{
-//                 if($number == null){
-//                     $deleted = DB::table('refresh_token')->whereRaw("BINARY email LIKE '%$email%' AND device = 'website'")->delete();
-//                     if($deleted){
-//                         return ['status'=>'success','message'=>'success delete refresh token','code'=>200];
-//                     }else{
-//                         return ['status'=>'error','message'=>'failed delete refresh token','code'=>500];
-//                     }
-//                 }else{
-//                     $deleted = DB::table('refresh_token')->whereRaw("BINARY email LIKE '%$email%' AND number = $number AND device = 'website'")->delete();
-//                     if($deleted){
-//                         return ['status'=>'success','message'=>'success delete refresh token','code'=>200];
-//                     }else{
-//                         return ['status'=>'error','message'=>'failed delete refresh token','code'=>500];
-//                     }
-//                 }
-//             }
-//         }catch(\Exception $e){
-//             return ['status'=>'error','message'=>$e->getMessage()];
-//         }
-//     }
+    //delete refresh token website 
+    public function deleteRefreshWebsite($email,$number = null){
+        try{
+            if(empty($email) || is_null($email)){
+                return ['status'=>'error','message'=>'email empty','code'=>400];
+            }else{
+                if($number == null){
+                    $query = "DELETE FROM refresh_token WHERE BINARY email = ? AND device = 'website'";
+                    $stmt = self::$con->prepare($query);
+                    $stmt->bind_param('s', $email);
+                    $result = $stmt->execute();
+                    if ($result) {
+                        return ['status'=>'success','message'=>'success delete refresh token','code'=>200];
+                    }else{
+                        return ['status'=>'error','message'=>'failed delete refresh token','code'=>500];
+                    }
+                }else{
+                    $query = "DELETE FROM refresh_token WHERE BINARY email = ? AND device = 'website' AND number = ?";
+                    $stmt = self::$con->prepare($query);
+                    $stmt->bind_param('si', $email, $number);
+                    $result = $stmt->execute();
+                    if ($result) {
+                        return ['status'=>'success','message'=>'success delete refresh token','code'=>200];
+                    }else{
+                        return ['status'=>'error','message'=>'failed delete refresh token','code'=>500];
+                    }
+                    // $deleted = DB::table('refresh_token')->whereRaw("BINARY email LIKE '%$email%' AND number = $number AND device = 'website'")->delete();
+                    // if($deleted){
+                    //     return ['status'=>'success','message'=>'success delete refresh token','code'=>200];
+                    // }else{
+                    //     return ['status'=>'error','message'=>'failed delete refresh token','code'=>500];
+                    // }
+                }
+            }
+        }catch(\Exception $e){
+            return ['status'=>'error','message'=>$e->getMessage()];
+        }
+    }
 }
 ?>

@@ -11,53 +11,16 @@ function showLoading(){
 function closeLoading(){
     document.querySelector('div#preloader').style.display = 'none';
 }
-loginForm.onsubmit = function(event){
-    event.preventDefault();
-    const email = inpEmail.value;
-    const password = inpPassword.value;
-    if (email.trim() === '') {
-        showRedPopup('Email harus diisi !');
-        return;
-    }
-    if (password.trim() === '') {
-        showRedPopup('Password harus diisi !');
-        return;
-    }
-    showLoading();
-    var xhr = new XMLHttpRequest();
-    var requestBody = {
-        email: inpEmail.value,
-        password:inpPassword.value
-    };
-    xhr.open('POST',"/users/login")
-    // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(requestBody));
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                closeLoading();
-                var response = JSON.parse(xhr.responseText);
-                showGreenPopup(response, 'dashboard');
-            } else {
-                closeLoading();
-                var response = JSON.parse(xhr.responseText);
-                showRedPopup(response);
-            }
-        }
-    }
-    return false; 
+function dashboardPage(){
+    window.location.href = '/page/dashboard';
 }
-// function dashboardPage(){
-//     window.location.href = '/dashboard';
-// }
 function showGreenPopup(data, div = null){
     if(div == 'dashboard'){
         greenPopup.innerHTML = `
             <div class="bg" onclick="closePopup('green',true)"></div>
             <div class="kotak">
                 <div class="bunder1"></div>
-                <div class="icon"><img src="${window.location.origin}/assets/img/check.png" alt=""></div>
+                <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
             </div>
             <span class="closePopup" onclick="closePopup('green',true)">X</span>
             <label>${data.message}</label>

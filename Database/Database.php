@@ -19,8 +19,7 @@ class Database{
         if ($this->conn->connect_error) {
             throw new Exception("Tidak bisa membuat koneksi");
         } else {
-            
-            echo "nyambung cuyy<br>";
+            // echo "nyambung cuyy<br>";
         }
     }
     public function getConnection() {

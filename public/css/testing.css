@@ -1,0 +1,836 @@
+*{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* 118B3E */
+}
+body{
+    margin:0;
+    max-height: 100vh;
+    /* background: linear-gradient(180deg, #FC466B 0%, #3F5EFB 100%); */
+    background-color: white;
+}
+#greenPopup, #redPopup{
+    width: 500px; 
+    height: 100px; 
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+    /* left:0%;
+    bottom: 2%; */
+}
+#redPopup .bg, #greenPopup .bg{
+    width: 500px; 
+    height: 100px; 
+    position: absolute; 
+    border-radius: 18px; 
+}
+#greenPopup .kotak, #redPopup .kotak{
+    width: 50px; 
+    height: 50px; 
+    left: 5%; 
+    top:50%;
+    transform: translateY(-50%);
+    position: absolute;
+    border-radius: 50%;
+}
+#greenPopup .kotak .bunder1, #redPopup .kotak .bunder1{
+    width: 25px; 
+    height: 25px; 
+    position: absolute; 
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+}
+#greenPopup .kotak .icon {
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+    width: 15px;
+    height: 15px;
+    display: inline-block; 
+    position: relative; 
+}
+#greenPopup .kotak .icon img {
+    width: 100%;
+    height: 100%; 
+}
+#redPopup .kotak span{
+    left:50%;
+    top:50%;
+    transform: translate(-50%, -50%);
+    position: absolute; 
+    font-size: 30px; 
+    font-family: Inter; 
+    font-weight: 400; 
+}
+#greenPopup .closePopup, #redPopup .closePopup{
+    right: 5%; 
+    top: 50%;
+    transform: translateY(-50%); 
+    position: absolute; 
+    font-size: 25px;
+    font-weight: 600;
+    cursor: pointer;
+}
+#greenPopup label,#redPopup label{
+    left: 22%;
+    top:50%;
+    width:65%;
+    transform: translateY(-50%);
+    position: absolute; 
+    font-size: 20px; 
+    font-family: Inter; 
+    font-weight: 400; 
+    line-height: 30px; 
+    word-break: keep-all;
+    white-space: normal;
+}
+#redPopup .bg{
+    background: #FFE1E1; 
+}
+#redPopup .kotak{
+    background: #FFBBBB; 
+}
+#redPopup .bg, #redPopup .kotak .bunder1{
+    border: 2px #FF0000 solid;
+}
+#redPopup .kotak span, #redPopup .closePopup, #redPopup label{
+    color:#FF0000;
+}
+#greenPopup .bg{
+    background: #ECFFEB; 
+}
+#greenPopup .kotak{
+    background: #bcffb7; 
+}
+#greenPopup .bg, #greenPopup .kotak .bunder1{
+    border: 2px #01B701 solid;
+}
+#greenPopup .kotak span, #greenPopup .closePopup, #greenPopup label{
+    color:#01B701;
+}
+@media (min-width: 700px) and (max-width: 1000px) {
+    #greenPopup, #greenPopup .bg, #redPopup, #redPopup .bg{
+        width: 350px;
+        height:80px;
+    }
+    #greenPopup .bg, #redPopup .bg{
+        border-radius: 15px; 
+    }
+    #greenPopup .kotak, #redPopup .kotak{
+        width: 44px;
+        height: 44px;
+    }
+    #greenPopp .kotak .bunder1, #redPopup .kotak .bunder1{
+        width: 22px;
+        height: 22px;
+        border-width: 2px;
+    }
+    #greenPopup .kotak .icon{
+        width: 15px;
+        height: 15px;
+    }
+    #redPopup .kotak span{
+        font-size: 20px;
+    }
+    #greenPopup .closePopup, #redPopup .closePopup{
+        font-size: 20px;
+    }
+    #greenPopup label, #redPopup label{
+        line-height: 27px;
+        font-size: 19px;
+    }
+}
+@media (min-width:500px) and (max-width:700px){
+    #greenPopup, #greenPopup .bg, #redPopup, #redPopup .bg{
+        width: 300px;
+        height:70px;
+    }
+    #greenPopup .bg, #redPopup .bg{
+        border-radius: 15px; 
+        border-width: 1px;
+    }
+    #greenPopup .kotak, #redPopup .kotak{
+        width: 40px;
+        height: 40px;
+    }
+    #greenPopup .kotak .bunder1, #redPopup .kotak .bunder1{
+        width: 20px;
+        height: 20px;
+        border-width: 2px;
+    }
+    #greenPopup .kotak .icon{
+        width: 12px;
+        height: 12px;
+    }
+    #redPopup .kotak span{
+        font-size: 18px;
+    }
+    #greenPopup .closePopup, #redPopup .closePopup{
+        font-size: 18px;
+    }
+    #greenPopup label, #redPopup label{
+        line-height: 20px;
+        font-size: 16px;
+    }
+}
+@media (max-width:500px){
+    #greenPopup, #greenPopup .bg, #redPopup, #redPopup .bg{
+        width: 200px;
+        height:50px;
+    }
+    #greenPopup .bg, #redPopup .bg{
+        border-radius: 12px; 
+        border-width: 1px;
+    }
+    #greenPopup .kotak, #redPopup .kotak{
+        width: 30px;
+        height: 30px;
+    }
+    #greenPopup .kotak .bunder1, #redPopup .kotak .bunder1{
+        width: 15px;
+        height: 15px;
+        border-width: 1px;
+    }
+    #greenPopup .kotak .icon{
+        width: 10px;
+        height: 10px;
+    }
+    #redPopup .kotak span{
+        font-size: 15px;
+    }
+    #greenPopup .closePopup, #redPopup .closePopup{
+        font-size: 15px;
+    }
+    #greenPopup label, #redPopup label{
+        line-height: 13px;
+        font-size: 12px;
+    }
+}
+#preloader{
+    position: fixed;
+    inset: 0;
+    z-index:999999;
+    overflow: hidden;
+    background-color: #fff;
+    transition: all 0.6s ease-out;
+}
+#preloader::before{
+    content: '';
+    position: fixed;
+    top:calc(50% - 30px);
+    left:calc(50% - 30px);
+    border: 6px solid #fff;
+    border-color: #008374 transparent #008374 transparent;
+    border-radius: 50%;
+    width: 60px;    
+    height: 60px;
+    animation: loading 3s ease-in-out infinite;
+}
+@keyframes loading{
+    100%{
+        transform: rotate(1080deg);
+    }
+}
+div.loading{
+    position: absolute;
+    background-color: transparent;
+    width:100%;
+    height: 100%;
+    z-index: 100;
+}
+div.loading .bg{
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.25);
+    width: 100%;
+    height: 100%;
+}
+div.loading .content{
+    background-color: transparent;
+    z-index: 110;
+    border-radius: 25px;    
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+div.loading .content span{
+    color:#7373;
+    font-weight: 500;
+    font-size: 20px;
+    letter-spacing: 1px;
+    line-height: 200px;
+    text-transform: uppercase;
+    animation: text 3s ease-in-out infinite;
+}
+div.loading .content .ring{
+    width: 125px;
+    height: 125px;
+    position: absolute;
+    border-radius: 50%;
+    /* background-color: red; */
+    animation: ring 2s linear infinite;
+}
+div.loading .content .ring::before{
+    content: '';
+    position: absolute;
+    top:0;
+    left:0;
+    height: 100%;
+    width: 100%;
+}
+@keyframes text{
+    50%{
+        color:black;
+    }
+}
+@keyframes ring{
+    0%{
+        transform: rotate(0deg);
+        box-shadow: 1px 5px 2px #365c00;
+    }
+    50%{
+        transform: rotate(180deg);
+        box-shadow: 1px 5px 2px #18b201;
+    }
+    100%{
+        transform: rotate(360deg);
+        box-shadow: 1px 5px 2px #0456c8;
+    }
+}
+#otp{
+    position: absolute;
+    background-color: transparent;
+    width:100%;
+    height: 100%;
+    z-index: 100;
+}
+#otp .bg{
+    position: absolute;
+    background-color: #f6f9ff;
+    /* background-color: rgba(0, 0, 0, 0.25); */
+    width: 100%;
+    height: 100%;
+}
+#otp form{
+    background-color: white;
+    z-index: 110;
+    border-radius: 15px;    
+    position: absolute;
+    width:400px;
+    height: 300px;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+}
+#otp form h3{
+    position: relative;
+    top:5%;
+    left:10%;
+    margin: 0;
+    font-size: 25px;
+}
+#otp form p{
+    position: absolute;
+    left:50%;
+    transform: translateX(-50%);
+    font-size: 17px;
+    width:82%;
+    top:15%;
+    letter-spacing: 1px;
+    line-height: normal;
+}
+#otp form p:nth-child(3){
+    font-weight: 500;
+    top:36%;
+}
+#otp form .input{
+    position: absolute;
+    left:50%;
+    transform: translateX(-50%);
+    width :87%;
+    height:35px;
+    bottom: 35%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+#otp form .input input[type="text"]{
+    color: black;
+    background-color: rgba(255, 255, 255, 0.1);
+    text-align: center;
+    width:35px;
+    height: 35px;
+    border-radius: 10px;
+    border:2px solid rgba(0, 0, 0, 0.1);
+}
+#otp form input[type="submit"]{
+    color: white;
+    font-weight: 500;
+    font-size: 16px;
+    position: absolute;
+    background-color: #118B3E;
+    bottom:17%;
+    left:50%;
+    transform: translateX(-50%);
+    width:150px;
+    height: 30px;
+    border-radius: 20px;
+    border:none;
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+#otp form span{
+    position: absolute;
+    font-size: 14px;
+    left:10%;
+    bottom: 5%;
+}
+#otp form span a{
+    font-weight: 500;
+    cursor: pointer;
+    font-style:normal;
+    text-decoration: none;
+}
+#otp form span a:hover, #otp form span a:active{
+    color:#0456c8;
+}
+@media (min-width: 600px) and (max-width: 1000px) {
+    #otp form{
+        width:350px;
+        height:210px;
+    }
+    #otp form h3{
+        font-size: 19px;
+    }
+    #otp form p{
+        font-size: 14px;
+    }
+    #otp form .input{
+        height: 25px;
+    }
+    #otp form .input input[type="text"]{
+        width: 25px;
+        height: 25px;
+    }
+    #otp form input[type="submit"]{
+        font-size: 12px;
+        font-weight: 400;
+        width: 120px;
+        height: 22px;
+    }
+    #otp form span{
+        font-size: 13px;
+    }
+}
+@media(max-width:600px){
+    #otp form{
+        width:280px;
+        height:180px;
+    }
+    #otp form h3{
+        font-size: 16px;
+    }
+    #otp form p{
+        font-size: 12px;
+    }
+    #otp form .input{
+        height: 20px;
+    }
+    #otp form .input input[type="text"]{
+        width: 20px;
+        height: 20px;
+    }
+    #otp form input[type="submit"]{
+        font-size: 10px;
+        font-weight: 400;
+        width: 100px;
+        height: 20px;
+    }
+    #otp form span{
+        font-size: 10px;
+    }
+}
+div.tambahDevice, div.editPopup, div.deletePopup{
+    /* overflow: hidden; */
+    position: absolute;
+    background-color:transparent;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+}
+div.tambahDevice .bg, div.editPopup .bg, div.deletePopup .bg{
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+div.tambahDevice .content, div.deletePopup .bg, div.editPopup .content{
+    background-color: rgba(255, 255, 255, 0.30); 
+    z-index: 110;
+    border-radius: 25px; 
+    overflow: hidden;
+    /* background-color: red; */
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+    width: 30%;
+    height: 65%;
+    max-height: 90vh;
+}
+div.tambahDevice .content .header,div.editPopup .content .header{
+    position: absolute;
+    /* background-color: red; */
+    width: 100%; 
+    height: 10%; 
+    justify-content: center; 
+    align-items: center; 
+    display: inline-flex;
+}
+div.tambahDevice .content .header h5, div.editPopup .content .header h5{
+    color:black;
+    font-size: 25px;
+    font-weight: 500;
+}
+div.tambahDevice .content form,div.editPopup .content form{
+    /* background-color: yellow; */
+    position: absolute;
+    top: 10%;
+    left: 0;
+    width: 100%;
+    height:90%;
+    display: flex;
+    justify-content:flex-start;
+    align-items: center;
+    flex-direction: column;
+}
+div.editPopup .content form .row{
+    /* margin-bottom: 10px; */
+    display: flex;
+    flex-direction: column;
+    /* background-color: green; */
+    left: 5%;
+    width: 90%;
+    height: fit-content;
+}
+div.editPopup .content form .row:nth-child(1){
+    margin-top: 10px;
+}
+div.editPopup .content form .row:nth-child(2){
+    height: 30%;
+    /* position: relative; */
+    /* height: ; */
+}
+div.editPopup .content form .row:nth-child(3){
+    margin-top: 10px;
+    background-color:transparent;
+    height: 40%;
+}
+div.tambahDevice .content form .row label, div.editPopup .content form .row label{
+    position: relative;
+    top:0;
+    left:5%;
+}
+div.tambahDevice .content form .row input, div.editPopup .content form .row input{
+    font-size:medium;
+    position: relative;
+    /* display: block; */
+    border-radius: 5px;
+    /* left:5%; */
+    width:100%;
+    height: 60%;
+    border: none;
+    outline: none;
+}
+div.editPopup .content form .row textarea{
+    position: relative;
+    /* left:5%; */
+    width:100%;
+    height: 90%;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+div.editPopup .content form .row #drag-area{
+    border: 2px dashed black;
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+div.editPopup .content form .row #drag-area.active{
+    border: 2px solid black;
+}
+div.editPopup .content form .row #drag-area .icon{
+    font-size: 100px;
+    color:#fff;
+}
+div.editPopup .content form .row #drag-area header{
+    font-size: 30px;
+    font-weight: 500;
+}
+div.editPopup .content form .row #drag-area span{
+    font-size: 20px;
+    font-weight: 200;
+    margin:10px;
+}
+div.editPopup .content form .row #drag-area button{
+    width: 30%;
+    height: 17%;
+    border: none;
+    outline: none;
+    font-size: 20px;
+    font-weight: 300;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #3F5EFB;
+}
+div.editPopup .content form .row #drag-area img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+div.editPopup .content form .button{
+    width: 100%;
+    /* background-color: #FC466B; */
+    height: 10%;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+}
+div.editPopup .content form .button button{
+    font-size: medium;
+    font-weight: 400;
+    position: absolute;
+    background-color: #118B3E;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    top:50%;
+    transform: translateY(-50%);
+    width:30%;
+    height: 75%;
+}
+div.editPopup .content form .button button:nth-child(1){
+    left:10%;
+}
+div.editPopup .content form .button button:nth-child(2){
+    right:10%;
+}
+div.tambahDevice .content form .row{
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    background-color: green;
+    left: 5%;
+    width: 90%;
+    height: fit-content;
+}
+div.tambahDevice .content form .row label{
+    position:relative;
+    top:0;
+    left:5%;
+}
+div.tambahDevice .content form .row input#inpToken{
+    width: 70%;
+    /* height: 20%; */
+}
+div.tambahDevice .content form .row button#token{
+    position: relative;
+    top:0;
+    left:80%;
+    width:20%;
+    /* height: 5%; */
+    background-color: red;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+div.tambahDevice .content form .button{
+    width: 100%;
+    /* background-color: #FC466B; */
+    height: 10%;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+}
+div.tambahDevice .content form .button button{
+    font-size: medium;
+    font-weight: 400;
+    position: absolute;
+    background-color: #118B3E;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    top:50%;
+    transform: translateY(-50%);
+    width:30%;
+    height: 75%;
+}
+div.tambahDevice .content form .button button:nth-child(1){
+    left:10%;
+}
+div.tambahDevice .content form .button button:nth-child(2){
+    right:10%;
+}
+
+div#popup{
+    background-color: transparent;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+}
+div#popup .bg{
+    background-color: rgba(0, 0, 0, 0.15);
+    width: 100%;
+    height: 100%;
+}
+div#popup .content{
+    box-sizing: content-box;
+    position: absolute;
+    width: 350px;
+    /* width: fit-content; */
+    /* height: fit-content; */
+    /* max-width: 600px; */
+    height: 150px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background-color: red;
+    background-color: #118B3E;
+    border-radius: 15px;
+    overflow: hidden;
+}
+div#popup .content p{
+    position: absolute;
+    margin:0;
+    top: 5%;
+    width: 90%;
+    left:5%;
+    color: #fff;
+    /* font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; */
+    font-weight: 500;
+    letter-spacing: 1px;
+    font-size: 20px;
+    line-height: fit-content;
+    text-transform: capitalize;
+    /* overflow-wrap: break-word;
+    word-wrap:break-word; */
+    word-break: keep-all;
+    white-space: normal;
+}
+div#popup .content button.cancel{
+    background-color: #FF0000;
+    position: absolute;
+    left:10%;
+    bottom:10%;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    width: 100px;
+    height: 25px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 16px;
+}
+div#popup .content button.success{
+    /* background-color: #157347; */
+    background-color: white;
+    position: absolute;
+    right: 10%;
+    bottom:10%;
+    border: none;
+    outline: none;
+    width: 100px;
+    height: 25px;
+    border-radius: 40px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 16px;
+}
+div#popup .content button.single{
+    /* background-color: #157347; */
+    background-color: #fff;
+    border: none;
+    outline: none;
+    position: absolute;
+    bottom:8%;
+    left:50%;
+    transform: translateX(-50%);
+    border-radius: 40px;
+    width: 100px;
+    max-width: 150px;
+    height: 25px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 18px;
+}   
+@media (min-width: 500px) and (max-width: 1000px) {
+    div#popup .content{
+        width: 300px;
+        height: 100px;
+    }
+    div#popup .content p{
+        font-size: 14px;
+        font-weight: 450;
+    }
+    div#popup .content button.single {
+        width: 29%;
+        font-size: 15px;
+    }    
+    div#popup .content button.cancel {
+        width: 26%;
+        font-size: 14px;
+    }
+    div#popup .content button.success {
+        width: 26%;
+        font-size: 14px;
+    }
+}
+@media (max-width:500px){
+    div#popup .content{
+        border-radius: 10px;
+        width: 150px;
+        height: 80px;
+    }
+    div#popup .content p{
+        font-size: 10px;
+        font-weight: 400;
+    }
+    div#popup .content button.single {
+        width: 29%;
+        font-size: 8px;
+        height:20%;
+    }
+    div#popup .content button.cancel {
+        width: 26%;
+        height:18%;
+        font-size: 7px;
+    }
+    div#popup .content button.success {
+        width: 26%;
+        height:18%;
+        font-size: 7px;
+    }
+
+}

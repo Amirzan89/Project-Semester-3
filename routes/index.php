@@ -15,29 +15,32 @@ require_once $rootDir . '/Controllers/Auth/LoginController.php';
 require_once $rootDir . '/Controllers/Auth/RegisterController.php';
 require_once $rootDir . '/Controllers/Auth/JWTController.php';
 require_once $rootDir . '/Controllers/Mail/MailController.php';
-use Controllers\Auth\RegisterController;
+// use Controllers\Auth\RegisterController;
 Route::add('/','GET',function(){
     include('view/page/dashboard.php');
     exit();
-});
+},['Authenticate@handle']);
 Route::add('/login','GET',function(){
     include('view/page/login.php');
     exit();
-});
+},['Authenticate@handle']);
 Route::add('/register','GET',function(){
     include('view/page/register.php');
     exit();
-});
+},['Authenticate@handle']);
 Route::add('/forgot/password','GET',function(){
     include('view/page/forgotPassword.php');
     exit();
-});
-Route::add('/email', 'GET', 'MailController@send',[],[$_SERVER['REQUEST_URI']]);
-Route::add('/dashboard', 'GET', 'DashboardController@index');
-Route::add('/users/register','POST','RegisterController@register');
-Route::add('/users/login','POST','LoginController@login()');
+},['Authenticate@handle']);
+// Route::add('/email', 'GET', 'MailController@send',[],[$_SERVER['REQUEST_URI']]);
+Route::add('/dashboard', 'GET', 'DashboardController@index',['Authenticate@handle']);
+// Route::add('/','GET','');
+Route::add('/users/register','POST','RegisterController@register',['Authenticate@handle']);
+Route::add('/users/login','POST','LoginController@login',['Authenticate@handle']);
 Route::add('/auth/redirect','GET','LoginController@redirectToProvider');
 Route::add('/auth/google','GET','LoginController@handleProviderCallback');
+Route::add('/token/get','POST','JwtController@createJWTWebsite');
+Route::add('/token/decode','POST','JwtController@decode');
 // Dispatch the request
 Route::dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 class Route{
@@ -53,7 +56,12 @@ class Route{
         ];
     }
     public static function dispatch($uri, $method, $data=null, $uriData=null){
-        $uri = ltrim($uri, '/');
+        $query = parse_url($uri, PHP_URL_QUERY);
+        parse_str($query, $queryParams);
+        // Extract the path from the URI
+        $path = parse_url($uri, PHP_URL_PATH);
+        $path = ltrim($path, '/');
+        // $uri = ltrim($uri, '/');
         $routeFound = false;
         $headers = getallheaders();
         // Get request body
@@ -78,7 +86,6 @@ class Route{
             }
             // Check if there is any regular form data (not file uploads)
             if (empty($requestData) && !empty($_POST)) {
-                // echo 'data ';
                 // Regular form data (not file uploads) will be available in $_POST
                 $requestData = $_POST;
             }
@@ -89,24 +96,33 @@ class Route{
         } else {
             $requestData = [];
         }
-        $cookies = $_COOKIE;
-        // echo 'ganbutttt';
         foreach (self::$routes as $route) {
-            if ($route['uri'] === $uri && $route['method'] === $method) {
+            if ($route['uri'] === $path && $route['method'] === $method) {
                 $routeFound = true;
                 // Apply middlewares
+                $middlewareResults = [];
                 foreach ($route['middlewares'] as $middleware) {
-                    $middlewareResult = call_user_func($middleware);
-                    if ($middlewareResult !== true) {
-                        // Middleware returned something other than true (e.g., error message)
-                        echo $middlewareResult;
+                    $middlewareClosure = function ($requestData, $data) use ($middleware) {
+                        $parts = explode('@', $middleware);
+                        $controllerName = $parts[0];
+                        $methodName = $parts[1];
+                        $controller = new $controllerName();
+                        return call_user_func_array([$controller, $methodName], [$requestData, $data]);
+                    };
+                    $middlewareResult = $middlewareClosure($requestData, ['uri'=>$_SERVER['REQUEST_URI'],'method'=>$_SERVER['REQUEST_METHOD']]);
+                    $middlewareResults[] = $middlewareResult;
+                    if($middlewareResult['status'] == 'error'){
+                        $middlewareResult['code'] ? http_response_code($middlewareResult['code']) : http_response_code(400);
+                        echo $middlewareResult['message'];
                         return;
                     }
                 }
+                $requestData = [
+                    'middleware'=>$middlewareResults,
+                    'request'=>$requestData
+                ];
                 // Call the controller or closure
                 $callback = $route['callback'];
-                // echo $callback instanceof Closure;
-                // return;
                 if ($callback instanceof Closure) {
                     call_user_func($callback);
                 } else {
@@ -114,12 +130,17 @@ class Route{
                     $controllerName = $parts[0];
                     $methodName = $parts[1];
                     $controller = new $controllerName();
-                    call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI']]);
+                    if($methodName == 'handleProviderCallback'){
+                        call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $_GET]);
+                    }else{
+                        call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI']]);
+                    }
                 }
             }
         }
         if (!$routeFound) {
             http_response_code(404);
+            echo 'random';
             include('view/page/PageNotFound.php');
             exit();
         }

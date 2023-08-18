@@ -2,6 +2,8 @@
 namespace Controllers;
 use Database\Database;
 use Controllers\Mail\MailController;
+use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 // use Exception;
 class UserController{
     private static $database;
@@ -52,11 +54,12 @@ class UserController{
                     return ['status'=>'error','message'=>'Akun Gagal Dibuat'];
                 }
             }else if('google'){
-                $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
-                $query = "INSERT INTO users (email,password, nama, email_verified) VALUES (?, ?, ?, ?)";
+                $hashedPassword = Hash::make($data['password']);
+                $query = "INSERT INTO users (email,password, nama, email_verified, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
                 $verified = false;
                 $stmt = self::$con->prepare($query);
-                $stmt->bind_param("sssb", $data['email'], $hashedPassword, $data['nama'],$verified);
+                $now = Carbon::now('Asia/Jakarta');
+                $stmt->bind_param("sssbss", $data['email'], $hashedPassword, $data['nama'],$verified, $now, $now);
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
                     $email = self::$mailController->createVerifyEmail($data);
@@ -124,12 +127,11 @@ class UserController{
         //         }
         //     }
     public function getUser($email, $data){
-        $database = Database::getInstance();
-        $con = $database->getConnection();
+        // $database = Database::getInstance();
+        // $con = $database->getConnection();
         $columns = implode(', ', $data); // Convert the array of columns to a comma-separated string
-        $query = "SELECT $columns FROM users WHERE BINARY email LIKE CONCAT('%', ?, '%') LIMIT 1";
-        $stmt = $con->prepare($query);
-        $email = '%' . $email . '%';
+        $query = "SELECT $columns FROM users WHERE BINARY email = ? LIMIT 1";
+        $stmt = self::$con->prepare($query);
         $stmt->bind_param('s', $email);
         $stmt->execute();
         $bindResultArray = [];
@@ -146,6 +148,22 @@ class UserController{
         }
         $stmt->close();
         return $result;
+    }
+    public function isExistUser($email){
+        if(empty($email) || is_null($email)){
+            return ['status'=>'error','message'=>'email empty'];
+        }else{
+            $query = "SELECT nama FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt = self::$con->prepare($query);
+            $stmt->bind_param('s', $email);
+            $stmt->execute();
+            $stmt->bind_result($email);
+            if ($stmt->fetch()) {
+                return ['status'=>'success','data'=>true];
+            }else{
+                return ['status'=>'success','data'=>false];
+            }
+        }
     }
 }
 ?>

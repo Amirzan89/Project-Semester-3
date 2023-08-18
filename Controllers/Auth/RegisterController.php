@@ -43,8 +43,7 @@ class RegisterController{
             $email = $data['email'];
             $pass = $data["password"];
             $pass1 = $data["password_confirm"];
-            $query = "SELECT nama FROM users WHERE BINARY email LIKE ?";
-            $email = '%' . $email . '%';
+            $query = "SELECT nama FROM users WHERE BINARY email = ?";
             $stmt = self::$con->prepare($query);
             $stmt->bind_param('s', $email);
             $stmt->execute();

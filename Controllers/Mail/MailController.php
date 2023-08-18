@@ -4,6 +4,7 @@ require_once 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Database\Database;
+use Carbon\Carbon;
 class MailController{ 
     protected $mail;
     private static $database;
@@ -11,7 +12,7 @@ class MailController{
     private static $timeZone;
     public function __construct(){
         try {
-            self::$timeZone = new \DateTimeZone('Asia/Jakarta');
+            self::$timeZone = 'Asia/Jakarta';
             self::$database = Database::getInstance();
             self::$con = self::$database->getConnection();
             $this->mail = new PHPMailer(true);
@@ -95,8 +96,7 @@ class MailController{
             if(empty($email) || is_null($email)){
                 return ['status'=>'error','message'=>'Email wajib di isi'];
             }else{
-                $dateTime = new \DateTime('now', self::$timeZone);
-                $currentDateTime = $dateTime->format('Y-m-d H:i:s');
+                $currentDateTime = Carbon::now(self::$timeZone);
                 $query = "SELECT nama FROM users WHERE BINARY email LIKE ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $email1 = '%' . $email . '%';
@@ -108,7 +108,7 @@ class MailController{
                 if ($stmt[0]->fetch()) {
                     $stmt[0]->close();
                     //create timeout
-                    $subminute = $dateTime->sub(new \DateInterval('PT15M'))->format('Y-m-d H:i:s');
+                    $subminute = $currentDateTime->subMinutes(15);
                     $query = "SELECT updated_at FROM verify WHERE BINARY email LIKE ? AND description = ? LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
                     $description = 'verifyEmail';
@@ -193,8 +193,7 @@ class MailController{
                 return ['status'=>'error','message'=>'Email empty'];
             }else{
                 //checking if email exist in table user
-                $dateTime = new \DateTime('now', self::$timeZone);
-                $currentDateTime = $dateTime->format('Y-m-d H:i:s');
+                $currentDateTime = Carbon::now(self::$timeZone);
                 $query = "SELECT nama FROM users WHERE BINARY email LIKE ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $email1 = '%' . $email . '%';
@@ -207,7 +206,7 @@ class MailController{
                     //checking if email exist in table verify
                     $stmt[0]->close();
                     //create timeout
-                    $subminute = $dateTime->sub(new \DateInterval('PT15M'))->format('Y-m-d H:i:s');
+                    $subminute = $currentDateTime->subMinutes(15);
                     $query = "SELECT updated_at FROM verify WHERE BINARY email LIKE ? AND description = ? LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
                     $description = 'changePass';
