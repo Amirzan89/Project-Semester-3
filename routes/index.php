@@ -32,9 +32,9 @@ Route::add('/forgot/password','GET',function(){
     include('view/page/forgotPassword.php');
     exit();
 },['Authenticate@handle']);
-// Route::add('/email', 'GET', 'MailController@send',[],[$_SERVER['REQUEST_URI']]);
+Route::add('/verify/password','GET','UserController@getChangePass');
+Route::add('/verify/password','POST','UserController@changePassEmail');
 Route::add('/dashboard', 'GET', 'DashboardController@index',['Authenticate@handle']);
-// Route::add('/','GET','');
 Route::add('/users/register','POST','RegisterController@register',['Authenticate@handle']);
 Route::add('/users/login','POST','LoginController@login',['Authenticate@handle']);
 Route::add('/auth/redirect','GET','LoginController@redirectToProvider');
@@ -58,10 +58,8 @@ class Route{
     public static function dispatch($uri, $method, $data=null, $uriData=null){
         $query = parse_url($uri, PHP_URL_QUERY);
         parse_str($query, $queryParams);
-        // Extract the path from the URI
         $path = parse_url($uri, PHP_URL_PATH);
         $path = ltrim($path, '/');
-        // $uri = ltrim($uri, '/');
         $routeFound = false;
         $headers = getallheaders();
         // Get request body
@@ -96,10 +94,13 @@ class Route{
         } else {
             $requestData = [];
         }
+        $routeFound = false;
         foreach (self::$routes as $route) {
-            if ($route['uri'] === $path && $route['method'] === $method) {
+            break;
+            $lastSlashPos = strrpos($path, '/');
+            $path1 = substr($uri, 1, $lastSlashPos);
+            if ($route['uri'] === $path1 && $route['method'] === $method) {
                 $routeFound = true;
-                // Apply middlewares
                 $middlewareResults = [];
                 foreach ($route['middlewares'] as $middleware) {
                     $middlewareClosure = function ($requestData, $data) use ($middleware) {
@@ -132,6 +133,8 @@ class Route{
                     $controller = new $controllerName();
                     if($methodName == 'handleProviderCallback'){
                         call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $_GET]);
+                    }else if(($methodName == 'getChangePass' || $methodName == 'verifyEmail')&& $route['method'] == 'GET'){
+                        call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $_GET]);
                     }else{
                         call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI']]);
                     }
@@ -140,7 +143,17 @@ class Route{
         }
         if (!$routeFound) {
             http_response_code(404);
-            echo 'random';
+            $query = parse_url($uri, PHP_URL_QUERY);
+            parse_str($query, $queryParams);
+            $path = parse_url($uri, PHP_URL_PATH);
+            $path = ltrim($path, '/');
+            echo '<br>path terserah '.$path;
+            $lastSlashPos = strrpos($path, '/');
+            $path1 = substr($uri, 1, $lastSlashPos);
+            echo '<br>pathh relativeee '.$path1;
+            $randomString = ltrim(substr($path, strrpos($path, '/')),'/');
+            echo '<br>pathh aneh '.$randomString;
+            // echo "<br>path asuu <br>".$path;
             include('view/page/PageNotFound.php');
             exit();
         }

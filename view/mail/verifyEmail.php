@@ -7,7 +7,16 @@
     <title>home</title>
 </head>
 <body>
-    <p>aloginvianvnavnaiv</p>
-    <h1>gabutttt</h1>
+    <div>
+        <div class="bg"></div>
+        <div class="content">
+            <h1>Verify Email</h1>
+            <span>Berikut ini adalah kode untuk verifikasi email anda</span>
+            <div class="otp">
+                <p>codee otp   %CODE%</p>
+            </div>
+            <p>atau link untuk verifikasi email anda <a href="%LINK%?email=%EMAIL%">Verifikasi Email</a></p>
+        </div>
+    </div>
 </body>
 </html>

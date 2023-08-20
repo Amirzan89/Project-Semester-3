@@ -11,24 +11,19 @@ class ChangePasswordController{
             }else if(!isset($nama) || empty($nama)){
                 throw new Exception(json_encode(['status'=>'error','message'=>'Nama tidak boleh kosong',    'code'=>400]));
             }else{
-            // $costum = new Request();
-            // $costum->replace(['email'=>$decoded['data'][0][0]['email'],'mode'=>'count']);
-            // $total = $deviceController->getDevice($costum,$device)->getData();
-            // return view('page.dashboard',['total'=>$total->data, 'penuh'=>0, 'kosong'=>0,'email'=>$decoded['data']   [0][0]['email'],'nama'=>$decoded['data'][0][0]['nama'],'number'=>$number]);
-            $data = [
-                'email' => $email,
-                'nama' => $nama,
-                'div' => 'register',
-                'title' => 'Lupa Password',
-                'description' => 'changePass',
-                'code' => '',
-                'link' => ''
-            ];
-            
-            extract($data);
-            include('view/page/forgotPassword.php');
-            exit();
-            // return view('page.forgotPassword',['email'=>$email,'nama'=>$nama,'div'=>'register','title'=>'Lupa   Password','description'=>'changePass','code'=>'','link'=>'']);
+                $data = [
+                    'email' => $email,
+                    'nama' => $nama,
+                    'div' => 'register',
+                    'title' => 'Lupa Password',
+                    'description' => 'changePass',
+                    'code' => '',
+                    'link' => ''
+                ];
+
+                extract($data);
+                include('view/page/forgotPassword.php');
+                exit();
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -58,7 +53,7 @@ class ChangePasswordController{
         }
     }
     //register user using google
-    public function showVerify($data){
+    public function showRegisterGoogle($data){
         try{
             $email = $data['email'];
             $nama = $data['nama'];
@@ -72,15 +67,15 @@ class ChangePasswordController{
                 $data = [
                     'email' => $email,
                     'nama' => $nama,
-                    'div' => 'register',
-                    'title' => 'Lupa Password',
+                    'div' => 'verifyDiv',
+                    'title' => 'Buat Password',
                     'description' => 'createUser',
                     'code' => '',
                     'link' => ''
                 ];
                 extract($data);
                 include('view/page/forgotPassword.php');
-                // return view('page.forgotPassword',['email'=>$email,'nama'=>$nama,'div'=>'verifyDiv','title'=>'Register Google','description'=>'createUser','code'=>'','link'=>'']);
+                exit();
             }
         }catch(Exception $e){
             $error = $e->getMessage();

@@ -13,6 +13,7 @@ class RegisterController{
     public function Register($data, $uri = null){
         try{
             $userController = new UserController();
+            $data = $data['request'];
             if (!isset($data['email']) || empty($data['email'])) {
                 throw new Exception(json_encode(['status'=>'error','message'=>'Email wajib di isi','code'=>400]));
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {

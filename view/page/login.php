@@ -43,11 +43,9 @@ if(!defined('APP')){
             <div class="wm"></div>
         </div>
     </div>
-    <!-- <div class="popup"></div> -->
     <div id="preloader" style="display: none;"></div>
     <div id="greenPopup" style="display:none"></div>
     <div id="redPopup" style="display:none"></div>
     <script src="/public/js/login.js"></script>
-    <!-- <script></script> -->
 </body>
 </html>

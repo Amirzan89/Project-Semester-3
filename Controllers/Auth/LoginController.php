@@ -6,6 +6,7 @@ use Controllers\UserController;
 require_once 'Controllers/Auth/JWTController.php';
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Hash;
+use Google\Service\Oauth2;
 use Database\Database;
 class LoginController{ 
     private static $database;
@@ -101,10 +102,6 @@ class LoginController{
             exit();
         }
     }
-    // $client_id = 'your_google_client_id';
-    // $client_secret = 'your_google_client_secret';
-    // $redirect_uri = 'your_redirect_uri';
-    // Function to redirect user to Google's authorization page
     function redirectToProvider(){
         // global $client_id, $redirect_uri;
         $client_id = $_SERVER['GOOGLE_CLIENT_ID'];
@@ -118,56 +115,6 @@ class LoginController{
         exit();
     }
     
-    // Function to handle the callback after user grants permission
-    // public function handleProviderCallback(){
-    //     global $client_id, $client_secret, $redirect_uri;
-    
-    //     if (isset($_GET['code'])) {
-    //         $code = $_GET['code'];
-        
-    //         // Exchange the authorization code for an access token
-    //         $token_url = "https://accounts.google.com/o/oauth2/token";
-    //         $params = [
-    //             'code' => $code,
-    //             'client_id' => $client_id,
-    //             'client_secret' => $client_secret,
-    //             'redirect_uri' => $redirect_uri,
-    //             'grant_type' => 'authorization_code'
-    //         ];
-        
-    //         $ch = curl_init();
-    //         curl_setopt($ch, CURLOPT_URL, $token_url);
-    //         curl_setopt($ch, CURLOPT_POST, true);
-    //         curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-    //         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    //         $response = curl_exec($ch);
-    //         curl_close($ch);
-        
-    //         $access_token_data = json_decode($response, true);
-        
-    //         if (isset($access_token_data['access_token'])) {
-    //             // Use the access token to fetch user information
-    //             $access_token = $access_token_data['access_token'];
-    //             $user_info_url = "https://www.googleapis.com/oauth2/v2/userinfo";
-    //             $headers = [
-    //                 "Authorization: Bearer {$access_token}"
-    //             ];
-            
-    //             $ch = curl_init();
-    //             curl_setopt($ch, CURLOPT_URL, $user_info_url);
-    //             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    //             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    //             $user_info_response = curl_exec($ch);
-    //             curl_close($ch);
-            
-    //             $user_info = json_decode($user_info_response, true);
-    //         }
-    //     }
-    // }
-    // public function redirectToProvider(){
-    //     return Socialite::driver('google')->redirect();
-    // }
-    // $user_google = Socialite::driver('google')->stateless()->user();
     public function handleProviderCallback($data, $uri=null, $param){
         try {
             $data = $data['request'];
@@ -175,15 +122,13 @@ class LoginController{
             $changePasswordController = new ChangePasswordController();
             $client = new Google_Client();
             $client->setClientId($_SERVER['GOOGLE_CLIENT_ID']);
-            $client->setClientSecret($_SERVER['GOOGLE_CLIENT_SECRET']);
+            $client->setClientSecret($_SERVER['GOOGLE_APP_SECRET']);
+            $client->addScope('https://www.googleapis.com/auth/drive');
             $client->setRedirectUri($_SERVER['GOOGLE_REDIRECT']);
-            $client->addScope('email');
-            $client->addScope('profile');
             $token = $client->fetchAccessTokenWithAuthCode($param['code']);
-            // $client->setAccessToken($token);
-            // Get user info from the Google API
-            $googleService = new Google_Service_Oauth2($token);
-            $user_google = $googleService->userinfo->get();
+            $client->setAccessToken($token['access_token']);
+            $google_oauth = new Google_Service_Oauth2($client);
+            $user_google = $google_oauth->userinfo->get();
             $query = "SELECT nama FROM users WHERE BINARY email LIKE ?";
             $email = '%' . $user_google->getEmail() . '%';
             $stmt = self::$con->prepare($query);
@@ -265,7 +210,7 @@ class LoginController{
             //if user dont exist in database
             }else{
                 $data = ['email'=>$user_google->getEmail(), 'nama'=>$user_google->getName()];
-                return $changePasswordController->showVerify($data);
+                return $changePasswordController->showRegisterGoogle($data);
             }
         } catch (\Exception $e) {
             echo $e->getTraceAsString();

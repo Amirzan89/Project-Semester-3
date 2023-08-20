@@ -461,7 +461,6 @@ class JwtController{
                     }else{
                         return ['status'=>'error','message'=>'invalid email'];
                     }
-                    exit();
                 }else if($opt == 'refresh'){
                     if ($token->isExpired(new DateTimeImmutable())) {
                         throw new Exception(json_encode(['status'=>'error','message'=>'Expired token']));

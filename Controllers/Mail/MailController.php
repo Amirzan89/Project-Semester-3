@@ -37,11 +37,31 @@ class MailController{
             if($data['description'] == 'verifyEmail'){
                 $filePath = __DIR__ . '/../../view/mail/verifyEmail.php';
                 $emailBody = file_get_contents($filePath);
-                $this->mail->Body = $emailBody;
+                $emailData = [
+                    'EMAIL' => $data['email'],
+                    'CODE' => $data['code'],
+                    'LINK' => $data['link'],
+                ];
+                $emailTemplate = $emailBody; 
+                foreach ($emailData as $key => $value) {
+                    $placeholder = '%' . strtoupper($key) . '%';
+                    $emailTemplate = str_replace($placeholder, $value, $emailTemplate);
+                }
+                $this->mail->Body = $emailTemplate;
             }else if($data['description'] == 'changePass'){
                 $filePath = __DIR__ . '/../../view/mail/forgotPassword.php';
                 $emailBody = file_get_contents($filePath);
-                $this->mail->Body = $emailBody;
+                $emailData = [
+                    'EMAIL' => $data['email'],
+                    'CODE' => $data['code'],
+                    'LINK' => $data['link'],
+                ];
+                $emailTemplate = $emailBody; 
+                foreach ($emailData as $key => $value) {
+                    $placeholder = '%' . strtoupper($key) . '%';
+                    $emailTemplate = str_replace($placeholder, $value, $emailBody);
+                }
+                $this->mail->Body = $emailTemplate;
             }
             $this->mail->send();
             echo 'Email sent successfully!';
