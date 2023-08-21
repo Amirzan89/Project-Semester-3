@@ -1,5 +1,9 @@
 <?php 
-$tPath = app()->environment('local') ? '' : '/public/';
+if(!defined('APP')){
+    http_response_code(404);
+    include('view/page/PageNotFound.php');
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,30 +11,27 @@ $tPath = app()->environment('local') ? '' : '/public/';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ isset($title) ? $title : 'Default Title' }}</title>
-    <link href="{{ asset($tPath.'css/page/notification.css') }}" rel="stylesheet">
+    <title><?php isset($title) ? $title : 'Default Title' ?></title>
+    <link rel="stylesheet" href="/public/css/notification.css">
+    <!-- <link href="{{ asset($tPath.'css/page/notification.css') }}" rel="stylesheet"> -->
 </head>
 <body>
-    @if(app()->environment('local'))
-        <script>
-            var tPath = '';
-        </script>
-    @else
-        <script>
-            var tPath = '/public/';
-        </script>
-    @endif
-    @if($div == 'green')
+    <?php if($div == 'green'){ ?>
         <div id="greenPopup" style="display:block;">
             <div class="bg" onclick="closePopup('green',true)"></div>
             <div class="kotak">
                 <div class="bunder1"></div>
-                <img src="{{ asset($tPath.'assets/img/check.png') }}" alt="">
+                <img src="/public/img/icon/check.png" alt="">
             </div>
             <span class="closePopup" onclick="closePopup('green',true)">X</span>
-            <label>{{ isset($message) ? $message : 'random ' }}</label>
+            <label><?php if(isset($message)){
+                echo $message;
+            }else{
+                echo 'Not Found ';
+            }
+            ?></label>
         </div>
-        @elseif($div == 'red')
+        <?php }else if($div == 'red'){ ?>
         <div id="redPopup" style="display:block;">
             <div class="bg" onclick="closePopup('red',true)"></div>
             <div class="kotak">
@@ -38,10 +39,16 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 <span>!</span>
             </div>
             <span class="closePopup" onclick="closePopup('red',true)">X</span>
-            <label>{{ isset($message) ? $message : 'Not Found ' }}</label>
+            <label><?php if(isset($message)){
+                echo $message;
+            }else{
+                echo 'Not Found ';
+            }
+            ?></label>
+
         </div>
-    @endif
-    @if(isset($div1) && $div1 == 'dashboard')
+    <?php }
+        if(isset($div1) && $div1 == 'dashboard'){ ?>
         <script>
             const delay = 3000;
             function dashboardPage(){
@@ -49,6 +56,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
             }
             setTimeout(dashboardPage, delay);
         </script>
-    @endif
+    <?php } ?>
 </body>
 </html>

@@ -1,8 +1,5 @@
 <?php
 namespace App\Http\Controllers\Website;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Exception;
 class NotificationPageController
 { 
     public function showSuccessVerifyEmail($message){

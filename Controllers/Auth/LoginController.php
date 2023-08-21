@@ -1,8 +1,9 @@
 <?php
 $rootDir = dirname(dirname(__DIR__));
 require_once $rootDir . '/Controllers/Website/ChangePasswordController.php';
-use Controllers\UserController;
+// use Controllers\UserController;
 // use Controllers\Auth\JwtController;
+require_once 'Controllers/UserController.php';
 require_once 'Controllers/Auth/JWTController.php';
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Hash;

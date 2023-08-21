@@ -1,7 +1,7 @@
 <?php 
-namespace Controllers;
+// namespace Controllers;
 require_once $rootDir . '/Controllers/Website/ChangePasswordController.php';
-require_once $rootDir . '/Controllers/Website/NoficationPageController.php';
+require_once $rootDir . '/Controllers/Website/NotificationPageController.php';
 use Database\Database;
 use Controllers\Mail\MailController;
 use Illuminate\Support\Facades\Hash;
@@ -25,7 +25,7 @@ class UserController{
     public function createUser($data, $opt){
         try{
             if (!isset($data['email']) || empty($data['email'])) {
-                throw new \Exception(json_encode(['status'=>'error','message'=>'Email wajib di isi','code'=>400]));
+                throw new Exception(json_encode(['status'=>'error','message'=>'Email wajib di isi','code'=>400]));
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
                 throw new Exception(json_encode(['status'=>'error','message'=>'Email invalid','code'=>400]));
             }
@@ -34,17 +34,17 @@ class UserController{
             } elseif (strlen($data['password']) < 8) {
                 throw new Exception(json_encode(['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400]));
             } elseif (strlen($data['password']) > 25) {
-                throw new \Exception(json_encode(['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400]));
+                throw new Exception(json_encode(['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400]));
             } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
-                throw new \Exception(json_encode(['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
             }
             // Validate 'nama' field
             if (!isset($data['nama']) || empty($data['nama'])) {
-                throw new \Exception(json_encode(['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400]));
             }
             if($opt == 'register'){
-                $hashedPassword = Hash::make($data['password']);
-                $query = "INSERT INTO users (email,password, nama, email_verified, level,created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+                $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+                $query = "INSERT INTO users (email,password, nama, email_verified, level,created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $now = Carbon::now('Asia/Jakarta');
                 $verified = false;
                 $stmt = self::$con->prepare($query);
@@ -178,30 +178,31 @@ class UserController{
     }
     public function getChangePass($data, $uri, $method, $param){
         try{
+            $data = $data['request'];
+            // echo '<br>change pass<br>';
             $changePassPage = new ChangePasswordController();
             $notificationPage = new NotificationPageController();
-            $validator = Validator::make($data, [
-                'email'=>'required|email',
-                'code' =>'nullable'
-            ],[
-                'email.required'=>'Email wajib di isi',
-                'email.email'=>'Email yang anda masukkan invalid',
-            ]);
-            if ($validator->fails()) {
-                $errors = [];
-                foreach ($validator->errors()->toArray() as $field => $errorMessages) {
-                    $errors = $errorMessages[0];
-                }
-                throw new Exception(json_encode(['status' => 'error', 'message' => $errors]));
-            }
-            $email = $data['email'];
+            // $validator = Validator::make($data, [
+            //     'email'=>'required|email',
+            //     'code' =>'nullable'
+            // ],[
+            //     'email.required'=>'Email wajib di isi',
+            //     'email.email'=>'Email yang anda masukkan invalid',
+            // ]);
+            // if ($validator->fails()) {
+            //     $errors = [];
+            //     foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+            //         $errors = $errorMessages[0];
+            //     }
+            //     throw new Exception(json_encode(['status' => 'error', 'message' => $errors]));
+            // }
             $code = $data['code'];
             //get path
             $path = parse_url($uri, PHP_URL_PATH);
             $path = ltrim($path, '/');
             //get relative path 
             $lastSlashPos = strrpos($path, '/');
-            $path1 = substr($uri, 1, $lastSlashPos);
+            $path1 = substr($uri, 0, $lastSlashPos+1);
             $email = $param['email'];
             if($path1 == '/verify/password' && $method == 'GET'){
                 //get link 
@@ -254,26 +255,25 @@ class UserController{
                                 extract($data);
                                 include('view/page/forgotPassword.php');
                                 exit();
-                                // return view('page.forgotPassword',['email'=>$email, 'title'=>'Reset Password','link'=>$link,'code'=>'','div'=>'verifyDiv','description'=>'changePass']);
                             }else{
                                 $stmt[3]->close();
                                 $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'changePass'";
                                 $stmt = self::$con->prepare($query);
                                 $stmt->bind_param('s', $email);
                                 $result = $stmt->execute();
-                                return $notificationPage->showFailResetPass($data,'Link Expired');
+                                return $notificationPage->showFailResetPass('Link Expired');
                             }
                         }else{
                             $stmt[2]->close();
-                            return $notificationPage->showFailResetPass($data,'Link invalid');
+                            return $notificationPage->showFailResetPass('Link invalid');
                         }
                     }else{
                         $stmt[1]->close();
-                        return $notificationPage->showFailResetPass($data,'Email invalid');
+                        return $notificationPage->showFailResetPass('Email invalid');
                     }
                 }else{
                     $stmt[0]->close();
-                    return $notificationPage->showFailResetPass($data,'Link invalid');
+                    return $notificationPage->showFailResetPass('Link invalid');
                 }
             }else{
                 $query = "SELECT id FROM verify WHERE BINARY email = ? LIMIT 1";
@@ -734,32 +734,35 @@ class UserController{
     }
     public function verifyEmail($data,$uri, $method, $param){
         try{
+            $data = $data['request'];
             $notificationPage = new NotificationPageController();
-            $validator = Validator::make($data, [
-                'email'=>'required|email',
-                'code' =>'nullable'
-            ],[
-                'email.required'=>'Email wajib di isi',
-                'email.email'=>'Email yang anda masukkan invalid',
-            ]);
-            if ($validator->fails()) {
-                $errors = [];
-                foreach ($validator->errors()->toArray() as $field => $errorMessages) {
-                    $errors = $errorMessages[0]; 
-                }
-                throw new Exception(json_encode(['status' => 'error', 'message' => $errors]));
-            }
-            $email = $data['email'];
+            // $validator = Validator::make($data, [
+            //     'email'=>'required|email',
+            //     'code' =>'nullable'
+            // ],[
+            //     'email.required'=>'Email wajib di isi',
+            //     'email.email'=>'Email yang anda masukkan invalid',
+            // ]);
+            // if ($validator->fails()) {
+            //     $errors = [];
+            //     foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+            //         $errors = $errorMessages[0]; 
+            //     }
+            //     throw new Exception(json_encode(['status' => 'error', 'message' => $errors]));
+            // }
+            echo '<br>entok <br>';
             $code = $data['code'];
             //get path
             $path = parse_url($uri, PHP_URL_PATH);
             $path = ltrim($path, '/');
             //get relative path 
             $lastSlashPos = strrpos($path, '/');
-            $path1 = substr($uri, 1, $lastSlashPos);
+            $path1 = substr($uri, 0, $lastSlashPos+1);
             $email = $param['email'];
             if($path1 == '/verify/email' && $method == 'GET'){
+                echo "gae link \n";
                 $link = ltrim(substr($path, strrpos($path, '/')),'/');
+                echo 'random string  '.$link;
                 $query =  "SELECT id FROM verify WHERE BINARY link = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $link);
@@ -806,17 +809,16 @@ class UserController{
                                 //update users
                                 if ($stmt[4]->fetch()) {
                                     $stmt[4]->close();
-                                // if(is_null(DB::table('users')->whereRaw("BINARY email = ?",[$email])->update(['email_verified'=>true]))){
                                     $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'verifyEmail'";
                                     $stmt[5] = self::$con->prepare($query);
                                     $stmt[5]->bind_param('s', $email);
                                     $result = $stmt[5]->execute();
                                     if($result){
                                         $stmt[5]->close();
-                                        return $notificationPage->showSuccessVerifyEmail($data, 'Verifikasi email berhasil silahkan login');
+                                        return $notificationPage->showSuccessVerifyEmail('Verifikasi email berhasil silahkan login');
                                     }else{
                                         $stmt[5]->close();
-                                        return $notificationPage->showFailVerifyEmail($data,'Error verifikasi Email',500);
+                                        return $notificationPage->showFailVerifyEmail('Error verifikasi Email',500);
                                     }
                                 }else{
                                     $stmt[4]->close();
@@ -829,21 +831,23 @@ class UserController{
                                 $stmt[4]->bind_param('s', $email);
                                 $result = $stmt[4]->execute();
                                 $stmt[4]->close();
-                                return $notificationPage->showFailVerifyEmail($data,'Link Expired');
+                                return $notificationPage->showFailVerifyEmail('Link Expired');
                             }
                         }else{
                             $stmt[2]->close();
-                            return $notificationPage->showFailVerifyEmail($data,'Link invalid');
+                            return $notificationPage->showFailVerifyEmail('Link invalid');
                         }
                     }else{
                         $stmt[1]->close();
-                        return $notificationPage->showFailVerifyEmail($data,'email invalid');
+                        return $notificationPage->showFailVerifyEmail('email invalid');
                     }
                 }else{
                     $stmt[0]->close();
-                    return $notificationPage->showFailVerifyEmail($data,'Link invalid');
+                    echo '  link gk kenek';
+                    return $notificationPage->showFailVerifyEmail('Link invalid');
                 }
             }else{
+                echo 'ngebugg link';
                 $query =  "SELECT id FROM verify WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $email);
@@ -915,6 +919,7 @@ class UserController{
                 }
             }
         } catch (Exception $e) {
+            // echo $e->getTraceAsString();
             $error = $e->getMessage();
             $erorr = json_decode($error, true);
             if ($erorr === null) {

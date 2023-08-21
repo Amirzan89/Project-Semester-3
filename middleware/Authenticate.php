@@ -1,6 +1,6 @@
 <?php
 require_once 'Controllers/Auth/JWTController.php';
-use Controllers\UserController;
+require_once 'Controllers/UserController.php';
 class Authenticate
 {
     public function handle($request,$data = null){

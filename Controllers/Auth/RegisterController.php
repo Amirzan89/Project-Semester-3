@@ -71,6 +71,7 @@ class RegisterController{
                 throw new Exception(json_encode(['status'=>'error','message'=>'Email sudah digunakan','code'=>400]));
             }
         }catch(\Exception $e){
+            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $erorr = json_decode($error, true);
             if ($erorr === null) {

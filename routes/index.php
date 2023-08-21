@@ -17,23 +17,29 @@ require_once $rootDir . '/Controllers/Auth/JWTController.php';
 require_once $rootDir . '/Controllers/Mail/MailController.php';
 // use Controllers\Auth\RegisterController;
 Route::add('/','GET',function(){
+    // echo '<br>home page<br>';
     include('view/page/dashboard.php');
     exit();
 },['Authenticate@handle']);
 Route::add('/login','GET',function(){
+    // echo 'loggiiinn';
     include('view/page/login.php');
     exit();
 },['Authenticate@handle']);
 Route::add('/register','GET',function(){
+    // echo 'registerr';
     include('view/page/register.php');
     exit();
 },['Authenticate@handle']);
 Route::add('/forgot/password','GET',function(){
+    // echo 'forgott';
     include('view/page/forgotPassword.php');
     exit();
 },['Authenticate@handle']);
 Route::add('/verify/password','GET','UserController@getChangePass');
 Route::add('/verify/password','POST','UserController@changePassEmail');
+Route::add('/verify/email','GET','UserController@verifyEmail');
+Route::add('/verify/email','POST','UserController@verifyEmail');
 Route::add('/dashboard', 'GET', 'DashboardController@index',['Authenticate@handle']);
 Route::add('/users/register','POST','RegisterController@register',['Authenticate@handle']);
 Route::add('/users/login','POST','LoginController@login',['Authenticate@handle']);
@@ -95,11 +101,15 @@ class Route{
             $requestData = [];
         }
         $routeFound = false;
+        $lastSlashPos = strrpos($path, '/');
+        if($lastSlashPos){
+            $path1 = substr($uri, 0, $lastSlashPos+1);
+            if(in_array($path1,['/verify/email','/verify/password'])){
+                $path = ltrim($path1,'/');
+            }
+        }
         foreach (self::$routes as $route) {
-            break;
-            $lastSlashPos = strrpos($path, '/');
-            $path1 = substr($uri, 1, $lastSlashPos);
-            if ($route['uri'] === $path1 && $route['method'] === $method) {
+            if ($route['uri'] === $path && $route['method'] === $method) {
                 $routeFound = true;
                 $middlewareResults = [];
                 foreach ($route['middlewares'] as $middleware) {
@@ -134,7 +144,7 @@ class Route{
                     if($methodName == 'handleProviderCallback'){
                         call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $_GET]);
                     }else if(($methodName == 'getChangePass' || $methodName == 'verifyEmail')&& $route['method'] == 'GET'){
-                        call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $_GET]);
+                        call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $method, $_GET]);
                     }else{
                         call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI']]);
                     }
@@ -143,17 +153,17 @@ class Route{
         }
         if (!$routeFound) {
             http_response_code(404);
-            $query = parse_url($uri, PHP_URL_QUERY);
-            parse_str($query, $queryParams);
-            $path = parse_url($uri, PHP_URL_PATH);
-            $path = ltrim($path, '/');
-            echo '<br>path terserah '.$path;
-            $lastSlashPos = strrpos($path, '/');
-            $path1 = substr($uri, 1, $lastSlashPos);
-            echo '<br>pathh relativeee '.$path1;
-            $randomString = ltrim(substr($path, strrpos($path, '/')),'/');
-            echo '<br>pathh aneh '.$randomString;
-            // echo "<br>path asuu <br>".$path;
+            // $query = parse_url($uri, PHP_URL_QUERY);
+            // parse_str($query, $queryParams);
+            // $path = parse_url($uri, PHP_URL_PATH);
+            // // $path = ltrim($path, '/');
+            // // echo '<br>path terserah '.$path;
+            // $lastSlashPos = strrpos($path, '/');
+            // $path1 = substr($uri, 1, $lastSlashPos);
+            // echo '<br>pathh relativeee '.$path1;
+            // $randomString = ltrim(substr($path, strrpos($path, '/')),'/');
+            // echo '<br>pathh aneh '.$randomString;
+            // echo "<br>path random <br>".$path;
             include('view/page/PageNotFound.php');
             exit();
         }

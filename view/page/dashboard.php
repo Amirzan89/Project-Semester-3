@@ -13,10 +13,11 @@ if(!defined('APP')){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="view/css/dashboard.css">
+    <!-- <link rel="stylesheet" href="view/css/dashboard.css"> -->
+    <link rel="stylesheet" href="/public/css/dsahboard.css">
 </head>
 <body>
     <p>aloginvianvnavnaiv</p>
-    <h1>gabutttt</h1>
+    <h1>whvbabvavau</h1>
 </body>
 </html>
