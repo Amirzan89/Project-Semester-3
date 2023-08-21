@@ -1,5 +1,5 @@
 <?php
-namespace Controllers\Mail;
+// namespace Controllers\Mail;
 require_once 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -109,9 +109,9 @@ class MailController{
             }
         }
     }
-    public function createVerifyEmail($data){
-        $stmt = array();
+    public function createVerifyEmail($data,$uri = null){
         try{
+            $data = $data['request'];
             $email = $data['email'];
             if(empty($email) || is_null($email)){
                 return ['status'=>'error','message'=>'Email wajib di isi'];
@@ -206,8 +206,9 @@ class MailController{
         }
     }
     //send email forgot password
-    public function createForgotPassword($data){
+    public function createForgotPassword($data, $uri = null){
         try{
+            $data = $data['request'];
             $email = $data['email'];
             if(empty($email) || is_null($email)){
                 return ['status'=>'error','message'=>'Email empty'];

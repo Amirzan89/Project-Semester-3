@@ -1,15 +1,13 @@
 <?php 
 // namespace Controllers;
+require_once $rootDir . '/Controllers/Auth/JwtController.php';
+require_once $rootDir . '/Controllers/Mail/MailController.php';
 require_once $rootDir . '/Controllers/Website/ChangePasswordController.php';
 require_once $rootDir . '/Controllers/Website/NotificationPageController.php';
 use Database\Database;
-use Controllers\Mail\MailController;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
-use ChangePasswordController;
-use JwtController;
-use Exception;
 use App\Http\Controllers\Website\NotificationPageController;
 
 // use Exception;
@@ -73,7 +71,7 @@ class UserController{
                 $stmt->bind_param("sssbsss", $data['email'], $hashedPassword, $data['nama'],$verified, $level, $now, $now);
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
-                    $email = self::$mailController->createVerifyEmail($data);
+                    $email = json_decode(self::$mailController->createVerifyEmail($data));
                     $stmt->close();
                     if($email['status'] == 'error'){
                         return ['status'=>'error','message'=>$email['message']];

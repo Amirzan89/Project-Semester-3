@@ -38,6 +38,8 @@ Route::add('/forgot/password','GET',function(){
 },['Authenticate@handle']);
 Route::add('/verify/password','GET','UserController@getChangePass');
 Route::add('/verify/password','POST','UserController@changePassEmail');
+Route::add('/verify/create/password','POST','MailController@createForgotPassword');
+Route::add('/verify/create/email','POST','MailController@createVerifyEmail');
 Route::add('/verify/email','GET','UserController@verifyEmail');
 Route::add('/verify/email','POST','UserController@verifyEmail');
 Route::add('/dashboard', 'GET', 'DashboardController@index',['Authenticate@handle']);
@@ -141,12 +143,23 @@ class Route{
                     $controllerName = $parts[0];
                     $methodName = $parts[1];
                     $controller = new $controllerName();
+                    $result = [];
                     if($methodName == 'handleProviderCallback'){
-                        call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $_GET]);
+                        $result = call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $_GET]);
                     }else if(($methodName == 'getChangePass' || $methodName == 'verifyEmail')&& $route['method'] == 'GET'){
-                        call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $method, $_GET]);
+                        $result = call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $method, $_GET]);
                     }else{
-                        call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI']]);
+                        $result = call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI']]);
+                    }
+                    if($result['status'] == 'error'){ 
+                        header('Content-Type: application/json');
+                        http_response_code(!empty($result['code']) ? $result['code'] : 400);
+                        echo json_encode($result);
+                        exit();
+                    }else{
+                        header('Content-Type: application/json');
+                        echo json_encode($result);
+                        exit();
                     }
                 }
             }

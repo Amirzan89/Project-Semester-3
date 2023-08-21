@@ -1,8 +1,6 @@
 <?php
 $rootDir = dirname(dirname(__DIR__));
 require_once $rootDir . '/Controllers/Website/ChangePasswordController.php';
-// use Controllers\UserController;
-// use Controllers\Auth\JwtController;
 require_once 'Controllers/UserController.php';
 require_once 'Controllers/Auth/JWTController.php';
 use Laravel\Socialite\Facades\Socialite;
@@ -25,11 +23,11 @@ class LoginController{
             $pass = $data["password"];
             $pass = "Admin@1234567890";
             if(!isset($email) || empty($email)){
-                throw new Exception(json_encode(['status'=>'error','message'=>'Email tidak boleh kosong', 'code'=>400]));
+                return ['status'=>'error','message'=>'Email tidak boleh kosong', 'code'=>400];
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Email yang anda masukkan invalid', 'code'=>400]));
+                return ['status'=>'error','message'=>'Email yang anda masukkan invalid', 'code'=>400];
             }else if(!isset($pass) || empty($pass)){
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password tidak boleh kosong', 'code'=>400]));
+                return ['status'=>'error','message'=>'Password tidak boleh kosong', 'code'=>400];
             }else{
                 $query = "SELECT id_user, email, nama FROM users WHERE BINARY email = ? LIMIT 1";
                 $stmt = self::$con->prepare($query);
@@ -48,7 +46,7 @@ class LoginController{
                     }
                     $stmt->close();
                     if(!password_verify($pass,$result['password'])){
-                        throw new Exception(json_encode(['status'=>'error','message'=>'Password salah damn','code'=>400]));
+                        return ['status'=>'error','message'=>'Password salah damn','code'=>400];
                     }else{
                         $data = $jwtController->createJWTWebsite($data);
                         if(is_null($data)){
@@ -64,14 +62,13 @@ class LoginController{
                                 setcookie('token1', $encoded, time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
                                 setcookie('token2', $data['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
                                 setcookie('token3', $data['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
-                                echo json_encode(['status'=>'success','message'=>'Login sukses silahkan masuk dashboard']);
-                                exit();
+                                return (['status'=>'success','message'=>'Login sukses silahkan masuk dashboard']);
                             }
                         }
                     }
                 }else{
                     $stmt->close();
-                    throw new Exception(json_encode(['status'=>'error','message'=>'Email tidak ditemukan','code'=>400]));
+                    return ['status'=>'error','message'=>'Email tidak ditemukan','code'=>400];
                     // exit();
                 }
             }

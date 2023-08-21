@@ -1,7 +1,7 @@
 <?php
 // namespace Controllers\Auth;
+require_once 'Controllers/UserController.php';
 use Database\DATABASE;
-use Controllers\UserController;
 class RegisterController{
     private static $database;
     private static $con;
