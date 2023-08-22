@@ -29,11 +29,11 @@ class LoginController{
             }else if(!isset($pass) || empty($pass)){
                 return ['status'=>'error','message'=>'Password tidak boleh kosong', 'code'=>400];
             }else{
-                $query = "SELECT id_user, email, nama FROM users WHERE BINARY email = ? LIMIT 1";
+                $query = "SELECT id_user, email, nama, password FROM users WHERE BINARY email = ? LIMIT 1";
                 $stmt = self::$con->prepare($query);
                 $stmt->bind_param('s', $email);
                 $stmt->execute();
-                $columns = ['id_user','email','nama'];
+                $columns = ['id_user','email','nama', 'password'];
                 $bindResultArray = [];
                 foreach ($columns as $column) {
                     $bindResultArray[] = &$$column;
@@ -46,8 +46,9 @@ class LoginController{
                     }
                     $stmt->close();
                     if(!password_verify($pass,$result['password'])){
-                        return ['status'=>'error','message'=>'Password salah damn','code'=>400];
+                        return ['status'=>'error','message'=>'Password salah','code'=>400];
                     }else{
+                        // unset($data['']);
                         $data = $jwtController->createJWTWebsite($data);
                         if(is_null($data)){
                             return ['status'=>'error','message'=>'create token error'];
@@ -93,11 +94,7 @@ class LoginController{
                     );
                 }
             }
-            $jsonResponse = json_encode($responseData);
-            header('Content-Type: application/json');
-            http_response_code(!empty($error['code']) ? $error['code'] : 400);
-            echo $jsonResponse;
-            exit();
+            return $responseData;
         }
     }
     function redirectToProvider(){
@@ -162,7 +159,7 @@ class LoginController{
                                 if($updated['status'] == 'error'){
                                     header('Content-Type: application/json');
                                     http_response_code(500);
-                                    throw new Exception(json_encode(['status'=>'error','message'=>$updated['message'], 'code'=>500]));
+                                    return ['status'=>'error','message'=>$updated['message'], 'code'=>500];
                                 }else{
                                     header('Location: /dashboard');
                                     setcookie('token2', $data['data'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']));
@@ -176,7 +173,7 @@ class LoginController{
                     }else{
                         $updated = $jwtController->updateTokenWebsite($decodedRefresh['data']['data']);
                         if($updated['status'] == 'error'){
-                            throw new Exception(json_encode(['status'=>'error','message'=>'update token error','code'=>500]));
+                            return ['status'=>'error','message'=>'update token error','code'=>500];
                         }else{
                             setcookie('token2', $updated['data'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']), '/');
                             header('Location: /dashboard');
@@ -189,12 +186,12 @@ class LoginController{
                     if(is_null($data)){
                         header('Content-Type: application/json');
                         http_response_code(500);
-                        throw new Exception(json_encode(['status'=>'error','message'=>'create token error','code'=>500]));
+                        return ['status'=>'error','message'=>'create token error','code'=>500];
                     }else{
                         if($data['status'] == 'error'){
                             header('Content-Type: application/json');
                             http_response_code(400);
-                            throw new Exception(json_encode(['status'=>'error','message'=>$data['message']]));
+                            return ['status'=>'error','message'=>$data['message']];
                         }else{
                             $encoded = base64_encode($user_google->getEmail());
                             header('Location: /dashboard');
@@ -232,10 +229,7 @@ class LoginController{
                     );
                 }
             }
-            $jsonResponse = json_encode($responseData);
-            header('Content-Type: application/json');
-            http_response_code(!empty($error['code']) ? $error['code'] : 400);
-            echo $jsonResponse;
+            return $responseData;
         }
     }
     // public function getPassPage(Request $request, User $user){
@@ -259,22 +253,22 @@ class LoginController{
             $jwtController = new JwtController();
             $userController = new UserController();
             if (!isset($data['email']) || empty($data['email'])) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Email wajib di isi','code'=>400]));
+                return ['status'=>'error','message'=>'Email wajib di isi','code'=>400];
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Email yang anda masukkan invalid','code'=>400]));
+                return ['status'=>'error','message'=>'Email yang anda masukkan invalid','code'=>400];
             }
             if (!isset($data['password']) || empty($data['password'])) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password wajib di isi','code'=>400]));
+                return ['status'=>'error','message'=>'Password wajib di isi','code'=>400];
             } elseif (strlen($data['password']) < 8) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400]));
+                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
             } elseif (strlen($data['password']) > 25) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password maksimal 25 karakter','code'=>400]));
+                return ['status'=>'error','message'=>'Password maksimal 25 karakter','code'=>400];
             } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
+                return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
             }
             // Validate 'nama' field
             if (!isset($data['nama']) || empty($data['nama'])) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Nama harus di isi','code'=>400]));
+                return ['status'=>'error','message'=>'Nama harus di isi','code'=>400];
             }
             $nama = $data['nama'];
             $email = $data['email'];
@@ -291,10 +285,10 @@ class LoginController{
                 if($register['status'] == 'success'){
                     $data = $jwtController->createJWTWebsite($email);
                     if(is_null($data)){
-                        throw new Exception(json_encode(['status'=>'error','message'=>'create token error']));
+                        return ['status'=>'error','message'=>'create token error'];
                     }else{
                         if($data['status'] == 'error'){
-                            return json_encode(['status'=>'error','message'=>$data['message']]);
+                            return ['status'=>'error','message'=>$data['message']];
                         }else{
                             $encoded = base64_encode($email);
                             header('Location: /dashboard');
@@ -305,11 +299,11 @@ class LoginController{
                         }
                     }
                 }else{
-                    throw new Exception(json_encode(['status'=>'error','message'=>'Akun gagal dibuat',!empty($register['code']) ? $register['code'] : 400]));
+                    return ['status'=>'error','message'=>'Akun gagal dibuat',!empty($register['code']) ? $register['code'] : 400];
                 }
             }else{
                 $stmt->close();
-                throw new Exception(json_encode(['status'=>'error','message'=>'Email sudah digunakan']));
+                return ['status'=>'error','message'=>'Email sudah digunakan'];
             }
         } catch (\Exception $e) {
             $error = $e->getMessage();
@@ -332,10 +326,7 @@ class LoginController{
                     );
                 }
             }
-            $jsonResponse = json_encode($responseData);
-            header('Content-Type: application/json');
-            http_response_code(!empty($error['code']) ? $error['code'] : 400);
-            echo $jsonResponse;
+            return $responseData;
         }
     }
 }

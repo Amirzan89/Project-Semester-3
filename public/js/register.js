@@ -279,7 +279,7 @@ function showGreenPopup(data, div = null){
                 <div class="bg" onclick="loginPage('green',true,${div})"></div>
                 <div class="kotak">
                     <div class="bunder1"></div>
-                    <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+                    <div class="icon"><img src="${window.location.origin}/public/img/icon/check.png" alt=""></div>
                 </div>
                 <span class="closePopup" onclick="closePopup('green',true,${div})">X</span>
                 <label>Berhasil membuat akun silahkan login </label>
@@ -293,7 +293,7 @@ function showGreenPopup(data, div = null){
                 <div class="bg" onclick="closePopup('green',true)"></div>
                 <div class="kotak">
                     <div class="bunder1"></div>
-                    <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+                    <div class="icon"><img src="${window.location.origin}/public/img/icon/check.png" alt=""></div>
                 </div>
                 <span class="closePopup" onclick="closePopup('green',true)">X</span>
                 <label>${data.message}</label>
@@ -309,7 +309,7 @@ function showGreenPopup(data, div = null){
             <div class="bg" onclick="closePopup('green',true)"></div>
             <div class="kotak">
                 <div class="bunder1"></div>
-                <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+                <div class="icon"><img src="${window.location.origin }/public/img/icon/check.png" alt=""></div>
             </div>
             <span class="closePopup" onclick="closePopup('green',true)">X</span>
             <label>${data.message}</label>

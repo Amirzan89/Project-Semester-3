@@ -52,7 +52,7 @@ if(!defined('APP')){
         <script>
             const delay = 3000;
             function dashboardPage(){
-                window.location.href = '/page/dashboard';
+                window.location.href = '/dashboard';
             }
             setTimeout(dashboardPage, delay);
         </script>

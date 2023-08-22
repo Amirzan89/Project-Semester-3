@@ -186,9 +186,9 @@ class JwtController{
                 if ($stmt->fetch()) {
                     $stmt->close();
                     header('Content-Type: application/json');
-                    return json_encode($token);
+                    return $token;
                 }else{
-                    throw new \Exception(json_encode(['status'=>'error','message'=>'Email tidak ditemukan']));
+                    return ['status'=>'error','message'=>'Email tidak ditemukan'];
                 }
             }
         }catch(\Exception $e){
@@ -285,11 +285,9 @@ class JwtController{
             if(empty($email) || is_null($email)){
                 return ['status'=>'error','message'=>'email empty'];
             }else{
-                $email1 = '%' . $email . '%';
                 //check email is exist on database
-                $query = "SELECT * FROM users WHERE BINARY email LIKE ? LIMIT 1";
+                $query = "SELECT * FROM users WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
-                $email = '%' . $email . '%';
                 $stmt[0]->bind_param('s', $email);
                 $stmt[0]->execute();
                 $bindResultArray = [];
@@ -395,8 +393,6 @@ class JwtController{
                         $stmt[1]->execute();
                         if ($stmt[1]->affected_rows > 0) {
                                 $stmt[1]->close();
-                                header('Content-Type: application/json');
-                                echo json_encode($json);
                                 return $json;
                             }else{
                                 $stmt[1]->close();
@@ -501,7 +497,6 @@ class JwtController{
                     );
                 }
             }
-            echo json_encode($responseData);
             return $responseData;
         }
     }

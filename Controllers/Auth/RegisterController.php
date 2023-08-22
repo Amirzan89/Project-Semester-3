@@ -15,31 +15,31 @@ class RegisterController{
             $userController = new UserController();
             $data = $data['request'];
             if (!isset($data['email']) || empty($data['email'])) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Email wajib di isi','code'=>400]));
-            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Email yang anda masukkan invalid','code'=>400]));
+                return ['status'=>'error','message'=>'Email wajib di isi1414144','code'=>400];
+            } else if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                return ['status'=>'error','message'=>'Email yang anda masukkan invalid','code'=>400];
             }
             if (!isset($data['password']) || empty($data['password'])) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password wajib di isi','code'=>400]));
-            } elseif (strlen($data['password']) < 8) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400]));
-            } elseif (strlen($data['password']) > 25) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password maksimal 25 karakter','code'=>400]));
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
+                return ['status'=>'error','message'=>'Password wajib di isi','code'=>400];
+            } else if (strlen($data['password']) < 8) {
+                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
+            } else if (strlen($data['password']) > 25) {
+                return ['status'=>'error','message'=>'Password maksimal 25 karakter','code'=>400];
+            } else if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
+                return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
             }
             if (!isset($data['password_confirm']) || empty($data['password_confirm'])) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password wajib di isi','code'=>400]));
-            } elseif (strlen($data['password_confirm']) < 8) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400]));
-            } elseif (strlen($data['password_confirm']) > 25) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Password maksimal 25 karakter','code'=>400]));
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password_confirm'])) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Password confirm harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400]));
+                return ['status'=>'error','message'=>'Password wajib di isi','code'=>400];
+            } else if (strlen($data['password_confirm']) < 8) {
+                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
+            } else if (strlen($data['password_confirm']) > 25) {
+                return ['status'=>'error','message'=>'Password maksimal 25 karakter','code'=>400];
+            } else if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password_confirm'])) {
+                return ['status' => 'error', 'message' => 'Password confirm harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
             }
             // Validate 'nama' field
             if (!isset($data['nama']) || empty($data['nama'])) {
-                throw new Exception(json_encode(['status'=>'error','message'=>'Nama harus di isi','code'=>400]));
+                return ['status'=>'error','message'=>'Nama harus di isi','code'=>400];
             }
             $email = $data['email'];
             $pass = $data["password"];
@@ -53,22 +53,12 @@ class RegisterController{
             if (!$stmt->fetch()) {
                 $stmt->close();
                 if($pass !== $pass1){
-                    throw new Exception(json_encode(['status'=>'error','message'=>'Password harus sama','code'=>400]));
+                    return ['status'=>'error','message'=>'Password harus sama','code'=>400];
                 }else{
-                    $user = $userController->createUser($data,'register');
-                    if($user['status'] == 'error'){
-                        throw new Exception(json_encode($user));
-                    }else{
-                        $responseData = array(
-                            'status' => 'success',
-                            'message' => 'register success',
-                        );
-                        header('Content-Type: application/json');
-                        return json_encode($responseData);
-                    }
+                    return $userController->createUser($data,'register');
                 }
             }else{
-                throw new Exception(json_encode(['status'=>'error','message'=>'Email sudah digunakan','code'=>400]));
+                return ['status'=>'error','message'=>'Email sudah digunakan','code'=>400];
             }
         }catch(\Exception $e){
             echo $e->getTraceAsString();
@@ -92,10 +82,7 @@ class RegisterController{
                     );
                 }
             }
-            $jsonResponse = json_encode($responseData);
-            header('Content-Type: application/json');
-            http_response_code(!empty($error['code']) ? $error['code'] : 400);
-            echo $jsonResponse;
+            return $responseData;
         }
     }
 }

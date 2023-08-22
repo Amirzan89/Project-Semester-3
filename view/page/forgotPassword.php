@@ -130,6 +130,6 @@ if(!defined('APP')){
         document.querySelector('div#gantiPassword').style.display = 'block';
     }
 </script>
-<script src="/public/js/forgotPassword.js"></script>
+<script src="/public/js/forgotPassword.js?"></script>
 </body>
 </html>

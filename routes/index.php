@@ -40,6 +40,8 @@ Route::add('/verify/password','GET','UserController@getChangePass');
 Route::add('/verify/password','POST','UserController@changePassEmail');
 Route::add('/verify/create/password','POST','MailController@createForgotPassword');
 Route::add('/verify/create/email','POST','MailController@createVerifyEmail');
+Route::add('/verify/otp/password','POST','UserController@getChangePass');
+Route::add('/verify/otp/email','POST','UserController@verifyEmail');
 Route::add('/verify/email','GET','UserController@verifyEmail');
 Route::add('/verify/email','POST','UserController@verifyEmail');
 Route::add('/dashboard', 'GET', 'DashboardController@index',['Authenticate@handle']);
@@ -146,7 +148,7 @@ class Route{
                     $result = [];
                     if($methodName == 'handleProviderCallback'){
                         $result = call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $_GET]);
-                    }else if(($methodName == 'getChangePass' || $methodName == 'verifyEmail')&& $route['method'] == 'GET'){
+                    }else if(($methodName == 'getChangePass' || $methodName == 'verifyEmail')){
                         $result = call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI'], $method, $_GET]);
                     }else{
                         $result = call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI']]);
@@ -158,6 +160,7 @@ class Route{
                         exit();
                     }else{
                         header('Content-Type: application/json');
+                        unset($result['code']);
                         echo json_encode($result);
                         exit();
                     }

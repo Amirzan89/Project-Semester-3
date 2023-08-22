@@ -7,7 +7,16 @@
     <title>home</title>
 </head>
 <body>
-    <p>aloginvianvnavnaiv</p>
-    <h1>gabutttt</h1>
+    <div>
+        <div class="bg"></div>
+        <div class="content">
+            <h1>Reset Password</h1>
+            <span>Berikut ini adalah kode untuk reset password anda</span>
+            <div class="otp">
+                <p>codee otp   %CODE%</p>
+            </div>
+            <p>atau link untuk reset password anda <a href="%LINK%?email=%EMAIL%">reset password</a></p>
+        </div>
+    </div>
 </body>
 </html>

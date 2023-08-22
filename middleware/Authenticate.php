@@ -11,7 +11,7 @@ class Authenticate
         $path = parse_url($previousUrl, PHP_URL_PATH);
         if(isset($_COOKIE['token1'] ) && isset($_COOKIE['token3'])){
             $token1 = $_COOKIE['token1'];
-            $token2 = $_COOKIE['token2'];
+            // $token2 = $_COOKIE['token2'];
             $token3 = $_COOKIE['token3'];
             $tokenDecode1 = json_decode(base64_decode($token1),true);
             $email = $tokenDecode1['email'];

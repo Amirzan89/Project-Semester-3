@@ -207,7 +207,7 @@ verifyChangeForm.onsubmit = function(event){
             nama:nama,
             link:link,
             password:passInput.value,
-            password_new:passNewInput.value,
+            password_confirm:passNewInput.value,
             description:description
         };
     }else{
@@ -215,7 +215,7 @@ verifyChangeForm.onsubmit = function(event){
             email: email,
             code:otp,
             password:passInput.value,
-            password_new:passNewInput.value,
+            password_confirm:passNewInput.value,
             description:'changePass'
         };
     }
@@ -315,7 +315,7 @@ function showGreenPopup(data, div = null){
                 <div class="bg" onclick="closePopup('green',true,${div})"></div>
                 <div class="kotak">
                     <div class="bunder1"></div>
-                    <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+                    <div class="icon"><img src="${window.location.origin}/public/img/icon/check.png" alt=""></div>
                 </div>
                 <span class="closePopup" onclick="closePopup('green',true,${div})">X</span>
                 <label>Berhasil membuat akun silahkan login </label>
@@ -329,7 +329,7 @@ function showGreenPopup(data, div = null){
                 <div class="bg" onclick="closePopup('green',true,${div})"></div>
                 <div class="kotak">
                     <div class="bunder1"></div>
-                    <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+                    <div class="icon"><img src="${window.location.origin}/public/img/icon/check.png" alt=""></div>
                 </div>
                 <span class="closePopup" onclick="closePopup('green',true,${div})">X</span>
                 <label>Berhasil membuat akun mohon tunggu sebentar </label>
@@ -343,7 +343,7 @@ function showGreenPopup(data, div = null){
                 <div class="bg" onclick="closePopup('green',true)"></div>
                 <div class="kotak">
                     <div class="bunder1"></div>
-                    <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+                    <div class="icon"><img src="${window.location.origin}/public/img/icon/check.png" alt=""></div>
                 </div>
                 <span class="closePopup" onclick="closePopup('green',true)">X</span>
                 <label>${data.message}</label>

@@ -16,7 +16,7 @@ if(!defined('APP')){
     <link rel="stylesheet" href="/public/css/register.css">
 </head>
 <body>
-    <div class='register'>
+    <div class='register' id='registerDiv'>
         <div class="bg"></div>
         <div class="content">
             <form id="registerForm">
@@ -73,7 +73,6 @@ if(!defined('APP')){
     <div id="preloader" style="display: none;"></div>
     <div id="greenPopup" style="display:none"></div>
     <div id="redPopup" style="display:none"></div>
-    <!-- <h1>gabutttt</h1> -->
-    <script src="/public/js/register.js"></script>
+    <script src="/public/js/register.js?"></script>
 </body>
 </html>
