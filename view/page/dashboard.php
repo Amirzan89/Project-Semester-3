@@ -16,7 +16,7 @@ if(!defined('APP')){
     <!-- <link rel="stylesheet" href="view/css/dashboard.css"> -->
     <link rel="stylesheet" href="/public/css/dsahboard.css">
 </head>
-<body>
+<body class="bg-red">
     <p>aloginvianvnavnaiv</p>
     <h1>whvbabvavau</h1>
 </body>

@@ -48,9 +48,9 @@ loginForm.onsubmit = function(event){
     }
     return false; 
 }
-// function dashboardPage(){
-//     window.location.href = '/dashboard';
-// }
+function dashboardPage(){
+    window.location.href = '/dashboard';
+}
 function showGreenPopup(data, div = null){
     if(div == 'dashboard'){
         greenPopup.innerHTML = `

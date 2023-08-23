@@ -5,7 +5,6 @@ class NotificationPageController
 { 
     public function showSuccessVerifyEmail($message, $data){
         $jwtController = new JwtController();
-        echo 'daa';
         $dataJwt = $jwtController->createJWTWebsite($data);
         if(is_null($dataJwt)){
             return ['status'=>'error','message'=>'create token error'];

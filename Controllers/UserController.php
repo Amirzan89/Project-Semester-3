@@ -44,7 +44,7 @@ class UserController{
                 $now = Carbon::now('Asia/Jakarta');
                 $verified = false;
                 $stmt = self::$con->prepare($query);
-                $level = 'ADMIIN';
+                $level = 'ADMIN';
                 $stmt->bind_param("sssbsss", $data['email'], $hashedPassword, $data['nama'],$verified, $level, $now, $now);
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
@@ -492,11 +492,11 @@ class UserController{
                                         }
                                     }else{
                                         $stmt[3]->close();
-                                        // $query = "DELETE FROM verify WHERE BINARY code = ? AND description = 'changePass'";
-                                        // $stmt[4] = self::$con->prepare($query);
-                                        // $stmt[4]->bind_param('s', $code);
-                                        // $result = $stmt[4]->execute();
-                                        // $stmt[4]->close();
+                                        $query = "DELETE FROM verify WHERE BINARY code = ? AND description = 'changePass'";
+                                        $stmt[4] = self::$con->prepare($query);
+                                        $stmt[4]->bind_param('s', $code);
+                                        $result = $stmt[4]->execute();
+                                        $stmt[4]->close();
                                         return ['status'=>'error','message'=>'token expired4144'];
                                     }
                                 }else{
@@ -596,7 +596,7 @@ class UserController{
                 }
             }
         } catch (Exception $e) {
-            echo $e->getTraceAsString();
+            // echo $e->getTraceAsString();
             $error = $e->getMessage();
             $erorr = json_decode($error, true);
             if ($erorr === null) {
@@ -738,7 +738,7 @@ class UserController{
             if($path1 == '/verify/email' && $method == 'GET'){
                 $email = $param['email'];
                 $link = ltrim(substr($path, strrpos($path, '/')),'/');
-                echo 'link '.$link;
+                // echo 'link '.$link;
                 $query =  "SELECT id FROM verify WHERE BINARY link = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $link);
@@ -821,7 +821,6 @@ class UserController{
             }else{
                 $email = $data['email'];
                 $code = $data['code'];
-                echo '    emaill '.$email. '  code '. $code;
                 $query =  "SELECT id FROM verify WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $email);

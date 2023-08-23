@@ -17,12 +17,10 @@ require_once $rootDir . '/Controllers/Auth/JWTController.php';
 require_once $rootDir . '/Controllers/Mail/MailController.php';
 // use Controllers\Auth\RegisterController;
 Route::add('/','GET',function(){
-    // echo '<br>home page<br>';
     include('view/page/dashboard.php');
     exit();
 },['Authenticate@handle']);
 Route::add('/login','GET',function(){
-    // echo 'loggiiinn';
     include('view/page/login.php');
     exit();
 },['Authenticate@handle']);

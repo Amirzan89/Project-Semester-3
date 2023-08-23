@@ -73,6 +73,7 @@ class Authenticate
                             }else{
                                 //check if token2 exist
                                 if(isset($_COOKIE['token2'])){
+                                    $token2 = $_COOKIE['token2'];
                                     $decode = [
                                         'email'=>$email,
                                         'token'=>$token2,
