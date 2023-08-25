@@ -115,7 +115,7 @@ if(!defined('APP')){
         // var otp = "{{$code}}";
         var link = "<?php echo $link ?>";
         <?php if(isset($nama)){ ?>
-            var nama = "{{$nama}}";
+            var nama = "<?php echo $nama?>";
         <?php }?>
         console.log('divvv ');
         console.log("<?php echo $email ?>");

@@ -154,6 +154,7 @@ class Route{
                     if($result['status'] == 'error'){ 
                         header('Content-Type: application/json');
                         http_response_code(!empty($result['code']) ? $result['code'] : 400);
+                        unset($result['code']);
                         echo json_encode($result);
                         exit();
                     }else{

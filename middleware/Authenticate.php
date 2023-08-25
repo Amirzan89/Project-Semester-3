@@ -100,7 +100,6 @@ class Authenticate
                                         $decoded['data'][0][0]['number'] = $number;
                                         if($data['uri'] === 'users/google' && $data['method'] == "GET"){
                                             $data = [$decoded['data'][0][0]];
-                                            // $request->request->add($data);
                                             return ['status'=>'success','data'=>$request];
                                         }
                                         return ['status'=>'success','data'=>$request];

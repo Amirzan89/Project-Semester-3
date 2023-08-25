@@ -78,6 +78,7 @@ class ChangePasswordController{
                 exit();
             }
         }catch(Exception $e){
+            // echo $e->getTraceAsString();
             $error = $e->getMessage();
             $erorr = json_decode($error, true);
             if ($erorr === null) {
@@ -98,10 +99,7 @@ class ChangePasswordController{
                     );
                 }
             }
-            $jsonResponse = json_encode($responseData);
-            header('Content-Type: application/json');
-            http_response_code(!empty($error['code']) ? $error['code'] : 400);
-            echo $jsonResponse;
+            return $responseData;
         }
     }
 }

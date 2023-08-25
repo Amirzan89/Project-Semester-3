@@ -38,7 +38,8 @@ loginForm.onsubmit = function(event){
             if (xhr.status === 200) {
                 closeLoading();
                 var response = JSON.parse(xhr.responseText);
-                showGreenPopup(response, 'dashboard');
+                // showGreenPopup(response, 'dashboard');
+                showGreenPopup(response);
             } else {
                 closeLoading();
                 var response = JSON.parse(xhr.responseText);
@@ -73,7 +74,7 @@ function showGreenPopup(data, div = null){
                 <div class="bg" onclick="closePopup('green',true)"></div>
                 <div class="kotak">
                     <div class="bunder1"></div>
-                    <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+                    <div class="icon"><img src="${window.location.origin}/public/img/icon/check.png" alt=""></div>
                 </div>
                 <span class="closePopup" onclick="closePopup('green',true)">X</span>
                 <label>${dataa}</label>
@@ -87,7 +88,7 @@ function showGreenPopup(data, div = null){
                 <div class="bg" onclick="closePopup('green',true)"></div>
                 <div class="kotak">
                     <div class="bunder1"></div>
-                    <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+                    <div class="icon"><img src="${window.location.origin}/public/img/icon/check.png" alt=""></div>
                 </div>
                 <span class="closePopup" onclick="closePopup('green',true)">X</span>
                 <label>${data.message}</label>

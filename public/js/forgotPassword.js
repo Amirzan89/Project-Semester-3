@@ -221,7 +221,6 @@ verifyChangeForm.onsubmit = function(event){
     }
     var xhr = new XMLHttpRequest();
     xhr.open('POST',"/verify/password");
-    // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(requestBody));
     xhr.onreadystatechange = function() {
@@ -229,11 +228,11 @@ verifyChangeForm.onsubmit = function(event){
             if (xhr.status === 200) {
                 closeLoading();
                 var response = JSON.parse(xhr.responseText);
-                // verifyChangeForm.reset();
                 if(otp == null || otp == ''){
                     showGreenPopup(response,'dashboard');
                 }else{
                     showGreenPopup(response,'login');
+                    // showGreenPopup(response);
                 }
             } else {
                 closeLoading();
@@ -336,6 +335,7 @@ function showGreenPopup(data, div = null){
             `;
             greenPopup.style.display = 'block';
             setTimeout(() => {
+                dashboardPage();
                 closePopup('green',false,div);
             }, 2000);
         }else{

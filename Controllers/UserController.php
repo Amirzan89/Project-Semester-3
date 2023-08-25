@@ -393,7 +393,6 @@ class UserController{
             $email = $data['email'];
             $pass = $data["password"];
             $pass1 = $data["password_confirm"];
-            $code = $data['code'];
             $link = $data['link'];
             $desc = $data['description'];
             if($pass !== $pass1){
@@ -402,7 +401,7 @@ class UserController{
                 if(is_null($link) || empty($link)){
                     if($desc == 'createUser'){
                         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-                        $query = "INSERT INTO users (email,password, nama, email_verified, level,created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+                        $query = "INSERT INTO users (email,password, nama, email_verified, level,created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
                         $verified = true;
                         $stmt = self::$con->prepare($query);
                         $now = Carbon::now('Asia/Jakarta');
@@ -411,7 +410,7 @@ class UserController{
                         $stmt->execute();
                         if ($stmt->affected_rows > 0) {
                             $stmt->close();
-                            $data = $jwtController->createJWTWebsite($email);
+                            $data = $jwtController->createJWTWebsite(['email'=>$email]);
                             if(is_null($data)){
                                 return ['status'=>'error','message'=>'create token error','code'=>500];
                             }else{
@@ -431,6 +430,7 @@ class UserController{
                             return ['status'=>'error','message'=>'Akun Gagal Dibuat'];
                         }
                     }else{
+                        $code = $data['code'];
                         $query = "SELECT id FROM verify WHERE BINARY code = ? LIMIT 1";
                         $stmt[0] = self::$con->prepare($query);
                         $stmt[0]->bind_param('s', $code);
@@ -469,13 +469,15 @@ class UserController{
                                     if ($stmt[3]->fetch()) {
                                         $stmt[3]->close();
                                         $newPass = password_hash($pass, PASSWORD_DEFAULT,['cost'=>10]);
-                                        $query = "UPDATE verify SET code = ? WHERE BINARY email = ? LIMIT 1";
+                                        $query = "UPDATE users SET password = ? WHERE BINARY email = ? LIMIT 1";
                                         $stmt[4] = self::$con->prepare($query);
                                         $stmt[4]->bind_param('ss', $newPass, $email);
+                                        $stmt[4]->execute();
+                                        $affectedRows = $stmt[4]->affected_rows;
                                         //check time is valid on table verify
-                                        if ($stmt[4]->execute()) {
+                                        if ($affectedRows > 0) {
                                             $stmt[4]->close();
-                                            $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'verifyEmail'";
+                                            $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'changePass'";
                                             $stmt[5] = self::$con->prepare($query);
                                             $stmt[5]->bind_param('s', $email);
                                             $result = $stmt[5]->execute();
@@ -497,7 +499,7 @@ class UserController{
                                         $stmt[4]->bind_param('s', $code);
                                         $result = $stmt[4]->execute();
                                         $stmt[4]->close();
-                                        return ['status'=>'error','message'=>'token expired4144'];
+                                        return ['status'=>'error','message'=>'token expired'];
                                     }
                                 }else{
                                     $stmt[2]->close();
@@ -512,6 +514,7 @@ class UserController{
                             return ['status'=>'error','message'=>'token invalid'];
                         }
                     }
+                //
                 }else{
                     $query = "SELECT id FROM verify WHERE BINARY link = ? AND description = $desc LIMIT 1";
                     $stmt[0] = self::$con->prepare($query);
@@ -554,8 +557,10 @@ class UserController{
                                     $stmt[4] = self::$con->prepare($query);
                                     $newPass = password_hash($pass, PASSWORD_DEFAULT);
                                     $stmt[4]->bind_param('ss', $newPass, $email);
+                                    $stmt[4]->execute();
+                                    $affectedRows = $stmt[4]->affected_rows;
                                     //check time is valid on table verify
-                                    if ($stmt[4]->execute()) {
+                                    if ($affectedRows > 0) {
                                         $stmt[4]->close();
                                         $query = "DELETE FROM verify WHERE BINARY email = ? AND description = $desc";
                                         $stmt[5] = self::$con->prepare($query);
@@ -596,7 +601,6 @@ class UserController{
                 }
             }
         } catch (Exception $e) {
-            // echo $e->getTraceAsString();
             $error = $e->getMessage();
             $erorr = json_decode($error, true);
             if ($erorr === null) {
@@ -779,8 +783,10 @@ class UserController{
                                 $query =  "UPDATE users SET email_verified = true WHERE BINARY email = ?";
                                 $stmt[4] = self::$con->prepare($query);
                                 $stmt[4]->bind_param('s', $email);
+                                $stmt[4]->execute();
+                                $affectedRows = $stmt[4]->affected_rows;
                                 //update users
-                                if ($stmt[4]->execute()) {
+                                if ($affectedRows > 0) {
                                     $stmt[4]->close();
                                     $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'verifyEmail'";
                                     $stmt[5] = self::$con->prepare($query);
@@ -852,8 +858,10 @@ class UserController{
                             $query =  "UPDATE users SET email_verified = true WHERE BINARY email = ?";
                             $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('s', $email);
+                            $stmt[3]->execute();
+                            $affectedRows = $stmt[3]->affected_rows;
                             //check time is valid on table verify
-                            if ($stmt[3]->execute()) {
+                            if ($affectedRows > 0) {
                                 $stmt[3]->close();
                                 $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'verifyEmail'";
                                 $stmt[4] = self::$con->prepare($query);

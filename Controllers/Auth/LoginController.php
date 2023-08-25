@@ -3,8 +3,6 @@ $rootDir = dirname(dirname(__DIR__));
 require_once $rootDir . '/Controllers/Website/ChangePasswordController.php';
 require_once 'Controllers/UserController.php';
 require_once 'Controllers/Auth/JWTController.php';
-use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Support\Facades\Hash;
 use Google\Service\Oauth2;
 use Database\Database;
 class LoginController{ 
@@ -24,7 +22,7 @@ class LoginController{
             $pass = "Admin@1234567890";
             if(!isset($email) || empty($email)){
                 return ['status'=>'error','message'=>'Email tidak boleh kosong', 'code'=>400];
-            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            } else if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
                 return ['status'=>'error','message'=>'Email yang anda masukkan invalid', 'code'=>400];
             }else if(!isset($pass) || empty($pass)){
                 return ['status'=>'error','message'=>'Password tidak boleh kosong', 'code'=>400];
@@ -48,7 +46,6 @@ class LoginController{
                     if(!password_verify($pass,$result['password'])){
                         return ['status'=>'error','message'=>'Password salah','code'=>400];
                     }else{
-                        // unset($data['']);
                         $data = $jwtController->createJWTWebsite($data);
                         if(is_null($data)){
                             return ['status'=>'error','message'=>'create token error'];
@@ -59,7 +56,6 @@ class LoginController{
                                 $data1 = ['email'=>$email,'number'=>$data['number'],'expire'=>time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED'])];
                                 $encoded = base64_encode(json_encode($data1));
                                 header('Content-Type: application/json');
-                                // $cv1 = json_encode(['data' => 'your_data', 'expires' => time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED'])]);
                                 setcookie('token1', $encoded, time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
                                 setcookie('token2', $data['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
                                 setcookie('token3', $data['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
@@ -125,8 +121,8 @@ class LoginController{
             $client->setAccessToken($token['access_token']);
             $google_oauth = new Google_Service_Oauth2($client);
             $user_google = $google_oauth->userinfo->get();
-            $query = "SELECT nama FROM users WHERE BINARY email LIKE ?";
-            $email = '%' . $user_google->getEmail() . '%';
+            $query = "SELECT nama FROM users WHERE BINARY email = ?";
+            $email = $user_google->getEmail();
             $stmt = self::$con->prepare($query);
             $stmt->bind_param('s', $email);
             $stmt->execute();
@@ -163,7 +159,7 @@ class LoginController{
                                     return ['status'=>'error','message'=>$updated['message'], 'code'=>500];
                                 }else{
                                     header('Location: /dashboard');
-                                    setcookie('token2', $data['data'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']));
+                                    setcookie('token2', $data['data'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
                                     exit();
                                 }
                             }
@@ -183,33 +179,27 @@ class LoginController{
                     }
                 //if user exist in database and doesnt login
                 }else{
-                    $data = $jwtController->createJWTWebsite($user_google->getEmail());
-                    if(is_null($data)){
-                        header('Content-Type: application/json');
-                        http_response_code(500);
-                        return ['status'=>'error','message'=>'create token error','code'=>500];
+                    $data = $jwtController->createJWTWebsite(['email'=>$user_google->getEmail()]);
+                    if($data['status'] == 'error'){
+                        return ['status'=>'error','message'=>$data['message'],'code'=>isset($data['code']) ? $data['code'] : 400];
                     }else{
-                        if($data['status'] == 'error'){
-                            header('Content-Type: application/json');
-                            http_response_code(400);
-                            return ['status'=>'error','message'=>$data['message']];
-                        }else{
-                            $encoded = base64_encode($user_google->getEmail());
-                            header('Location: /dashboard');
-                            setcookie('token1', $encoded, time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']));
-                            setcookie('token2', $data['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']));
-                            setcookie('token3', $data['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']));
-                            exit();
-                        }
+                        // $encoded = base64_encode([$user_google->getEmail()]);
+                        $data1 = ['email'=>$email,'number'=>$data['number'],'expire'=>time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED'])];
+                        $encoded = base64_encode(json_encode($data1));
+                        setcookie('token1', $encoded, time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
+                        setcookie('token2', $data['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
+                        setcookie('token3', $data['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
+                        header('Location: /dashboard');
+                        exit();
                     }
                 }
             //if user dont exist in database
             }else{
+                $stmt->close();
                 $data = ['email'=>$user_google->getEmail(), 'nama'=>$user_google->getName()];
                 return $changePasswordController->showRegisterGoogle($data);
             }
         } catch (\Exception $e) {
-            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $erorr = json_decode($error, true);
             if ($erorr === null) {
@@ -273,8 +263,7 @@ class LoginController{
             }
             $nama = $data['nama'];
             $email = $data['email'];
-            $query = "SELECT nama FROM users WHERE BINARY email LIKE ?";
-            $email = '%' . $email. '%';
+            $query = "SELECT nama FROM users WHERE BINARY email = ?";
             $stmt = self::$con->prepare($query);
             $stmt->bind_param('s', $email);
             $stmt->execute();
@@ -293,9 +282,9 @@ class LoginController{
                         }else{
                             $encoded = base64_encode($email);
                             header('Location: /dashboard');
-                            setcookie('token1', $encoded, time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']));
-                            setcookie('token2', $data['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']));
-                            setcookie('token3', $data['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']));
+                            setcookie('token1', $encoded, time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
+                            setcookie('token2', $data['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
+                            setcookie('token3', $data['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
                             exit();
                         }
                     }

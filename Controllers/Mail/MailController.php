@@ -156,8 +156,9 @@ class MailController{
                             $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('ssss',$verificationLink, $verificationCode, $email, $now, $email);
                             $stmt[3]->execute();
+                            $affectedRows = $stmt[3]->affected_rows;
                             //update link
-                            if ($stmt[3]->fetch()) {
+                            if ($affectedRows > 0) {
                                 $stmt[3]->close();
                                 $data = ['name'=>$result,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink),'description'=>'verifyEmail'];
                                 //resend email
@@ -262,12 +263,13 @@ class MailController{
                             $host = $_SERVER['HTTP_HOST'];
                             $baseURL = $protocol . '://' . $host;
                             $verificationLink = $baseURL . '/verify/password/' . $linkPath;
-                            $query = "UPDATE verify SET link = ?, code = ?, updated_at = ? WHERE BINARY email = ? LIMIT 1";
+                            $query = "UPDATE verify SET link = ?, code = ?, updated_at = ? WHERE BINARY email = ? AND description = 'changePass' LIMIT 1";
                             $stmt[3] = self::$con->prepare($query);
-                            $stmt[3]->bind_param('ssss',$verificationLink, $verificationCode, $now, $email);
+                            $stmt[3]->bind_param('ssss',$linkPath, $verificationCode, $now, $email);
                             $stmt[3]->execute();
+                            $affectedRows = $stmt[3]->affected_rows;
                             //update link
-                            if ($stmt[3]->fetch()) {
+                            if ($affectedRows > 0) {
                                 $stmt[3]->close();
                                 $data = ['name'=>$result,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink),'description'=>'changePass'];
                                 //resend email
@@ -346,8 +348,9 @@ class MailController{
                         $verified = true;
                         $stmt[1]->bind_param('bs',$verified, $email);
                         $stmt[1]->execute();
+                        $affectedRows = $stmt[1]->affected_rows;
                         //update link
-                        if ($stmt[1]->fetch()) {
+                        if ($affectedRows > 0) {
                             $stmt[1]->close();
                             return ['status'=>'success','message'=>'email verify success'];
                         }else{
