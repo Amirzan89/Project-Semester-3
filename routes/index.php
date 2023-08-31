@@ -29,7 +29,6 @@ Route::add('/register','GET',function(){
     exit();
 },['Authenticate@handle']);
 Route::add('/forgot/password','GET',function(){
-    // echo 'forgott';
     include('view/page/forgotPassword.php');
     exit();
 },['Authenticate@handle']);
@@ -69,32 +68,22 @@ class Route{
         $path = ltrim($path, '/');
         $routeFound = false;
         $headers = getallheaders();
-        // Get request body
         $body = file_get_contents('php://input');
-        // Check if the request method is POST
         if (in_array($_SERVER['REQUEST_METHOD'], ['POST','PUT','DELETE'])) {
-            // Check if the request data is provided as JSON
             if ($_SERVER['CONTENT_TYPE'] === 'application/json') {
-                // Decode the JSON data from the request body
                 $requestData = json_decode($body, true);
-                // If the JSON is not valid or not provided, default to an empty array
                 if ($requestData === null) {
                     $requestData = [];
                 }
             } elseif (strpos($_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded') !== false) {
                 parse_str($body, $requestData);
             } else {
-                // For other types of data, treat the request data as an empty array
                 $requestData = [];
             }
-            // Check if there is any regular form data (not file uploads)
             if (empty($requestData) && !empty($_POST)) {
-                // Regular form data (not file uploads) will be available in $_POST
                 $requestData = $_POST;
             }
-            // Check if there are uploaded files
             if (!empty($_FILES)) {
-                // Process uploaded files here, if needed
             }
         } else {
             $requestData = [];
@@ -131,7 +120,6 @@ class Route{
                     'middleware'=>$middlewareResults,
                     'request'=>$requestData
                 ];
-                // Call the controller or closure
                 $callback = $route['callback'];
                 if ($callback instanceof Closure) {
                     call_user_func($callback);
