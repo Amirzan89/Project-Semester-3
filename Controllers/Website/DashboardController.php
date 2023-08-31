@@ -8,9 +8,7 @@ use Database\Database;
             self::$con = self::$database->getConnection();
         }
         public static function index(){
-            echo 'mlebuuu';
             include('view/page/dashboard.php');
-            // echo 'gabutt';
             exit();
         }
     }

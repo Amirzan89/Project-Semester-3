@@ -12,7 +12,7 @@ function closeLoading(){
     document.querySelector('div#preloader').style.display = 'none';
 }
 function dashboardPage(){
-    window.location.href = '/page/dashboard';
+    window.location.href = '/dashboard';
 }
 function showGreenPopup(data, div = null){
     if(div == 'dashboard'){

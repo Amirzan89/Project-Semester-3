@@ -25,7 +25,6 @@ Route::add('/login','GET',function(){
     exit();
 },['Authenticate@handle']);
 Route::add('/register','GET',function(){
-    // echo 'registerr';
     include('view/page/register.php');
     exit();
 },['Authenticate@handle']);
@@ -83,8 +82,6 @@ class Route{
                     $requestData = [];
                 }
             } elseif (strpos($_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded') !== false) {
-                // Check if the content type is application/x-www-form-urlencoded
-                // Parse form data from the request body
                 parse_str($body, $requestData);
             } else {
                 // For other types of data, treat the request data as an empty array
@@ -168,17 +165,6 @@ class Route{
         }
         if (!$routeFound) {
             http_response_code(404);
-            // $query = parse_url($uri, PHP_URL_QUERY);
-            // parse_str($query, $queryParams);
-            // $path = parse_url($uri, PHP_URL_PATH);
-            // // $path = ltrim($path, '/');
-            // // echo '<br>path terserah '.$path;
-            // $lastSlashPos = strrpos($path, '/');
-            // $path1 = substr($uri, 1, $lastSlashPos);
-            // echo '<br>pathh relativeee '.$path1;
-            // $randomString = ltrim(substr($path, strrpos($path, '/')),'/');
-            // echo '<br>pathh aneh '.$randomString;
-            // echo "<br>path random <br>".$path;
             include('view/page/PageNotFound.php');
             exit();
         }
