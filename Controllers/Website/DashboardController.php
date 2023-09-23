@@ -14,7 +14,7 @@ use Database\Database;
             self::$con = self::$database->getConnection();
         }
         public static function index(){
-            include('view/page/utama/dashboard.php');
+            include('view/page/dashboard.php');
             exit();
         }
     }

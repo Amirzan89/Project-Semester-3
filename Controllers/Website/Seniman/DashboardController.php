@@ -6,7 +6,6 @@ if(!defined('APP')){
     include($rootDir.'/view/page/PageNotFound.php');
     exit();
 }
-// require_once ''
 use Database\Database;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
