@@ -1,4 +1,10 @@
 <?php
+if(!defined('APP')){
+    $rootDir = dirname(dirname(__DIR__));
+    http_response_code(404);
+    include($rootDir.'/view/page/PageNotFound.php');
+    exit();
+}
 class ChangePasswordController{ 
     public function showCreatePass($data){
         try{

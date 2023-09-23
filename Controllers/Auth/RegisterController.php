@@ -1,5 +1,11 @@
 <?php
 // namespace Controllers\Auth;
+$rootDir = dirname(dirname(__DIR__));
+if(!defined('APP')){
+    http_response_code(404);
+    include($rootDir.'/view/page/PageNotFound.php');
+    exit();
+}
 require_once 'Controllers/UserController.php';
 use Database\DATABASE;
 class RegisterController{

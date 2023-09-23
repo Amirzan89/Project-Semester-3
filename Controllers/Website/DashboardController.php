@@ -1,4 +1,10 @@
 <?php 
+if(!defined('APP')){
+    $rootDir = dirname(dirname(__DIR__));
+    http_response_code(404);
+    include($rootDir.'/view/page/PageNotFound.php');
+    exit();
+}
 use Database\Database;
     class DashboardController{
         private static $database;
@@ -8,7 +14,7 @@ use Database\Database;
             self::$con = self::$database->getConnection();
         }
         public static function index(){
-            include('view/page/dashboard.php');
+            include('view/page/utama/dashboard.php');
             exit();
         }
     }

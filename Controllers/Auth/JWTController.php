@@ -1,4 +1,10 @@
 <?php
+if(!defined('APP')){
+    $rootDir = dirname(dirname(__DIR__));
+    http_response_code(404);
+    include($rootDir.'/view/page/PageNotFound.php');
+    exit();
+}
 // namespace Controllers\Auth;
 use Database\Database;
 use Illuminate\Support\Facades\Hash;
@@ -32,7 +38,7 @@ class JwtController{
     private static $keyRefresh; 
     private static $algorithm;
     public function __construct(){
-        self::$userColumns = ['id_user','email', 'password','nama','email_verified','level','created_at','updated_at'];
+        self::$userColumns = ['id_user','nama','no_telpon','email', 'password','email_verified','level','created_at','updated_at'];
         self::$database = Database::getInstance();
         self::$con = self::$database->getConnection();
         self::$exp = intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']);
@@ -286,14 +292,14 @@ class JwtController{
     //create token and refresh token 
     public function createJWTWebsite($data, $uri = null){
         try{
-            $email = $data['email'];
-            if(empty($email) || is_null($email)){
+            $emailInput = $data['email'];
+            if(empty($emailInput) || is_null($emailInput)){
                 return ['status'=>'error','message'=>'email empty'];
             }else{
                 //check email is exist on database
                 $query = "SELECT * FROM users WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
-                $stmt[0]->bind_param('s', $email);
+                $stmt[0]->bind_param('s', $emailInput);
                 $stmt[0]->execute();
                 $bindResultArray = [];
                 foreach (self::$userColumns as $column) {
@@ -309,8 +315,7 @@ class JwtController{
                     $now1 = Carbon::now('Asia/Jakarta');
                     $now   = new DateTimeImmutable();
                     //check total login on website
-                    $number = $this->checkTotalLoginWebsite(['email'=>$email]);
-                    // var_dump($number);
+                    $number = $this->checkTotalLoginWebsite(['email'=>$emailInput]);
                     $device = 'website';
                     if($number['status'] == 'error'){
                         return $number;
@@ -321,14 +326,14 @@ class JwtController{
                             $Rtoken = $tokenBuilder->issuedBy('http://localhost')->permittedFor('http://localhost')->issuedAt($now)->canOnlyBeUsedAfter($now)->expiresAt($now->modify("+". self::$expRefresh ." seconds"))->withClaim('data', $payloadRefresh)->getToken(self::$algorithm, self::$secretRefreshKey)->toString();
                             $query = "DELETE FROM refresh_token WHERE BINARY email = ? AND device = 'website' AND number = 1";
                             $stmt[1] = self::$con->prepare($query);
-                            $stmt[1]->bind_param('s', $email);
+                            $stmt[1]->bind_param('s', $emailInput);
                             $result = '';
                             $stmt[1]->execute();
                             if ($stmt[1]->execute()) {
                                 $stmt[1]->close();
                                 $query = "UPDATE refresh_token SET number = number - 1 WHERE BINARY email = ? AND device = 'website' AND number BETWEEN 1 AND 3";
                                 $stmt[2] = self::$con->prepare($query);
-                                $stmt[2]->bind_param('s', $email);
+                                $stmt[2]->bind_param('s', $emailInput);
                                 $result = '';
                                 $stmt[2]->execute();
                                 $stmt[2]->close();
@@ -338,7 +343,7 @@ class JwtController{
                                 $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
                                 $stmt[3] = self::$con->prepare($query);
                                 $number['data'] = 3;
-                                $stmt[3]->bind_param("sssiss", $email, $Rtoken,$device, $number['data'], $now1, $now1);
+                                $stmt[3]->bind_param("sssiss", $emailInput, $Rtoken,$device, $number['data'], $now1, $now1);
                                 $stmt[3]->execute();
                                 if ($stmt[3]->affected_rows > 0) {
                                     $stmt[3]->close();
@@ -363,7 +368,7 @@ class JwtController{
                             $payloadRefresh = [ 'data'=>$resultDb, 'exp'=>self::$expRefresh];
                             $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
                             $Rtoken = $tokenBuilder->issuedBy('http://localhost')->permittedFor('http://localhost')->issuedAt($now)->canOnlyBeUsedAfter($now)->expiresAt($now->modify("+". self::$expRefresh ." seconds"))->withClaim('data', $payloadRefresh)->getToken(self::$algorithm, self::$secretRefreshKey)->toString();
-                            $number = $this->checkTotalLoginWebsite(['email'=>$email]);
+                            $number = $this->checkTotalLoginWebsite(['email'=>$emailInput]);
                             if($number['status'] == 'error'){
                                 $number['data'] = 1;
                                 $payload = [ 'data'=>$resultDb, 'number'=> 1,'exp'=>self::$exp];
@@ -378,7 +383,6 @@ class JwtController{
                                     ],
                                     'number' => 1];
                             }else{
-                                echo '';
                                 $payload = [ 'data'=>$resultDb, 'number'=> $number['data']+1,'exp'=>self::$exp];
                                 $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
                                 $token = $tokenBuilder->issuedBy('http://localhost')->permittedFor('http://localhost')->issuedAt($now)->canOnlyBeUsedAfter($now)->expiresAt($now->modify("+". self::$exp ." seconds"))->withClaim('data', $payload)->getToken(self::$algorithm, self::$secretKey)->toString();
@@ -394,14 +398,14 @@ class JwtController{
                             }
                             $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
                             $stmt[1] = self::$con->prepare($query);
-                            $stmt[1]->bind_param("sssiss", $email, $Rtoken, $device, $number['data'], $now1, $now1);
+                            $stmt[1]->bind_param("sssiss", $emailInput, $Rtoken, $device, $number['data'], $now1, $now1);
                             $stmt[1]->execute();
                             if ($stmt[1]->affected_rows > 0) {
-                                    $stmt[1]->close();
-                                    return $json;
-                                }else{
-                                    $stmt[1]->close();
-                                    return ['status'=>'error','message'=>'Error saving token','code'=>500];
+                                $stmt[1]->close();
+                                return $json;
+                            }else{
+                                $stmt[1]->close();
+                                return ['status'=>'error','message'=>'Error saving token','code'=>500];
                             }
                         }
                     }
@@ -411,7 +415,6 @@ class JwtController{
                 }
             }
         }catch(Exception $e){
-            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $erorr = json_decode($error, true);
             if ($erorr === null) {
@@ -441,6 +444,7 @@ class JwtController{
             $email = $data['email'];
             $tokenValue = $data['token'];
             $opt = $data['opt'];
+            // echo 'email cookie '.$email."    \n";
             if(empty($email) || is_null($email)){
                 return ['status'=>'error','message'=>'email empty'];
             }else if(empty($tokenValue) || is_null($tokenValue)){
@@ -468,6 +472,8 @@ class JwtController{
                         return ['status'=>'error','message'=>'Expired token'];
                     }
                     $decoded = $token->claims()->get('data');
+                    // var_dump($decoded);
+                    // exit();
                     if(isset($decoded['data']['email'])){
                         if($email == $decoded['data']['email']){
                             return ['status'=>'success','data'=>$decoded, true];

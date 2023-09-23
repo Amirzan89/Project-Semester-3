@@ -6,12 +6,14 @@ class Authenticate
     public function handle($request,$data = null){
         $userController = new UserController();
         $jwtController = new JwtController();
-        // $pathh = $request->path();
-        $previousUrl = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
-        $path = parse_url($previousUrl, PHP_URL_PATH);
+        if(isset($_SERVER['HTTP_REFERER'])){
+            $previousUrl = $_SERVER['HTTP_REFERER'];
+            $path = parse_url($previousUrl, PHP_URL_PATH);
+        }else{
+            $path = isset($data['uri']) ? $data['uri'] : null;
+        }
         if(isset($_COOKIE['token1'] ) && isset($_COOKIE['token3'])){
             $token1 = $_COOKIE['token1'];
-            // $token2 = $_COOKIE['token2'];
             $token3 = $_COOKIE['token3'];
             $tokenDecode1 = json_decode(base64_decode($token1),true);
             $email = $tokenDecode1['email'];
@@ -19,7 +21,7 @@ class Authenticate
             $authPage = ['login','register','password/reset','verify/password','verify/email','auth/redirect','auth/google','/'];
             if(in_array(ltrim($data['uri'],'/'),$authPage) && $data['method'] == "GET"){
                 $auth = ['/login','/register','/password/reset','/verify/password','/verify/email','/auth/redirect','/auth/google','/'];
-                if (in_array('/'.ltrim($path,'/'), $authPage)) {
+                if (in_array(ltrim($path,'/'), $authPage)) {
                     header('Location: /dashboard');
                 } else {
                     header("Location: $path");
@@ -54,7 +56,11 @@ class Authenticate
                     }else{
                         //check token if exist in database
                         if($jwtController->checkExistRefreshWebsiteNew(['token'=>$token3])){
+                            // echo 'data enek nang database ';
+                            // exit();
                             $decodedRefresh = $jwtController->decode($decodeRefresh);
+                            // var_dump($decodedRefresh);
+                            // exit();
                             if($decodedRefresh['status'] == 'error'){
                                 if($decodedRefresh['message'] == 'Expired token'){
                                     setcookie('token1', '', time() - 3600, '/');

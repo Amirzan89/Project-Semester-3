@@ -1,5 +1,10 @@
 <?php
 $rootDir = dirname(dirname(__DIR__));
+if(!defined('APP')){
+    http_response_code(404);
+    include($rootDir.'/view/page/PageNotFound.php');
+    exit();
+}
 require_once $rootDir . '/Controllers/Website/ChangePasswordController.php';
 require_once 'Controllers/UserController.php';
 require_once 'Controllers/Auth/JWTController.php';
@@ -17,7 +22,7 @@ class LoginController{
             $jwtController = new JwtController();
             $data = $data['request'];
             $email = $data["email"];
-            $email = "Admin@gmail.com";
+            // $email = "Admin@gmail.com";
             $pass = $data["password"];
             $pass = "Admin@1234567890";
             if(!isset($email) || empty($email)){

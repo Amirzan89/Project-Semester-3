@@ -1,4 +1,10 @@
 <?php
+if(!defined('APP')){
+    $rootDir = dirname(dirname(__DIR__));
+    http_response_code(404);
+    include($rootDir.'/view/page/PageNotFound.php');
+    exit();
+}
 // namespace Controllers\Website;
 require_once __DIR__.'/../Auth/JWTController.php';
 class NotificationPageController
@@ -115,4 +121,3 @@ class NotificationPageController
     }
 }
 ?>
-
