@@ -1,4 +1,5 @@
 const domain = window.location.protocol + '//' + window.location.hostname +":"+window.location.port;
+// const logoutForms = document.querySelectorAll('form#logoutForm');
 const logoutForms = document.querySelectorAll('form#logoutForm');
 logoutForms.forEach(function(form) {
     form.onsubmit = function(event){
@@ -10,7 +11,7 @@ logoutForms.forEach(function(form) {
         };
         //open the request
         xhr.open('POST', "/users/logout");
-        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+        // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
         xhr.setRequestHeader('Content-Type', 'application/json');
         //send the form data
         xhr.send(JSON.stringify(requestBody));

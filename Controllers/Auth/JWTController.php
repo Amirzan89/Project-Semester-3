@@ -444,7 +444,6 @@ class JwtController{
             $email = $data['email'];
             $tokenValue = $data['token'];
             $opt = $data['opt'];
-            // echo 'email cookie '.$email."    \n";
             if(empty($email) || is_null($email)){
                 return ['status'=>'error','message'=>'email empty'];
             }else if(empty($tokenValue) || is_null($tokenValue)){
@@ -483,7 +482,6 @@ class JwtController{
                     }else{
                         return ['status'=>'error','message'=>'invalid email'];
                     }
-                    // exit();
                 }else{
                     return ['status'=>'error','message'=>'invalid data'];
                 }

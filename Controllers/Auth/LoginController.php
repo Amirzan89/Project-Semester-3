@@ -32,25 +32,18 @@ class LoginController{
             }else if(!isset($pass) || empty($pass)){
                 return ['status'=>'error','message'=>'Password tidak boleh kosong', 'code'=>400];
             }else{
-                $query = "SELECT id_user, email, nama, password FROM users WHERE BINARY email = ? LIMIT 1";
+                $query = "SELECT password FROM users WHERE BINARY email = ? LIMIT 1";
                 $stmt = self::$con->prepare($query);
                 $stmt->bind_param('s', $email);
                 $stmt->execute();
-                $columns = ['id_user','email','nama', 'password'];
-                $bindResultArray = [];
-                foreach ($columns as $column) {
-                    $bindResultArray[] = &$$column;
-                }
-                call_user_func_array([$stmt, 'bind_result'], $bindResultArray);
-                $result = [];
+                $passDb = '';
+                $stmt->bind_result($passDb);
                 if ($stmt->fetch()) {
-                    foreach ($columns as $column) {
-                        $result[$column] = $$column;
-                    }
-                    $stmt->close();
-                    if(!password_verify($pass,$result['password'])){
+                    if(!password_verify($pass,$passDb)){
+                        $stmt->close();
                         return ['status'=>'error','message'=>'Password salah','code'=>400];
                     }else{
+                        $stmt->close();
                         $data = $jwtController->createJWTWebsite($data);
                         if(is_null($data)){
                             return ['status'=>'error','message'=>'create token error'];

@@ -1,4 +1,5 @@
 <?php 
+use GuzzleHttp\Middleware;
 if(!defined('APP')){
     $rootDir = dirname(dirname(__DIR__));
     http_response_code(404);
@@ -13,8 +14,10 @@ use Database\Database;
             self::$database = Database::getInstance();
             self::$con = self::$database->getConnection();
         }
-        public static function index(){
-            include('view/page/dashboard.php');
+        public static function index($request){
+            $data = $request['middleware']['data'];
+            $number = $request['middleware']['number'];
+            include('view/page/utama/dashboard.php');
             exit();
         }
     }

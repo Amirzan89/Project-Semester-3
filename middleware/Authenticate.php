@@ -56,11 +56,7 @@ class Authenticate
                     }else{
                         //check token if exist in database
                         if($jwtController->checkExistRefreshWebsiteNew(['token'=>$token3])){
-                            // echo 'data enek nang database ';
-                            // exit();
                             $decodedRefresh = $jwtController->decode($decodeRefresh);
-                            // var_dump($decodedRefresh);
-                            // exit();
                             if($decodedRefresh['status'] == 'error'){
                                 if($decodedRefresh['message'] == 'Expired token'){
                                     setcookie('token1', '', time() - 3600, '/');
@@ -77,7 +73,7 @@ class Authenticate
                                 }
                             //if token refresh success decoded and not expired
                             }else{
-                                //check if token2 exist
+                                //check if token 2 exist
                                 if(isset($_COOKIE['token2'])){
                                     $token2 = $_COOKIE['token2'];
                                     $decode = [
@@ -103,12 +99,12 @@ class Authenticate
                                         }
                                     //if success decode
                                     }else{
-                                        $decoded['data'][0][0]['number'] = $number;
+                                        $decoded['data']['number'] = $number;
                                         if($data['uri'] === 'users/google' && $data['method'] == "GET"){
                                             $data = [$decoded['data'][0][0]];
                                             return ['status'=>'success','data'=>$request];
                                         }
-                                        return ['status'=>'success','data'=>$request];
+                                        return ['status'=>'success','data'=>$decoded['data']];
                                     }
                                 //if token 2 disappear
                                 }else{
@@ -117,10 +113,10 @@ class Authenticate
                                         return ['status'=>'error','message'=>'update token error','code'=>500];
                                     }else{
                                         setcookie('token2', $updated['data'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']), '/');
-                                        foreach($updated['data'] as $key => $value){
-                                            $request[$key] = $value;
-                                        }
-                                        return ['status'=>'success','data'=>$request];
+                                        // foreach($updated['data'] as $key => $value){
+                                        //     $request[$key] = $value;
+                                        // }
+                                        // return ['status'=>'success','data'=>$updated['data']];
                                     }
                                 }
                             }

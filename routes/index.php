@@ -21,7 +21,7 @@ require_once $rootDir . '/Controllers/Auth/RegisterController.php';
 require_once $rootDir . '/Controllers/Auth/JWTController.php';
 require_once $rootDir . '/Controllers/Mail/MailController.php';
 Route::add('/','GET',function(){
-    include('view/page/utama/dashboard.php');
+    include('view/page/utama/home.php');
     exit();
 },['Authenticate@handle']);
 Route::add('/login','GET',function(){
@@ -41,59 +41,83 @@ Route::add('/auth/redirect','GET','LoginController@redirectToProvider');
 Route::add('/auth/google','GET','LoginController@handleProviderCallback');
 Route::add('/token/get','POST','JwtController@createJWTWebsite');
 Route::add('/token/decode','POST','JwtController@decode');
-Route::group('/verify',function(){
-    Route::group('/password',function(){
-        Route::add('/','GET','UserController@getChangePass');
-        Route::add('/','POST','UserController@changePassEmail');
-    });
-    Route::group('/create',function(){
-        Route::add('/password','POST','MailController@createForgotPassword');
-        Route::add('/email','POST','MailController@createVerifyEmail');
-    });
-    Route::group('/otp',function(){
-        Route::add('/otp/password','POST','UserController@getChangePass');
-        Route::add('/otp/email','POST','UserController@verifyEmail');
-    });
-    Route::group('/email',function(){
-        Route::add('/','GET','UserController@verifyEmail');
-        Route::add('/','POST','UserController@verifyEmail');
-    });
-});
-Route::group('/users',function(){
-    Route::add('/users/register','POST','RegisterController@register',['Authenticate@handle']);
-    Route::add('/users/login','POST','LoginController@login',['Authenticate@handle']);
-});
+Route::group('/verify',[
+    ['/create',[
+        ['/password','POST','MailController@createForgotPassword'],
+        ['/email','POST','MailController@createVerifyEmail'],
+    ]],
+    ['/password',[
+        ['/','GET','UserController@getChangePass'],
+        ['/','POST','UserController@changePassEmail'],
+    ]],
+    ['/otp',[
+        ['/otp/password','POST','UserController@getChangePass'],
+        ['/otp/email','POST','UserController@verifyEmail'],
+    ]],
+    ['/email',[
+        ['/','GET','UserController@verifyEmail'],
+        ['/','POST','UserController@verifyEmail'],
+    ]],
+]);
+Route::group('/users',[
+    ['/register','POST','RegisterController@register',['Authenticate@handle']],
+    ['/login','POST','LoginController@login',['Authenticate@handle']],
+    ['/logout','POST','UserController@logout',['Authenticate@handle']],
+]);
 //event
-Route::group('/event',function(){
-    Route::add('/dashboard','GET','Controllers\Website\Event\EventDashboardController@show');
-});
+Route::group('/event',[
+    ['/dashboard','GET','Controllers\Website\Event\EventDashboardController@show'],
+]);
 //Izin
-Route::group('/izin',function(){
-    Route::add('/Izin/dashboard','GET','Izin\Dashboard@show');
-});
+Route::group('/izin',[
+    ['/Izin/dashboard','GET','Izin\Dashboard@show'],
+]);
 //seniman
-Route::group('/seniman',function(){
-    Route::add('/Seniman/dashboard','GET','Seniman\Dashboard@show');
-});
+Route::group('/seniman',[
+    ['/Seniman/dashboard','GET','Seniman\Dashboard@show'],
+]);
 //tempat
-Route::group('/tempat',function(){
-    Route::add('/Tempat/dashboard','GET','Tempat\Dashboard@show');
-});
-Route::group('/mobile',function(){
+Route::group('/tempat',[
+    ['/Tempat/dashboard','GET','Tempat\Dashboard@show'],
+]);
+Route::group('/mobile',[
     //
-});
+]);
 //mobile
+Route::group('/mobile',[
+    ['/dashboard','GET','Controllers\Website\Event\EventDashboardController@show'],
+]);
+Route::group('/verify',[
+    ['/create',[
+        ['/password','POST','MailController@createForgotPassword'],
+        ['/email','POST','MailController@createVerifyEmail'],
+    ]],
+    ['/password',[
+        ['/','GET','UserController@getChangePass'],
+        ['/','POST','UserController@changePassEmail'],
+    ]],
+    ['/otp',[
+        ['/otp/password','POST','UserController@getChangePass'],
+        ['/otp/email','POST','UserController@verifyEmail'],
+    ]],
+    ['/email',[
+        ['/','GET','UserController@verifyEmail'],
+        ['/','POST','UserController@verifyEmail'],
+    ]],
+]);
 // Route::add('/mobile','POST','DashboardController@show');
 // Dispatch the request
-// echo $_SERVER['REQUEST_URI'];   
 Route::dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 class Route{
     private static $routes = [];
-    public static function group($prefix, $callback){
-    $prefix = ltrim($prefix, '/');
-    foreach ($callback() as $route) {
-        $route['uri'] = $prefix . '/' . $route['uri'];
-            self::add($route['uri'], $route['method'], $route['callback'], $route['middlewares'], $route['parameter']);
+    public static function group($prefix, $routes){
+        foreach ($routes as $route) {
+            if (is_array($route[1])) {
+                self::group($prefix . $route[0], $route[1]);
+            } else {
+                $route[0] = $prefix . $route[0];
+                self::add($route[0], $route[1], $route[2], isset($route[3]) ? $route[3] : [], isset($route[4]) ? $route[4] : []);
+            }
         }
     }
     public static function add($uri, $method, $callback, $middlewares = [], $parameter = []){
@@ -107,7 +131,6 @@ class Route{
         ];
     }
     public static function dispatch($uri, $method, $data=null, $uriData=null){
-        // echo 'uriii '.$uri;
         $query = parse_url($uri, PHP_URL_QUERY);
         parse_str($query, $queryParams);
         $path = parse_url($uri, PHP_URL_PATH);
@@ -144,8 +167,6 @@ class Route{
                 $path = ltrim($path1,'/');
             }
         }
-        // echo 'uri '.$uri;
-        // exit();
         foreach (self::$routes as $route) {
             if ($route['uri'] === $path && $route['method'] === $method) {
                 $routeFound = true;
@@ -166,8 +187,15 @@ class Route{
                         return;
                     }
                 }
+                //merge data from middleware
+                $middlewareResult = [];
+                foreach ($middlewareResults as $results) {
+                    if (isset($results['data'])) {
+                        $middlewareResult = array_merge($middlewareResult, $results['data']);
+                    }
+                }
                 $requestData = [
-                    'middleware'=>$middlewareResults,
+                    'middleware'=>$middlewareResult,
                     'request'=>$requestData
                 ];
                 $callback = $route['callback'];
@@ -186,8 +214,6 @@ class Route{
                     }else{
                         $result = call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI']]);
                     }
-                    // echo $result;
-                    // var_dump($result);
                     if($result['status'] == 'error'){ 
                         header('Content-Type: application/json');
                         http_response_code(!empty($result['code']) ? $result['code'] : 400);
