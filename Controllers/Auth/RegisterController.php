@@ -8,6 +8,7 @@ if(!defined('APP')){
 }
 require_once 'Controllers/UserController.php';
 use Database\DATABASE;
+use Database\Models\User as UsersModels;
 class RegisterController{
     private static $database;
     private static $con;
@@ -50,7 +51,7 @@ class RegisterController{
             $email = $data['email'];
             $pass = $data["password"];
             $pass1 = $data["password_confirm"];
-            $query = "SELECT nama FROM users WHERE BINARY email = ?";
+            $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ?";
             $stmt = self::$con->prepare($query);
             $stmt->bind_param('s', $email);
             $stmt->execute();

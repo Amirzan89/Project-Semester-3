@@ -38,7 +38,7 @@ if(!defined('APP')){
                 </div>
                 <input type="submit" name='submit' value='Login'>
                 <!-- <img src="" alt=""> -->
-                <a href="/auth/redirect" id="google"><img src="public/img/icon/search.png" alt=""> Sig in with Google</a>
+                <a href="/auth/redirect" id="google"><img src="public/img/icon/google.png" alt=""> Sig in with Google</a>
                 <span id="register">Don't have account ? <a href="/register">Signup</a></span>
             </form>
             <div class="wm"></div>

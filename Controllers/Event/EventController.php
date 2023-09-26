@@ -1,5 +1,6 @@
 <?php
 use Database\Database;
+use Database\Models\Event;
 use Carbon\Carbon;
 class EventController{
     private static $database;

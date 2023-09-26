@@ -15,6 +15,7 @@ use Database\Database;
             self::$con = self::$database->getConnection();
         }
         public static function index($request){
+            $csrf = $GLOBALS['csrf'];
             $data = $request['middleware']['data'];
             $number = $request['middleware']['number'];
             include('view/page/utama/dashboard.php');

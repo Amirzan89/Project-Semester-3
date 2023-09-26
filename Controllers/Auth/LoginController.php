@@ -119,7 +119,7 @@ class LoginController{
             $client->setAccessToken($token['access_token']);
             $google_oauth = new Google_Service_Oauth2($client);
             $user_google = $google_oauth->userinfo->get();
-            $query = "SELECT nama FROM users WHERE BINARY email = ?";
+            $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ?";
             $email = $user_google->getEmail();
             $stmt = self::$con->prepare($query);
             $stmt->bind_param('s', $email);
@@ -221,22 +221,6 @@ class LoginController{
             return $responseData;
         }
     }
-    // public function getPassPage(Request $request, User $user){
-    //     $validator = Validator::make($request->all(), [
-    //         'email'=>'required|email',
-    //         'nama'=>'required',
-    //     ],[
-    //         'nama.required'=>'nama wajib di isi',
-    //         'email.required'=>'Email wajib di isi',
-    //         'email.email'=>'Email yang anda masukkan invalid',
-    //     ]);
-    //     if ($validator->fails()) {
-    //         return response()->json(['status'=>'error','message'=>$validator->failed()],400);
-    //     }
-    //     $email = $request->input('email');
-    //     $nama = $request->input('nama');
-    //     return view('page.changePassword',['email'=>$email,'nama'=>$nama,'div'=>'register','description'=>'changePass','code'=>'','link'=>'']);
-    // }
     public function GooglePass($data, $user){
         try{
             $jwtController = new JwtController();
@@ -261,7 +245,7 @@ class LoginController{
             }
             $nama = $data['nama'];
             $email = $data['email'];
-            $query = "SELECT nama FROM users WHERE BINARY email = ?";
+            $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ?";
             $stmt = self::$con->prepare($query);
             $stmt->bind_param('s', $email);
             $stmt->execute();

@@ -18,7 +18,7 @@ $tPath = "";
 </head> 
 <body class="bg-red">
     <script>
-        var csrfToken = "<?php echo($GLOBALS['csrf']) ?>";
+        var csrfToken = "<?php echo($csrf) ?>";
         var email = "<?php echo($data['email'])?>";
         var number = "<?php echo($number) ?>";
     </script>

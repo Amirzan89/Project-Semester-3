@@ -33,13 +33,13 @@ class MailController{
             $this->mail->setFrom($_SERVER['MAIL_FROM_ADDRESS'], 'gabutt');
             $this->mail->addAddress($data['email'], $data['name']);
             $this->mail->isHTML(true);
-            $this->mail->Subject = $data['description'];
-            if($data['description'] == 'verifyEmail'){
-                $filePath = __DIR__ . '/../../view/mail/verifyEmail.php';
+            $this->mail->Subject = $data['deskripsi'];
+            if($data['deskripsi'] == 'email'){
+                $filePath = __DIR__ . '/../../view/mail/email.php';
                 $emailBody = file_get_contents($filePath);
                 $emailData = [
                     'EMAIL' => $data['email'],
-                    'CODE' => $data['code'],
+                    'CODE' => $data['kode_otp'],
                     'LINK' => $data['link'],
                 ];
                 $emailTemplate = $emailBody; 
@@ -48,12 +48,12 @@ class MailController{
                     $emailTemplate = str_replace($placeholder, $value, $emailTemplate);
                 }
                 $this->mail->Body = $emailTemplate;
-            }else if($data['description'] == 'changePass'){
+            }else if($data['deskripsi'] == 'password'){
                 $filePath = __DIR__ . '/../../view/mail/forgotPassword.php';
                 $emailBody = file_get_contents($filePath);
                 $emailData = [
                     'EMAIL' => $data['email'],
-                    'CODE' => $data['code'],
+                    'CODE' => $data['kode_otp'],
                     'LINK' => $data['link'],
                 ];
                 $emailTemplate = $emailBody; 
@@ -75,7 +75,7 @@ class MailController{
             return ['status'=>'error','message'=>'email kosong'];
         }else{
             //check email exist in table user
-            $query = "SELECT nama FROM users WHERE BINARY email = ? LIMIT 1";
+            $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
             $stmt[0]->bind_param('s', $email);
             $result = '';
@@ -83,21 +83,21 @@ class MailController{
             $stmt[0]->execute();
             if ($stmt[0]->fetch()) {
                 $stmt[0]->close();
-                //checking if email exist in table verify
-                $query = "SELECT code,link FROM verify WHERE BINARY email = ? AND description = ? LIMIT 1";
+                //checking if email exist in table verifikasi
+                $query = "SELECT kode_otp,link FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? LIMIT 1";
                 $stmt[1] = self::$con->prepare($query);
-                $description = 'verifyEmail';
-                $stmt[1]->bind_param('ss', $email, $description);
-                $code = ''; $link = '';
-                $stmt[1]->bind_result($code, $link);
+                $deskripsi = 'email';
+                $stmt[1]->bind_param('ss', $email, $deskripsi);
+                $kode_otp = ''; $link = '';
+                $stmt[1]->bind_result($kode_otp, $link);
                 $stmt[1]->execute();
                 if ($stmt[1]->fetch()) {
                     $stmt[1]->close();
                     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
                     $host = $_SERVER['HTTP_HOST'];
                     $baseURL = $protocol . '://' . $host;
-                    $verificationLink = $baseURL . '/verify/email/' . $link;
-                    return ['status'=>'success','data'=>['code'=>$code,'link'=>$verificationLink]];
+                    $verificationLink = $baseURL . '/verifikasi/email/' . $link;
+                    return ['status'=>'success','data'=>['kode_otp'=>$kode_otp,'link'=>$verificationLink]];
                 }else{
                     $stmt[1]->close();
                     return ['status'=>'error','message'=>'email invalid'];
@@ -119,7 +119,7 @@ class MailController{
             }else{
                 $currentDateTime = Carbon::now(self::$timeZone);
                 $now = $currentDateTime->format('Y-m-d H:i:s');
-                $query = "SELECT nama FROM users WHERE BINARY email = ? LIMIT 1";
+                $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $email);
                 $result = '';
@@ -130,29 +130,29 @@ class MailController{
                     $stmt[0]->close();
                     //create timeout
                     $subminute = $currentDateTime->subMinutes(15);
-                    $query = "SELECT updated_at FROM verify WHERE BINARY email = ? AND description = ? LIMIT 1";
+                    $query = "SELECT updated_at FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
-                    $description = 'verifyEmail';
-                    $stmt[1]->bind_param('ss', $email, $description);
+                    $deskripsi = 'email';
+                    $stmt[1]->bind_param('ss', $email, $deskripsi);
                     $stmt[1]->execute();
-                    //checking if email exist in table verify
+                    //checking if email exist in table verifikasi
                     if ($stmt[1]->fetch()) {
                         $stmt[1]->close();
-                        $query = "SELECT updated_at FROM verify WHERE BINARY email = ? AND description = ? AND updated_at >= ? LIMIT 1";
+                        $query = "SELECT updated_at FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? AND updated_at >= ? LIMIT 1";
                         $stmt[2] = self::$con->prepare($query);
-                        $stmt[2]->bind_param('sss', $email, $description, $subminute);
+                        $stmt[2]->bind_param('sss', $email, $deskripsi, $subminute);
                         $stmt[2]->execute();
-                        //checking if user have create verify email
+                        //checking if user have create verifikasi email
                         if ($stmt[2]->fetch()) {
                             $stmt[2]->close();
-                            //if after 15 minute then update code
+                            //if after 15 minute then update kode_otp
                             $verificationCode = mt_rand(100000, 999999);
                             $linkPath = bin2hex(random_bytes(50 / 2));
                             $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
                             $host = $_SERVER['HTTP_HOST'];
                             $baseURL = $protocol . '://' . $host;
-                            $verificationLink = $baseURL . '/verify/email/' . $linkPath;
-                            $query = "UPDATE verify SET link = ?, code = ? updated_at = ? FROM verify WHERE BINARY email = ? LIMIT 1";
+                            $verificationLink = $baseURL . '/verifikasi/email/' . $linkPath;
+                            $query = "UPDATE verifikasi SET link = ?, kode_otp = ? updated_at = ? FROM verifikasi WHERE BINARY email = ? LIMIT 1";
                             $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('ssss',$verificationLink, $verificationCode, $email, $now, $email);
                             $stmt[3]->execute();
@@ -160,23 +160,23 @@ class MailController{
                             //update link
                             if ($affectedRows > 0) {
                                 $stmt[3]->close();
-                                $data = ['name'=>$result,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink),'description'=>'verifyEmail'];
+                                $data = ['name'=>$result,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'email'];
                                 //resend email
                                 $result = $this->send($data);
                                 if($result['status'] == 'error'){
                                     return ['status'=>'error','message'=>$result['message']];
                                 }else{
-                                    return ['status'=>'success','message'=>'success send verify email','data'=>['waktu'=>$subminute]];
+                                    return ['status'=>'success','message'=>'success send verifikasi email','data'=>['waktu'=>$subminute]];
                                 }
                             }else{
                                 $stmt[3]->close();
-                                return ['status'=>'error','message'=>'fail create verify email'];
+                                return ['status'=>'error','message'=>'fail create verifikasi email'];
                             }
                         }else{
                             $stmt[2]->close();
-                            return ['status'=>'error','message'=>'we have send verify email'];
+                            return ['status'=>'error','message'=>'we have send verifikasi email'];
                         }
-                    //if user not create verify email
+                    //if user not create verifikasi email
                     }else{
                         $stmt[1]->close();
                         $verificationCode = mt_rand(100000, 999999);
@@ -184,31 +184,41 @@ class MailController{
                         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
                         $host = $_SERVER['HTTP_HOST'];
                         $baseURL = $protocol . '://' . $host;
-                        $verificationLink = $baseURL . '/verify/email/' . $linkPath;
-                        $query = "INSERT INTO verify (email, code, link, description, created_at, updated_at) VALUES(?,?,?,?,?,?)";
+                        $verificationLink = $baseURL . '/verifikasi/email/' . $linkPath;
+                        //get id_user
+                        $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
                         $stmt[2] = self::$con->prepare($query);
-                        $description = 'verifyEmail';
-                        $stmt[2]->bind_param("ssssss", $data['email'], $verificationCode, $linkPath, $description, $now, $now);
+                        $stmt[2]->bind_param('s', $data['email']);
                         $stmt[2]->execute();
-                        if ($stmt[2]->affected_rows > 0) {
-                            $data = ['name'=>$result,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink),'description'=>'verifyEmail'];
+                        $idUser = '';
+                        $stmt[2]->bind_result($idUser);
+                        $stmt[2]->fetch();
+                        $stmt[2]->close();
+                        //insert data
+                        $query = "INSERT INTO verifikasi (email, kode_otp, link, deskripsi, created_at, updated_at,id_user) VALUES(?,?,?,?,?,?,?)";
+                        $stmt[3] = self::$con->prepare($query);
+                        $deskripsi = 'email';
+                        $stmt[3]->bind_param("sssssss", $data['email'], $verificationCode, $linkPath, $deskripsi, $now, $now, $idUser);
+                        $stmt[3]->execute();
+                        if ($stmt[3]->affected_rows > 0) {
+                            $data = ['name'=>$result,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'email'];
                             $result = $this->send($data);
                             if($result['status'] == 'error'){
-                                return ['status'=>'error','message'=>$result['message'],'code'=> isset($result['code']) ? $result['code'] : 400 ,'data'=>['waktu'=>$subminute]];
+                                return ['status'=>'error','message'=>$result['message'],'kode_otp'=> isset($result['kode_otp']) ? $result['kode_otp'] : 400 ,'data'=>['waktu'=>$subminute]];
                             }else{
-                                return ['status'=>'success','message'=>'Akun Berhasil Dibuat Silahkan verifikasi email','code'=>200,'data'=>['waktu'=>$subminute]];
+                                return ['status'=>'success','message'=>'Akun Berhasil Dibuat Silahkan verifikasi email','kode_otp'=>200,'data'=>['waktu'=>$subminute]];
                             }
                         }else{
-                            $stmt[2]->close();
-                            return ['status'=>'error','message'=>'fail create verify email','code'=>500];
+                            $stmt[3]->close();
+                            return ['status'=>'error','message'=>'fail create verifikasi email','kode_otp'=>500];
                         }
                     }
                 }else{
                     $stmt[0]->close();
-                    if($_SERVER['REQUEST_URI']->path() === 'verify/create/email' && $_SERVER['REQUEST_METHOD'] === 'get'){
+                    if($_SERVER['REQUEST_URI']->path() === 'verifikasi/create/email' && $_SERVER['REQUEST_METHOD'] === 'get'){
                         return ['status'=>'error','message'=>'email invalid'];
                     }else{
-                        return ['status'=>'error','message'=>'email invalid','code'=>400];
+                        return ['status'=>'error','message'=>'email invalid','kode_otp'=>400];
                     }
                 }    
             }
@@ -229,7 +239,7 @@ class MailController{
                 //checking if email exist in table user
                 $currentDateTime = Carbon::now(self::$timeZone);
                 $now = $currentDateTime->format('Y-m-d H:i:s');
-                $query = "SELECT nama FROM users WHERE BINARY email = ? LIMIT 1";
+                $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $email);
                 $result = '';
@@ -237,33 +247,33 @@ class MailController{
                 $stmt[0]->execute();
                 //check email exist in table user
                 if ($stmt[0]->fetch()) {
-                    //checking if email exist in table verify
+                    //checking if email exist in table verifikasi
                     $stmt[0]->close();
                     //create timeout
                     $subminute = $currentDateTime->subMinutes(15);
-                    $query = "SELECT updated_at FROM verify WHERE BINARY email = ? AND description = ? LIMIT 1";
+                    $query = "SELECT updated_at FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
-                    $description = 'changePass';
-                    $stmt[1]->bind_param('ss', $email, $description);
+                    $deskripsi = 'password';  
+                    $stmt[1]->bind_param('ss', $email, $deskripsi);
                     $stmt[1]->execute();
-                    //checking if email exist in table verify
+                    //checking if email exist in table verifikasi
                     if ($stmt[1]->fetch()) {
                         $stmt[1]->close();
-                        $query = "SELECT updated_at FROM verify WHERE BINARY email = ? AND description = ? AND updated_at >= ? LIMIT 1";
+                        $query = "SELECT updated_at FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? AND updated_at >= ? LIMIT 1";
                         $stmt[2] = self::$con->prepare($query);
-                        $stmt[2]->bind_param('sss', $email, $description, $subminute);
+                        $stmt[2]->bind_param('sss', $email, $deskripsi, $subminute);
                         $stmt[2]->execute();
-                        //checking if user have create verify email
+                        //checking if user have create verifikasi email
                         if ($stmt[2]->fetch()) {
                             $stmt[2]->close();
-                            //if after 15 minute then update code
+                            //if after 15 minute then update kode_otp
                             $verificationCode = mt_rand(100000, 999999);
                             $linkPath = bin2hex(random_bytes(50 / 2));
                             $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
                             $host = $_SERVER['HTTP_HOST'];
                             $baseURL = $protocol . '://' . $host;
-                            $verificationLink = $baseURL . '/verify/password/' . $linkPath;
-                            $query = "UPDATE verify SET link = ?, code = ?, updated_at = ? WHERE BINARY email = ? AND description = 'changePass' LIMIT 1";
+                            $verificationLink = $baseURL . '/verifikasi/password/' . $linkPath;
+                            $query = "UPDATE verifikasi SET link = ?, kode_otp = ?, updated_at = ? WHERE BINARY email = ? AND deskripsi = 'password' LIMIT 1";
                             $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('ssss',$linkPath, $verificationCode, $now, $email);
                             $stmt[3]->execute();
@@ -271,17 +281,17 @@ class MailController{
                             //update link
                             if ($affectedRows > 0) {
                                 $stmt[3]->close();
-                                $data = ['name'=>$result,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink),'description'=>'changePass'];
+                                $data = ['name'=>$result,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'password'];
                                 //resend email
                                 $result = $this->send($data);
                                 if($result['status' == 'error']){
-                                    return ['status'=>'error','message'=>$result['message'],'code'=>isset($result['code']) ? $result['code'] : 400,'data'=>['waktu'=>$subminute]];
+                                    return ['status'=>'error','message'=>$result['message'],'kode_otp'=>isset($result['kode_otp']) ? $result['kode_otp'] : 400,'data'=>['waktu'=>$subminute]];
                                 }else{
                                     return ['status'=>'success','message'=>'success send reset Password','data'=>['waktu'=>$subminute]];
                                 }
                             }else{
                                 $stmt[3]->close();
-                                return ['status'=>'error','message'=>'fail create verify email','code'=>500];
+                                return ['status'=>'error','message'=>'fail create verifikasi email','kode_otp'=>500];
                             }
                         }else{
                             $stmt[2]->close();
@@ -295,23 +305,33 @@ class MailController{
                         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
                         $host = $_SERVER['HTTP_HOST'];
                         $baseURL = $protocol . '://' . $host;
-                        $verificationLink = $baseURL . '/verify/password/' . $linkPath;
-                        $query = "INSERT INTO verify (email, code, link, description, created_at, updated_at) VALUES(?,?,?,?,?,?)";
+                        $verificationLink = $baseURL . '/verifikasi/password/' . $linkPath;
+                        //get id_user
+                        $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
                         $stmt[2] = self::$con->prepare($query);
-                        $description = 'changePass';
-                        $stmt[2]->bind_param("ssssss", $data['email'], $verificationCode, $linkPath, $description, $now, $now);
+                        $stmt[2]->bind_param('s', $data['email']);
                         $stmt[2]->execute();
-                        if ($stmt[2]->affected_rows > 0) {
-                            $data = ['name'=>$result,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink),'description'=>'changePass'];
+                        $idUser = '';
+                        $stmt[2]->bind_result($idUser);
+                        $stmt[2]->fetch();
+                        $stmt[2]->close();
+                        //insert data
+                        $query = "INSERT INTO verifikasi (email, kode_otp, link, deskripsi, created_at, updated_at,id_user) VALUES(?,?,?,?,?,?,?)";
+                        $stmt[3] = self::$con->prepare($query);
+                        $deskripsi = 'password';
+                        $stmt[3]->bind_param("sssssss", $data['email'], $verificationCode, $linkPath, $deskripsi, $now, $now, $idUser);
+                        $stmt[3]->execute();
+                        if ($stmt[3]->affected_rows > 0) {
+                            $data = ['name'=>$result,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'password'];
                             $result = $this->send($data);
                             if($result['status'] == 'error'){
-                                return ['status'=>'error','message'=>$result['message'],'code'=>isset($result['code']) ? $result['code'] : 400,'data'=>['waktu'=>$subminute]];
+                                return ['status'=>'error','message'=>$result['message'],'kode_otp'=>isset($result['kode_otp']) ? $result['kode_otp'] : 400,'data'=>['waktu'=>$subminute]];
                             }else{
-                                return ['status'=>'success','message'=>'Reset password sudah dikirim ','code'=>200,'data'=>['waktu'=>$subminute]];
+                                return ['status'=>'success','message'=>'Reset password sudah dikirim ','kode_otp'=>200,'data'=>['waktu'=>$subminute]];
                             }
                         }else{
-                            $stmt[2]->close();
-                            return ['status'=>'error','message'=>'fail create verify email','code'=>500];
+                            $stmt[3]->close();
+                            return ['status'=>'error','message'=>'fail create verifikasi email','kode_otp'=>500];
                         }
                     }
                 }else{
@@ -324,21 +344,21 @@ class MailController{
             return ['status'=>'error','message'=>$e->getMessage()];
         }
     }
-    public function verifyEmail($data, $uri,$method){
+    public function email($data, $uri,$method){
         $email = $data['email'];
         if(empty($email) || is_null($email)){
-            return ['status'=>'error','message'=>'Email empty','code'=>400];
+            return ['status'=>'error','message'=>'Email empty','kode_otp'=>400];
         }else{
-            $prefix = "/verify/email/";
+            $prefix = "/verifikasi/email/";
             if(($uri === $prefix) && $method === "post"){
                 $linkPath = substr($uri, strlen($prefix));
-                $query = "SELECT email FROM verify WHERE BINARY link = ? LIMIT 1";
+                $query = "SELECT email FROM verifikasi WHERE BINARY link = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $linkPath);
                 $email1 = '';
                 $stmt[0]->bind_result($email1);
                 $stmt[0]->execute();
-                //checking if email exist in table verify
+                //checking if email exist in table verifikasi
                 if ($stmt[0]->fetch()) {
                     $stmt[0]->close();
                     //check email is same
@@ -352,18 +372,18 @@ class MailController{
                         //update link
                         if ($affectedRows > 0) {
                             $stmt[1]->close();
-                            return ['status'=>'success','message'=>'email verify success'];
+                            return ['status'=>'success','message'=>'email verifikasi success'];
                         }else{
                             $stmt[1]->close();
                             // return redirect('/login');
-                            return ['status'=>'error','message'=>'Email invalid','code'=>500];
+                            return ['status'=>'error','message'=>'Email invalid','kode_otp'=>500];
                         }
                     }else{
-                        return ['status'=>'error','message'=>'email invalid','code'=>400];
+                        return ['status'=>'error','message'=>'email invalid','kode_otp'=>400];
                     }
                 }else{
                     $stmt[0]->close();
-                    return ['status'=>'error','message'=>'link invalid','code'=>400];
+                    return ['status'=>'error','message'=>'link invalid','kode_otp'=>400];
                 }
             }else{
                 return ['status'=>'error','message'=>'not found'];

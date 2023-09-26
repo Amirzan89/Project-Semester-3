@@ -10,6 +10,7 @@ require_once $rootDir . '/Controllers/Mail/MailController.php';
 // require_once $rootDir . '/Controllers/Website/ChangePasswordController.php';
 require_once $rootDir . '/Controllers/Website/NotificationPageController.php';
 use Database\Database;
+use Database\Models\User as UsersModels;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
@@ -45,12 +46,12 @@ class UserController{
             }
             if($opt == 'register'){
                 $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-                $query = "INSERT INTO users (email,password, nama, email_verified, level,created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                $now = Carbon::now('Asia/Jakarta');
-                $verified = false;
+                $query = "INSERT INTO users (email,password, nama_lengkap, verifikasi, role) VALUES (?, ?, ?, ?, ?)";
+                // $now = Carbon::now('Asia/Jakarta');
+                $verifikasi = false;
                 $stmt = self::$con->prepare($query);
-                $level = 'ADMIN';
-                $stmt->bind_param("sssbsss", $data['email'], $hashedPassword, $data['nama'],$verified, $level, $now, $now);
+                $role = 'MASYARAKAT';
+                $stmt->bind_param("sssbs", $data['email'], $hashedPassword, $data['nama'],$verifikasi, $role);
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
                     $email = self::$mailController->createVerifyEmail($data);
@@ -66,12 +67,12 @@ class UserController{
                 }
             }else if('google'){
                 $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-                $query = "INSERT INTO users (email,password, nama, no_telpon, email_verified, level,created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                $verified = true;
+                $query = "INSERT INTO users (email,password, nama_lengkap, no_telpon, verifikasi, role) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $verifikasi = true;
                 $stmt = self::$con->prepare($query);
-                $now = Carbon::now('Asia/Jakarta');
-                $level = 'ADMIN';
-                $stmt->bind_param("sssbsss", $data['email'], $hashedPassword, $data['nama'],$data['no_telpon'],$verified, $level, $now, $now);
+                // $now = Carbon::now('Asia/Jakarta');
+                $role = 'ADMIN';
+                $stmt->bind_param("sssbsss", $data['email'], $hashedPassword, $data['nama'],$data['no_telpon'],$verifikasi, $role);
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
                     $email = self::$mailController->createVerifyEmail($data);
@@ -165,7 +166,7 @@ class UserController{
         if(empty($email) || is_null($email)){
             return ['status'=>'error','message'=>'email empty'];
         }else{
-            $query = "SELECT nama FROM users WHERE BINARY email = ? LIMIT 1";
+            $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt = self::$con->prepare($query);
             $stmt->bind_param('s', $email);
             $stmt->execute();
@@ -203,11 +204,11 @@ class UserController{
             //get relative path 
             $lastSlashPos = strrpos($path, '/');
             $path1 = substr($uri, 0, $lastSlashPos+1);
-            if($path1 == '/verify/password' && $method == 'GET'){
+            if($path1 == '/verifikasi/password' && $method == 'GET'){
                 $email = $param['email'];
                 //get link 
                 $link = ltrim(substr($path, strrpos($path, '/')),'/');
-                $query = "SELECT id_verify FROM verify WHERE BINARY link = ? LIMIT 1";
+                $query = "SELECT id_verify FROM verifikasi WHERE BINARY link = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $link);
                 $stmt[0]->execute();
@@ -216,7 +217,7 @@ class UserController{
                 //check link is valid
                 if ($stmt[0]->fetch()) {
                     $stmt[0]->close();
-                    $query = "SELECT id_verify FROM verify WHERE BINARY email = ? LIMIT 1";
+                    $query = "SELECT id_verify FROM verifikasi WHERE BINARY email = ? LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
                     $stmt[1]->bind_param('s', $email);
                     $stmt[1]->execute();
@@ -225,7 +226,7 @@ class UserController{
                     //check email is valid
                     if ($stmt[1]->fetch()) {
                         $stmt[1]->close();
-                        $query = "SELECT id_verify FROM verify WHERE BINARY email = ? AND BINARY LINK = ? LIMIT 1";
+                        $query = "SELECT id_verify FROM verifikasi WHERE BINARY email = ? AND BINARY LINK = ? LIMIT 1";
                         $stmt[2] = self::$con->prepare($query);
                         $stmt[2]->bind_param('ss', $email,$link);
                         $stmt[2]->execute();
@@ -235,7 +236,7 @@ class UserController{
                         if ($stmt[2]->fetch()) {
                             $stmt[2]->close();
                             $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
-                            $query = "SELECT id_verify FROM verify WHERE BINARY email = ?  AND updated_at >= ? LIMIT 1";
+                            $query = "SELECT id_verify FROM verifikasi WHERE BINARY email = ?  AND updated_at >= ? LIMIT 1";
                             $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('ss', $email,$time);
                             $stmt[3]->execute();
@@ -257,7 +258,7 @@ class UserController{
                                 exit();
                             }else{
                                 $stmt[3]->close();
-                                $query = "DELETE FROM verify WHERE BINARY link = ?";
+                                $query = "DELETE FROM verifikasi WHERE BINARY link = ?";
                                 $stmt = self::$con->prepare($query);
                                 $stmt->bind_param('s', $link);
                                 $result = $stmt->execute();
@@ -277,7 +278,7 @@ class UserController{
                 }
             }else{
                 $email = $data['email'];
-                $query = "SELECT id_verify FROM verify WHERE BINARY email = ? LIMIT 1";
+                $query = "SELECT id_verify FROM verifikasi WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $email);
                 $stmt[0]->execute();
@@ -286,7 +287,7 @@ class UserController{
                 //check email is valid
                 if ($stmt[0]->fetch()) {
                     $stmt[0]->close();
-                    $query = "SELECT id_verify FROM verify WHERE BINARY email = ? AND binary code = ? LIMIT 1";
+                    $query = "SELECT id_verify FROM verifikasi WHERE BINARY email = ? AND binary code = ? LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
                     $stmt[1]->bind_param('ss', $email, $code);
                     $stmt[1]->execute();
@@ -296,7 +297,7 @@ class UserController{
                     if ($stmt[1]->fetch()) {
                         $stmt[1]->close();
                         $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
-                        $query = "SELECT id_verify FROM verify WHERE BINARY email = ? AND updated_at >= ? LIMIT 1";
+                        $query = "SELECT id_verify FROM verifikasi WHERE BINARY email = ? AND updated_at >= ? LIMIT 1";
                         $stmt[2] = self::$con->prepare($query);
                         $stmt[2]->bind_param('ss', $email, $time);
                         $stmt[2]->execute();
@@ -306,10 +307,10 @@ class UserController{
                         if ($stmt[2]->fetch()) {
                             $stmt[2]->close();
                             return ['status'=>'success','message'=>'otp anda benar silahkan ganti password'];
-                            // return response()->json(['status'=>'success','data'=>['div'=>'verify','description'=>'changePass']]);
+                            // return response()->json(['status'=>'success','data'=>['div'=>'verifikasi','description'=>'changePass']]);
                         }else{
                             $stmt[2]->close();
-                            $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'changePass'";
+                            $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND description = 'changePass'";
                             $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('s', $email);
                             $result = $stmt[3]->execute();
@@ -406,12 +407,12 @@ class UserController{
                 if(is_null($link) || empty($link)){
                     if($desc == 'createUser'){
                         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-                        $query = "INSERT INTO users (email,password, nama, email_verified, level,created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                        $verified = true;
+                        $query = "INSERT INTO users (email,password, nama_lengkap, verifikasi, role) VALUES (?, ?, ?, ?, ?)";
+                        $verifikasi = true;
                         $stmt = self::$con->prepare($query);
-                        $now = Carbon::now('Asia/Jakarta');
-                        $level = 'ADMIN';
-                        $stmt->bind_param("sssbsss", $data['email'], $hashedPassword, $data['nama'],$verified, $level, $now, $now);
+                        // $now = Carbon::now('Asia/Jakarta');
+                        $role = 'MASYARAKAT';
+                        $stmt->bind_param("sssbs", $data['email'], $hashedPassword, $data['nama'],$verifikasi, $role);
                         $stmt->execute();
                         if ($stmt->affected_rows > 0) {
                             $stmt->close();
@@ -436,13 +437,13 @@ class UserController{
                         }
                     }else{
                         $code = $data['code'];
-                        $query = "SELECT id_verify FROM verify WHERE BINARY code = ? LIMIT 1";
+                        $query = "SELECT id_verify FROM verifikasi WHERE BINARY code = ? LIMIT 1";
                         $stmt[0] = self::$con->prepare($query);
                         $stmt[0]->bind_param('s', $code);
                         $stmt[0]->execute();
                         $name = '';
                         $stmt[0]->bind_result($name);
-                        //check email is valid on table verify
+                        //check email is valid on table verifikasi
                         if ($stmt[0]->fetch()) {
                             $stmt[0]->close();
                             $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
@@ -460,17 +461,17 @@ class UserController{
                                 $stmt[2]->execute();
                                 $name = '';
                                 $stmt[2]->bind_result($name);
-                                //check email and code is valid on table verify
+                                //check email and code is valid on table verifikasi
                                 if ($stmt[2]->fetch()) {
                                     $stmt[2]->close();
                                     $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
-                                    $query = "SELECT id_verify FROM verify WHERE BINARY email = ? AND updated_at >= ? LIMIT 1";
+                                    $query = "SELECT id_verify FROM verifikasi WHERE BINARY email = ? AND updated_at >= ? LIMIT 1";
                                     $stmt[3] = self::$con->prepare($query);
                                     $stmt[3]->bind_param('ss', $email, $time);
                                     $stmt[3]->execute();
                                     $name = '';
                                     $stmt[3]->bind_result($name);
-                                    //check time is valid on table verify
+                                    //check time is valid on table verifikasi
                                     if ($stmt[3]->fetch()) {
                                         $stmt[3]->close();
                                         $newPass = password_hash($pass, PASSWORD_DEFAULT,['cost'=>10]);
@@ -479,10 +480,10 @@ class UserController{
                                         $stmt[4]->bind_param('ss', $newPass, $email);
                                         $stmt[4]->execute();
                                         $affectedRows = $stmt[4]->affected_rows;
-                                        //check time is valid on table verify
+                                        //check time is valid on table verifikasi
                                         if ($affectedRows > 0) {
                                             $stmt[4]->close();
-                                            $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'changePass'";
+                                            $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND description = 'changePass'";
                                             $stmt[5] = self::$con->prepare($query);
                                             $stmt[5]->bind_param('s', $email);
                                             $result = $stmt[5]->execute();
@@ -499,7 +500,7 @@ class UserController{
                                         }
                                     }else{
                                         $stmt[3]->close();
-                                        $query = "DELETE FROM verify WHERE BINARY code = ? AND description = 'changePass'";
+                                        $query = "DELETE FROM verifikasi WHERE BINARY code = ? AND description = 'changePass'";
                                         $stmt[4] = self::$con->prepare($query);
                                         $stmt[4]->bind_param('s', $code);
                                         $result = $stmt[4]->execute();
@@ -521,41 +522,41 @@ class UserController{
                     }
                 //
                 }else{
-                    $query = "SELECT id_verify FROM verify WHERE BINARY link = ? AND description = $desc LIMIT 1";
+                    $query = "SELECT id_verify FROM verifikasi WHERE BINARY link = ? AND description = $desc LIMIT 1";
                     $stmt[0] = self::$con->prepare($query);
                     $stmt[0]->bind_param('s', $link);
                     $stmt[0]->execute();
                     $name = '';
                     $stmt[0]->bind_result($name);
-                    //check link is valid on table verify
+                    //check link is valid on table verifikasi
                     if ($stmt[0]->fetch()) {
                         $stmt[0]->close();
-                        $query = "SELECT id_verify FROM verify WHERE BINARY email = ? AND description = $desc LIMIT 1";
+                        $query = "SELECT id_verify FROM verifikasi WHERE BINARY email = ? AND description = $desc LIMIT 1";
                         $stmt[1] = self::$con->prepare($query);
                         $stmt[1]->bind_param('s', $email);
                         $stmt[1]->execute();
                         $name = '';
                         $stmt[1]->bind_result($name);
-                        //check email is valid on table verify
+                        //check email is valid on table verifikasi
                         if ($stmt[1]->fetch()) {
                             $stmt[1]->close();
-                            $query = "SELECT id_verify FROM verify WHERE BINARY email = ? AND BINARY link = ? AND description = $desc LIMIT 1";
+                            $query = "SELECT id_verify FROM verifikasi WHERE BINARY email = ? AND BINARY link = ? AND description = $desc LIMIT 1";
                             $stmt[2] = self::$con->prepare($query);
                             $stmt[2]->bind_param('ss', $email, $link);
                             $stmt[2]->execute();
                             $name = '';
                             $stmt[2]->bind_result($name);
-                            //check email and link is valid on table verify
+                            //check email and link is valid on table verifikasi
                             if ($stmt[2]->fetch()) {
                                 $stmt[2]->close();
                                 $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
-                                $query = "SELECT id_verify FROM verify WHERE BINARY email = ? AND updated_at >= ? AND description = $desc LIMIT 1";
+                                $query = "SELECT id_verify FROM verifikasi WHERE BINARY email = ? AND updated_at >= ? AND description = $desc LIMIT 1";
                                 $stmt[3] = self::$con->prepare($query);
                                 $stmt[3]->bind_param('ss', $email, $time);
                                 $stmt[3]->execute();
                                 $name = '';
                                 $stmt[3]->bind_result($name);
-                                //check time is valid on table verify
+                                //check time is valid on table verifikasi
                                 if ($stmt[3]->fetch()) {
                                     $stmt[3]->close();
                                     $query = "UPDATE users SET password = ? WHERE BINARY email = ? LIMIT 1";
@@ -564,10 +565,10 @@ class UserController{
                                     $stmt[4]->bind_param('ss', $newPass, $email);
                                     $stmt[4]->execute();
                                     $affectedRows = $stmt[4]->affected_rows;
-                                    //check time is valid on table verify
+                                    //check time is valid on table verifikasi
                                     if ($affectedRows > 0) {
                                         $stmt[4]->close();
-                                        $query = "DELETE FROM verify WHERE BINARY email = ? AND description = $desc";
+                                        $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND description = $desc";
                                         $stmt[5] = self::$con->prepare($query);
                                         $stmt[5]->bind_param('s', $email);
                                         $result = $stmt[5]->execute();
@@ -584,7 +585,7 @@ class UserController{
                                     }
                                 }else{
                                     $stmt[3]->close();
-                                    $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'changePass'";
+                                    $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND description = 'changePass'";
                                     $stmt[4] = self::$con->prepare($query);
                                     $stmt[4]->bind_param('s', $email);
                                     $result = $stmt[4]->execute();
@@ -606,6 +607,7 @@ class UserController{
                 }
             }
         } catch (Exception $e) {
+            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $erorr = json_decode($error, true);
             if ($erorr === null) {
@@ -646,7 +648,7 @@ class UserController{
                 return ['status' => 'error', 'message' => $errors];
             }
             $email = $data['email'];
-            $query =  "SELECT nama FROM users WHERE BINARY email = ? LIMIT 1";
+            $query =  "SELECT nama_lengkap FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
             $stmt[0]->bind_param('s', $email);
             $stmt[0]->execute();
@@ -662,9 +664,9 @@ class UserController{
                 $lastSlashPos = strrpos($path, '/');
                 $path1 = substr($uri, 1, $lastSlashPos);
                 // $email = $param['email'];
-                if($path1 == '/verify/email' && $method == 'GET'){
+                if($path1 == '/verifikasi/email' && $method == 'GET'){
                     $link = ltrim(substr($path, strrpos($path, '/')),'/');
-                    $query =  "SELECT id_verify FROM verify WHERE BINARY link = ? LIMIT 1";
+                    $query =  "SELECT id_verify FROM verifikasi WHERE BINARY link = ? LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
                     $stmt[1]->bind_param('s', $link);
                     $stmt[1]->execute();
@@ -744,48 +746,48 @@ class UserController{
             //get relative path 
             $lastSlashPos = strrpos($path, '/');
             $path1 = substr($uri, 0, $lastSlashPos+1);
-            if($path1 == '/verify/email' && $method == 'GET'){
+            if($path1 == '/verifikasi/email' && $method == 'GET'){
                 $email = $param['email'];
                 $link = ltrim(substr($path, strrpos($path, '/')),'/');
                 // echo 'link '.$link;
-                $query =  "SELECT id_verify FROM verify WHERE BINARY link = ? LIMIT 1";
+                $query =  "SELECT id_verify FROM verifikasi WHERE BINARY link = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $link);
                 $stmt[0]->execute();
                 $name = '';
                 $stmt[0]->bind_result($name);
-                //check link is valid on table verify
+                //check link is valid on table verifikasi
                 if ($stmt[0]->fetch()) {
                     $stmt[0]->close();
-                    $query =  "SELECT id_verify FROM verify WHERE BINARY email = ? LIMIT 1";
+                    $query =  "SELECT id_verify FROM verifikasi WHERE BINARY email = ? LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
                     $stmt[1]->bind_param('s', $email);
                     $stmt[1]->execute();
                     $name = '';
                     $stmt[1]->bind_result($name);
-                    //check email is valid on table verify
+                    //check email is valid on table verifikasi
                     if ($stmt[1]->fetch()) {
                         $stmt[1]->close();
-                        $query =  "SELECT id_verify FROM verify WHERE BINARY email = ? AND BINARY link = ? AND description = 'verifyEmail' LIMIT 1";
+                        $query =  "SELECT id_verify FROM verifikasi WHERE BINARY email = ? AND BINARY link = ? AND description = 'verifyEmail' LIMIT 1";
                         $stmt[2] = self::$con->prepare($query);
                         $stmt[2]->bind_param('ss', $email, $link);
                         $stmt[2]->execute();
                         $name = '';
                         $stmt[2]->bind_result($name);
-                        //check email and link is valid on table verify
+                        //check email and link is valid on table verifikasi
                         if ($stmt[2]->fetch()) {
                             $stmt[2]->close();
                             $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
-                            $query =  "SELECT id_verify FROM verify WHERE BINARY email = ? AND updated_at >= ? AND description = 'verifyEmail' LIMIT 1";
+                            $query =  "SELECT id_verify FROM verifikasi WHERE BINARY email = ? AND updated_at >= ? AND description = 'verifyEmail' LIMIT 1";
                             $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('ss', $email, $time);
                             $stmt[3]->execute();
                             $name = '';
                             $stmt[3]->bind_result($name);
-                            //check time is valid on table verify
+                            //check time is valid on table verifikasi
                             if ($stmt[3]->fetch()) {
                                 $stmt[3]->close();
-                                $query =  "UPDATE users SET email_verified = true WHERE BINARY email = ?";
+                                $query =  "UPDATE users SET verifikasi = true WHERE BINARY email = ?";
                                 $stmt[4] = self::$con->prepare($query);
                                 $stmt[4]->bind_param('s', $email);
                                 $stmt[4]->execute();
@@ -793,7 +795,7 @@ class UserController{
                                 //update users
                                 if ($affectedRows > 0) {
                                     $stmt[4]->close();
-                                    $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'verifyEmail'";
+                                    $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND description = 'verifyEmail'";
                                     $stmt[5] = self::$con->prepare($query);
                                     $stmt[5]->bind_param('s', $email);
                                     $result = $stmt[5]->execute();
@@ -806,11 +808,11 @@ class UserController{
                                     }
                                 }else{
                                     $stmt[4]->close();
-                                    return ['status'=>'error','message'=>'error verify email','code'=>500];
+                                    return ['status'=>'error','message'=>'error verifikasi email','code'=>500];
                                 }
                             }else{
                                 $stmt[3]->close();
-                                $query = "DELETE FROM verify WHERE BINARY link = ?";
+                                $query = "DELETE FROM verifikasi WHERE BINARY link = ?";
                                 $stmt[4] = self::$con->prepare($query);
                                 $stmt[4]->bind_param('s', $link);
                                 $result = $stmt[4]->execute();
@@ -832,43 +834,43 @@ class UserController{
             }else{
                 $email = $data['email'];
                 $code = $data['code'];
-                $query =  "SELECT id_verify FROM verify WHERE BINARY email = ? LIMIT 1";
+                $query =  "SELECT id_verify FROM verifikasi WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $email);
                 $stmt[0]->execute();
                 $name = '';
                 $stmt[0]->bind_result($name);
-                //check email is valid on table verify
+                //check email is valid on table verifikasi
                 if ($stmt[0]->fetch()) {
                     $stmt[0]->close();
-                    $query =  "SELECT id_verify FROM verify WHERE BINARY email = ? AND BINARY code = ? AND description = 'verifyEmail' LIMIT 1";
+                    $query =  "SELECT id_verify FROM verifikasi WHERE BINARY email = ? AND BINARY code = ? AND description = 'verifyEmail' LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
                     $stmt[1]->bind_param('ss', $email, $code);
                     $stmt[1]->execute();
                     $name = '';
                     $stmt[1]->bind_result($name);
-                    //check email and code is valid on table verify
+                    //check email and code is valid on table verifikasi
                     if ($stmt[1]->fetch()) {
                         $stmt[1]->close();
                         $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
-                        $query =  "SELECT id_verify FROM verify WHERE BINARY email = ? AND updated_at >= ? AND description = 'verifyEmail' LIMIT 1";
+                        $query =  "SELECT id_verify FROM verifikasi WHERE BINARY email = ? AND updated_at >= ? AND description = 'verifyEmail' LIMIT 1";
                         $stmt[2] = self::$con->prepare($query);
                         $stmt[2]->bind_param('ss', $email, $time);
                         $stmt[2]->execute();
                         $name = '';
                         $stmt[2]->bind_result($name);
-                        //check time is valid on table verify
+                        //check time is valid on table verifikasi
                         if ($stmt[2]->fetch()) {
                             $stmt[2]->close();
-                            $query =  "UPDATE users SET email_verified = true WHERE BINARY email = ?";
+                            $query =  "UPDATE users SET verifikasi = true WHERE BINARY email = ?";
                             $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('s', $email);
                             $stmt[3]->execute();
                             $affectedRows = $stmt[3]->affected_rows;
-                            //check time is valid on table verify
+                            //check time is valid on table verifikasi
                             if ($affectedRows > 0) {
                                 $stmt[3]->close();
-                                $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'verifyEmail'";
+                                $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND description = 'verifyEmail'";
                                 $stmt[4] = self::$con->prepare($query);
                                 $stmt[4]->bind_param('s', $email);
                                 $result = $stmt[4]->execute();
@@ -877,7 +879,7 @@ class UserController{
                                     return ['status'=>'success','message'=>'verifikasi email berhasil silahkan login'];
                                 }else{
                                     $stmt[4]->close();
-                                    return ['status'=>'error','message'=>'error verify email','code'=>500];
+                                    return ['status'=>'error','message'=>'error verifikasi email','code'=>500];
                                 }
                             }else{
                                 $stmt[3]->close();
@@ -885,7 +887,7 @@ class UserController{
                             }
                         }else{
                             $stmt[2]->close();
-                            $query = "DELETE FROM verify WHERE BINARY email = ? AND description = 'verifyEmail'";
+                            $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND description = 'verifyEmail'";
                             $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('s', $email);
                             $result = $stmt[3]->execute();

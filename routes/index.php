@@ -14,7 +14,7 @@ require_once $rootDir . '/Controllers/UserController.php';
 require_once $rootDir . '/Controllers/Website/DashboardController.php';
 require_once $rootDir . '/Controllers/Website/Event/DashboardController.php';
 require_once $rootDir . '/Controllers/Website/Tempat/DashboardController.php';
-require_once $rootDir . '/Controllers/Website/Izin/DashboardController.php';
+require_once $rootDir . '/Controllers/Website/pentas/DashboardController.php';
 require_once $rootDir . '/Controllers/Website/Seniman/DashboardController.php';
 require_once $rootDir . '/Controllers/Auth/LoginController.php';
 require_once $rootDir . '/Controllers/Auth/RegisterController.php';
@@ -62,17 +62,17 @@ Route::group('/verify',[
     ]],
 ]);
 Route::group('/users',[
-    ['/register','POST','RegisterController@register',['Authenticate@handle']],
     ['/login','POST','LoginController@login',['Authenticate@handle']],
+    ['/register','POST','RegisterController@register',['Authenticate@handle']],
     ['/logout','POST','UserController@logout',['Authenticate@handle']],
 ]);
 // event
 Route::group('/event',[
-    ['/dashboard','GET','Controllers\Website\Event\EventDashboardController@show',['Authenticate@handle']],
+    ['/dashboard','GET','EventDashboardController@show',['Authenticate@handle']],
     ['/tambah','POST','Controllers\Website\Event\EventDashboardController@show',['Authenticate@handle']],
 ]);
-// Izin
-Route::group('/izin',[
+// pentas
+Route::group('/pentas',[
     ['/dashboard','GET','Izin\Dashboard@show'],
 ]);
 // seniman

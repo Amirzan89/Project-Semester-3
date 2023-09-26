@@ -144,7 +144,7 @@ class Authenticate
             }
         //if cookie gone
         }else{
-            $page = ['/dashboard','/device','/pengaturan','/laporan','/edukasi'];
+            $page = ['/dashboard','/device','/pengaturan','/laporan','/edukasi','/event/dashboard','/tempat/dashboard','/seniman/dashboard'];
             if(in_array($data['uri'],$page)){
                 if(isset($_COOKIE["token1"])){
                     $token1 = $_COOKIE['token1'];

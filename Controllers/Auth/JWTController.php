@@ -7,6 +7,7 @@ if(!defined('APP')){
 }
 // namespace Controllers\Auth;
 use Database\Database;
+use Database\Models\User as UsersModels;
 use Illuminate\Support\Facades\Hash;
 // use Firebase\JWT\JWT;
 // use Lcobucci\JWT\Builder;
@@ -27,7 +28,6 @@ use Carbon\Carbon;
 class JwtController{
     private static $database;
     private static $con;
-    private static $userColumns;
     private static $exp; 
     private static $expRefresh;
     private static $secretKey;
@@ -38,7 +38,6 @@ class JwtController{
     private static $keyRefresh; 
     private static $algorithm;
     public function __construct(){
-        self::$userColumns = ['id_user','nama','no_telpon','email', 'password','email_verified','level','created_at','updated_at'];
         self::$database = Database::getInstance();
         self::$con = self::$database->getConnection();
         self::$exp = intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']);
@@ -250,17 +249,27 @@ class JwtController{
                 return ['status'=>'error','message'=>'token kosong'];
             }
             if($opt == 'website'){
-                $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+                //get id_user
+                $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
+                $stmt[0] = self::$con->prepare($query);
+                $stmt[0]->bind_param('s', $data['email']);
+                $stmt[0]->execute();
+                $idUser = '';
+                $stmt[0]->bind_result($idUser);
+                $stmt[0]->fetch();
+                $stmt[0]->close();
+                $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at,id_user) VALUES (?, ?, ?, ?, ?, ?)";
                 $number = false;
-                $stmt = self::$con->prepare($query);
+                $stmt[1] = self::$con->prepare($query);
                 $now = Carbon::now('Asia/Jakarta');
                 $device = 'website';
-                $stmt->bind_param("sssbss", $email,$token, $device,$number, $now, $now);
-                $stmt->execute();
-                if ($stmt->affected_rows > 0) {
-                    $stmt->close();
+                $stmt[1]->bind_param("sssbss", $email,$token, $device,$number, $now, $now, $idUser);
+                $stmt[1]->execute();
+                if ($stmt[1]->affected_rows > 0) {
+                    $stmt[1]->close();
                     return ['status'=>'success','message'=>'saving token success website'];
                 }else{
+                    $stmt[1]->close();
                     return ['status'=>'error','message'=>'error saving token','code'=>500];
                 }
             }
@@ -297,18 +306,19 @@ class JwtController{
                 return ['status'=>'error','message'=>'email empty'];
             }else{
                 //check email is exist on database
-                $query = "SELECT * FROM users WHERE BINARY email = ? LIMIT 1";
+                $columns = implode(',', UsersModels::$userColumns);
+                $query = "SELECT $columns FROM users WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $emailInput);
                 $stmt[0]->execute();
                 $bindResultArray = [];
-                foreach (self::$userColumns as $column) {
+                foreach (UsersModels::$userColumns as $column) {
                     $bindResultArray[] = &$$column;
                 }
                 call_user_func_array([$stmt[0], 'bind_result'], $bindResultArray);
                 $resultDb = [];
                 if ($stmt[0]->fetch()) {
-                    foreach (self::$userColumns as $column) {
+                    foreach(UsersModels::$userColumns as $column) {
                         $resultDb[$column] = $$column;
                     }
                     $stmt[0]->close();
@@ -320,6 +330,15 @@ class JwtController{
                     if($number['status'] == 'error'){
                         return $number;
                     }else{
+                        //get id_user
+                        $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
+                        $stmt[0] = self::$con->prepare($query);
+                        $stmt[0]->bind_param('s', $data['email']);
+                        $stmt[0]->execute();
+                        $idUser = '';
+                        $stmt[0]->bind_result($idUser);
+                        $stmt[0]->fetch();
+                        $stmt[0]->close();
                         if($number['data'] >= 3){
                             $payloadRefresh = [ 'data'=>$resultDb, 'exp'=>self::$expRefresh];
                             $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
@@ -340,10 +359,10 @@ class JwtController{
                                 $payload = ['data'=>$resultDb, 'number'=> 3, 'exp'=>self::$exp];
                                 $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
                                 $token = $tokenBuilder->issuedBy('http://localhost')->permittedFor('http://localhost')->issuedAt($now)->canOnlyBeUsedAfter($now)->expiresAt($now->modify("+". self::$exp ." seconds"))->withClaim('data', $payload)->getToken(self::$algorithm, self::$secretKey)->toString();
-                                $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+                                $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at,id_user) VALUES (?, ?, ?, ?, ?, ?, ?)";
                                 $stmt[3] = self::$con->prepare($query);
                                 $number['data'] = 3;
-                                $stmt[3]->bind_param("sssiss", $emailInput, $Rtoken,$device, $number['data'], $now1, $now1);
+                                $stmt[3]->bind_param("sssisss", $emailInput, $Rtoken,$device, $number['data'], $now1, $now1,$idUser);
                                 $stmt[3]->execute();
                                 if ($stmt[3]->affected_rows > 0) {
                                     $stmt[3]->close();
@@ -396,9 +415,9 @@ class JwtController{
                                     ],
                                     'number' => $number['data']];
                             }
-                            $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+                            $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at,id_user) VALUES (?, ?, ?, ?, ?, ?, ?)";
                             $stmt[1] = self::$con->prepare($query);
-                            $stmt[1]->bind_param("sssiss", $emailInput, $Rtoken, $device, $number['data'], $now1, $now1);
+                            $stmt[1]->bind_param("sssisss", $emailInput, $Rtoken, $device, $number['data'], $now1, $now1,$idUser);
                             $stmt[1]->execute();
                             if ($stmt[1]->affected_rows > 0) {
                                 $stmt[1]->close();
@@ -415,6 +434,7 @@ class JwtController{
                 }
             }
         }catch(Exception $e){
+            // echo $e->getTraceAsString();
             $error = $e->getMessage();
             $erorr = json_decode($error, true);
             if ($erorr === null) {
