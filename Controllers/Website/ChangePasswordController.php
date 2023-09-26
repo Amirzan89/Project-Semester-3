@@ -28,7 +28,7 @@ class ChangePasswordController{
                 ];
 
                 extract($data);
-                include('view/page/forgotPassword.php');
+                include('view/page/utama/forgotPassword.php');
                 exit();
             }
         }catch(Exception $e){
@@ -80,7 +80,7 @@ class ChangePasswordController{
                     'link' => ''
                 ];
                 extract($data);
-                include('view/page/forgotPassword.php');
+                include('view/page/utama/forgotPassword.php');
                 exit();
             }
         }catch(Exception $e){

@@ -37,8 +37,10 @@ Route::add('/forgot/password','GET',function(){
     exit();
 },['Authenticate@handle']);
 Route::add('/dashboard', 'GET', 'DashboardController@index',['Authenticate@handle']);
-Route::add('/auth/redirect','GET','LoginController@redirectToProvider');
-Route::add('/auth/google','GET','LoginController@handleProviderCallback');
+Route::group('/auth',[
+    ['/redirect','GET','LoginController@redirectToProvider'],
+    ['/google','GET','LoginController@handleProviderCallback'],
+]);
 Route::add('/token/get','POST','JwtController@createJWTWebsite');
 Route::add('/token/decode','POST','JwtController@decode');
 Route::group('/verify',[
@@ -64,48 +66,27 @@ Route::group('/users',[
     ['/login','POST','LoginController@login',['Authenticate@handle']],
     ['/logout','POST','UserController@logout',['Authenticate@handle']],
 ]);
-//event
+// event
 Route::group('/event',[
-    ['/dashboard','GET','Controllers\Website\Event\EventDashboardController@show'],
+    ['/dashboard','GET','Controllers\Website\Event\EventDashboardController@show',['Authenticate@handle']],
+    ['/tambah','POST','Controllers\Website\Event\EventDashboardController@show',['Authenticate@handle']],
 ]);
-//Izin
+// Izin
 Route::group('/izin',[
-    ['/Izin/dashboard','GET','Izin\Dashboard@show'],
+    ['/dashboard','GET','Izin\Dashboard@show'],
 ]);
-//seniman
+// seniman
 Route::group('/seniman',[
-    ['/Seniman/dashboard','GET','Seniman\Dashboard@show'],
+    ['/dashboard','GET','Seniman\Dashboard@show'],
 ]);
-//tempat
+// tempat
 Route::group('/tempat',[
-    ['/Tempat/dashboard','GET','Tempat\Dashboard@show'],
-]);
-Route::group('/mobile',[
-    //
+    ['/dashboard','GET','Controllers\Website\Tempat\TempatDashboardController@show',['Authenticate@handle']],
 ]);
 //mobile
 Route::group('/mobile',[
     ['/dashboard','GET','Controllers\Website\Event\EventDashboardController@show'],
 ]);
-Route::group('/verify',[
-    ['/create',[
-        ['/password','POST','MailController@createForgotPassword'],
-        ['/email','POST','MailController@createVerifyEmail'],
-    ]],
-    ['/password',[
-        ['/','GET','UserController@getChangePass'],
-        ['/','POST','UserController@changePassEmail'],
-    ]],
-    ['/otp',[
-        ['/otp/password','POST','UserController@getChangePass'],
-        ['/otp/email','POST','UserController@verifyEmail'],
-    ]],
-    ['/email',[
-        ['/','GET','UserController@verifyEmail'],
-        ['/','POST','UserController@verifyEmail'],
-    ]],
-]);
-// Route::add('/mobile','POST','DashboardController@show');
 // Dispatch the request
 Route::dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 class Route{
@@ -115,7 +96,7 @@ class Route{
             if (is_array($route[1])) {
                 self::group($prefix . $route[0], $route[1]);
             } else {
-                $route[0] = $prefix . $route[0];
+                $route[0] = trim($prefix  . $route[0], '/');
                 self::add($route[0], $route[1], $route[2], isset($route[3]) ? $route[3] : [], isset($route[4]) ? $route[4] : []);
             }
         }

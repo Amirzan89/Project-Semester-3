@@ -73,6 +73,6 @@ if(!defined('APP')){
     <div id="preloader" style="display: none;"></div>
     <div id="greenPopup" style="display:none"></div>
     <div id="redPopup" style="display:none"></div>
-    <script src="/public/js/register.js?"></script>
+    <script src="/public/js/utama/register.js?"></script>
 </body>
 </html>

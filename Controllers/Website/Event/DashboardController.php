@@ -25,44 +25,6 @@ class EventDashboardController{
         self::$con = self::$database->getConnection();
     }
     public function show($data,$uri = null){
-        $client = new Client(); 
-        try{
-            $uri = substr($uri, strlen(self::$prefix));
-            $response = $client->get(self::$url.$uri);
-            // echo "path ".self::$url.$uri;
-            $contentType = $response->getHeaderLine('Content-Type');
-            $parts = explode(';', $contentType);
-            $contentType = trim($parts[0]);
-            if (strpos($contentType, 'application/json') !== false) {
-                $body = $response->getBody();
-                return json_decode($body, true);
-            } else {
-                $htmlContent = $response->getBody()->getContents();
-                return ['status'=>'success','data'=>$htmlContent,'content'=>$contentType];
-            }
-        }catch(RequestException $e){
-            $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                if($erorr['message']){
-                    $responseData = array(
-                        'status' => 'error',
-                        'message' => $erorr['message'],
-                    );
-                }else{
-                    $responseData = array(
-                        'status' => 'error',
-                        'message' => $erorr->message,
-                    );
-                }
-            }
-            return $responseData;
-        }
     }
 }
 ?>

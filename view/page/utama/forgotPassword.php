@@ -12,7 +12,7 @@ if(!defined('APP')){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> <?php echo $title?></title>
-    <link rel="stylesheet" href="/public/css/forgotPassword.css">
+    <link rel="stylesheet" href="/public/css/utama/forgotPassword.css">
 </head>
 <body>
     <script>
@@ -130,6 +130,6 @@ if(!defined('APP')){
         document.querySelector('div#gantiPassword').style.display = 'block';
     }
 </script>
-<script src="/public/js/forgotPassword.js?"></script>
+<script src="/public/js/utama/forgotPassword.js?"></script>
 </body>
 </html>
