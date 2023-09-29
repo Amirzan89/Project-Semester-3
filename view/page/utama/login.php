@@ -13,9 +13,25 @@ if(!defined('APP')){
     <style></style>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <!-- <title>Login</title> -->
+    <title>Disporabudpar - Nganjuk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="/public/img/icon/utama/logo.png" rel="icon">
+    <!-- <link href="/public/css/utama/login.css" rel="stylesheet"> -->
 </head>
 <body>
+    <!-- <div class="container">
+            <form action="" class="form-login" id="loginForm">
+                <h2><b> Selamat datang kembali!</b></h2>
+                <input type="email" name="email" id="inpEmail" class="box" placeholder="Masukkan emailmu">
+                <input type="password" name="password" id="inpPassword" class="box" placeholder="Masukkan kata sandimu">
+                <input type="submit" value="Masuk" id="submit">
+                
+            </form>
+            <div class="side-login">
+                <img src="/public/img/icon/utama/login.png" alt="">
+            </div>
+        </div> -->
     <div class='login'>
         <div class="bg"></div>
         <div class="content">
@@ -37,8 +53,8 @@ if(!defined('APP')){
                     <a href="/forgot/password">Forgot Password ?</a>
                 </div>
                 <input type="submit" name='submit' value='Login'>
-                <!-- <img src="" alt=""> -->
-                <a href="/auth/redirect" id="google"><img src="public/img/icon/google.png" alt=""> Sig in with Google</a>
+                <img src="" alt="">
+                <a href="/auth/redirect" id="google"><img src="public/img/icon/utama/google.png" alt=""> Sig in with Google</a>
                 <span id="register">Don't have account ? <a href="/register">Signup</a></span>
             </form>
             <div class="wm"></div>

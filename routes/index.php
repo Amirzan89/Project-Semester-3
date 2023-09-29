@@ -10,6 +10,7 @@ use Controllers\Website\Event\DashboardController as EventDashboard;
 require_once $rootDir . '/autoload.php';
 // Include the required files using the absolute paths
 require_once $rootDir . '/middleware/Authenticate.php';
+require_once $rootDir . '/middleware/Authorization.php';
 require_once $rootDir . '/Controllers/UserController.php';
 require_once $rootDir . '/Controllers/Website/DashboardController.php';
 require_once $rootDir . '/Controllers/Website/Event/DashboardController.php';
@@ -20,6 +21,18 @@ require_once $rootDir . '/Controllers/Auth/LoginController.php';
 require_once $rootDir . '/Controllers/Auth/RegisterController.php';
 require_once $rootDir . '/Controllers/Auth/JWTController.php';
 require_once $rootDir . '/Controllers/Mail/MailController.php';
+Route::add('/','GET',function(){
+    include('view/page/utama/home.php');
+    exit();
+},['Authenticate@handle']);
+Route::add('/tempat/1','GET',function(){
+    include('view/page/utama/home.php');
+    exit();
+},['Authenticate@handle']);
+Route::add('/tempat/2','GET',function(){
+    include('view/page/utama/home.php');
+    exit();
+},['Authenticate@handle']);
 Route::add('/','GET',function(){
     include('view/page/utama/home.php');
     exit();
@@ -41,8 +54,10 @@ Route::group('/auth',[
     ['/redirect','GET','LoginController@redirectToProvider'],
     ['/google','GET','LoginController@handleProviderCallback'],
 ]);
-Route::add('/token/get','POST','JwtController@createJWTWebsite');
-Route::add('/token/decode','POST','JwtController@decode');
+Route::group('/token',[
+    ['/get','POST','JwtController@createJWTWebsite'],
+    ['/decode','POST','JwtController@decode'],
+]);
 Route::group('/verify',[
     ['/create',[
         ['/password','POST','MailController@createForgotPassword'],
@@ -69,23 +84,57 @@ Route::group('/users',[
 // event
 Route::group('/event',[
     ['/dashboard','GET','EventDashboardController@show',['Authenticate@handle']],
-    ['/tambah','POST','Controllers\Website\Event\EventDashboardController@show',['Authenticate@handle']],
+    ['/tambah','POST','Controllers\Event\EventController@tambahEventMasyarakat',['Authenticate@handle','Authorization@handle']],
+    ['/edit','PUT','Controllers\Event\EventController@editEvent',['Authenticate@handle','Authorization@handle']],
+    ['/delete','DELETE','ControllersEvent\EventController@hapusEvent',['Authenticate@handle','Authorization@handle']],
+    ['/verifikasi','POST','Controllers\Event\EventController@verifikasiEvent',['Authenticate@handle','Authorization@handle']],
 ]);
 // pentas
 Route::group('/pentas',[
-    ['/dashboard','GET','Izin\Dashboard@show'],
+    ['/tambah','POST','Izin\Dashboard@show','Authenticate@handle','Authorization@handle'],
+    ['/edit','PUT','Izin\Dashboard@show','Authenticate@handle','Authorization@handle'],
+    ['/hapus','DELETE','Izin\Dashboard@show','Authenticate@handle','Authorization@handle'],
 ]);
 // seniman
 Route::group('/seniman',[
-    ['/dashboard','GET','Seniman\Dashboard@show'],
+    ['/dashboard','GET','Seniman\Dashboard@show','Authenticate@handle','Authorization@handle'],
+    ['/tambah','POST','Seniman\Dashboard@show','Authenticate@handle','Authorization@handle'],
+    ['/edit','PUT','Seniman\Dashboard@show','Authenticate@handle','Authorization@handle'],
+    ['/delete','DELETE','Seniman\Dashboard@show','Authenticate@handle','Authorization@handle'],
+    ['/perpanjang','POST','Seniman\Dashboard@show','Authenticate@handle','Authorization@handle'],
 ]);
 // tempat
 Route::group('/tempat',[
-    ['/dashboard','GET','Controllers\Website\Tempat\TempatDashboardController@show',['Authenticate@handle']],
+    ['/dashboard','GET','Controllers\Website\Tempat\TempatDashboardController@show',['Authenticate@handle','Authorization@handle']],
+    ['/tambah','POST','Controllers\Tempat\TempatController@tambahTempat',['Authenticate@handle','Authorization@handle']],
+    ['/edit','PUT','Controllers\Tempat\TempatController@editTempat',['Authenticate@handle','Authorization@handle']],
+    ['/hapus','DELETE','Controllers\Tempat\TempatController@hapusTempat',['Authenticate@handle','Authorization@handle']],
+    ['/sewa','POST','Controllers\Tempat\TempatController@sewaTempat',['Authenticate@handle','Authorization@handle']],
 ]);
 //mobile
 Route::group('/mobile',[
     ['/dashboard','GET','Controllers\Website\Event\EventDashboardController@show'],
+]);
+Route::group('/verify',[
+    ['/create',[
+        ['/password','POST','MailController@createForgotPassword'],
+    ]],
+]);
+
+//khusus tesing web
+Route::group('/testing',[
+    ['/event',[
+        ['/dashboard','GET','EventDashboardController@show',['Authenticate@handle','Authorization@handle']]
+    ]],
+    ['/seniman',[
+        ['/dashboard','GET','EventDashboardController@show',['Authenticate@handle','Authorization@handle']]
+    ]],
+    ['/tempat',[
+        ['dashboard','GET','EventDashboardController@show',['Authenticate@handle','Authorization@handle']]
+    ]],
+    ['/pentas',[
+        ['/dashboard','GET','EventDashboardController@show',['Authenticate@handle','Authorization@handle']]
+    ]],
 ]);
 // Dispatch the request
 Route::dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
@@ -111,7 +160,8 @@ class Route{
             'parameter'=>$parameter
         ];
     }
-    public static function dispatch($uri, $method, $data=null, $uriData=null){
+    // public static function dispatch($uri, $method, $data=null, $uriData=null){
+    public static function dispatch($uri, $method){
         $query = parse_url($uri, PHP_URL_QUERY);
         parse_str($query, $queryParams);
         $path = parse_url($uri, PHP_URL_PATH);
@@ -148,37 +198,42 @@ class Route{
                 $path = ltrim($path1,'/');
             }
         }
+        // exit();
         foreach (self::$routes as $route) {
             if ($route['uri'] === $path && $route['method'] === $method) {
                 $routeFound = true;
-                $middlewareResults = [];
-                foreach ($route['middlewares'] as $middleware) {
-                    $middlewareClosure = function ($requestData, $data) use ($middleware) {
-                        $parts = explode('@', $middleware);
-                        $controllerName = $parts[0];
+                // $middlewareResult = [];
+                foreach ($route['middlewares'] as $Middleware) {
+                    $middlewareClosure = function ($requestData, $data) use ($Middleware) {
+                        $parts = explode('@', $Middleware);
+                        $middlewareName = $parts[0];
                         $methodName = $parts[1];
-                        $controller = new $controllerName();
-                        return call_user_func_array([$controller, $methodName], [$requestData, $data]);
+                        $middleware = new $middlewareName();
+                        return call_user_func_array([$middleware, $methodName], [$requestData, $data]);
                     };
-                    $middlewareResult = $middlewareClosure($requestData, ['uri'=>$_SERVER['REQUEST_URI'],'method'=>$_SERVER['REQUEST_METHOD']]);
-                    $middlewareResults[] = $middlewareResult;
-                    if($middlewareResult['status'] == 'error'){
-                        $middlewareResult['code'] ? http_response_code($middlewareResult['code']) : http_response_code(400);
-                        echo $middlewareResult['message'];
-                        return;
+                    $middlewareResult = $middlewareClosure($requestData, [
+                        'uri'=>$_SERVER['REQUEST_URI'],
+                        'method'=>$_SERVER['REQUEST_METHOD']
+                    ]);
+                    if(is_array($middlewareResult)){
+                        if($middlewareResult['status'] == 'error'){
+                            echo 'errror';
+                            echo "<br>";
+                            if($middlewareResult['redirect'] == '/login'){
+                                echo '   masuk login ';
+                                exit();
+                                header("Location: /login");
+                                exit();
+                            }
+                            header('Content-Type: application/json');
+                            http_response_code(!empty($middlewareResult['code']) ? $middlewareResult['code'] : 400);
+                            unset($middlewareResult['code']);
+                            echo json_encode($middlewareResult  );
+                            exit();
+                        }
+                        $requestData = array_merge($requestData, $middlewareResult['data']);
                     }
                 }
-                //merge data from middleware
-                $middlewareResult = [];
-                foreach ($middlewareResults as $results) {
-                    if (isset($results['data'])) {
-                        $middlewareResult = array_merge($middlewareResult, $results['data']);
-                    }
-                }
-                $requestData = [
-                    'middleware'=>$middlewareResult,
-                    'request'=>$requestData
-                ];
                 $callback = $route['callback'];
                 if ($callback instanceof Closure) {
                     call_user_func($callback);
@@ -195,6 +250,8 @@ class Route{
                     }else{
                         $result = call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI']]);
                     }
+                    echo json_encode($result);
+                    exit();
                     if($result['status'] == 'error'){ 
                         header('Content-Type: application/json');
                         http_response_code(!empty($result['code']) ? $result['code'] : 400);

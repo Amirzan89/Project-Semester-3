@@ -1,4 +1,5 @@
 <?php 
+namespace Controllers\Pentas;
 use Database\Database;
 use Database\Models\Pentas;
 class PentasController{

@@ -2,9 +2,106 @@
     margin:0;
     min-height: 100vh;
 } */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* *{
+    box-sizing: border-box;
+}
+body{
+    background-color: white;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: -20px 0 50px;
+	margin-top: 20px;
+
+}
+.container{
+    display: flex;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .2), 0 10px 10px rgba(0, 0, 0, .2);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 480px;
+    transition: all .6s ease-in-out;
+}
+.form-login{
+
+    background: 0C3924;
+    display: flex;
+    flex-direction: column;
+    padding:  0 50px;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.form-login input {
+    font-weight: bold;
+        background-color: #fff;
+        color: #0C3924;
+        border: none;
+        outline: none;
+        border-radius: 7px;
+        padding: 12px 15px;
+        margin: 8px 0;
+        width: 100%;
+        border: 2px solid #0C3924;
+
+    }
+    
+input[type="email"]::placeholder {
+    color: #0C3924; 
+}
+
+input[type="password"]::placeholder {
+    color: #0C3924; 
+}
+.form-login h2{
+
+    margin-top: 20px;
+    margin-bottom: 30px;
+    font-size: 30px;
+    text-align: left;
+    color: black;
+}
+.box{
+    padding: 12px;
+    width: 65%;
+    margin: 15px;
+    border: 1px solid black;
+    outline: none;
+    border-radius: 20px;
+}
+#submit{
+
+    padding: 12px 30px;
+    width: 40%;
+    margin-top: 40px;
+    background-color: #0C3924;
+    color: white;
+    font-weight: bold;
+    border: none;
+    outline: none;
+    border-radius: 20px;
+}
+#submit:hover{
+    cursor: pointer;
+    background-color: white ;
+    outline: 3px solid #0C3924;
+    color: #0C3924;
+}
+
+.side-login{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    background-color: #0c3924;
+} */
 body {
     margin: 0;
     background: rgb(2, 0, 36);
@@ -16,10 +113,8 @@ body {
 .login{
     background: transparent;
     position: absolute;
-    /* background-color:transparent; */
     width: 100%;
     height: 100%;
-    /* z-index:; */
 }
 .login .bg{
     position: absolute;
@@ -46,7 +141,6 @@ div .content form{
     position: absolute;
     width:50%;
     height: 95%;
-    /* background-color: green; */
     top:50%;
     left:5%;
     transform:translateY(-50%);
@@ -56,7 +150,6 @@ div .content form{
     flex-direction: column;
 }
 div .content .header{
-    /* position: absolute; */
     width: 100%; 
     height: 10%; 
     justify-content: center; 
@@ -69,7 +162,6 @@ div .content .header h1{
     font-weight: 600;
 }
 div .content form .row{
-    /* background-color: orange; */
     font-size: 30px;
     width: 90%;
     height: fit-content;
@@ -80,9 +172,6 @@ div .content form .row:nth-child(2){
 }
 div .content form .row:nth-child(3){
     margin-top: 30px;
-    /* margin-top: 10px; */
-    /* background-color:transparent;
-    height: 40%; */
 } 
 div .content form .row:nth-child(4) {
     /* width: 90%; */
@@ -201,9 +290,6 @@ div .content .wm{
     div .content form .header h1{
         font-size: 55px;
     }
-    div .content form .row:nth-child(4) {
-        /* font-size: 18px; */
-    }
     div .content form input[type="submit"],
     div .content form #google{
         width:200px;
@@ -213,20 +299,6 @@ div .content .wm{
     div .content form #google{
         font-size: 16px;
     }
-    /*
-    div .content form input[type="submit"]{
-        bottom: 27%;
-    }
-    div .content form span{
-        bottom: 12%;
-    }
-    div .content form #google{
-        font-size: 15px;
-        bottom:20%;
-    }
-    div .content .wm{
-        width: 300px;
-    } */
 }
 @media (max-width:950px){
     div .content .wm{
@@ -253,7 +325,6 @@ div .content .wm{
     @media (min-width:500px) and (max-width:700px){
         div .content form .header h1{
             font-size: 50px;
-            /* color:red */
         }
         div .content form .row input[type="email"],
         div .content form .row input[type="password"]{
@@ -276,7 +347,6 @@ div .content .wm{
     @media (max-width:500px){
         div .content form .header h1{
             font-size: 35px;
-            /* color:red */
         }
         div .content form .row input[type="email"],
         div .content form .row input[type="password"]{

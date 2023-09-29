@@ -24,17 +24,19 @@ $tPath = "";
     </script>
     <p>halaman dasboard utama </p>
     <br>
-    <a href="/event/dashboard"><h1>halaman event</h1></a>
+    <a href="/testing/event/dashboard"><h1>halaman event</h1></a>
     <br>
-    <a href="/tempat/dashboard"><h1>halaman tempat</h1></a>
+    <a href="/testing/tempat/dashboard"><h1>halaman tempat</h1></a>
     <br>
-    <a href="/pentas/dashboard"><h1>halaman izin pentas seni</h1></a>
+    <a href="/testing/pentas/dashboard"><h1>halaman izin pentas seni</h1></a>
     <br>
-    <a href="/seniman/dashboard"><h1>halaman seniman</h1></a>
+    <a href="/testing/seniman/dashboard"><h1>halaman seniman</h1></a>
     <form method="POST" id="logoutForm">
         <input type="submit" value="metu">
-            <span>Keluar</span>
     </form>
+    <div id="preloader" style="display: none;"></div>
+    <div id="greenPopup" style="display:none"></div>
+    <div id="redPopup" style="display:none"></div>
     <script src="<?php echo $tPath.'/public/js/utama/dashboard.js?'?>"></script>
 </body>
 </html>

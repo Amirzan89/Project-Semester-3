@@ -15,9 +15,10 @@ use Database\Database;
             self::$con = self::$database->getConnection();
         }
         public static function show($request){
-            $data = $request['middleware']['data'];
-            $number = $request['middleware']['number'];
-            include('view/page/event/dashboard.php');
+            $csrf = $GLOBALS['csrf'];
+            $data = $request;
+            $number = $request['number'];
+            include('view/page/testing/event/dashboard.php');
             exit();
         }
     }

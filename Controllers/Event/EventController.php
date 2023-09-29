@@ -1,4 +1,5 @@
 <?php
+namespace Controllers\Event;
 use Database\Database;
 use Database\Models\Event;
 use Carbon\Carbon;
@@ -14,7 +15,14 @@ class EventController{
     //untuk masyarakat
     public function tambahEventMasyarakat($data, $uri = null){
         try{
-            if (!isset($data['nama']) || empty($data['nama'])) {
+            //check role
+            if(!isset($data['role']) || empty($data['role'])){
+                return ['status'=>''];
+            }
+            if(!isset($data['id_user']) || empty($data['id_user'])){
+                return ['status'=>'error','message'=>'ID User harus di isi','code'=>400];
+            }
+            if (!isset($data['nama_event']) || empty($data['nama_event'])) {
                 return ['status'=>'error','message'=>'Nama event harus di isi','code'=>400];
             } elseif (strlen($data['nama']) < 8) {
                 return ['status'=>'error','message'=>'Nama event minimal 8 karakter','code'=>400];
@@ -37,8 +45,8 @@ class EventController{
                 return ['status'=>'error','message'=>'Tanggal akhir harus di isi','code'=>400];
             }
             // Create DateTime objects for both tanggal_awal and tanggal_akhir
-            $tanggal_awal = DateTime::createFromFormat('Y-m-d H:i:s', $data['tanggal_awal']);
-            $tanggal_akhir = DateTime::createFromFormat('Y-m-d H:i:s', $data['tanggal_akhir']);
+            $tanggal_awal = DateTime::createFromFormat('d-m-Y s:i:H', $data['tanggal_awal']);
+            $tanggal_akhir = DateTime::createFromFormat('d-m-Y s:i:H', $data['tanggal_akhir']);
             // Check if the date formats are valid
             if (!$tanggal_awal) {
                 return ['status' => 'error', 'message' => 'Format tanggal awal tidak valid', 'code' => 400];
@@ -85,6 +93,10 @@ class EventController{
         //
     }
     public function hapusEvent($data, $uri = null){
+        //
+    }
+    //khusus admin event dan super admin
+    public function verifikasiEvent($data, $uri = null){
         //
     }
 }

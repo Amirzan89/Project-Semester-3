@@ -16,8 +16,8 @@ use Database\Database;
         }
         public static function index($request){
             $csrf = $GLOBALS['csrf'];
-            $data = $request['middleware']['data'];
-            $number = $request['middleware']['number'];
+            $data = $request;
+            $number = $request['number'];
             include('view/page/utama/dashboard.php');
             exit();
         }

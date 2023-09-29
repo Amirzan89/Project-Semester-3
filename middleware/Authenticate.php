@@ -99,12 +99,13 @@ class Authenticate
                                         }
                                     //if success decode
                                     }else{
-                                        $decoded['data']['number'] = $number;
+                                        $decoded['data']['data']['number'] = $number;
+                                        $decoded['data']['data']['exp'] = $decoded['data']['exp'];
                                         if($data['uri'] === 'users/google' && $data['method'] == "GET"){
                                             $data = [$decoded['data'][0][0]];
                                             return ['status'=>'success','data'=>$request];
                                         }
-                                        return ['status'=>'success','data'=>$decoded['data']];
+                                        return ['status'=>'success','data'=>$decoded['data']['data']];
                                     }
                                 //if token 2 disappear
                                 }else{
@@ -144,7 +145,7 @@ class Authenticate
             }
         //if cookie gone
         }else{
-            $page = ['/dashboard','/device','/pengaturan','/laporan','/edukasi','/event/dashboard','/tempat/dashboard','/seniman/dashboard'];
+            $page = ['/dashboard','/device','/pengaturan','/laporan','/edukasi','/event/dashboard','/tempat/dashboard','/seniman/dashboard','/testing/event/dashboard','/testing/tempat/dashboard'];
             if(in_array($data['uri'],$page)){
                 if(isset($_COOKIE["token1"])){
                     $token1 = $_COOKIE['token1'];
@@ -169,7 +170,10 @@ class Authenticate
                     exit();
                 }
             }
-            return ['status'=>'success','data'=>$request];
+            if($data['uri'] != '/login'){
+                header('Location: /login');
+            }
+            // return ['status'=>'success','data'=>$request];
         }
     }
 }

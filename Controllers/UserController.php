@@ -180,7 +180,6 @@ class UserController{
     }
     public function getChangePass($data, $uri, $method, $param){
         try{
-            $data = $data['request'];
             $changePassPage = new ChangePasswordController();
             $notificationPage = new NotificationPageController();
             // $validator = Validator::make($data, [
@@ -375,7 +374,7 @@ class UserController{
             //     'link' => 'nullable',
             //     'description'=>'required'
             // ],[
-            //     'email.required'=>'Email wajib di isi',
+            //     'email.required'=>'Email wreajib di isi',
             //     'email.email'=>'Email yang anda masukkan invalid',
             //     'password.required'=>'Password wajib di isi',
             //     'password.min'=>'Password minimal 8 karakter',
@@ -395,7 +394,6 @@ class UserController{
             //     return ['status' => 'error', 'message' => $errors];
             // }
             // var_dump($data);
-            $data = $data['request'];
             $email = $data['email'];
             $pass = $data["password"];
             $pass1 = $data["password_confirm"];
@@ -722,9 +720,6 @@ class UserController{
     }
     public function verifyEmail($data,$uri, $method, $param){
         try{
-            if(isset($data['request'])){
-                $data = $data['request'];
-            }
             $notificationPage = new NotificationPageController();
             // $validator = Validator::make($data, [
             //     'email'=>'required|email',
@@ -934,7 +929,6 @@ class UserController{
     public function logout($data,$uri = null){
         try{
             $jwtController = new JwtController();
-            $data = $data['request'];
             $email = $data['email'];
             $number = $data['number'];
             if(empty($email) || is_null($email)){

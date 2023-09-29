@@ -20,8 +20,9 @@ class LoginController{
     public function Login($data, $uri =  null){
         try{
             $jwtController = new JwtController();
-            $data = $data['request'];
+            // $data = $data['request'];
             $email = $data["email"];
+            echo 'email kontt '.$email;
             // $email = "Admin@gmail.com";
             $pass = $data["password"];
             $pass = "Admin@1234567890";
@@ -57,6 +58,8 @@ class LoginController{
                                 setcookie('token1', $encoded, time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
                                 setcookie('token2', $data['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
                                 setcookie('token3', $data['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
+                                echo 'login kenek';
+                                exit();
                                 return (['status'=>'success','message'=>'Login sukses silahkan masuk dashboard']);
                             }
                         }
