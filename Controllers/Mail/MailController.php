@@ -30,12 +30,13 @@ class MailController{
 
     public function send($data){
         try {
+            // exit();
             $this->mail->setFrom($_SERVER['MAIL_FROM_ADDRESS'], 'gabutt');
             $this->mail->addAddress($data['email'], $data['name']);
             $this->mail->isHTML(true);
             $this->mail->Subject = $data['deskripsi'];
             if($data['deskripsi'] == 'email'){
-                $filePath = __DIR__ . '/../../view/mail/email.php';
+                $filePath = __DIR__ . '/../../view/mail/verifyEmail.php';
                 $emailBody = file_get_contents($filePath);
                 $emailData = [
                     'EMAIL' => $data['email'],
@@ -110,9 +111,6 @@ class MailController{
     }
     public function createVerifyEmail($data,$uri = null){
         try{
-            if(isset($data['request'])){
-                $data = $data['request'];
-            }
             $email = $data['email'];
             if(empty($email) || is_null($email)){
                 return ['status'=>'error','message'=>'Email wajib di isi'];
@@ -229,9 +227,6 @@ class MailController{
     //send email forgot password
     public function createForgotPassword($data, $uri = null){
         try{
-            if (isset($data['request'])){
-                $data = $data['request'];
-            }
             $email = $data['email'];
             if(empty($email) || is_null($email)){
                 return ['status'=>'error','message'=>'Email empty'];

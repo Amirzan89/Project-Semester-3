@@ -82,86 +82,97 @@ const dataUpload = {
     url:'/users/upload',
     maxFileSize:'10MB'
 }
-tambahEventForms.onsubmit = function(event){
-    event.preventDefault();
-    const namaEvent = inpNamaEvent.value;
-    const deskripsiEvent = inpDeskripsiEvent.value;
-    const kategoriEvent = inpKategoriEvent.value;
-    const tanggalAwal = inpTAwalEvent.value;
-    const tanggalAkhir = inpTAkhirEvent.value;
-    const pendaftaranEvent = inpPendaftaranEvent.value;
-    const selectedDatetimeAwal = inpTAwalEvent.value;
-    const selectedDatetimeAkhir = inpTAkhirEvent.value;
-    const selectedDateAWal = new Date(selectedDatetimeAwal);
-    const selectedDateAkhir = new Date(selectedDatetimeAkhir);
-    if (namaEvent.trim() === '') {
-        showRedPopup('nama event harus diisi !');
-        return;
-    }
-    if (kategoriEvent.trim() === '') {
-        showRedPopup('kategori harus diisi !');
-        return;
-    }
-    if (tanggalAwal.trim() === '') {
-        showRedPopup('tanggal awal harus diisi !');
-        return;
-    }
-    if (tanggalAkhir.trim() === '') {
-        showRedPopup('tanggal akhir harus diisi !');
-        return;
-    }
-    if (selectedDateAWal > selectedDateAkhir) {
-        showRedPopup("tanggal awal lebih lama dari tanggal akhir")
-    }
-    //convert to date time
-    const [dateAwal, timeAwal] = selectedDatetimeAwal.split('T');
-    const [dateAkhir, timeAkhir] = selectedDatetimeAkhir.split('T');
-    //convert date 
-    const [yearAwal, monthAwal, dayAwal] = dateAwal.split('-');
-    const [yearAkhir, monthAkhir, dayAkhir] = dateAkhir.split('-');
-    const tanggalIAwal = dayAwal + '-'+ monthAwal +'-' + yearAwal;
-    const tanggalIAkhir = dayAkhir + '-' + monthAkhir + '-' + yearAkhir;
-    //convert time
-    const hourAwal = selectedDateAWal.getUTCHours();
-    const minuteAwal = selectedDateAWal.getUTCMinutes();
-    const hourAkhir = selectedDateAkhir.getUTCHours();
-    const minuteAkhir = selectedDateAkhir.getUTCMinutes();
-    // Format the time in 24-hour format (HH:MM)
-    const formattedTimeAwal = `${hourAwal.toString().padStart(2, '0')}:${minuteAwal.toString().padStart(2, '0')}`;
-    const formattedTimeAkhir = `${hourAkhir.toString().padStart(2, '0')}:${minuteAkhir.toString().padStart(2, '0')}`;
-    //change date format and time`
-    showLoading();
-    var requestBody = {
-        id_user: idUser,
-        nama_event:namaEvent,
-        deskripsi:deskripsiEvent,
-        kategori:kategoriEvent,
-        tanggal_awal:formattedTimeAwal+" "+tanggalIAwal,
-        tanggal_akhir:formattedTimeAkhir+" "+tanggalIAkhir,
-        link:pendaftaranEvent.value,
-    };
-    // console.log("data form");
-    // console.log(JSON.stringify(requestBody));
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', "/event/tambah");
-    // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(requestBody));
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                closeLoading();
-                var response = JSON.parse(xhr.responseText);
-                showGreenPopup(response);
-            } else {
-                closeLoading();
-                var response = JSON.parse(xhr.responseText);
-                showRedPopup(response);
-            }
-        }
-    }
-    return false; 
-}
+console.log("tambah event");
+console.log(tambahEventForms);
+// tambahEventForms.onsubmit = function(event){
+//     console.log('tambah eventt');
+//     event.preventDefault();
+//     const namaEvent = inpNamaEvent.value;
+//     const deskripsiEvent = inpDeskripsiEvent.value;
+//     const kategoriEvent = inpKategoriEvent.value;
+//     const tanggalAwal = inpTAwalEvent.value;
+//     const tanggalAkhir = inpTAkhirEvent.value;
+//     const pendaftaranEvent = inpPendaftaranEvent.value;
+//     const selectedDatetimeAwal = inpTAwalEvent.value;
+//     const selectedDatetimeAkhir = inpTAkhirEvent.value;
+//     const selectedDateAWal = new Date(selectedDatetimeAwal);
+//     const selectedDateAkhir = new Date(selectedDatetimeAkhir);
+//     if (namaEvent.trim() === '') {
+//         showRedPopup('nama event harus diisi !');
+//         return;
+//     }
+//     if (kategoriEvent.trim() === '') {
+//         showRedPopup('kategori harus diisi !');
+//         return;
+//     }
+//     if (tanggalAwal.trim() === '') {
+//         showRedPopup('tanggal awal harus diisi !');
+//         return;
+//     }
+//     if (tanggalAkhir.trim() === '') {
+//         showRedPopup('tanggal akhir harus diisi !');
+//         return;
+//     }
+//     if (selectedDateAWal > selectedDateAkhir) {
+//         showRedPopup("tanggal awal lebih lama dari tanggal akhir")
+//     }
+//     //convert to date time
+//     const [dateAwal, timeAwal] = selectedDatetimeAwal.split('T');
+//     const [dateAkhir, timeAkhir] = selectedDatetimeAkhir.split('T');
+//     //convert date 
+//     const [yearAwal, monthAwal, dayAwal] = dateAwal.split('-');
+//     const [yearAkhir, monthAkhir, dayAkhir] = dateAkhir.split('-');
+//     const tanggalIAwal = dayAwal + '-'+ monthAwal +'-' + yearAwal;
+//     const tanggalIAkhir = dayAkhir + '-' + monthAkhir + '-' + yearAkhir;
+//     //convert time
+//     const hourAwal = selectedDateAWal.getUTCHours();
+//     const minuteAwal = selectedDateAWal.getUTCMinutes();
+//     const hourAkhir = selectedDateAkhir.getUTCHours();
+//     const minuteAkhir = selectedDateAkhir.getUTCMinutes();
+//     // Format the time in 24-hour format (HH:MM)
+//     const formattedTimeAwal = `${hourAwal.toString().padStart(2, '0')}:${minuteAwal.toString().padStart(2, '0')}`;
+//     const formattedTimeAkhir = `${hourAkhir.toString().padStart(2, '0')}:${minuteAkhir.toString().padStart(2, '0')}`;
+//     //change date format and time`
+//     showLoading();
+//     var requestBody = {
+//         id_user: idUser,
+//         nama_event:namaEvent,
+//         deskripsi:deskripsiEvent,
+//         kategori:kategoriEvent,
+//         tanggal_awal:formattedTimeAwal+" "+tanggalIAwal,
+//         tanggal_akhir:formattedTimeAkhir+" "+tanggalIAkhir,
+//         link:pendaftaranEvent.value,
+//     };
+//     var xhr = new XMLHttpRequest();
+//     xhr.open('POST', "/event/tambah");
+//     // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+//     xhr.setRequestHeader('Content-Type', 'application/json');
+//     xhr.send(JSON.stringify(requestBody));
+//     xhr.onreadystatechange = function() {
+//         if (xhr.readyState == XMLHttpRequest.DONE) {
+//             if (xhr.status === 200) {
+//                 closeLoading();
+//                 var response = JSON.parse(xhr.responseText);
+//                 //tambah data ke table event
+//                 var newRow = document.createElement('tr');
+//                 for (var key in eventData) {
+//                     if (eventData.hasOwnProperty(key)) {
+//                         var newCell = document.createElement('td');
+//                         newCell.textContent = eventData[key];
+//                         newRow.appendChild(newCell);
+//                     }
+//                 }
+//                 document.getElementById('tableEvent').querySelector('tbody').appendChild(newRow);
+//                 showGreenPopup(response);
+//             } else {
+//                 closeLoading();
+//                 var response = JSON.parse(xhr.responseText);
+//                 showRedPopup(response);
+//             }
+//         }
+//     }
+//     return false; 
+// }
 logoutForms.forEach(function(form) {
     form.onsubmit = function(event){
         event.preventDefault();
@@ -190,52 +201,20 @@ logoutForms.forEach(function(form) {
     }
 });
 function showGreenPopup(data, div = null){
-    // if(div == 'dashboard'){
-    //     greenPopup.innerHTML = `
-    //         <div class="bg" onclick="closePopup('green',true)"></div>
-    //         <div class="kotak">
-    //             <div class="bunder1"></div>
-    //             <div class="icon"><img src="${window.location.origin}/assets/img/check.png" alt=""></div>
-    //         </div>
-    //         <span class="closePopup" onclick="closePopup('green',true)">X</span>
-    //         <label>${data.message}</label>
-    //     `;
-    //     greenPopup.style.display = 'block';
-    //     setTimeout(() => {
-    //         dashboardPage();
-    //     }, 3000);
-    // }else{
-        let dataa = JSON.stringify(data);
-        // if(dataa.includes('logout') ||dataa.includes('Logout') ){
-        //     greenPopup.innerHTML = `
-        //         <div class="bg" onclick="closePopup('green',true)"></div>
-        //         <div class="kotak">
-        //             <div class="bunder1"></div>
-        //             <div class="icon"><img src="${window.location.origin}/public/img/icon/check.png" alt=""></div>
-        //         </div>
-        //         <span class="closePopup" onclick="closePopup('green',true)">X</span>
-        //         <label>${dataa}</label>
-        //     `;
-        //     greenPopup.style.display = 'block';
-        //     setTimeout(() => {
-        //         closePopup('green');
-        //     }, 3000);
-        // }else{
-            greenPopup.innerHTML = `
-                <div class="bg" onclick="closePopup('green',true)"></div>
-                <div class="kotak">
-                    <div class="bunder1"></div>
-                    <div class="icon"><img src="${window.location.origin}/public/img/icon/check.png" alt=""></div>
-                </div>
-                <span class="closePopup" onclick="closePopup('green',true)">X</span>
-                <label>${data.message}</label>
-            `;
-            greenPopup.style.display = 'block';
-            setTimeout(() => {
-                closePopup('green');
-            }, 3000);
-        // }
-    // }
+    let dataa = JSON.stringify(data);
+    greenPopup.innerHTML = `
+        <div class="bg" onclick="closePopup('green',true)"></div>
+        <div class="kotak">
+            <div class="bunder1"></div>
+            <div class="icon"><img src="${window.location.origin}/public/img/icon/check.png" alt=""></div>
+        </div>
+        <span class="closePopup" onclick="closePopup('green',true)">X</span>
+        <label>${data.message}</label>
+    `;
+    greenPopup.style.display = 'block';
+    setTimeout(() => {
+        closePopup('green');
+    }, 3000);
 }
 function showRedPopup(data){
     if(data.message){

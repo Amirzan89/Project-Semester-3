@@ -12,6 +12,7 @@ function closeLoading(){
     document.querySelector('div#preloader').style.display = 'none';
 }
 loginForm.onsubmit = function(event){
+    console.log("wayahe login");
     event.preventDefault();
     const email = inpEmail.value;
     const password = inpPassword.value;
@@ -38,6 +39,7 @@ loginForm.onsubmit = function(event){
             if (xhr.status === 200) {
                 closeLoading();
                 var response = JSON.parse(xhr.responseText);
+                // console.log(response);
                 showGreenPopup(response, 'dashboard');
             } else {
                 closeLoading();

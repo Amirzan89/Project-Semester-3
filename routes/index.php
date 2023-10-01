@@ -86,7 +86,7 @@ Route::group('/event',[
     ['/dashboard','GET','EventDashboardController@show',['Authenticate@handle']],
     ['/tambah','POST','Controllers\Event\EventController@tambahEventMasyarakat',['Authenticate@handle','Authorization@handle']],
     ['/edit','PUT','Controllers\Event\EventController@editEvent',['Authenticate@handle','Authorization@handle']],
-    ['/delete','DELETE','ControllersEvent\EventController@hapusEvent',['Authenticate@handle','Authorization@handle']],
+    ['/delete','DELETE','Controllers\Event\EventController@hapusEvent',['Authenticate@handle','Authorization@handle']],
     ['/verifikasi','POST','Controllers\Event\EventController@verifikasiEvent',['Authenticate@handle','Authorization@handle']],
 ]);
 // pentas
@@ -121,19 +121,19 @@ Route::group('/verify',[
     ]],
 ]);
 
-//khusus tesing web
+//khusus testing web
 Route::group('/testing',[
     ['/event',[
         ['/dashboard','GET','EventDashboardController@show',['Authenticate@handle','Authorization@handle']]
     ]],
     ['/seniman',[
-        ['/dashboard','GET','EventDashboardController@show',['Authenticate@handle','Authorization@handle']]
+        ['/dashboard','GET','SenimanDashboardController@show',['Authenticate@handle','Authorization@handle']]
     ]],
     ['/tempat',[
-        ['dashboard','GET','EventDashboardController@show',['Authenticate@handle','Authorization@handle']]
+        ['/dashboard','GET','TempatDashboardController@show',['Authenticate@handle','Authorization@handle']]
     ]],
     ['/pentas',[
-        ['/dashboard','GET','EventDashboardController@show',['Authenticate@handle','Authorization@handle']]
+        ['/dashboard','GET','PentasDashboardController@show',['Authenticate@handle','Authorization@handle']]
     ]],
 ]);
 // Dispatch the request
@@ -217,13 +217,11 @@ class Route{
                     ]);
                     if(is_array($middlewareResult)){
                         if($middlewareResult['status'] == 'error'){
-                            echo 'errror';
-                            echo "<br>";
                             if($middlewareResult['redirect'] == '/login'){
-                                echo '   masuk login ';
-                                exit();
-                                header("Location: /login");
-                                exit();
+                                // echo '   masuk login ';
+                                // exit();
+                                // // header("Location: /login");
+                                // exit();
                             }
                             header('Content-Type: application/json');
                             http_response_code(!empty($middlewareResult['code']) ? $middlewareResult['code'] : 400);
@@ -250,8 +248,6 @@ class Route{
                     }else{
                         $result = call_user_func_array([$controller, $methodName], [$requestData,  $_SERVER['REQUEST_URI']]);
                     }
-                    echo json_encode($result);
-                    exit();
                     if($result['status'] == 'error'){ 
                         header('Content-Type: application/json');
                         http_response_code(!empty($result['code']) ? $result['code'] : 400);

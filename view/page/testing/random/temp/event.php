@@ -25,16 +25,10 @@ $tPath = '';
         var email = "<?php echo($user['email'])?>";
         var idUser = "<?php echo($user['id_user'])?>";
         var number = "<?php echo($number) ?>";
-        var showForm, closeForm;
         console.log('email  '+email )
         console.log('number  '+number )
-    </script>
-    <?php if($role == 'masyarakat'){?>
-        <script>
-            <?php if(isset($dataEvents) || !is_null($dataEvents)){?>
-                var dataEvent = <?php echo json_encode($dataEvents) ?>
-            <?php }?>
         </script>
+    <!-- <?php if($role == 'masyarakat'){?>
         <table class="tableEvent" id="tableEvent">
             <thead>
                 <tr>
@@ -46,24 +40,24 @@ $tPath = '';
                 </tr>
             </thead>
             <tbody>
-                <?php
+                <tr>
+            <?php
                 $no = 1;
                 foreach($dataEvents as $dataEvent){
-                    ?>
-                    <tr>
-                        <th scope="row"><?php echo $no ?></th>
-                        <td> <?php echo $dataEvent['nama_event'] ?></td>
-                        <td> <?php echo $dataEvent['tanggal_awal_event'] ?></td>
-                        <td> <?php echo $dataEvent['tanggal_akhir_event'] ?></td>
-                        <td>
-                            <button onclick="showForm('edit',<?php echo json_encode($dataEvent['id_event']) ?>,<?php echo $no ?>)">edit</button>
-                            <button onclick="showForm('hapus',<?php echo json_encode($dataEvent['id_event']) ?>,<?php echo $no ?>)">hapus</button>
-                        </td>
-                    </tr>
-            <?php
+            ?>
+                    <th scope="row"><?php echo $no?></th>
+                    <td> <?php echo $dataEvent['nama_event'] ?></td>
+                    <td> <?php echo $dataEvent['tanggal_awal_event'] ?></td>
+                    <td> <?php echo $dataEvent['tanggal_akhir_event'] ?></td>
+                    <td>
+                        <button onclick="showForm('edit',<?php echo json_encode($dataEvent['id_event']) ?>)">hapus</button>
+                        <button onclick="showForm('hapus',<?php echo json_encode($dataEvent['id_event']) ?>)">hapus</button>
+                    </td>
+            <?php 
                 $no++;
             }
             ?>
+                </tr>
             </tbody>
         </table>
         <div id="divTambahEvent" style="display:none">
@@ -159,11 +153,18 @@ $tPath = '';
             <div class="bg"></div>
             <div class="content">
                 <span>apakah anda mau menghapus</span>
-                <button id="btnHapusEvent" onclick="hapusEvent()">hapus</button>
+                <button class="hapusEvent" onclick="hapusEvent()">hapus</button>
                 <button onclick="closeForm('hapus')">batal</button>
             </div>
         </div>
         <button onclick="showForm('tambah')"> tambah event</button>
+        <script>
+            // 
+            <?php if(isset($dataEvent) || !is_null($dataEvent)){?>
+                var dataEvent = <?php echo json_encode($dataEvent) ?>
+            <?php }?>
+        </script>
+        <script src="<?php echo $tPath.'/public/js/event/dashboardMasyarakat.js?'?>"></script>
     <?php }else if($role == 'super admin' || $role == 'admin event'){ ?>
         <form id="editEventForm">
             <input type="text">
@@ -189,7 +190,7 @@ $tPath = '';
                     <td> <?php echo $dataEvent['tanggal_awal_event'] ?></td>
                     <td> <?php echo $dataEvent['tanggal_akhir_event'] ?></td>
                     <td>
-                        <button onclick="showEditForm(<?php echo json_encode($dataEvent['id_event']) ?>)">edit</button>
+                        <button onclick="showEditForm(<?php echo json_encode($dataEvent['id_event']) ?>)">hapus</button>
                         <button onclick="showDeleteForm(<?php echo json_encode($dataEvent['id_event']) ?>)">hapus</button>
                     </td>
             <?php 
@@ -202,19 +203,15 @@ $tPath = '';
         <script>
             var dataEvent = <?php echo json_encode($dataEvent) ?>
         </script>
-        <?php } ?>
-        <a href="/dashboard"><h1>kembali</h1></a>
-        <br>
-        <form method="POST" id="logoutForm">
-            <input type="submit" value="metu">
-        </form>
+        <script src="<?php echo $tPath.'/public/js/event/dashboardAdmin.js?'?>"></script>
+    <?php } ?> -->
+    <a href="/dashboard"><h1>kembali</h1></a>
+    <br>
+    <form method="POST" id="logoutForm">
+        <input type="submit" value="metu">
+    </form>
     <div id="preloader" style="display: none;"></div>
-    <div id="greenPopup" style="display:none"></div>    
+    <div id="greenPopup" style="display:none"></div>
     <div id="redPopup" style="display: none"></div>
-    <?php if($role == 'masyarakat'){ ?>
-    <script src="<?php echo $tPath.'/public/js/event/dashboardMasyarakat.js?'?>"></script>
-    <?php }else if($role == 'super admin' || $role == 'admin event'){ ?>
-    <script src="<?php echo $tPath.'/public/js/event/dashboardAdmin.js?'?>"></script>
-    <?php } ?>
 </body>
 </html>

@@ -598,8 +598,10 @@ class JwtController{
                     $stmt = self::$con->prepare($query);
                     $stmt->bind_param('s', $email);
                     if ($stmt->execute()) {
+                        $stmt->close();
                         return ['status'=>'success','message'=>'success delete refresh token','code'=>200];
                     }else{
+                        $stmt->close();
                         return ['status'=>'error','message'=>'failed delete refresh token','code'=>500];
                     }
                 }else{
@@ -607,8 +609,10 @@ class JwtController{
                     $stmt = self::$con->prepare($query);
                     $stmt->bind_param('si', $email, $number);
                     if ($stmt->execute()) {
+                        $stmt->close();
                         return ['status'=>'success','message'=>'success delete refresh token','code'=>200];
                     }else{
+                        $stmt->close();
                         return ['status'=>'error','message'=>'failed delete refresh token','code'=>500];
                     }
                     // $deleted = DB::table('refresh_token')->whereRaw("BINARY email LIKE '%$email%' AND number = $number AND device = 'website'")->delete();

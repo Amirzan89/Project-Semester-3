@@ -18,14 +18,13 @@ class RegisterController{
     public function Register($data, $uri = null){
         try{
             $userController = new UserController();
-            $data = $data['request'];
             if (!isset($data['email']) || empty($data['email'])) {
-                return ['status'=>'error','message'=>'Email wajib di isi1414144','code'=>400];
+                return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
             } else if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
                 return ['status'=>'error','message'=>'Email yang anda masukkan invalid','code'=>400];
             }
             if (!isset($data['password']) || empty($data['password'])) {
-                return ['status'=>'error','message'=>'Password wajib di isi','code'=>400];
+                return ['status'=>'error','message'=>'Password harus di isi','code'=>400];
             } else if (strlen($data['password']) < 8) {
                 return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
             } else if (strlen($data['password']) > 25) {
@@ -34,7 +33,7 @@ class RegisterController{
                 return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
             }
             if (!isset($data['password_confirm']) || empty($data['password_confirm'])) {
-                return ['status'=>'error','message'=>'Password wajib di isi','code'=>400];
+                return ['status'=>'error','message'=>'Password harus di isi','code'=>400];
             } else if (strlen($data['password_confirm']) < 8) {
                 return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
             } else if (strlen($data['password_confirm']) > 25) {

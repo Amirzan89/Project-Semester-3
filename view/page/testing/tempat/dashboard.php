@@ -19,7 +19,7 @@ $tPath = '';
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
 </head>
-<body class="bg-red">
+<body>
     <script>
         var csrfToken = "<?php echo($csrf) ?>";
         var email = "<?php echo($data['email'])?>";
@@ -28,10 +28,10 @@ $tPath = '';
     </script>
     <form id="tambahEventForm" method="POST">
         <div class="header">
-            <h1>daftar event</h1>
+            <h1>sewa tempat</h1>
         </div>
         <div class="row">
-            <label>Nama event</label>
+            <label></label>
             <input type="text" name="inpNamaEvent" id="inpNamaEvent">
         </div>
         <div class="row">
@@ -39,7 +39,7 @@ $tPath = '';
             <textarea name="inpDeskripsiEvent" id="inpDeskripsiEvent"></textarea>
         </div>
         <div class="row">
-            <label>Daftar kategori</label>
+            <label>Daftar tempat</label>
             <select name="inpKategoriEvent" id="inpKategoriEvent" multiple>
                 <option value="olahraga">Olahraga</option>  
                 <option value="seni">Seni</option>

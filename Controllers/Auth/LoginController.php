@@ -22,7 +22,6 @@ class LoginController{
             $jwtController = new JwtController();
             // $data = $data['request'];
             $email = $data["email"];
-            echo 'email kontt '.$email;
             // $email = "Admin@gmail.com";
             $pass = $data["password"];
             $pass = "Admin@1234567890";
@@ -58,8 +57,6 @@ class LoginController{
                                 setcookie('token1', $encoded, time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
                                 setcookie('token2', $data['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
                                 setcookie('token3', $data['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
-                                echo 'login kenek';
-                                exit();
                                 return (['status'=>'success','message'=>'Login sukses silahkan masuk dashboard']);
                             }
                         }
@@ -67,7 +64,6 @@ class LoginController{
                 }else{
                     $stmt->close();
                     return ['status'=>'error','message'=>'Email tidak ditemukan','code'=>400];
-                    // exit();
                 }
             }
         }catch(Exception $e){
@@ -110,7 +106,7 @@ class LoginController{
     
     public function handleProviderCallback($data, $uri=null, $param){
         try {
-            $data = $data['request'];
+            // $data = $data['request'];
             $jwtController = new JwtController();
             $changePasswordController = new ChangePasswordController();
             $client = new Google_Client();

@@ -3,7 +3,7 @@ require_once 'Controllers/Auth/JWTController.php';
 require_once 'Controllers/UserController.php';
 class Authenticate
 {
-    public function handle($request,$data = null){
+    public function handle($request,$data){
         $userController = new UserController();
         $jwtController = new JwtController();
         if(isset($_SERVER['HTTP_REFERER'])){
@@ -145,7 +145,7 @@ class Authenticate
             }
         //if cookie gone
         }else{
-            $page = ['/dashboard','/device','/pengaturan','/laporan','/edukasi','/event/dashboard','/tempat/dashboard','/seniman/dashboard','/testing/event/dashboard','/testing/tempat/dashboard'];
+            $page = ['/dashboard','/device','/pengaturan','/laporan','/edukasi','/event/dashboard','/tempat/dashboard','/testing/seniman/dashboard','/testing/event/dashboard','/testing/tempat/dashboard'];
             if(in_array($data['uri'],$page)){
                 if(isset($_COOKIE["token1"])){
                     $token1 = $_COOKIE['token1'];
@@ -169,9 +169,6 @@ class Authenticate
                     header('Location: /login');
                     exit();
                 }
-            }
-            if($data['uri'] != '/login'){
-                header('Location: /login');
             }
             // return ['status'=>'success','data'=>$request];
         }

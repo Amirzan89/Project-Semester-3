@@ -6,6 +6,7 @@ const greenPopup = document.querySelector('div#greenPopup');
 const inpEmail = document.getElementById('inpEmail');
 const inpPassword = document.getElementById('inpPassword');
 const logoutForms = document.querySelectorAll('form#logoutForm');
+console.log(logoutForms);
 function showLoading(){
     document.querySelector('div#preloader').style.display = 'block';
 }

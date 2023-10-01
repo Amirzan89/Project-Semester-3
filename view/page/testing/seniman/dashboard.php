@@ -14,19 +14,19 @@ $tPath = '';
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="/public/css/seniman/dashboard.css">
+    <link rel="stylesheet" href="/public/css/seniman/seniman.css">
     <!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
 </head>
-<body class="bg-red">
+<body>
     <script>
         var csrfToken = "<?php echo($csrf) ?>";
-        var email = "<?php echo($data['email'])?>";
-        var idUser = "<?php echo($data['id_user'])?>";
+        var email = "<?php echo($user['email'])?>";
+        var idUser = "<?php echo($user['id_user'])?>";
         var number = "<?php echo($number) ?>";
     </script>
-    <form id="tambahEventForm" method="POST">
+    <!-- <form id="tambahEventForm" method="POST">
         <div class="header">
             <h1>daftar event</h1>
         </div>
@@ -55,14 +55,6 @@ $tPath = '';
             <label>Tanggal akhir event</label>
             <input type="datetime-local" name="inpTAkhirEvent" id="inpTAkhirEvent">
         </div>
-        <!-- <div class="row">
-            <label>Waktu awal event</label>
-            <input type="time" name="inpWAwalEvent" id="inpWAwalEvent">
-        </div>
-        <div class="row">
-            <label>Waktu akhir event</label>
-            <input type="time" name="inpWAkhirEvent" id="inpWAkhirEvent">
-        </div> -->
         <div class="row">
             <label>link pendaftaran event</label>
             <input type="text" name="inpPendaftaranEvent" id="inpPendaftaranEvent">
@@ -72,7 +64,7 @@ $tPath = '';
             <input type="file" name="inpPosterEvent" id="inpPosterEvent">
         </div>
         <input type="submit" value="Kirim">
-    </form>
+    </form> -->
     <a href="/dashboard"><h1>kembali</h1></a>
     <br>
     <form method="POST" id="logoutForm">
@@ -81,6 +73,6 @@ $tPath = '';
     <div id="preloader" style="display: none;"></div>
     <div id="greenPopup" style="display:none"></div>
     <div id="redPopup" style="display:none"></div>
-    <script src="<?php echo $tPath.'/public/js/seniman/dashboard.js?'?>"></script>
+    <script src="<?php echo $tPath.'/public/js/seniman/seniman.js?'?>"></script>
 </body>
 </html>

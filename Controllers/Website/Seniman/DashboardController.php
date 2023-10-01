@@ -15,8 +15,11 @@ use Database\Database;
             self::$con = self::$database->getConnection();
         }
         public static function show($request){
+            // echo json_encode($request);
+            // exit();
+            $role = $request['role'];
             $csrf = $GLOBALS['csrf'];
-            $data = $request;
+            $user = $request;
             $number = $request['number'];
             include('view/page/testing/seniman/dashboard.php');
             exit();
