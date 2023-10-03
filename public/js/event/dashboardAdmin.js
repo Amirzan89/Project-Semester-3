@@ -1,6 +1,5 @@
 const domain = window.location.protocol + '//' + window.location.hostname +":"+window.location.port;
 const tambahEventForms = document.getElementById('tambahEventForm');
-const logoutForms = document.querySelectorAll('form#logoutForm');
 const popup = document.querySelector('div#popup');
 const redPopup = document.querySelector('div#redPopup');
 const greenPopup = document.querySelector('div#greenPopup');
@@ -173,33 +172,29 @@ console.log(tambahEventForms);
 //     }
 //     return false; 
 // }
-logoutForms.forEach(function(form) {
-    form.onsubmit = function(event){
-        event.preventDefault();
-        var xhr = new XMLHttpRequest();
-        var requestBody = {
-            email: email,
-            number: number,
-        };
-        //open the request
-        xhr.open('POST', "/users/logout");
-        // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        //send the form data
-        xhr.send(JSON.stringify(requestBody));
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    var response = xhr.responseText;
-                    form.reset();
-                    window.location.reload();
-                } else {
-                }
+// logoutForms.forEach(function(form) {
+//     form.onsubmit = function(event){
+function logout(){
+    var xhr = new XMLHttpRequest();
+    var requestBody = {
+        email: email,
+        number: number,
+    };
+    //open the request
+    xhr.open('POST', "/users/logout");
+    // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    //send the form data
+    xhr.send(JSON.stringify(requestBody));
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                window.location.reload();
+            } else {
             }
         }
-        return false; 
     }
-});
+}
 function showGreenPopup(data, div = null){
     let dataa = JSON.stringify(data);
     greenPopup.innerHTML = `

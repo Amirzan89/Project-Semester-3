@@ -19,21 +19,26 @@ $tPath = '';
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
 </head>
-<body class="bg-red">
+<body class="">
     <script>
-        var csrfToken = "<?php echo($csrf) ?>";
-        var email = "<?php echo($user['email'])?>";
-        var idUser = "<?php echo($user['id_user'])?>";
-        var number = "<?php echo($number) ?>";
+        var csrfToken = "<?php echo $csrf ?>";
+        var email = "<?php echo $user['email'] ?>";
+        var idUser = "<?php echo $user['id_user'] ?>";
+        var number = "<?php echo $number ?>";
         var showForm, closeForm;
-        console.log('email  '+email )
-        console.log('number  '+number )
     </script>
     <?php if($role == 'masyarakat'){?>
         <script>
             <?php if(isset($dataEvents) || !is_null($dataEvents)){?>
-                var dataEvent = <?php echo json_encode($dataEvents) ?>
-            <?php }?>
+                var  dataEvents = <?php echo json_encode($dataEvents) ?>;
+                var id_event = dataEvents[dataEvents.length-1].id_event;
+                console.log(dataEvents);
+                console.log(dataEvents.length);
+                console.log(dataEvents.length+1);
+                console.log(id_event);
+                <?php }else{ ?>
+                    // var id_event 
+                <?php }?>
         </script>
         <table class="tableEvent" id="tableEvent">
             <thead>

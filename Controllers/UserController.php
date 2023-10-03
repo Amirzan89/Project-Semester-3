@@ -27,12 +27,12 @@ class UserController{
     public function createUser($data, $opt){
         try{
             if (!isset($data['email']) || empty($data['email'])) {
-                return ['status'=>'error','message'=>'Email wajib di isirwr','code'=>400];
+                return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
                 return ['status'=>'error','message'=>'Email invalid','code'=>400];
             }
             if (!isset($data['password']) || empty($data['password'])) {
-                return ['status'=>'error','message'=>'Password wajib di isi00','code'=>400];
+                return ['status'=>'error','message'=>'Password harus di isi00','code'=>400];
             } elseif (strlen($data['password']) < 8) {
                 return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
             } elseif (strlen($data['password']) > 25) {
@@ -140,27 +140,41 @@ class UserController{
         //         }
         //     }
     public function getUser($email, $data){
-        // $database = Database::getInstance();
-        // $con = $database->getConnection();
-        $columns = implode(', ', $data); // Convert the array of columns to a comma-separated string
-        $query = "SELECT $columns FROM users WHERE BINARY email = ? LIMIT 1";
-        $stmt = self::$con->prepare($query);
-        $stmt->bind_param('s', $email);
-        $stmt->execute();
-        $bindResultArray = [];
-        foreach ($data as $column) {
-            $bindResultArray[] = &$$column;
-        }
-        call_user_func_array([$stmt, 'bind_result'], $bindResultArray);
-        $result = [];
-        if ($stmt->fetch()) {
-            // Fetch the data and store it in the $result array
+        try{
+            $columns = implode(', ', $data);
+            $query = "SELECT $columns FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt = self::$con->prepare($query);
+            $stmt->bind_param('s', $email);
+            $stmt->execute();
+            $bindResultArray = [];
             foreach ($data as $column) {
-                $result[$column] = $$column;
+                $bindResultArray[] = &$$column;
             }
+            call_user_func_array([$stmt, 'bind_result'], $bindResultArray);
+            $result = [];
+            if ($stmt->fetch()) {
+                foreach ($data as $column) {
+                    $result[$column] = $$column;
+                }
+            }
+            $stmt->close();
+            return $result;
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $erorr->message,
+                );
+            }
+            return $responseData;
         }
-        $stmt->close();
-        return $result;
     }
     public function isExistUser($email){
         if(empty($email) || is_null($email)){
@@ -186,7 +200,7 @@ class UserController{
             //     'email'=>'required|email',
             //     'code' =>'nullable'
             // ],[
-            //     'email.required'=>'Email wajib di isi',
+            //     'email.required'=>'Email harus di isi',
             //     'email.email'=>'Email yang anda masukkan invalid',
             // ]);
             // if ($validator->fails()) {
@@ -376,15 +390,15 @@ class UserController{
             // ],[
             //     'email.required'=>'Email wreajib di isi',
             //     'email.email'=>'Email yang anda masukkan invalid',
-            //     'password.required'=>'Password wajib di isi',
+            //     'password.required'=>'Password harus di isi',
             //     'password.min'=>'Password minimal 8 karakter',
             //     'password.max'=>'Password maksimal 25 karakter',
-            //     'password.regex'=>'Password baru wajib terdiri dari 1 huruf besar, huruf kecil, angka dan karakter unik',
+            //     'password.regex'=>'Password baru harus terdiri dari 1 huruf besar, huruf kecil, angka dan karakter unik',
             //     'password_confirm.required'=>'Password konfirmasi konfirmasi harus di isi',
             //     'password_confirm.min'=>'Password konfirmasi minimal 8 karakter',
             //     'password_confirm.max'=>'Password konfirmasi maksimal 25 karakter',
             //     'password_confirm.regex'=>'Password konfirmasi terdiri dari 1 huruf besar, huruf kecil, angka dan karakter unik',
-            //     'description.required'=>'Deskripsi wajib di isi',
+            //     'description.required'=>'Deskripsi harus di isi',
             // ]);
             // if ($validator->fails()) {
             //     $errors = [];
@@ -635,7 +649,7 @@ class UserController{
                 'email'=>'required|email',
                 'link' => 'nullable',
             ],[
-                'email.required'=>'Email wajib di isi',
+                'email.required'=>'Email harus di isi',
                 'email.email'=>'Email yang anda masukkan invalid',
             ]);
             if ($validator->fails()) {
@@ -725,7 +739,7 @@ class UserController{
             //     'email'=>'required|email',
             //     'code' =>'nullable'
             // ],[
-            //     'email.required'=>'Email wajib di isi',
+            //     'email.required'=>'Email harus di isi',
             //     'email.email'=>'Email yang anda masukkan invalid',
             // ]);
             // if ($validator->fails()) {
@@ -972,6 +986,117 @@ class UserController{
                         'message' => $erorr->message,
                     );
                 }
+            }
+            return $responseData;
+        }
+    }
+    public function tambahAdmin($data, $uri = null){
+        try{
+            if (!isset($data['email']) || empty($data['email'])) {
+                return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
+            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                return ['status'=>'error','message'=>'Email invalid','code'=>400];
+            }
+            if (!isset($data['password']) || empty($data['password'])) {
+                return ['status'=>'error','message'=>'Password harus di isi00','code'=>400];
+            } elseif (strlen($data['password']) < 8) {
+                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
+            } elseif (strlen($data['password']) > 25) {
+                return ['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400];
+            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
+                return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
+            }
+            // Validate 'nama' field
+            if (!isset($data['nama']) || empty($data['nama'])) {
+                return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $erorr->message,
+                );
+            }
+            return $responseData;
+        }
+    }
+    public function editAdmin($data, $uri = null){
+        try{
+            if (!isset($data['email']) || empty($data['email'])) {
+                return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
+            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                return ['status'=>'error','message'=>'Email invalid','code'=>400];
+            }
+            if (!isset($data['password']) || empty($data['password'])) {
+                return ['status'=>'error','message'=>'Password harus di isi00','code'=>400];
+            } elseif (strlen($data['password']) < 8) {
+                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
+            } elseif (strlen($data['password']) > 25) {
+                return ['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400];
+            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
+                return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
+            }
+            // Validate 'nama' field
+            if (!isset($data['nama']) || empty($data['nama'])) {
+                return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $erorr->message,
+                );
+            }
+            return $responseData;
+        }
+    }
+    public function hapusAdmin($data, $uri = null){
+        try{
+            if (!isset($data['email']) || empty($data['email'])) {
+                return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
+            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                return ['status'=>'error','message'=>'Email invalid','code'=>400];
+            }
+            if (!isset($data['password']) || empty($data['password'])) {
+                return ['status'=>'error','message'=>'Password harus di isi00','code'=>400];
+            } elseif (strlen($data['password']) < 8) {
+                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
+            } elseif (strlen($data['password']) > 25) {
+                return ['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400];
+            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
+                return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
+            }
+            // Validate 'nama' field
+            if (!isset($data['nama']) || empty($data['nama'])) {
+                return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $erorr->message,
+                );
             }
             return $responseData;
         }

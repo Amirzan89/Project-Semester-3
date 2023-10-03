@@ -80,6 +80,12 @@ Route::group('/users',[
     ['/login','POST','LoginController@login',['Authenticate@handle']],
     ['/register','POST','RegisterController@register',['Authenticate@handle']],
     ['/logout','POST','UserController@logout',['Authenticate@handle']],
+    //khusus admin
+    ['/admin',[
+        ['/tambah','POST','UserController@tambahAdmin'],
+        ['/edit','PUT','UserController@editAdmin'],
+        ['/delete','DELETE','UserController@deleteAdmin'],
+    ]],
 ]);
 // event
 Route::group('/event',[
@@ -133,6 +139,10 @@ Route::group('/testing',[
         ['/dashboard','GET','TempatDashboardController@show',['Authenticate@handle','Authorization@handle']]
     ]],
     ['/pentas',[
+        ['/dashboard','GET','PentasDashboardController@show',['Authenticate@handle','Authorization@handle']]
+    ]],
+    //khusus super admin
+    ['/admin',[
         ['/dashboard','GET','PentasDashboardController@show',['Authenticate@handle','Authorization@handle']]
     ]],
 ]);

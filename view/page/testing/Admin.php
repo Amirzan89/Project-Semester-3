@@ -13,7 +13,7 @@ $tPath = "";
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="<?php echo '/public/css/utama/dashboard.css' ?>">
+    <link rel="stylesheet" href="<?php echo '/public/css/utama/Admin.css' ?>">
     <script></script>
 </head> 
 <body class="bg-red">
@@ -23,23 +23,20 @@ $tPath = "";
         var idUser = "<?php echo $user['id_user'] ?>";
         var number = "<?php echo $number ?>";
         var role = "<?php echo $role ?>";
+        var showForm, closeForm;
     </script>
-    <p>halaman dasboard utama </p>
+    <p>halaman super admin</p>
     <br>
-    <a href="/testing/event/dashboard"><h1>halaman event</h1></a>
+    <a href="/dashboard"><h1>kembali</h1></a>
     <br>
-    <a href="/testing/tempat/dashboard"><h1>halaman tempat</h1></a>
-    <br>
-    <a href="/testing/pentas/dashboard"><h1>halaman izin pentas seni</h1></a>
-    <br>
-    <a href="/testing/seniman/dashboard"><h1>halaman seniman</h1></a>
     <button onclick="logout()">metu</button>
     <?php if($role == 'super admin'){ ?>
-        <a href="/testing/admin"></a>
+        <button onclick="showForm('tambah')">tambah admin</button><br>
+        <form id=""></form>
     <?php } ?>
     <div id="preloader" style="display: none;"></div>
     <div id="greenPopup" style="display:none"></div>
     <div id="redPopup" style="display:none"></div>
-    <script src="<?php echo $tPath.'/public/js/utama/dashboard.js?'?>"></script>
+    <script src="<?php echo $tPath.'/public/js/utama/Admin.js?'?>"></script>
 </body>
 </html>

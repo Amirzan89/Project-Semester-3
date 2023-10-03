@@ -20,9 +20,6 @@ use Database\Database;
             $csrf = $GLOBALS['csrf'];
             $user = $request;
             $number = $request['number'];
-            // echo 'data json';
-            // echo json_encode($request);
-            // echo "<br>";
             if($role == 'super admin' || $role == 'admin event'){
                 //get data event
                 $columns = implode(',', EventsModels::$eventColumns);
@@ -67,6 +64,9 @@ use Database\Database;
                         $row[$column] = $$column;
                     }
                     $dataEvents[] = $row;
+                }
+                if (count($dataEvents) == 0) {
+                    $dataEvents = [];
                 }
                 echo "data masyarakat";
                 echo json_encode($dataEvents);

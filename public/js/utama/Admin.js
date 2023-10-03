@@ -1,15 +1,86 @@
 const domain = window.location.protocol + '//' + window.location.hostname +":"+window.location.port;
+const tambahAdminForm = document.querySelector('form#tambahAdmin');
 // const logoutForms = document.querySelectorAll('form#logoutForm');
 const popup = document.querySelector('div#popup');
 const redPopup = document.querySelector('div#redPopup');
 const greenPopup = document.querySelector('div#greenPopup');
 const inpEmail = document.getElementById('inpEmail');
 const inpPassword = document.getElementById('inpPassword');
+const logoutForms = document.querySelectorAll('form#logoutForm');
+// console.log(logoutForms);
 function showLoading(){
     document.querySelector('div#preloader').style.display = 'block';
 }
 function closeLoading(){
     document.querySelector('div#preloader').style.display = 'none';
+}
+showForm = function(condition, id_event = null, numRow = null){
+    if(condition == 'tambah'){
+        setTimeout(() => {
+            divTambahEvent.style.display = 'block';
+        }, 200);
+    }else if(condition == 'edit'){
+        setTimeout(() => {
+            divEditEvent.style.display = 'block';
+            // editEventForm.getElementById().value = 
+            editEventForm.getElementById('inpIdEvent').value = id_event;
+        }, 200);
+    }else if(condition == 'hapus'){
+        setTimeout(() => {
+            divHapusEvent.querySelector('#btnHapusEvent').onclick = function(){
+                hapusEvent(id_event,numRow);
+            }
+            divHapusEvent.style.display = 'block';
+        }, 200);
+    }
+}
+closeForm = function(condition){
+    if(condition == 'tambah'){
+        setTimeout(() => {
+            divTambahEvent.style.display = 'none';
+        }, 200);
+    }else if(condition == 'edit'){
+        setTimeout(() => {
+            divEditEvent.style.display = 'none';
+        }, 200);
+    }else if(condition == 'hapus'){
+        setTimeout(() => {
+            divHapusEvent.querySelector('#btnHapusEvent').onclick = function(){
+                hapusEvent();
+            }
+            divHapusEvent.style.display = 'none';
+        }, 200);
+    }
+}
+function tambahAdmin(){
+    showLoading();
+    var xhr = new XMLHttpRequest();
+    var requestBody = {
+        id_user: email,
+        role:role,
+        new_name:inpNewName.value,
+        new_email:inpNewEmail.value,
+        new_password:inpNewPassword.value,
+        newRole:inpNewRole.value
+    };
+    xhr.open('POST', "/users/logout");
+    // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    //send the form data
+    xhr.send(JSON.stringify(requestBody));
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                closeLoading();
+                var response = JSON.parse(xhr.responseText);
+                showGreenPopup(response);
+            } else {
+                closeLoading();
+                var response = JSON.parse(xhr.responseText);
+                showRedPopup(response);
+            }
+        }
+    }
 }
 function logout(){
     var xhr = new XMLHttpRequest();
@@ -17,9 +88,11 @@ function logout(){
         email: email,
         number:number
     };
+    //open the request
     xhr.open('POST', "/users/logout");
     // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
     xhr.setRequestHeader('Content-Type', 'application/json');
+    //send the form data
     xhr.send(JSON.stringify(requestBody));
     xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE) {

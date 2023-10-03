@@ -5,7 +5,6 @@ const divEditEvent = document.getElementById('divEditEvent');
 const divHapusEvent = document.getElementById('divHapusEvent');
 const tambahEventForm = document.getElementById('tambahEventForm');
 const editEventForm = document.getElementById('editEventForm');
-const logoutForms = document.querySelectorAll('form#logoutForm');
 const popup = document.querySelector('div#popup');
 const redPopup = document.querySelector('div#redPopup');
 const greenPopup = document.querySelector('div#greenPopup');
@@ -77,7 +76,7 @@ function showLoading(){
 function closeLoading(){
     document.querySelector('div#preloader').style.display = 'none';
 }
-showForm = function(condition, id_event = null, numRow = null){
+showForm = function(condition, id_user = null, numRow = null){
     if(condition == 'tambah'){
         setTimeout(() => {
             divTambahEvent.style.display = 'block';
@@ -207,42 +206,25 @@ tambahEventForm.onsubmit = function(event){
                     }
                 }
                 tableEvent.querySelector('tbody').appendChild(newRow);
-                // //add button edit
-                // var editCell = document.createElement('td');
-                // var editBtn = document.createElement('button');
-                // editBtn.onclick = function(){
-                //     showForm('edit',id_event);
-                // }
-                // editCell.appendChild(editBtn);
-                // newRow.appendChild(editCell);
-                // //add button delete
-                // var delCell = document.createElement('td');
-                // var delBtn = document.createElement('button');
-                // delBtn.onclick = function(){
-                //     showForm('hapus',id_event);
-                // }
-                // delCell.appendChild(delBtn);
-                // newRow.appendChild(delCell);
+                //get id event
+                id_event += 1;
                 // Add button edit
-                var editCell = document.createElement('td');
+                console.log('tambah id event '+id_event);
+                var btnCell = document.createElement('td');
                 var editBtn = document.createElement('button');
-                editBtn.textContent = 'Edit';
-                editBtn.onclick = function () {
+                editBtn.textContent = 'edit';
+                editBtn.onclick = ()=>{
                     showForm('edit', id_event,numRow);
                 };
-                editCell.appendChild(editBtn);
-                newRow.appendChild(editCell);
-                
+                btnCell.appendChild(editBtn);
                 // Add button delete
-                var delCell = document.createElement('td');
                 var delBtn = document.createElement('button');
                 delBtn.textContent = 'hapus';
-                delBtn.onclick = function () {
+                delBtn.onclick = ()=>{
                     showForm('hapus', id_event,numRow);
                 };
-                delCell.appendChild(delBtn);
-                newRow.appendChild(delCell);
-
+                btnCell.appendChild(delBtn);
+                newRow.appendChild(btnCell);
                 closeForm('tambah');
                 //show popup
                 showGreenPopup(response);
@@ -359,6 +341,7 @@ function hapusEvent(id_event, numRow){
         if (xhr.readyState == XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
                 closeLoading();
+                closeForm('hapus');
                 var response = JSON.parse(xhr.responseText);
                 tableEvent.getElementsByTagName('tbody')[0].rows;
                 if (numRow >= 1 && numRow <= tableEvent.getElementsByTagName('tbody')[0].rows.length){
@@ -366,7 +349,6 @@ function hapusEvent(id_event, numRow){
                 } else {
                     console.error('Invalid row number');
                 }
-                closeForm('hapus');
                 showGreenPopup(response);
             } else {
                 closeLoading();
@@ -376,34 +358,27 @@ function hapusEvent(id_event, numRow){
         }
     }
 }
-logoutForms.forEach(function(form) {
-    console.log('wayaae')
-    form.onsubmit = function(event){
-        event.preventDefault();
-        var xhr = new XMLHttpRequest();
-        var requestBody = {
-            email: email,
-            number: number,
-        };
-        //open the request
-        xhr.open('POST', "/users/logout");
-        // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        //send the form data
-        xhr.send(JSON.stringify(requestBody));
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    var response = xhr.responseText;
-                    form.reset();
-                    window.location.reload();
-                } else {
-                }
+function logout(){
+    var xhr = new XMLHttpRequest();
+    var requestBody = {
+        email: email,
+        number: number,
+    };
+    //open the request
+    xhr.open('POST', "/users/logout");
+    // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    //send the form data
+    xhr.send(JSON.stringify(requestBody));
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                window.location.reload();
+            } else {
             }
         }
-        return false; 
     }
-});
+}
 function showGreenPopup(data, div = null){
     let dataa = JSON.stringify(data);
     greenPopup.innerHTML = `

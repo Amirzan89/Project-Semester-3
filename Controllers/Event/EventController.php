@@ -104,7 +104,7 @@ class EventController{
             }
             $query = "DELETE FROM event WHERE id_event = ? AND id_user = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param('ss', $data['id_user'],$data['id_event']);
+            $stmt[2]->bind_param('ss', $data['id_event'],$data['id_user']);
             if ($stmt[2]->execute()) {
                 $stmt[2]->close();
                 return ['status'=>'success','message'=>'event berhasil dihapus'];
@@ -112,9 +112,6 @@ class EventController{
                 $stmt[2]->close();
                 return ['status'=>'error','message'=>'event gagal dihapus','terserah'];
             }
-            // }else{
-            //     $stmt[0]->close();
-            // }
         }catch(Exception $e){
             $error = $e->getMessage();
             $erorr = json_decode($error, true);
@@ -133,7 +130,34 @@ class EventController{
         }
     }
     //khusus admin event dan super admin
-    public function verifikasiEvent($data, $uri = null){
+    public function prosesEvent($data, $uri = null){
+        if(!isset($data['id_user']) || empty($data['id_user'])){
+            return ['status'=>'error','message'=>'ID User harus di isi','code'=>400];
+        }
+        if (!isset($data['nama_event']) || empty($data['nama_event'])) {
+            return ['status'=>'error','message'=>'Nama event harus di isi','code'=>400];
+        } elseif (strlen($data['nama_event']) < 5) {
+            return ['status'=>'error','message'=>'Nama event minimal 5 karakter','code'=>400];
+        } elseif (strlen($data['nama_event']) > 50) {
+            return ['status'=>'error','message'=>'Nama event maksimal 50 karakter','code'=>400];
+        }
+        if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
+            return ['status'=>'error','message'=>'Deskripsi event harus di isi','code'=>400];
+        } elseif (strlen($data['deskripsi']) > 4000) {
+            return ['status'=>'error','message'=>'deskripsi event maksimal 4000 karakter','code'=>400];
+        }
+        if (!isset($data['kategori']) || empty($data['kategori'])) {
+            return ['status'=>'error','message'=>'Kategori event harus di isi','code'=>400];
+        }else if(!in_array($data['kategori'],['olahraga','seni'])){
+            return ['status'=>'error','message'=>'Kategori salah','code'=>400];
+        }
+        if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
+            return ['status'=>'error','message'=>'Tanggal awal harus di isi','code'=>400];
+        }else if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
+            return ['status'=>'error','message'=>'Tanggal akhir harus di isi','code'=>400];
+        }
+    }
+    public function verfikasiEvent($data, $uri = null){
         if(!isset($data['id_user']) || empty($data['id_user'])){
             return ['status'=>'error','message'=>'ID User harus di isi','code'=>400];
         }

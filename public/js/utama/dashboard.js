@@ -1,45 +1,38 @@
 const domain = window.location.protocol + '//' + window.location.hostname +":"+window.location.port;
-// const logoutForms = document.querySelectorAll('form#logoutForm');
 const popup = document.querySelector('div#popup');
 const redPopup = document.querySelector('div#redPopup');
 const greenPopup = document.querySelector('div#greenPopup');
 const inpEmail = document.getElementById('inpEmail');
 const inpPassword = document.getElementById('inpPassword');
 const logoutForms = document.querySelectorAll('form#logoutForm');
-console.log(logoutForms);
+// console.log(logoutForms);
 function showLoading(){
     document.querySelector('div#preloader').style.display = 'block';
 }
 function closeLoading(){
     document.querySelector('div#preloader').style.display = 'none';
 }
-logoutForms.forEach(function(form) {
-    form.onsubmit = function(event){
-        event.preventDefault();
-        var xhr = new XMLHttpRequest();
-        var requestBody = {
-            email: email,
-            number:number
-        };
-        //open the request
-        xhr.open('POST', "/users/logout");
-        // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        //send the form data
-        xhr.send(JSON.stringify(requestBody));
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    var response = xhr.responseText;
-                    form.reset(); //reset form after AJAX success.
-                    window.location.reload();
-                } else {
-                }
+function logout(){
+    var xhr = new XMLHttpRequest();
+    var requestBody = {
+        email: email,
+        number:number
+    };
+    //open the request
+    xhr.open('POST', "/users/logout");
+    // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    //send the form data
+    xhr.send(JSON.stringify(requestBody));
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                window.location.reload();
+            } else {
             }
         }
-        return false; 
     }
-});
+}
 function showGreenPopup(data, div = null){
     if(div == 'dashboard'){
         greenPopup.innerHTML = `
