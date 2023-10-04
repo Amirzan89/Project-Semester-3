@@ -48,7 +48,7 @@ forgotPasswordForm.onsubmit = function(event){
     var requestBody = {
         email: emailInput.value
     };
-    xhr.open('POST',"/verify/create/password")
+    xhr.open('POST',"/verifikasi/create/password")
     // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(requestBody));
@@ -123,7 +123,7 @@ verifyOTPForm.onsubmit = function(event){
         email: email,
         code:data,
     };
-    xhr.open('POST',"/verify/otp/password")
+    xhr.open('POST',"/verifikasi/otp/password")
     // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(requestBody));
@@ -137,7 +137,7 @@ verifyOTPForm.onsubmit = function(event){
             } else {
                 closeLoading();
                 var response = JSON.parse(xhr.responseText);
-                showRedPopup(data);
+                showRedPopup(response);
             }
         }
     }
@@ -220,7 +220,7 @@ verifyChangeForm.onsubmit = function(event){
         };
     }
     var xhr = new XMLHttpRequest();
-    xhr.open('POST',"/verify/password");
+    xhr.open('POST',"/verifikasi/password");
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(requestBody));
     xhr.onreadystatechange = function() {
@@ -253,7 +253,7 @@ function sendOtp(){
             var requestBody = {
                 email: email,
             };
-            xhr.open('POST',"/verify/create/password");
+            xhr.open('POST',"/verifikasi/create/password");
             // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify(requestBody));

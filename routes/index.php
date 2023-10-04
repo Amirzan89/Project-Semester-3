@@ -58,7 +58,7 @@ Route::group('/token',[
     ['/get','POST','JwtController@createJWTWebsite'],
     ['/decode','POST','JwtController@decode'],
 ]);
-Route::group('/verify',[
+Route::group('/verifikasi',[
     ['/create',[
         ['/password','POST','MailController@createForgotPassword'],
         ['/email','POST','MailController@createVerifyEmail'],
@@ -68,8 +68,8 @@ Route::group('/verify',[
         ['/','POST','UserController@changePassEmail'],
     ]],
     ['/otp',[
-        ['/otp/password','POST','UserController@getChangePass'],
-        ['/otp/email','POST','UserController@verifyEmail'],
+        ['/password','POST','UserController@getChangePass'],
+        ['/email','POST','UserController@verifyEmail'],
     ]],
     ['/email',[
         ['/','GET','UserController@verifyEmail'],
@@ -121,12 +121,6 @@ Route::group('/tempat',[
 Route::group('/mobile',[
     ['/dashboard','GET','Controllers\Website\Event\EventDashboardController@show'],
 ]);
-Route::group('/verify',[
-    ['/create',[
-        ['/password','POST','MailController@createForgotPassword'],
-    ]],
-]);
-
 //khusus testing web
 Route::group('/testing',[
     ['/event',[

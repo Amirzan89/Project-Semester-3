@@ -3,22 +3,27 @@ const tableEvent = document.getElementById('tableEvent');
 const divTambahEvent = document.getElementById('divTambahEvent');
 const divEditEvent = document.getElementById('divEditEvent');
 const divHapusEvent = document.getElementById('divHapusEvent');
-const tambahEventForm = document.getElementById('tambahEventForm');
-const editEventForm = document.getElementById('editEventForm');
 const popup = document.querySelector('div#popup');
 const redPopup = document.querySelector('div#redPopup');
 const greenPopup = document.querySelector('div#greenPopup');
-const inpNamaEvent = document.getElementById('inpNamaEvent');
-const inpDeskripsiEvent = document.getElementById('inpDeskripsiEvent');
-const inpKategoriEvent = document.getElementById('inpKategoriEvent');
-const inpTAwalEvent = document.getElementById('inpTAwalEvent');
-const inpTAkhirEvent = document.getElementById('inpTAkhirEvent');
-const inpPendaftaranEvent = document.getElementById('inpPendaftaranEvent');
-const inpPosterEvent = document.getElementById('inpPosterEvent');
-console.log(tableEvent.getElementsByTagName('tbody'));
-console.log(tableEvent.getElementsByTagName('tbody').rows);
-console.log(tableEvent.getElementsByTagName('tbody')[0].rows);
-// console.log(tableEvent.getElementsByTagName('tbody')[0].rows[]);
+//tambah form
+const tambahEventForm = document.getElementById('tambahEventForm');
+const inpNamaEvent = tambahEventForm.querySelector('#inpNamaEvent');
+const inpDeskripsiEvent = tambahEventForm.querySelector('#inpDeskripsiEvent');
+const inpKategoriEvent = tambahEventForm.querySelector('#inpKategoriEvent');
+const inpTAwalEvent = tambahEventForm.querySelector('#inpTAwalEvent');
+const inpTAkhirEvent = tambahEventForm.querySelector('#inpTAkhirEvent');
+const inpPendaftaranEvent = tambahEventForm.querySelector('#inpPendaftaranEvent');
+const inpPosterEvent = tambahEventForm.querySelector('#inpPosterEvent');
+//edit form
+const editEventForm = document.getElementById('editEventForm');
+const inpENamaEvent = editEventForm.querySelector('#inpENamaEvent');
+const inpEDeskripsiEvent = editEventForm.querySelector('#inpEDeskripsiEvent');
+const inpEKategoriEvent = editEventForm.querySelector('#inpEKategoriEvent');
+const inpETAwalEvent = editEventForm.querySelector('#inpETAwalEvent');
+const inpETAkhirEvent = editEventForm.querySelector('#inpETAkhirEvent');
+const inpEPendaftaranEvent = editEventForm.querySelector('#inpEPendaftaranEvent');
+const inpEPosterEvent = editEventForm.querySelector('#inpEPosterEvent');
 const formatFile = {
     image: ["image/jpeg", "image/png"],
     pdf: "application/pdf",
@@ -68,7 +73,6 @@ inpTAkhirEvent.onchange = function (event) {
         return;
     }
     dateAkhirSebelum = selectedDatetimeAkhir;
-    const [datePart, timePart] = selectedDatetimeAwal.split('T');
 };
 function showLoading(){
     document.querySelector('div#preloader').style.display = 'block';
@@ -76,7 +80,7 @@ function showLoading(){
 function closeLoading(){
     document.querySelector('div#preloader').style.display = 'none';
 }
-showForm = function(condition, id_user = null, numRow = null){
+showForm = function(condition, IdEvent = null, numRow = null){
     if(condition == 'tambah'){
         setTimeout(() => {
             divTambahEvent.style.display = 'block';
@@ -84,11 +88,32 @@ showForm = function(condition, id_user = null, numRow = null){
     }else if(condition == 'edit'){
         setTimeout(() => {
             divEditEvent.style.display = 'block';
-            // editEventForm.getElementById().value = 
-            editEventForm.getElementById('inpIdEvent').value = id_event;
+            var foundEvent = dataEvents.find(function(event){  
+                return event.id_event === IdEvent;
+            });
+
+            if (foundEvent) {
+                editEventForm.querySelector('#IDEvent').value = [foundEvent.id_event,numRow];
+                inpENamaEvent.value = foundEvent.nama_event;
+                inpEDeskripsiEvent.value = foundEvent.deskripsi_event;
+                //set kategori
+                var kategori = foundEvent.kategori_event;
+                for (var i = 0; i < inpEKategoriEvent.options.length; i++) {
+                    var option = inpEKategoriEvent.options[i];
+                    if (kategori.includes(option.value.toUpperCase())) {
+                        option.selected = true;
+                    }
+                }
+                inpETAwalEvent.value = foundEvent.tanggal_awal_event;
+                inpETAkhirEvent.value = foundEvent.tanggal_akhir_event;
+                inpEPendaftaranEvent.value = foundEvent.link_pendaftaran;
+                inpEPosterEvent.value = foundEvent.poster_event;
+                console.log(foundEvent);
+            }
         }, 200);
     }else if(condition == 'hapus'){
         setTimeout(() => {
+            closeForm('hapus');
             divHapusEvent.querySelector('#btnHapusEvent').onclick = function(){
                 hapusEvent(id_event,numRow);
             }
@@ -103,6 +128,7 @@ closeForm = function(condition){
         }, 200);
     }else if(condition == 'edit'){
         setTimeout(() => {
+            editEventForm.reset();
             divEditEvent.style.display = 'none';
         }, 200);
     }else if(condition == 'hapus'){
@@ -127,10 +153,8 @@ tambahEventForm.onsubmit = function(event){
     const tanggalAwal = inpTAwalEvent.value;
     const tanggalAkhir = inpTAkhirEvent.value;
     const pendaftaranEvent = inpPendaftaranEvent.value;
-    const selectedDatetimeAwal = inpTAwalEvent.value;
-    const selectedDatetimeAkhir = inpTAkhirEvent.value;
-    const selectedDateAWal = new Date(selectedDatetimeAwal);
-    const selectedDateAkhir = new Date(selectedDatetimeAkhir);
+    const selectedDateAWal = new Date(tanggalAwal);
+    const selectedDateAkhir = new Date(tanggalAkhir);
     if (namaEvent.trim() === '') {
         showRedPopup('nama event harus diisi !');
         return;
@@ -151,8 +175,8 @@ tambahEventForm.onsubmit = function(event){
         showRedPopup("tanggal awal lebih lama dari tanggal akhir")
     }
     //convert to date time
-    const [dateAwal, timeAwal] = selectedDatetimeAwal.split('T');
-    const [dateAkhir, timeAkhir] = selectedDatetimeAkhir.split('T');
+    const [dateAwal, timeAwal] = tanggalAwal.split('T');
+    const [dateAkhir, timeAkhir] = tanggalAkhir.split('T');
     //convert date 
     const [yearAwal, monthAwal, dayAwal] = dateAwal.split('-');
     const [yearAkhir, monthAkhir, dayAkhir] = dateAkhir.split('-');
@@ -166,7 +190,7 @@ tambahEventForm.onsubmit = function(event){
     // Format the time in 24-hour format (HH:MM)
     const formattedTimeAwal = `${hourAwal.toString().padStart(2, '0')}:${minuteAwal.toString().padStart(2, '0')}`;
     const formattedTimeAkhir = `${hourAkhir.toString().padStart(2, '0')}:${minuteAkhir.toString().padStart(2, '0')}`;
-    //change date format and time`
+    //change date format and time
     showLoading();
     var requestBody = {
         id_user: idUser,
@@ -186,14 +210,17 @@ tambahEventForm.onsubmit = function(event){
         if (xhr.readyState == XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
                 closeLoading();
+                tambahEventForm.reset();
+                inpTAwalEvent.value = currentDate.toISOString().substring(0, 16);
+                inpTAkhirEvent.value = currentDate.toISOString().substring(0, 16);
                 var response = JSON.parse(xhr.responseText);
                 //tambah data ke table event
                 const dataTable = ['nama_event','tanggal_awal','tanggal_akhir'];
                 var newRow = document.createElement('tr');
-                //add number row
                 var nCell = document.createElement('th');
                 nCell.setAttribute('scope','row');
-                var numRow = tableEvent.getElementsByTagName('tbody')[0].rows.length+1
+                //add number row
+                var numRow = tableEvent.getElementsByTagName('tbody')[0].rows.length+1;
                 nCell.textContent = numRow; 
                 newRow.appendChild(nCell);
                 //add data row
@@ -209,7 +236,6 @@ tambahEventForm.onsubmit = function(event){
                 //get id event
                 id_event += 1;
                 // Add button edit
-                console.log('tambah id event '+id_event);
                 var btnCell = document.createElement('td');
                 var editBtn = document.createElement('button');
                 editBtn.textContent = 'edit';
@@ -225,6 +251,9 @@ tambahEventForm.onsubmit = function(event){
                 };
                 btnCell.appendChild(delBtn);
                 newRow.appendChild(btnCell);
+                //tambah data ke array
+                dataEvents.push(requestBody);
+                console.log(dataEvents);
                 closeForm('tambah');
                 //show popup
                 showGreenPopup(response);
@@ -238,18 +267,18 @@ tambahEventForm.onsubmit = function(event){
     return false; 
 }
 editEventForm.onsubmit = function(event){
-    console.log('tambah eventt');
+    console.log('ubah eventt');
     event.preventDefault();
-    const namaEvent = inpNamaEvent.value;
-    const deskripsiEvent = inpDeskripsiEvent.value;
-    const kategoriEvent = inpKategoriEvent.value;
-    const tanggalAwal = inpTAwalEvent.value;
-    const tanggalAkhir = inpTAkhirEvent.value;
-    const pendaftaranEvent = inpPendaftaranEvent.value;
-    const selectedDatetimeAwal = inpTAwalEvent.value;
-    const selectedDatetimeAkhir = inpTAkhirEvent.value;
-    const selectedDateAWal = new Date(selectedDatetimeAwal);
-    const selectedDateAkhir = new Date(selectedDatetimeAkhir);
+    const IDEvent = editEventForm.querySelector('#IDEvent').value;
+    var [id_event, numRow] = IDEvent.split(',');
+    const namaEvent = inpENamaEvent.value;
+    const deskripsiEvent = inpEDeskripsiEvent.value;
+    const kategoriEvent = inpEKategoriEvent.value;
+    const tanggalAwal = inpETAwalEvent.value;
+    const tanggalAkhir = inpETAkhirEvent.value;
+    const pendaftaranEvent = inpEPendaftaranEvent.value;
+    const selectedDateAWal = new Date(tanggalAwal);
+    const selectedDateAkhir = new Date(tanggalAkhir);
     if (namaEvent.trim() === '') {
         showRedPopup('nama event harus diisi !');
         return;
@@ -270,8 +299,8 @@ editEventForm.onsubmit = function(event){
         showRedPopup("tanggal awal lebih lama dari tanggal akhir")
     }
     //convert to date time
-    const [dateAwal, timeAwal] = selectedDatetimeAwal.split('T');
-    const [dateAkhir, timeAkhir] = selectedDatetimeAkhir.split('T');
+    const [dateAwal, timeAwal] = tanggalAwal.split('T');
+    const [dateAkhir, timeAkhir] = tanggalAkhir.split('T');
     //convert date 
     const [yearAwal, monthAwal, dayAwal] = dateAwal.split('-');
     const [yearAkhir, monthAkhir, dayAkhir] = dateAkhir.split('-');
@@ -289,15 +318,16 @@ editEventForm.onsubmit = function(event){
     showLoading();
     var requestBody = {
         id_user: idUser,
+        id_event:id_event,
         nama_event:namaEvent,
-        deskripsi:deskripsiEvent,
-        kategori:kategoriEvent,
-        tanggal_awal:formattedTimeAwal+" "+tanggalIAwal,
-        tanggal_akhir:formattedTimeAkhir+" "+tanggalIAkhir,
-        link:pendaftaranEvent.value,
+        deskripsi_event:deskripsiEvent,
+        kategori_event:kategoriEvent,
+        tanggal_awal_event:formattedTimeAwal+" "+tanggalIAwal,
+        tanggal_akhir_event:formattedTimeAkhir+" "+tanggalIAkhir,
+        link_pendaftaran:pendaftaranEvent.value,
     };
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', "/event/edit");
+    xhr.open('PUT', "/event/edit");
     // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(requestBody));
@@ -306,16 +336,28 @@ editEventForm.onsubmit = function(event){
             if (xhr.status === 200) {
                 closeLoading();
                 var response = JSON.parse(xhr.responseText);
-                //tambah data ke table event
-                var newRow = document.createElement('tr');
-                for (var key in eventData) {
-                    if (eventData.hasOwnProperty(key)) {
-                        var newCell = document.createElement('td');
-                        newCell.textContent = eventData[key];
-                        newRow.appendChild(newCell);
-                    }
+                //edit data di event array
+                var foundEvent = dataEvents.find(function(event){  
+                    return event.id_event === id_event;
+                });
+                if (foundEvent) {
+                    delete requestBody['id_user'];
+                    delete requestBody['id_event'];
+                    Object.assign(foundEvent,requestBody);
                 }
-                document.getElementById('tableEvent').querySelector('tbody').appendChild(newRow);
+                //ubah tabel
+                numRow -= 1;
+                var tbody = tableEvent.getElementsByTagName('tbody')[0];
+                var rows = tbody.getElementsByTagName('tr');
+                if (numRow >= 0 && numRow < rows.length) {
+                    console.log('ganti data event');
+                    var cells = rows[numRow].getElementsByTagName('td');
+                        var dataTable = [namaEvent,formattedTimeAwal+" "+tanggalIAwal,formattedTimeAkhir+" "+tanggalIAkhir];
+                        for(var i = 0; i < cells.length-1; i++){
+                            cells[i].textContent = dataTable[i]; 
+                        }
+                }
+                closeForm('edit');
                 showGreenPopup(response);
             } else {
                 closeLoading();
@@ -343,7 +385,6 @@ function hapusEvent(id_event, numRow){
                 closeLoading();
                 closeForm('hapus');
                 var response = JSON.parse(xhr.responseText);
-                tableEvent.getElementsByTagName('tbody')[0].rows;
                 if (numRow >= 1 && numRow <= tableEvent.getElementsByTagName('tbody')[0].rows.length){
                     tableEvent.querySelector('tbody').removeChild(tableEvent.getElementsByTagName('tbody')[0].rows[numRow-1]);
                 } else {
@@ -364,7 +405,6 @@ function logout(){
         email: email,
         number: number,
     };
-    //open the request
     xhr.open('POST', "/users/logout");
     // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
     xhr.setRequestHeader('Content-Type', 'application/json');

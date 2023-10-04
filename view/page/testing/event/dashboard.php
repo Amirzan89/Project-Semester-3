@@ -24,20 +24,21 @@ $tPath = '';
         var csrfToken = "<?php echo $csrf ?>";
         var email = "<?php echo $user['email'] ?>";
         var idUser = "<?php echo $user['id_user'] ?>";
+        console.log('id user '+idUser);
         var number = "<?php echo $number ?>";
         var showForm, closeForm;
     </script>
     <?php if($role == 'masyarakat'){?>
         <script>
-            <?php if(isset($dataEvents) || !is_null($dataEvents)){?>
+            <?php if(isset($dataEvents) && !empty($dataEvents && !is_null($dataEvents))){?>
                 var  dataEvents = <?php echo json_encode($dataEvents) ?>;
                 var id_event = dataEvents[dataEvents.length-1].id_event;
-                console.log(dataEvents);
-                console.log(dataEvents.length);
-                console.log(dataEvents.length+1);
-                console.log(id_event);
+                // console.log(dataEvents);
+                // console.log(dataEvents.length);
+                // console.log(dataEvents.length+1);
+                // console.log(id_event);
                 <?php }else{ ?>
-                    // var id_event 
+                    var dataEvents = [], id_event = 1; 
                 <?php }?>
         </script>
         <table class="tableEvent" id="tableEvent">
@@ -119,21 +120,21 @@ $tPath = '';
             <div class="bg" onclick="closeForm('hapus')"></div>
             <div class="content">
                 <form id="editEventForm">
+                    <input type="hidden" id="IDEvent">
                     <div class="header">
                         <h1>edit event</h1>
                     </div>
-                    <input type="hidden" class="inpIdEvent" id="inpIdEvent">
                     <div class="row">
                         <label>Nama event</label>
-                        <input type="text" name="inpNamaEvent" id="inpNamaEvent">
+                        <input type="text" name="inpNamaEvent" id="inpENamaEvent">
                     </div>
                     <div class="row">
                         <label>Deskripsi event</label>
-                        <textarea name="inpDeskripsiEvent" id="inpDeskripsiEvent"></textarea>
+                        <textarea name="inpDeskripsiEvent" id="inpEDeskripsiEvent"></textarea>
                     </div>
                     <div class="row">
                         <label>Daftar kategori</label>
-                        <select name="inpKategoriEvent" id="inpKategoriEvent" multiple>
+                        <select name="inpKategoriEvent" id="inpEKategoriEvent" multiple>
                             <option value="olahraga">Olahraga</option>  
                             <option value="seni">Seni</option>
                             <option value="budaya">Budaya</option>
@@ -142,21 +143,22 @@ $tPath = '';
                     </div>
                     <div class="row">
                         <label>Tanggal awal event</label>
-                        <input type="datetime-local" name="inpTAwalEvent" id="inpTAwalEvent">
+                        <input type="datetime-local" name="inpTAwalEvent" id="inpETAwalEvent">
                     </div>
                     <div class="row">
                         <label>Tanggal akhir event</label>
-                        <input type="datetime-local" name="inpTAkhirEvent" id="inpTAkhirEvent">
+                        <input type="datetime-local" name="inpTAkhirEvent" id="inpETAkhirEvent">
                     </div>
                     <div class="row">
                         <label>link pendaftaran event</label>
-                        <input type="text" name="inpPendaftaranEvent" id="inpPendaftaranEvent">
+                        <input type="text" name="inpPendaftaranEvent" id="inpEPendaftaranEvent">
                     </div>
                     <div class="row">
                         <label>Poster event</label>
-                        <input type="file" name="inpPosterEvent" id="inpPosterEvent">
+                        <input type="file" name="inpPosterEvent" id="inpEPosterEvent">
                     </div>
                     <input type="submit" value="Kirim">
+                    <button type="button" onclick="closeForm('edit')"">kembali</button>
                 </form>
             </div>
         </div>
@@ -210,9 +212,8 @@ $tPath = '';
         <?php } ?>
         <a href="/dashboard"><h1>kembali</h1></a>
         <br>
-        <form method="POST" id="logoutForm">
-            <input type="submit" value="metu">
-        </form>
+        <button onclick="logout()"> metu
+        </button>
     <div id="preloader" style="display: none;"></div>
     <div id="greenPopup" style="display:none"></div>    
     <div id="redPopup" style="display: none"></div>
