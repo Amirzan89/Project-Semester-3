@@ -303,7 +303,7 @@ $csrf = $GLOBALS['csrf'];
 			}, 1000);
 		});
 	</script>
-    <script src="/public/js/utama/Admin.js?"></script>
+    <!-- <script src="/public/js/utama/Admin.js?"></script> -->
     <script src="/public/js/utama/logout.js"></script>
 </body>
 

@@ -24,10 +24,10 @@
 	</a>
 </li>
 <li>
-	<button onclick="logout()" class="ai-icon" aria-expanded="false">
-		<!-- <a href="/web/logout.php" class="ai-icon" aria-expanded="false"> -->
+	<!-- <button onclick="logout()" class="ai-icon" aria-expanded="false"> -->
+		<a href="#" class="ai-icon" aria-expanded="false" onclick="logout()">
 			<i class="lni lni-bullhorn"></i>
 			<span class="nav-text">Keluar</span>
-		</button>
-	<!-- </a> -->
+		<!-- </button> -->
+	</a>
 </li>
