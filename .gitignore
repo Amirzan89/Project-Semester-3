@@ -6,7 +6,7 @@
 /public/img-edukasi
 /storage/*.key
 /vendor
-.env
+/web/.env
 .env.backup
 .env.production
 .phpunit.result.cache
