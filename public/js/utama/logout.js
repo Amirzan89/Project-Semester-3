@@ -1,5 +1,4 @@
 function logout(){
-    console.log('loggotoggu');
     var xhr = new XMLHttpRequest();
     var requestBody = {
         email: email,

@@ -16,6 +16,10 @@ $loadEnv = function($path = null){
         }
     }
 };
+//protection
+if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    header('Location: /');
+}
 if(isset($_POST['login'])){
     try{
         $email = $_POST["email"];
@@ -55,11 +59,6 @@ if(isset($_POST['login'])){
                             exit();
                         }else{
                             $loadEnv();
-                            // echo 'exp ';
-                            // echo $_SERVER['JWT_ACCESS_TOKEN_EXPIRED'];
-                            // echo "<br>";
-                            // echo json_encode($result);
-                            // exit();
                             $data1 = ['email'=>$email,'number'=>$result['number'],'expire'=>time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED'])];
                             $encoded = base64_encode(json_encode($data1));
                             header('Content-Type: application/json');
@@ -98,10 +97,8 @@ if(isset($_POST['login'])){
                 );
             }
         }
-        echo "<script>alert('$responseData')</script>";
+        echo "<script>alert('".json_encode($responseData)."')</script>";
         exit();
     }
-}else{
-    // header('');
 }
 ?>

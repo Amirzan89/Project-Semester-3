@@ -268,7 +268,7 @@ class seniman{
     }
 }
 if(isset($_POST['tambah'])){
-    tambahSenimanMasyarakat($_POST);
+    tambahSeniman($_POST);
 }
 if(isset($_POST['edit'])){
     editSeniman($_POST);
