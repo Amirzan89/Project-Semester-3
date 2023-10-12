@@ -1,10 +1,4 @@
 <?php 
-if(!defined('APP')){
-    $rootDir = dirname(dirname(__DIR__));
-    http_response_code(404);
-    include($rootDir.'/view/page/PageNotFound.php');
-    exit();
-}
 $tPath = '';
 ?>
 <!DOCTYPE html>
@@ -28,7 +22,6 @@ $tPath = '';
         var number = "<?php echo $number ?>";
         var showForm, closeForm;
     </script>
-    <?php if($role == 'masyarakat'){?>
         <script>
             <?php if(isset($dataEvents) && !empty($dataEvents && !is_null($dataEvents))){?>
                 var  dataEvents = <?php echo json_encode($dataEvents) ?>;
@@ -37,7 +30,7 @@ $tPath = '';
                     var dataEvents = [], id_event = 1; 
                 <?php }?>
         </script>
-        <table class="tableEvent" id="tableEvent">
+        <!-- <table class="tableEvent" id="tableEvent">
             <thead>
                 <tr>
                     <th scope="col">No</th>
@@ -48,71 +41,74 @@ $tPath = '';
                 </tr>
             </thead>
             <tbody>
-                <?php
-                $no = 1;
-                foreach($dataEvents as $dataEvent){
-                    ?>
-                    <tr>
-                        <th scope="row"><?php echo $no ?></th>
-                        <td> <?php echo $dataEvent['nama_event'] ?></td>
-                        <td> <?php echo $dataEvent['tanggal_awal_event'] ?></td>
-                        <td> <?php echo $dataEvent['tanggal_akhir_event'] ?></td>
-                        <td>
-                            <button onclick="showForm('edit',<?php echo json_encode($dataEvent['id_event']) ?>,<?php echo $no ?>)">edit</button>
-                            <button onclick="showForm('hapus',<?php echo json_encode($dataEvent['id_event']) ?>,<?php echo $no ?>)">hapus</button>
-                        </td>
-                    </tr>
-            <?php
-                $no++;
-            }
-            ?>
             </tbody>
-        </table>
-        <div id="divTambahEvent" style="display:none">
+        </table> -->
+        <div id="divTambahEvent" style="display:block">
             <div class="bg" onclick="closeForm('tambah')"></div>
             <div class="content">
-                <form id="tambahEventForm">
+                <form id="" action="mobile/seniman/seniman.php" method="POST" enctype="multipart/form-data">
                     <div class="header">
-                        <h1>tambah event</h1>
+                        <h1>registrasi seniman</h1>
+                    </div>
+                    <div>
+                        <input type="hidden" name="id_user" value="32">
                     </div>
                     <div class="row">
-                        <label>Nama event</label>
-                        <input type="text" name="inpNamaEvent" id="inpNamaEvent">
+                        <label>NIK seniman</label>
+                        <input type="text" name="nik_seniman" id="nama_seniman">
                     </div>
                     <div class="row">
-                        <label>Deskripsi event</label>
-                        <textarea name="inpDeskripsiEvent" id="inpDeskripsiEvent"></textarea>
+                        <label>Nama seniman</label>
+                        <input type="text" name="nama_seniman" id="nama_seniman">
                     </div>
                     <div class="row">
-                        <label>Daftar kategori</label>
-                        <select name="inpKategoriEvent" id="inpKategoriEvent" multiple>
-                            <option value="olahraga">Olahraga</option>  
-                            <option value="seni">Seni</option>
-                            <option value="budaya">Budaya</option>
-                            <option value="lain-lain">Lain-lain</option>
+                        <label>no telpon seniman</label>
+                        <input type="text" name="no_telpon" id="nama_seniman">
+                    </div>
+                    <div class="row">
+                        <label>Alamat event</label>
+                        <textarea name="alamat" id="alamat"></textarea>
+                    </div>
+                    <div class="row">
+                        <label>Jenis kelamin</label>
+                        <select name="jenis_kelamin_seniman" id="jenis_kelamin" multiple>
+                            <option value="laki-laki">Laki-laki</option>  
+                            <option value="perempuan">perempuan</option>
                         </select>
                     </div>
                     <div class="row">
-                        <label>Tanggal awal event</label>
-                        <input type="datetime-local" name="inpTAwalEvent" id="inpTAwalEvent">
+                        <label>tempat lahir seniman</label>
+                        <input type="text" name="tempat_lahir" id="tempat_lahir">
                     </div>
                     <div class="row">
-                        <label>Tanggal akhir event</label>
-                        <input type="datetime-local" name="inpTAkhirEvent" id="inpTAkhirEvent">
+                        <label>Tanggal lahir seniman</label>
+                        <input type="date" name="tanggal_lahir" id="tanggal_lahir">
                     </div>
                     <div class="row">
-                        <label>link pendaftaran event</label>
-                        <input type="text" name="inpPendaftaranEvent" id="inpPendaftaranEvent">
+                        <label>nama organisasi</label>
+                        <input type="text" name="nama_organisasi" id="nama_organisasi">
                     </div>
                     <div class="row">
-                        <label>Poster event</label>
-                        <input type="file" name="inpPosterEvent" id="inpPosterEvent">
+                        <label>jumlah anggota organisasi</label>
+                        <input type="text" name="anggota_organisasi" id="anggota_organisasi">
                     </div>
-                    <input type="submit" value="Kirim">
+                    <div class="row">
+                        <label>foto ktp</label>
+                        <input type="file" name="foto_ktp" id="foto_ktp">
+                    </div>
+                    <div class="row">
+                        <label>pass foto</label>
+                        <input type="file" name="pass_foto" id="pass_foto">
+                    </div>
+                    <div class="row">
+                        <label>surat keterangan</label>
+                        <input type="file" name="surat_keterangan" id="surat_keterangan">
+                    </div>
+                    <input type="submit" name="tambah" value="Kirim">
                 </form>
             </div>
         </div>
-        <div id="divEditEvent" style="display:none">
+        <!-- <div id="divEditEvent" style="display:none">
             <div class="bg" onclick="closeForm('hapus')"></div>
             <div class="content">
                 <form id="editEventForm">
@@ -157,18 +153,17 @@ $tPath = '';
                     <button type="button" onclick="closeForm('edit')"">kembali</button>
                 </form>
             </div>
-        </div>
-        <div id="divHapusEvent" style="display:none">
+        </div> -->
+        <!-- <div id="divHapusEvent" style="display:none">
             <div class="bg"></div>
             <div class="content">
                 <span>apakah anda mau menghapus</span>
                 <button id="btnHapusEvent" onclick="hapusEvent()">hapus</button>
                 <button onclick="closeForm('hapus')">batal</button>
             </div>
-        </div>
+        </div> -->
         <button onclick="showForm('tambah')"> tambah event</button>
-    <?php }else if($role == 'super admin' || $role == 'admin event'){ ?>
-        <table class="tableEvent" id="tableEvent">
+        <table class="tableEvent" id="tableEvent"> 
             <thead>
                 <tr>
                     <th scope="col">No</th>
@@ -201,7 +196,6 @@ $tPath = '';
         <script>
             var dataEvent = <?php echo json_encode($dataEvent) ?>
         </script>
-        <?php } ?>
         <a href="/dashboard"><h1>kembali</h1></a>
         <br>
         <button onclick="logout()"> metu</button>

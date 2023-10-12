@@ -142,7 +142,8 @@ class EventWeb{
                 );
             }
             isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
-            echo json_encode($responseData);
+            // echo json_encode($responseData);
+            echo "<script>alert('".json_encode($responseData)."')</script>";
             exit();
         }
     }

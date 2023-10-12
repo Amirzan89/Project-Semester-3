@@ -6,6 +6,7 @@
 /public/img-edukasi
 /storage/*.key
 /vendor
+/private
 /web/.env
 .env.backup
 .env.production

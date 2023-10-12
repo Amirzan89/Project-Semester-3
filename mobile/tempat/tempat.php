@@ -1,6 +1,6 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
-class EventMobile{
+class TempatMobile{
     private static $database;
     private static $con;
     private static $folderPath;
@@ -46,8 +46,6 @@ class EventMobile{
             }else if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
                 throw new Exception('Tanggal akhir harus di isi');
             }
-            // $tanggal_awal = date('Y-m-d H:i:s',strtotime($data['tanggal_awal']));
-            // $tanggal_akhir = date('Y-m-d H:i:s',strtotime($data['tanggal_akhir']));
             date_default_timezone_set('Asia/Jakarta');
             $tanggal_awal = strtotime($data['tanggal_awal']);
             $tanggal_akhir = strtotime($data['tanggal_akhir']);

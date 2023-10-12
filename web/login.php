@@ -27,12 +27,15 @@ if(isset($_POST['login'])){
         $pass = $_POST["password"];
         $pass = "Admin@1234567890";
         if(!isset($email) || empty($email)){
+            header("Location: /login.php");
             echo "<script>alert('Email tidak boleh kosong')</script>";
             exit();
         } else if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+            header("Location: /login.php");
             echo "<script>alert('Email yang anda masukkan ivalid')</script>";
             exit();
         }else if(!isset($pass) || empty($pass)){
+            header("Location: /login.php");
             echo "<script>alert('Password tidak boleh kosong')</script>";
             exit();
         }else{
@@ -47,12 +50,16 @@ if(isset($_POST['login'])){
             if ($stmt[0]->fetch()) {
                 if(!password_verify($pass,$passDb)){
                     $stmt[0]->close();
+                    header("Location: /login.php");
                     echo "<script>alert('Password salah')</script>";
+                    exit();
                 }else{
                     $stmt[0]->close();
                     $result = Jwt::createToken($_POST,$con,$loadEnv);
                     if(is_null($result)){
-                        return ['status'=>'error','message'=>'create token error'];
+                        // return ['status'=>'error','message'=>'create token error'];
+                        header("Location: /login.php");
+                        echo "<script>alert('Create token error')</script>";
                     }else{
                         if($result['status'] == 'error'){
                             echo json_encode($result);
@@ -72,7 +79,8 @@ if(isset($_POST['login'])){
             }else{
                 $stmt[0]->close();
                 echo "<script>alert('Email tidak ditemukan')</script>";
-                exit();
+                // header("Location: /login.php");
+                // exit();
             }
         }
     }catch(Exception $e){

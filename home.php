@@ -47,7 +47,7 @@
           <li><a class="nav-link scrollto" href="#about">Informasi</a></li>
           <li><a class="nav-link scrollto" href="#layanan">Layanan</a></li>
           <li><a class="nav-link   scrollto" href="#profil">Profil</a></li>
-          <li><a class="getstarted scrollto" href="login.html">Masuk</a></li>
+          <li><a class="getstarted scrollto" href="login.php">Masuk</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav>
