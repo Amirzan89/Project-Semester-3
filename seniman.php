@@ -43,7 +43,7 @@ $tPath = '';
             <tbody>
             </tbody>
         </table> -->
-        <div id="divTambahEvent" style="display:block">
+        <div id="divTambahSeniman" style="display:block">
             <div class="bg" onclick="closeForm('tambah')"></div>
             <div class="content">
                 <form id="" action="mobile/seniman/seniman.php" method="POST" enctype="multipart/form-data">
@@ -108,52 +108,75 @@ $tPath = '';
                 </form>
             </div>
         </div>
-        <!-- <div id="divEditEvent" style="display:none">
-            <div class="bg" onclick="closeForm('hapus')"></div>
+        <div id="divEditSeniman" style="display:block">
+            <div class="bg" onclick="closeForm('tambah')"></div>
             <div class="content">
-                <form id="editEventForm">
-                    <input type="hidden" id="IDEvent">
+                <form id="" action="mobile/seniman/seniman.php" method="PUT" enctype="multipart/form-data">
                     <div class="header">
-                        <h1>edit event</h1>
+                        <h1>edit seniman</h1>
+                    </div>
+                    <div>
+                        <input type="hidden" name="id_user" value="32">
                     </div>
                     <div class="row">
-                        <label>Nama event</label>
-                        <input type="text" name="inpNamaEvent" id="inpENamaEvent">
+                        <label>id seniman</label>
+                        <input type="text" name="id_seniman" id="id_seniman">
                     </div>
                     <div class="row">
-                        <label>Deskripsi event</label>
-                        <textarea name="inpDeskripsiEvent" id="inpEDeskripsiEvent"></textarea>
+                        <label>NIK seniman</label>
+                        <input type="text" name="nik_seniman" id="nama_seniman">
                     </div>
                     <div class="row">
-                        <label>Daftar kategori</label>
-                        <select name="inpKategoriEvent" id="inpEKategoriEvent" multiple>
-                            <option value="olahraga">Olahraga</option>  
-                            <option value="seni">Seni</option>
-                            <option value="budaya">Budaya</option>
-                            <option value="lain-lain">Lain-lain</option>
+                        <label>Nama seniman</label>
+                        <input type="text" name="nama_seniman" id="nama_seniman">
+                    </div>
+                    <div class="row">
+                        <label>no telpon seniman</label>
+                        <input type="text" name="no_telpon" id="nama_seniman">
+                    </div>
+                    <div class="row">
+                        <label>Alamat event</label>
+                        <textarea name="alamat" id="alamat"></textarea>
+                    </div>
+                    <div class="row">
+                        <label>Jenis kelamin</label>
+                        <select name="jenis_kelamin_seniman" id="jenis_kelamin" multiple>
+                            <option value="laki-laki">Laki-laki</option>  
+                            <option value="perempuan">perempuan</option>
                         </select>
                     </div>
                     <div class="row">
-                        <label>Tanggal awal event</label>
-                        <input type="datetime-local" name="inpTAwalEvent" id="inpETAwalEvent">
+                        <label>tempat lahir seniman</label>
+                        <input type="text" name="tempat_lahir" id="tempat_lahir">
                     </div>
                     <div class="row">
-                        <label>Tanggal akhir event</label>
-                        <input type="datetime-local" name="inpTAkhirEvent" id="inpETAkhirEvent">
+                        <label>Tanggal lahir seniman</label>
+                        <input type="date" name="tanggal_lahir" id="tanggal_lahir">
                     </div>
                     <div class="row">
-                        <label>link pendaftaran event</label>
-                        <input type="text" name="inpPendaftaranEvent" id="inpEPendaftaranEvent">
+                        <label>nama organisasi</label>
+                        <input type="text" name="nama_organisasi" id="nama_organisasi">
                     </div>
                     <div class="row">
-                        <label>Poster event</label>
-                        <input type="file" name="inpPosterEvent" id="inpEPosterEvent">
+                        <label>jumlah anggota organisasi</label>
+                        <input type="text" name="anggota_organisasi" id="anggota_organisasi">
                     </div>
-                    <input type="submit" value="Kirim">
-                    <button type="button" onclick="closeForm('edit')"">kembali</button>
+                    <div class="row">
+                        <label>foto ktp</label>
+                        <input type="file" name="foto_ktp" id="foto_ktp">
+                    </div>
+                    <div class="row">
+                        <label>pass foto</label>
+                        <input type="file" name="pass_foto" id="pass_foto">
+                    </div>
+                    <div class="row">
+                        <label>surat keterangan</label>
+                        <input type="file" name="surat_keterangan" id="surat_keterangan">
+                    </div>
+                    <input type="submit" name="tambah" value="Kirim">
                 </form>
             </div>
-        </div> -->
+        </div>
         <!-- <div id="divHapusEvent" style="display:none">
             <div class="bg"></div>
             <div class="content">

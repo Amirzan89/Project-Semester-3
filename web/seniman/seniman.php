@@ -1,161 +1,41 @@
 <?php
-class seniman{
-//untuk masyarakat
-    public static function tambahSenimanMasyarakat($data, $uri = null){
-        try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi')</script>";
-                exit();
-            }
-            if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
-                echo "<script>alert('Nama Seniman harus di isi')</script>";
-                exit();
-            } elseif (strlen($data['nama_seniman']) < 5) {
-                echo "<script>alert('Nama Seniman minimal 5 karakter')</script>";
-                exit();
-            } elseif (strlen($data['nama_seniman']) > 50) {
-                echo "<script>alert('Nama Seniman maksimal 50 karakter')</script>";
-                exit();
-            }
-            if (strlen($data['deskripsi']) > 4000) {
-                echo "<script>alert('deskripsi Seniman maksimal 4000 karakter')</script>";
-                exit();
-            }
-            if (!isset($data['kategori']) || empty($data['kategori'])) {
-                echo "<script>alert('kategori seniman harus di isi')</script>";
-                exit();
-            }else if(!in_array($data['kategori'],['olahraga','seni','budaya'])){
-                echo "<script>alert('kategori salah')</script>";
-                exit();
-            }
-            if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
-                echo "<script>alert('Tanggal awal harus di isi')</script>";
-                exit();
-            }else if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
-                echo "<script>alert('Tanggal akhir harus di isi')</script>";
-                exit();
-            }
-            $tanggal_awal = date('Y-m-d H:i:s',strtotime($data['tanggal_awal']));
-            $tanggal_akhir = date('Y-m-d H:i:s',strtotime($data['tanggal_akhir']));
-            // Check if the date formats are valid
-            if (!$tanggal_awal) {
-                echo "<script>alert('Format tanggal awal tidak valid')</script>";
-                exit();
-                // return ['status' => 'error', 'message' => 'Format tanggal awal tidak valid', 'code' => 400];
-            }else if (!$tanggal_akhir) {
-                echo "<script>alert('Format tanggal akhir tidak valid')</script>";
-                exit();
-            }
-            // Compare the dates
-            if ($tanggal_awal > $tanggal_akhir) {
-                echo "<script>alert('Tanggal akhir tidak boleh lebih awal dari tanggal awal')</script>";
-                exit();
-            }
-            $query = "INSERT INTO seniman (nama_seniman,deskripsi_seniman, kategori_seniman, tanggal_awal_seniman, tanggal_akhir_seniman, link_pendaftaran, poster_seniman,status,id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = self::$con->prepare($query);
-            $status = 'terkirim';
-            $data['kategori'] = strtoupper($data['kategori']);
-            $stmt->bind_param("sssssssss", $data['nama_seniman'], $data[  'deskripsi'], $data['kategori'],$tanggal_awal, $tanggal_akhir, $data['link'], $data['poster'],$status,$data['id_user']);
-            $stmt->execute();
-            if ($stmt->affected_rows > 0) {
-                echo "<script>alert('seniman berhasil ditambahkan')</script>";
-                exit();
-            } else {
-                $stmt->close();
-                echo "<script>alert('seniman gagal ditambahkan')</script>";
-                exit();
-            }
-        }catch(Exception $e){
-            $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $erorr->message,
-                );
-            }
-            echo "<script>alert('$responseData')</script>";
-            exit();
-        }
+require_once(__DIR__ . '/../../web/koneksi.php');
+class SenimanWebsite{
+    private static $database;
+    private static $con;
+    private static $folderPath;
+    public function __construct(){
+        self::$database = koneksi::getInstance();
+        self::$con = self::$database->getConnection();
+        self::$folderPath = __DIR__.'/../../private/seniman';
     }
-    public static function editSeniman($data){
+    public static function getData($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi')</script>";
-                exit();
+                throw new Exception('id user harus di isi');
             }
-            if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
-                echo "<script>alert('ID seniman harus di isi')</script>";
-                exit();
+            if($data['role'] != 'admin seniman' || $data['role'] == 'super admin'){
+                throw new Exception('invalid role');
             }
-            if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
-                echo "<script>alert('Nama seniman harus di isi')</script>";
-                exit();
-            } elseif (strlen($data['nama_seniman']) < 5) {
-                echo "<script>alert('Nama seniman minimal 5 karakter')</script>";
-                exit();
-            } elseif (strlen($data['nama_seniman']) > 50) {
-                echo "<script>alert('Nama seniman maksimal 50 karakter')</script>";
-                exit();
+            //check user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                throw new Exception('user tidak ditemukan');
             }
-            if (strlen($data['deskripsi_seniman']) > 4000) {
-                echo "<script>alert('Deskripsi seniman maksimal 4000 karakter')</script>";
-                exit();
-            }
-            if (!isset($data['kategori_seniman']) || empty($data['kategori_seniman'])) {
-                echo "<script>alert('Kategori seniman harus di isi')</script>";
-                exit();
-            }else if(!in_array($data['kategori_seniman'],['olahraga','seni','budaya'])){
-                echo "<script>alert('Kategori salah')</script>";
-                exit();
-            }
-            if (!isset($data['tanggal_awal_seniman']) || empty($data['tanggal_awal_seniman'])) {
-                echo "<script>alert('Tanggal awal harus di isi')</script>";
-                exit();
-            }else if (!isset($data['tanggal_akhir_seniman']) || empty($data['tanggal_akhir_seniman'])) {
-                echo "<script>alert('Tanggal akhir harus di isi')</script>";
-                exit();
-            }
-            $tanggal_awal = date('Y-m-d H:i:s',strtotime($data['tanggal_awal_seniman']));
-            $tanggal_akhir = date('Y-m-d H:i:s',strtotime($data['tanggal_akhir_seniman']));
-            // Check if the date formats are valid
-            if (!$tanggal_awal) {
-                echo "<script>alert('Format tanggal awal tidak valid')</script>";
-                exit();
-            }else if (!$tanggal_akhir) {
-                echo "<script>alert('Format tanggal akhir tidak valid')</script>";
-                exit();
-            }
-            // Compare the dates
-            if ($tanggal_awal > $tanggal_akhir) {
-                echo "<script>alert('Tanggal akhir tidak boleh lebih awal dari tanggal awal')</script>";
-                exit();
-            }
-            $query = "UPDATE seniman SET nama_seniman = ?, deskripsi_seniman = ?, kategori_seniman = ?, tanggal_awal_seniman = ?, tanggal_akhir_seniman = ?, link_pendaftaran = ?, poster_seniman = ?, status = ? WHERE id_user = ? AND id_seniman = ?";
-            $stmt = self::$con->prepare($query);
-            $status = 'terkirim';
-            $data['kategori'] = strtoupper($data['kategori']);
-            $stmt->bind_param("ssssssssii", $data['nama_seniman'], $data['deskripsi_seniman'], $data['kategori_seniman'], $tanggal_awal, $tanggal_akhir, $data['link_pendaftaran'], $data['poster_seniman'], $status, $data['id_user'], $data['id_seniman']);
-            $stmt->execute();
-            if ($stmt->affected_rows > 0) {
-                $stmt->close();
-                echo "<script>alert('seniman berhasil diupdate')</script>";
-                exit();
-            } else {
-                $stmt->close();
-                echo "<script>alert('seniman gagal diupdate')</script>";
-                exit();
+            $stmt[0]->close();
+            if($role == $data['role']){
+                throw new Exception('invalid role');
             }
         }catch(Exception $e){
-            echo $e->getTraceAsString();
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
@@ -163,120 +43,218 @@ class seniman{
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $erorr->message,
+                    'message' => $errorJson['message'],
                 );
             }
-            echo "<script>alert('$responseData')</script>";
-            exit();
-        }
-    }
-    public static function hapusSeniman($data, $uri = null){
-        try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi')</script>";
-                exit();
-            }
-            if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
-                echo "<script>alert('ID seniman harus di isi')</script>";
-                exit();
-            }
-            $query = "DELETE FROM seniman WHERE id_seniman = ? AND id_user = ?";
-            $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param('ss', $data['id_seniman'],$data['id_user']);
-            if ($stmt[2]->execute()) {
-                $stmt[2]->close();
-                echo "<script>alert('seniman berhasil dihapus')</script>";
-                exit();
-            } else {
-                $stmt[2]->close();
-                echo "<script>alert('seniman gagal dihapus')</script>";
-                exit();
-            }
-        }catch(Exception $e){
-            $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $erorr->message,
-                );
-            }
-            echo "<script>alert('$responseData')</script>";
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
             exit();
         }
     }
     //khusus admin seniman dan super admin
-    public static function prosesSeniman($data, $uri = null){
-        if(!isset($data['id_user']) || empty($data['id_user'])){
-            echo "<script>alert('ID User harus di isi')</script>";
+    public static function prosesSeniman($data){
+        try{
+            if(!isset($data['id_user']) || empty($data['id_user'])){
+                throw new Exception('id user harus di isi');
+            }
+            if (!isset($data['id_seniman']) || empty($data['id_seniman'])) {
+                throw new Exception('id seniman harus di isi');
+            }
+            if (!isset($data['keterangan']) || empty($data['keterangan'])) {
+                throw new Exception('keterangan harus di isi');
+            }
+            if($data['keterangan'] != 'proses'){
+                throw new Exception('keterangan invalid');
+            }
+            //check user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                throw new Exception('user tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if($role == 'super admin' || $role == 'admin seniman'){
+                throw new Exception('invalid role');
+            }
+            //check id seniman
+            $query = "SELECT id_seniman FROM seniman WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_user']);
+            $stmt[1]->execute();
+            if(!$stmt[1]->fetch()){
+                $stmt[1]->close();
+                throw new Exception('Data seniman tidak ditemukan');
+            }
+            //update status
+            $query = "UPDATE seniman SET status = ? WHERE id_seniman = ?";
+            $stmt[2] = self::$con->prepare($query);
+            $status = 'proses';
+            $stmt[2]->bind_param("ss", $status, $data['id_seniman']);
+            $stmt[2]->execute();
+            if ($stmt[2]->affected_rows > 0) {
+                $stmt[2]->close();
+                echo json_encode(['status'=>'success','message'=>'seniman berhasil dubah']);
+                exit();
+            } else {
+                $stmt[2]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'seniman gagal diubah','code'=>500]));
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
             exit();
         }
-        if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
-            return ['status'=>'error','message'=>'Nama seniman harus di isi','code'=>400];
-        } elseif (strlen($data['nama_seniman']) < 5) {
-            return ['status'=>'error','message'=>'Nama seniman minimal 5 karakter','code'=>400];
-        } elseif (strlen($data['nama_seniman']) > 50) {
-            return ['status'=>'error','message'=>'Nama seniman maksimal 50 karakter','code'=>400];
-        }
-        if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
-            return ['status'=>'error','message'=>'Deskripsi seniman harus di isi','code'=>400];
-        } elseif (strlen($data['deskripsi']) > 4000) {
-            return ['status'=>'error','message'=>'deskripsi seniman maksimal 4000 karakter','code'=>400];
-        }
-        if (!isset($data['kategori']) || empty($data['kategori'])) {
-            return ['status'=>'error','message'=>'Kategori seniman harus di isi','code'=>400];
-        }else if(!in_array($data['kategori'],['olahraga','seni'])){
-            return ['status'=>'error','message'=>'Kategori salah','code'=>400];
-        }
-        if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
-            return ['status'=>'error','message'=>'Tanggal awal harus di isi','code'=>400];
-        }else if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
-            return ['status'=>'error','message'=>'Tanggal akhir harus di isi','code'=>400];
+    }
+    public static function verifikasiSeniman($data){
+        try{
+            if(!isset($data['id_user']) || empty($data['id_user'])){
+                throw new Exception('id user harus di isi');
+            }
+            if (!isset($data['id_seniman']) || empty($data['id_seniman'])) {
+                throw new Exception('id seniman harus di isi');
+            }
+            if (!isset($data['keterangan']) || empty($data['keterangan'])) {
+                throw new Exception('keterangan harus di isi');
+            }
+            if($data['keterangan'] != 'setuju'){
+                throw new Exception('keterangan invalid');
+            }else{
+                $status = 'diterima';
+            }
+            if($data['keterangan'] != 'tolak'){
+                throw new Exception('keterangan invalid');
+            }else{
+                if (!isset($data['catatan']) || empty($data['catata'])) {
+                    throw new Exception('catatan harus di isi');
+                }else{
+                    $status = 'ditolak';
+                }
+            }
+            //check user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                throw new Exception('user tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if($role == 'super admin' || $role == 'admin seniman'){
+                throw new Exception('invalid role');
+            }
+            //check id seniman
+            $query = "SELECT id_seniman FROM seniman WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_user']);
+            $stmt[1]->execute();
+            if(!$stmt[1]->fetch()){
+                $stmt[1]->close();
+                throw new Exception('Data seniman tidak ditemukan');
+            }
+            //update status
+            if($status == 'diterima'){
+                $query = "UPDATE seniman SET status = ? WHERE id_seniman = ?";
+                $stmt[2] = self::$con->prepare($query);
+                $stmt[2]->bind_param("ss", $status, $data['id_seniman']);
+                $stmt[2]->execute();
+                if ($stmt[2]->affected_rows > 0) {
+                    $stmt[2]->close();
+                    echo json_encode(['status'=>'success','message'=>'seniman berhasil dubah']);
+                    exit();
+                } else {
+                    $stmt[2]->close();
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'seniman gagal diubah','code'=>500]));
+                }
+            }else if($status == 'ditolak'){
+                $query = "UPDATE seniman SET status = ?, catatan = ? WHERE id_seniman = ?";
+                $stmt[2] = self::$con->prepare($query);
+                $stmt[2]->bind_param("ss", $status, $data['catatan'], $data['id_seniman']);
+                $stmt[2]->execute();
+                if ($stmt[2]->affected_rows > 0) {
+                    $stmt[2]->close();
+                    echo json_encode(['status'=>'success','message'=>'seniman berhasil dubah']);
+                    exit();
+                } else {
+                    $stmt[2]->close();
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'seniman gagal diubah','code'=>500]));
+                }
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
         }
     }
-    public static function verfikasiSeniman($data, $uri = null){
-        if(!isset($data['id_user']) || empty($data['id_user'])){
-            return ['status'=>'error','message'=>'ID User harus di isi','code'=>400];
-        }
-        if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
-            return ['status'=>'error','message'=>'Nama seniman harus di isi','code'=>400];
-        } elseif (strlen($data['nama_seniman']) < 5) {
-            return ['status'=>'error','message'=>'Nama seniman minimal 5 karakter','code'=>400];
-        } elseif (strlen($data['nama_seniman']) > 50) {
-            return ['status'=>'error','message'=>'Nama seniman maksimal 50 karakter','code'=>400];
-        }
-        if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
-            return ['status'=>'error','message'=>'Deskripsi seniman harus di isi','code'=>400];
-        } elseif (strlen($data['deskripsi']) > 4000) {
-            return ['status'=>'error','message'=>'deskripsi seniman maksimal 4000 karakter','code'=>400];
-        }
-        if (!isset($data['kategori']) || empty($data['kategori'])) {
-            return ['status'=>'error','message'=>'Kategori seniman harus di isi','code'=>400];
-        }else if(!in_array($data['kategori'],['olahraga','seni'])){
-            return ['status'=>'error','message'=>'Kategori salah','code'=>400];
-        }
-        if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
-            return ['status'=>'error','message'=>'Tanggal awal harus di isi','code'=>400];
-        }else if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
-            return ['status'=>'error','message'=>'Tanggal akhir harus di isi','code'=>400];
+    public static function handle(){
+        $contentType = $_SERVER["CONTENT_TYPE"];
+        if ($contentType === "application/json") {
+            $rawData = file_get_contents("php://input");
+            $requestData = json_decode($rawData, true);
+            if ($requestData === null && json_last_error() !== JSON_ERROR_NONE) {
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
+                exit();
+            }
+            return $requestData;
+        } elseif ($contentType === "application/x-www-form-urlencoded") {
+            $requestData = $_POST;
+            return $requestData;
+        // } elseif ($contentType === "multipart/form-data") {
+        //     $requestData = $_POST;
+        //     return $requestData;
+        } elseif (strpos($contentType, 'multipart/form-data') !== false) {
+            $requestData = $_POST;
+            return $requestData;
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
+            exit();
         }
     }
 }
-if(isset($_POST['tambah'])){
-    tambahSenimanMasyarakat($_POST);
+if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    echo 'ilang';
 }
-if(isset($_POST['edit'])){
-    editSeniman($_POST);
-}
-if(isset($_POST['hapus'])){
-    hapusSeniman($_POST);
-}
-if(isset($_POST['proses'])){
-    prosesSeniman($_POST);
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    $data = SenimanWebsite::handle();
+    if($data['keterangan'] == 'proses'){
+        SenimanWebsite::prosesSeniman($data);
+    }else{
+        SenimanWebsite::verifikasiSeniman($data);
+    }
 }
 ?>
