@@ -1,5 +1,13 @@
 <?php 
-
+require_once('web/koneksi.php');
+$db = koneksi::getInstance();
+$con = $db->getConnection();
+require('web/authenticate.php'); 
+$userAuth = authenticate($_POST,[
+    'uri'=>$_SERVER['REQUEST_URI'],
+    'method'=>$_SERVER['REQUEST_METHOD'
+    ]
+],$con);
 ?>
 <!DOCTYPE html>
 <html lang="en">

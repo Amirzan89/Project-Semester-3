@@ -50,16 +50,16 @@ if(isset($_POST['login'])){
             if ($stmt[0]->fetch()) {
                 if(!password_verify($pass,$passDb)){
                     $stmt[0]->close();
-                    header("Location: /login.php");
                     echo "<script>alert('Password salah')</script>";
+                    echo "<script>window.location.href = '/login.php';</script>";
                     exit();
                 }else{
                     $stmt[0]->close();
                     $result = Jwt::createToken($_POST,$con,$loadEnv);
                     if(is_null($result)){
-                        // return ['status'=>'error','message'=>'create token error'];
-                        header("Location: /login.php");
                         echo "<script>alert('Create token error')</script>";
+                        echo "<script>window.location.href = '/login.php';</script>";
+                        exit();
                     }else{
                         if($result['status'] == 'error'){
                             echo json_encode($result);
@@ -79,8 +79,8 @@ if(isset($_POST['login'])){
             }else{
                 $stmt[0]->close();
                 echo "<script>alert('Email tidak ditemukan')</script>";
-                // header("Location: /login.php");
-                // exit();
+                echo "<script>window.location.href = '/login.php';</script>";
+                exit();
             }
         }
     }catch(Exception $e){

@@ -9,8 +9,7 @@ class SenimanMobile{
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/../../private/seniman';
     }
-//untuk masyarakat
-    public static function regisrasiSeniman($data, $uri = null){
+    public static function regisrasiSeniman($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('ID User harus di isi');
@@ -198,7 +197,7 @@ class SenimanMobile{
             exit();
         }
     }
-    public static function editSeniman($data, $uri = null){
+    public static function editSeniman($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('ID User harus di isi');
@@ -387,76 +386,7 @@ class SenimanMobile{
             exit();
         }
     }
-    public static function editSenimanold($data){
-        try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                exit();
-            }
-            if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
-                exit();
-            }
-            if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
-                exit();
-            } elseif (strlen($data['nama_seniman']) < 5) {
-                exit();
-            } elseif (strlen($data['nama_seniman']) > 50) {
-                exit();
-            }
-            if (strlen($data['deskripsi_seniman']) > 4000) {
-                exit();
-            }
-            if (!isset($data['kategori_seniman']) || empty($data['kategori_seniman'])) {
-                exit();
-            }else if(!in_array($data['kategori_seniman'],['olahraga','seni','budaya'])){
-                exit();
-            }
-            if (!isset($data['tanggal_awal_seniman']) || empty($data['tanggal_awal_seniman'])) {
-                exit();
-            }else if (!isset($data['tanggal_akhir_seniman']) || empty($data['tanggal_akhir_seniman'])) {
-                exit();
-            }
-            $tanggal_awal = date('Y-m-d H:i:s',strtotime($data['tanggal_awal_seniman']));
-            $tanggal_akhir = date('Y-m-d H:i:s',strtotime($data['tanggal_akhir_seniman']));
-            if (!$tanggal_awal) {
-                exit();
-            }else if (!$tanggal_akhir) {
-                exit();
-            }
-            // Compare the dates
-            if ($tanggal_awal > $tanggal_akhir) {
-                exit();
-            }
-            $query = "UPDATE seniman SET nama_seniman = ?, deskripsi_seniman = ?, kategori_seniman = ?, tanggal_awal_seniman = ?, tanggal_akhir_seniman = ?, link_pendaftaran = ?, poster_seniman = ?, status = ? WHERE id_user = ? AND id_seniman = ?";
-            $stmt = self::$con->prepare($query);
-            $status = 'terkirim';
-            $data['kategori'] = strtoupper($data['kategori']);
-            $stmt->bind_param("ssssssssii", $data['nama_seniman'], $data['deskripsi_seniman'], $data['kategori_seniman'], $tanggal_awal, $tanggal_akhir, $data['link_pendaftaran'], $data['poster_seniman'], $status, $data['id_user'], $data['id_seniman']);
-            $stmt->execute();
-            if ($stmt->affected_rows > 0) {
-                $stmt->close();
-                exit();
-            } else {
-                $stmt->close();
-                exit();
-            }
-        }catch(Exception $e){
-            $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $erorr->message,
-                );
-            }
-            exit();
-        }
-    }
-    public static function hapusSeniman($data, $uri = null){
+    public static function hapusSeniman($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 exit();
@@ -476,8 +406,8 @@ class SenimanMobile{
             }
         }catch(Exception $e){
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
@@ -485,65 +415,12 @@ class SenimanMobile{
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $erorr->message,
+                    'message' => $errorJson['message'],
                 );
             }
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
             exit();
-        }
-    }
-    //khusus admin seniman dan super admin
-    public static function prosesSeniman($data, $uri = null){
-        if(!isset($data['id_user']) || empty($data['id_user'])){
-            exit();
-        }
-        if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
-            return ['status'=>'error','message'=>'Nama seniman harus di isi','code'=>400];
-        } elseif (strlen($data['nama_seniman']) < 5) {
-            return ['status'=>'error','message'=>'Nama seniman minimal 5 karakter','code'=>400];
-        } elseif (strlen($data['nama_seniman']) > 50) {
-            return ['status'=>'error','message'=>'Nama seniman maksimal 50 karakter','code'=>400];
-        }
-        if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
-            return ['status'=>'error','message'=>'Deskripsi seniman harus di isi','code'=>400];
-        } elseif (strlen($data['deskripsi']) > 4000) {
-            return ['status'=>'error','message'=>'deskripsi seniman maksimal 4000 karakter','code'=>400];
-        }
-        if (!isset($data['kategori']) || empty($data['kategori'])) {
-            return ['status'=>'error','message'=>'Kategori seniman harus di isi','code'=>400];
-        }else if(!in_array($data['kategori'],['olahraga','seni'])){
-            return ['status'=>'error','message'=>'Kategori salah','code'=>400];
-        }
-        if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
-            return ['status'=>'error','message'=>'Tanggal awal harus di isi','code'=>400];
-        }else if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
-            return ['status'=>'error','message'=>'Tanggal akhir harus di isi','code'=>400];
-        }
-    }
-    public static function verfikasiSeniman($data, $uri = null){
-        if(!isset($data['id_user']) || empty($data['id_user'])){
-            return ['status'=>'error','message'=>'ID User harus di isi','code'=>400];
-        }
-        if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
-            return ['status'=>'error','message'=>'Nama seniman harus di isi','code'=>400];
-        } elseif (strlen($data['nama_seniman']) < 5) {
-            return ['status'=>'error','message'=>'Nama seniman minimal 5 karakter','code'=>400];
-        } elseif (strlen($data['nama_seniman']) > 50) {
-            return ['status'=>'error','message'=>'Nama seniman maksimal 50 karakter','code'=>400];
-        }
-        if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
-            return ['status'=>'error','message'=>'Deskripsi seniman harus di isi','code'=>400];
-        } elseif (strlen($data['deskripsi']) > 4000) {
-            return ['status'=>'error','message'=>'deskripsi seniman maksimal 4000 karakter','code'=>400];
-        }
-        if (!isset($data['kategori']) || empty($data['kategori'])) {
-            return ['status'=>'error','message'=>'Kategori seniman harus di isi','code'=>400];
-        }else if(!in_array($data['kategori'],['olahraga','seni'])){
-            return ['status'=>'error','message'=>'Kategori salah','code'=>400];
-        }
-        if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
-            return ['status'=>'error','message'=>'Tanggal awal harus di isi','code'=>400];
-        }else if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
-            return ['status'=>'error','message'=>'Tanggal akhir harus di isi','code'=>400];
         }
     }
     public static function handle(){

@@ -43,11 +43,11 @@ function authenticate($request,$data,$con = null){
                 $con = $db->getConnection();
             }
             //check user is exist in database
-            $exist = $user->isExistUser($email,$con);
+            $exist = $user->isExistUser($email);
             if($exist['status'] == 'error'){
                 setcookie('token1', '', time() - 3600, '/');
-                // setcookie('token2', '', time() - 3600, '/');
-                // setcookie('token3', '', time() - 3600, '/');
+                setcookie('token2', '', time() - 3600, '/');
+                setcookie('token3', '', time() - 3600, '/');
                 header('Location: /login.html');
                 exit();
             }else{
@@ -153,7 +153,7 @@ function authenticate($request,$data,$con = null){
         }
     //if cookie gone
     }else{
-        $page = ['/dashboard.php','/pengaturan','/laporan','/event/dashboard','/tempat/dashboard','/testing/seniman/dashboard','/testing/event/dashboard','/testing/tempat/dashboard'];
+        $page = ['/dashboard.php','/pengaturan','/admin.php','/event/dashboard','/tempat/dashboard','/testing/seniman/dashboard','/testing/event/dashboard','/testing/tempat/dashboard'];
         if(in_array($data['uri'],$page)){
             if(isset($_COOKIE["token1"])){
                 $token1 = $_COOKIE['token1'];

@@ -2,8 +2,6 @@
 require(__DIR__.'/../web/koneksi.php');
 require(__DIR__.'/../web/User.php');
 function Register($data,$con){
-    echo 'mlebu register';
-    echo "<br>";
     try{
         if (!isset($data['email']) || empty($data['email'])) {
             echo "<script>alert('Email harus di isi')</script>";

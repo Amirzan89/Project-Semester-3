@@ -1,113 +1,148 @@
 <?php 
 require_once('koneksi.php');
 class User{
-    public function createUser($data,$opt,$con){
+    private static $database;
+    private static $con;
+    private static $folderPath;
+    public function __construct(){
+        self::$database = koneksi::getInstance();
+        self::$con = self::$database->getConnection();
+        self::$folderPath = __DIR__.'/public/img/event';
+    }
+    //khusus admin 
+    public function tambahAdmin($data){
         try{
-            // echo 'mlebu user';
             if (!isset($data['email']) || empty($data['email'])) {
-                return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
+                echo "<script>alert('Email harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                return ['status'=>'error','message'=>'Email invalid','code'=>400];
+                echo "<script>alert('Email invalid !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
-            if (!isset($data['password']) || empty($data['password'])) {
-                return ['status'=>'error','message'=>'Password harus di isi','code'=>400];
-            } elseif (strlen($data['password']) < 8) {
-                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
-            } elseif (strlen($data['password']) > 25) {
-                return ['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400];
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
-                return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
+            if (!isset($data['pass']) || empty($data['pass'])) {
+                echo "<script>alert('Password harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            } elseif (strlen($data['pass']) < 8) {
+                echo "<script>alert('Password minimal 8 angka !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            } elseif (strlen($data['pass']) > 25) {
+                echo "<script>alert('Password maksimal 25 angka !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
+                echo "<script>alert('Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
-            // Validate 'nama' field
             if (!isset($data['nama']) || empty($data['nama'])) {
-                return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
+                echo "<script>alert('Nama lengkap harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
-            if($opt == 'register'){
-                echo '<br>';
-                echo 'tambahhhhhh ';
-                echo '<br>';
-                $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-                $query = "INSERT INTO users (email,password, nama_lengkap, verifikasi, role) VALUES (?, ?, ?, ?, ?)";
-                $verifikasi = 0;
-                $stmt = $con->prepare($query);
-                $role = 'MASYARAKAT';
-                $stmt->bind_param("sssis", $data['email'], $hashedPassword, $data['nama'],$verifikasi, $role);
-                $stmt->execute();
-                if ($stmt->affected_rows > 0) {
-                    echo '<br>';
-                    echo 'nambah data coyy';
-                    echo '<br>';
-                    $email = createVerifyEmail($data);
-                    $stmt->close();
-                    if($email['status'] == 'error'){
-                        return ['status'=>'error','message'=>$email['message']];
-                    }else{
-                        echo "<script>alert(".$email['message'].")</script>";
-                        return ['status'=>'success','message'=>$email['message'],'data'=>$email['data']];
-                    }
-                } else {
-                    $stmt->close();
-                    return ['status'=>'error','message'=>'Akun Gagal Dibuat'];
-                }
-            }else if($opt == 'google'){
-                $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-                $query = "INSERT INTO users (email,password, nama_lengkap, no_telpon, verifikasi, role) VALUES (?, ?, ?, ?, ?, ?)";
-                $verifikasi = 1;
-                $stmt = $con->prepare($query);
-                $role = 'MASYARAKAT';
-                $stmt->bind_param("ssssis", $data['email'], $hashedPassword, $data['nama'],$data['no_telpon'],$verifikasi, $role);
-                $stmt->execute();
-                if ($stmt->affected_rows > 0) {
-                    $email = createVerifyEmail($data);
-                    $stmt->close();
-                    if($email['status'] == 'error'){
-                        return ['status'=>'error','message'=>$email['message']];
-                    }else{
-                        return ['status'=>'success','message'=>$email['message'],'data'=>$email['data']];
-                    }
-                } else {
-                    $stmt->close();
-                    return ['status'=>'error','message'=>'Akun Gagal Dibuat'];
-                }
+            if (!isset($data['phone']) || empty($data['phone'])) {
+                echo "<script>alert('nomer telepon harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
-        }catch(Exception $e){
-            echo $e->getTraceAsString();
-            $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $erorr->message,
-                );
+            if (!is_numeric($data['phone'])) {
+                echo "<script>alert('Nomer telepon harus berisi hanya angka.')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
-            return $responseData;
-        }
-    }
-    public function getUser($email, $data,$con){
-        try{
-            $columns = implode(', ', $data);
-            $query = "SELECT $columns FROM users WHERE BINARY email = ? LIMIT 1";
-            $stmt = $con->prepare($query);
-            $stmt->bind_param('s', $email);
+            if (strlen($data['phone']) < 8) {
+                echo "<script>alert('Nomer telpon minimal 8 karakter !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (strlen($data['phone']) > 15) {
+                echo "<script>alert('Nomer telpon maksimal 15 karakter !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (substr($data['phone'], 0, 2) !== '08') {
+                echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['jenisK']) || empty($data['jenisK'])) {
+                echo "<script>alert('Jenis kelamin harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if(!in_array($data['jenisK'], ['laki-laki','perempuan'])){
+                echo "<script>alert('Invalid jenis kelamin !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['tempatL']) || empty($data['tempatL'])) {
+                echo "<script>alert('Tempat lahir harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['tanggalL']) || empty($data['tanggalL'])) {
+                echo "<script>alert('Tanggal lahir harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['role']) || empty($data['role'])) {
+                echo "<script>alert('Role harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if(!in_array($data['role'], ['super admin','admin event','admin pentas', 'admin tempat', 'admin seniman'])){
+                echo "<script>alert('Invalid role !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check tanggal
+            date_default_timezone_set('Asia/Jakarta');
+            $tanggal_lahir = strtotime($data['tanggalL']);
+            $tanggal_sekarang = date('Y-m-d H:i:s');
+            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            if (!$tanggal_lahir) {
+                echo "<script>alert('Format tanggal lahir tidak valid !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            // Compare the dates
+            if ($tanggal_lahir > $tanggal_sekarang){
+                echo "<script>alert('Tanggal lahir tidak boleh kurang dari sekarang !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check email
+            $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['email']);
+            $stmt[0]->execute();
+            if ($stmt[0]->fetch()) {
+                $stmt[0]->close();
+                echo "<script>alert('Email sudah digunakan !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $stmt[0]->close();
+            $hashedPassword = password_hash($data['pass'], PASSWORD_DEFAULT);
+            $query = "INSERT INTO users (email,password, nama_lengkap, no_telpon, jenis_kelamin, tempat_lahir, tanggal_lahir, role, verifikasi) VALUES (?, ?, ?, ?, ? , ?, ?, ?, ?)";
+            $verifikasi = 1;
+            $stmt = self::$con->prepare($query);
+            $stmt->bind_param("ssssssssi", $data['email'], $hashedPassword, $data['nama'], $data['phone'], $data['jenisK'],$data['tempatL'], $data['tanggalL'], $data['role'],$verifikasi);
             $stmt->execute();
-            $bindResultArray = [];
-            foreach ($data as $column) {
-                $bindResultArray[] = &$$column;
+            if ($stmt->affected_rows > 0) {
+                $stmt->close();
+                echo "<script>alert('akun berhasil dibuat');</script>";
+                echo "<script>window.location.href = '/admin.php';</script>";
+                exit();
+            } else {
+                $stmt->close();
+                echo "<script>alert('Akun gagal dibuat');</script>";
+                echo "<script>window.location.href = '/admin.php';</script>";
+                exit();
             }
-            call_user_func_array([$stmt, 'bind_result'], $bindResultArray);
-            $result = [];
-            if ($stmt->fetch()) {
-                foreach ($data as $column) {
-                    $result[$column] = $$column;
-                }
-            }
-            $stmt->close();
-            return $result;
         }catch(Exception $e){
             $error = $e->getMessage();
             $erorr = json_decode($error, true);
@@ -122,15 +157,174 @@ class User{
                     'message' => $erorr->message,
                 );
             }
-            return $responseData;
+            echo "<script> alert('$responseData');</script>";
+            echo "<script>window.history.back();</script>";
+            exit();
         }
     }
-    public function isExistUser($email,$con){
+    public function editAdmin($data){
+        try{
+            if (!isset($data['email']) || empty($data['email'])) {
+                echo "<script>alert('Email harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                echo "<script>alert('Email invalid !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (isset($data['pass']) && !empty($data['pass'])){
+                if (strlen($data['pass']) < 8) {
+                    echo "<script>alert('Password minimal 8 karakter !');</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
+                if (strlen($data['pass']) > 25) {
+                    echo "<script>alert('Password maksimal 25 karakter !');</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
+                if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
+                    echo "<script>alert('Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !');</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
+            }
+            if (!isset($data['nama']) || empty($data['nama'])) {
+                echo "<script>alert('Nama lengkap harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['phone']) || empty($data['phone'])) {
+                echo "<script>alert('Nomer telepon harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!is_numeric($data['phone'])) {
+                echo "<script>alert('Nomer telepon harus berisi hanya angka.')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (strlen($data['phone']) < 8) {
+                echo "<script>alert('Nomer telpon minimal 8 angka !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (strlen($data['phone']) > 15) {
+                echo "<script>alert('Nomer telpon maksimal 15 angka !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (substr($data['phone'], 0, 2) !== '08') {
+                echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['jenisK']) || empty($data['jenisK'])) {
+                echo "<script>alert('Jenis kelamin harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if(!in_array($data['jenisK'], ['laki-laki','perempuan'])){
+                echo "<script>alert('Invalid jenis kelamin !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['tempatL']) || empty($data['tempatL'])) {
+                echo "<script>alert('Tempat lahir harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['tanggalL']) || empty($data['tanggalL'])) {
+                echo "<script>alert('Tanggal lahir harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['role']) || empty($data['role'])) {
+                echo "<script>alert('Role harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if(!in_array($data['role'], ['super admin','admin event','admin pentas', 'admin tempat', 'admin seniman'])){
+                echo "<script>alert('Invalid role !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check tanggal
+            date_default_timezone_set('Asia/Jakarta');
+            $tanggal_lahir = strtotime($data['tanggalL']);
+            $tanggal_sekarang = date('Y-m-d');
+            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            if (!$tanggal_lahir) {
+                echo "<script>alert('Format tanggal lahir tidak valid !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            // Compare the dates
+            if ($tanggal_lahir > $tanggal_sekarang){
+                echo "<script>alert('Tanggal lahir tidak boleh kurang dari tanggal sekarang !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //jika admin mengubah password
+            if(isset($data['pass']) && !empty($data['pass'])){
+                $hashedPassword = password_hash($data['pass'], PASSWORD_DEFAULT);
+                $query = "UPDATE users SET email = ?, password = ?, nama_lengkap = ?, no_telpon = ?, jenis_kelamin = ?, tempat_lahir = ?, tanggal_lahir = ?, role = ? WHERE id_user = ?";
+                $stmt = self::$con->prepare($query);
+                $stmt->bind_param("ssssssssi", $data['email'], $hashedPassword, $data['nama'], $data['phone'], $data['jenisK'], $data['tempatL'], $data['tanggalL'], $data['role'], $data['id_user']);
+                $stmt->execute();
+                if ($stmt->affected_rows > 0) {
+                    $stmt->close();
+                    echo "<script>alert('akun berhasil diubah')</script>";
+                    echo "<script>window.location.href = '/admin.php';</script>";
+                    exit();
+                } else {
+                    $stmt->close();
+                    echo "<script>alert('akun gagal diubah')</script>";
+                    echo "<script>window.location.href = '/admin.php';</script>";
+                    exit();
+                }
+            }else{
+                $query = "UPDATE users SET email = ?, nama_lengkap = ?, no_telpon = ?, jenis_kelamin = ?, tempat_lahir = ?, tanggal_lahir = ?, role = ? WHERE id_user = ?";
+                $stmt = self::$con->prepare($query);
+                $stmt->bind_param("sssssssi", $data['email'], $data['nama'], $data['phone'], $data['jenisK'], $data['tempatL'], $data['tanggalL'], $data['role'], $data['id_user']);
+                $stmt->execute();
+                if ($stmt->affected_rows > 0) {
+                    $stmt->close();
+                    echo "<script>alert('akun berhasil diubah')</script>";
+                    echo "<script>window.location.href = '/admin.php';</script>";
+                    exit();
+                } else {
+                    $stmt->close();
+                    echo "<script>alert('akun gagal diubah')</script>";
+                    echo "<script>window.location.href = '/admin.php';</script>";
+                    exit();
+                }
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $erorr->message,
+                );
+            }
+            echo "<script> alert('$responseData')</script>";
+            exit();
+        }
+    }
+    public function isExistUser($email){
         if(empty($email) || is_null($email)){
             return ['status'=>'error','message'=>'email empty'];
         }else{
             $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ? LIMIT 1";
-            $stmt = $con->prepare($query);
+            $stmt = self::$con->prepare($query);
             $stmt->bind_param('s', $email);
             $stmt->execute();
             $stmt->bind_result($email);
@@ -141,7 +335,7 @@ class User{
             }
         }
     }
-    public function getChangePass($data, $uri, $method, $param,$con){
+    public function getChangePass($data, $uri, $method, $param){
         try{
             $changePassPage = new ChangePasswordController();
             $notificationPage = new NotificationPageController();
@@ -171,7 +365,7 @@ class User{
                 //get link 
                 $link = ltrim(substr($path, strrpos($path, '/')),'/');
                 $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY link = ? LIMIT 1";
-                $stmt[0] = $con->prepare($query);
+                $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $link);
                 $stmt[0]->execute();
                 $name = '';
@@ -180,7 +374,7 @@ class User{
                 if ($stmt[0]->fetch()) {
                     $stmt[0]->close();
                     $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? LIMIT 1";
-                    $stmt[1] = $con->prepare($query);
+                    $stmt[1] = self::$con->prepare($query);
                     $stmt[1]->bind_param('s', $email);
                     $stmt[1]->execute();
                     $name = '';
@@ -189,7 +383,7 @@ class User{
                     if ($stmt[1]->fetch()) {
                         $stmt[1]->close();
                         $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND BINARY LINK = ? LIMIT 1";
-                        $stmt[2] = $con->prepare($query);
+                        $stmt[2] = self::$con->prepare($query);
                         $stmt[2]->bind_param('ss', $email,$link);
                         $stmt[2]->execute();
                         $name = '';
@@ -202,7 +396,7 @@ class User{
                             $time = $now->format('Y-m-d H:i:s');
                             // $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
                             $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ?  AND updated_at >= ? LIMIT 1";
-                            $stmt[3] = $con->prepare($query);
+                            $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('ss', $email,$time);
                             $stmt[3]->execute();
                             $name = '';
@@ -224,7 +418,7 @@ class User{
                             }else{
                                 $stmt[3]->close();
                                 $query = "DELETE FROM verifikasi WHERE BINARY link = ?";
-                                $stmt = $con->prepare($query);
+                                $stmt = self::$con->prepare($query);
                                 $stmt->bind_param('s', $link);
                                 $result = $stmt->execute();
                                 return $notificationPage->showFailResetPass('Link Expired');
@@ -244,7 +438,7 @@ class User{
             }else{
                 $email = $data['email'];
                 $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? LIMIT 1";
-                $stmt[0] = $con->prepare($query);
+                $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $email);
                 $stmt[0]->execute();
                 $name = '';
@@ -253,7 +447,7 @@ class User{
                 if ($stmt[0]->fetch()) {
                     $stmt[0]->close();
                     $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND binary kode_otp = ? LIMIT 1";
-                    $stmt[1] = $con->prepare($query);
+                    $stmt[1] = self::$con->prepare($query);
                     $stmt[1]->bind_param('ss', $email, $code);
                     $stmt[1]->execute();
                     $name = '';
@@ -266,7 +460,7 @@ class User{
                         $time = $now->format('Y-m-d H:i:s');
                         // $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
                         $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND updated_at >= ? LIMIT 1";
-                        $stmt[2] = $con->prepare($query);
+                        $stmt[2] = self::$con->prepare($query);
                         $stmt[2]->bind_param('ss', $email, $time);
                         $stmt[2]->execute();
                         $name = '';
@@ -279,7 +473,7 @@ class User{
                         }else{
                             $stmt[2]->close();
                             $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND deskripsi = 'password'";
-                            $stmt[3] = $con->prepare($query);
+                            $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('s', $email);
                             $result = $stmt[3]->execute();
                             $stmt[3]->close();
@@ -319,7 +513,7 @@ class User{
             return $responseData;
         }
     }
-    public function changePassEmail($data, $uri, $con){
+    public function changePassEmail($data, $uri){
         try{
             $jwtController = new JwtController();
             // $validator = Validator::make($data, [
@@ -373,10 +567,10 @@ class User{
             }else{
                 if(is_null($link) || empty($link)){
                     if($desc == 'createUser'){
-                        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+                        $hashedPassword = password_hash($data['pass'], PASSWORD_DEFAULT);
                         $query = "INSERT INTO users (email,password, nama_lengkap, verifikasi, role) VALUES (?, ?, ?, ?, ?)";
                         $verifikasi = 1;
-                        $stmt = $con->prepare($query);
+                        $stmt = self::$con->prepare($query);
                         // $now = Carbon::now('Asia/Jakarta');
                         $role = 'MASYARAKAT';
                         $stmt->bind_param("sssis", $data['email'], $hashedPassword, $data['nama'],$verifikasi, $role);
@@ -405,7 +599,7 @@ class User{
                     }else{
                         $code = $data['code'];
                         $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY kode_otp = ? LIMIT 1";
-                        $stmt[0] = $con->prepare($query);
+                        $stmt[0] = self::$con->prepare($query);
                         $stmt[0]->bind_param('s', $code);
                         $stmt[0]->execute();
                         $name = '';
@@ -414,7 +608,7 @@ class User{
                         if ($stmt[0]->fetch()) {
                             $stmt[0]->close();
                             $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
-                            $stmt[1] = $con->prepare($query);
+                            $stmt[1] = self::$con->prepare($query);
                             $stmt[1]->bind_param('s', $email);
                             $stmt[1]->execute();
                             $name = '';
@@ -423,7 +617,7 @@ class User{
                             if ($stmt[1]->fetch()) {
                                 $stmt[1]->close();
                                 $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
-                                $stmt[2] = $con->prepare($query);
+                                $stmt[2] = self::$con->prepare($query);
                                 $stmt[2]->bind_param('s', $email);
                                 $stmt[2]->execute();
                                 $name = '';
@@ -436,7 +630,7 @@ class User{
                                     $time = $now->format('Y-m-d H:i:s');
                                     // $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
                                     $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND updated_at >= ? LIMIT 1";
-                                    $stmt[3] = $con->prepare($query);
+                                    $stmt[3] = self::$con->prepare($query);
                                     $stmt[3]->bind_param('ss', $email, $time);
                                     $stmt[3]->execute();
                                     $name = '';
@@ -446,7 +640,7 @@ class User{
                                         $stmt[3]->close();
                                         $newPass = password_hash($pass, PASSWORD_DEFAULT,['cost'=>10]);
                                         $query = "UPDATE users SET password = ? WHERE BINARY email = ? LIMIT 1";
-                                        $stmt[4] = $con->prepare($query);
+                                        $stmt[4] = self::$con->prepare($query);
                                         $stmt[4]->bind_param('ss', $newPass, $email);
                                         $stmt[4]->execute();
                                         $affectedRows = $stmt[4]->affected_rows;
@@ -454,7 +648,7 @@ class User{
                                         if ($affectedRows > 0) {
                                             $stmt[4]->close();
                                             $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND deskripsi = 'password'";
-                                            $stmt[5] = $con->prepare($query);
+                                            $stmt[5] = self::$con->prepare($query);
                                             $stmt[5]->bind_param('s', $email);
                                             $result = $stmt[5]->execute();
                                             if($result){
@@ -471,7 +665,7 @@ class User{
                                     }else{
                                         $stmt[3]->close();
                                         $query = "DELETE FROM verifikasi WHERE BINARY kode_otp = ? AND deskripsi = 'password'";
-                                        $stmt[4] = $con->prepare($query);
+                                        $stmt[4] = self::$con->prepare($query);
                                         $stmt[4]->bind_param('s', $code);
                                         $result = $stmt[4]->execute();
                                         $stmt[4]->close();
@@ -493,7 +687,7 @@ class User{
                 //
                 }else{
                     $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY link = ? AND deskripsi = $desc LIMIT 1";
-                    $stmt[0] = $con->prepare($query);
+                    $stmt[0] = self::$con->prepare($query);
                     $stmt[0]->bind_param('s', $link);
                     $stmt[0]->execute();
                     $name = '';
@@ -502,7 +696,7 @@ class User{
                     if ($stmt[0]->fetch()) {
                         $stmt[0]->close();
                         $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND deskripsi = $desc LIMIT 1";
-                        $stmt[1] = $con->prepare($query);
+                        $stmt[1] = self::$con->prepare($query);
                         $stmt[1]->bind_param('s', $email);
                         $stmt[1]->execute();
                         $name = '';
@@ -511,7 +705,7 @@ class User{
                         if ($stmt[1]->fetch()) {
                             $stmt[1]->close();
                             $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND BINARY link = ? AND deskripsi = $desc LIMIT 1";
-                            $stmt[2] = $con->prepare($query);
+                            $stmt[2] = self::$con->prepare($query);
                             $stmt[2]->bind_param('ss', $email, $link);
                             $stmt[2]->execute();
                             $name = '';
@@ -524,7 +718,7 @@ class User{
                                 $time = $now->format('Y-m-d H:i:s');
                                 // $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
                                 $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND updated_at >= ? AND deskripsi = $desc LIMIT 1";
-                                $stmt[3] = $con->prepare($query);
+                                $stmt[3] = self::$con->prepare($query);
                                 $stmt[3]->bind_param('ss', $email, $time);
                                 $stmt[3]->execute();
                                 $name = '';
@@ -533,7 +727,7 @@ class User{
                                 if ($stmt[3]->fetch()) {
                                     $stmt[3]->close();
                                     $query = "UPDATE users SET password = ? WHERE BINARY email = ? LIMIT 1";
-                                    $stmt[4] = $con->prepare($query);
+                                    $stmt[4] = self::$con->prepare($query);
                                     $newPass = password_hash($pass, PASSWORD_DEFAULT);
                                     $stmt[4]->bind_param('ss', $newPass, $email);
                                     $stmt[4]->execute();
@@ -542,7 +736,7 @@ class User{
                                     if ($affectedRows > 0) {
                                         $stmt[4]->close();
                                         $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND deskripsi = $desc";
-                                        $stmt[5] = $con->prepare($query);
+                                        $stmt[5] = self::$con->prepare($query);
                                         $stmt[5]->bind_param('s', $email);
                                         $result = $stmt[5]->execute();
                                         if($result){
@@ -559,7 +753,7 @@ class User{
                                 }else{
                                     $stmt[3]->close();
                                     $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND deskripsi = 'password'";
-                                    $stmt[4] = $con->prepare($query);
+                                    $stmt[4] = self::$con->prepare($query);
                                     $stmt[4]->bind_param('s', $email);
                                     $result = $stmt[4]->execute();
                                     $stmt[4]->close();
@@ -604,7 +798,7 @@ class User{
             return $responseData;
         }
     }
-    public function getVerifyEmail($data, $uri,$method,$con){
+    public function getVerifyEmail($data, $uri,$method){
         try{
             $validator = Validator::make($data, [
                 'email'=>'required|email',
@@ -622,7 +816,7 @@ class User{
             }
             $email = $data['email'];
             $query =  "SELECT nama_lengkap FROM users WHERE BINARY email = ? LIMIT 1";
-            $stmt[0] = $con->prepare($query);
+            $stmt[0] = self::$con->prepare($query);
             $stmt[0]->bind_param('s', $email);
             $stmt[0]->execute();
             $name = '';
@@ -640,7 +834,7 @@ class User{
                 if($path1 == '/verifikasi/email' && $method == 'GET'){
                     $link = ltrim(substr($path, strrpos($path, '/')),'/');
                     $query =  "SELECT id_verifikasi FROM verifikasi WHERE BINARY link = ? LIMIT 1";
-                    $stmt[1] = $con->prepare($query);
+                    $stmt[1] = self::$con->prepare($query);
                     $stmt[1]->bind_param('s', $link);
                     $stmt[1]->execute();
                     $name = '';
@@ -693,7 +887,7 @@ class User{
             return $responseData;
         }
     }
-    public function verifyEmail($data,$uri, $method, $param, $con){
+    public function verifyEmail($data,$uri, $method, $param){
         try{
             $notificationPage = new NotificationPageController();
             $validator = Validator::make($data, [
@@ -721,7 +915,7 @@ class User{
                 $link = ltrim(substr($path, strrpos($path, '/')),'/');
                 // echo 'link '.$link;
                 $query =  "SELECT id_verifikasi FROM verifikasi WHERE BINARY link = ? LIMIT 1";
-                $stmt[0] = $con->prepare($query);
+                $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $link);
                 $stmt[0]->execute();
                 $name = '';
@@ -730,7 +924,7 @@ class User{
                 if ($stmt[0]->fetch()) {
                     $stmt[0]->close();
                     $query =  "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? LIMIT 1";
-                    $stmt[1] = $con->prepare($query);
+                    $stmt[1] = self::$con->prepare($query);
                     $stmt[1]->bind_param('s', $email);
                     $stmt[1]->execute();
                     $name = '';
@@ -739,7 +933,7 @@ class User{
                     if ($stmt[1]->fetch()) {
                         $stmt[1]->close();
                         $query =  "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND BINARY link = ? AND deskripsi = 'email' LIMIT 1";
-                        $stmt[2] = $con->prepare($query);
+                        $stmt[2] = self::$con->prepare($query);
                         $stmt[2]->bind_param('ss', $email, $link);
                         $stmt[2]->execute();
                         $name = '';
@@ -752,7 +946,7 @@ class User{
                             $time = $now->format('Y-m-d H:i:s');
                             // $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
                             $query =  "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND updated_at >= ? AND deskripsi = 'email' LIMIT 1";
-                            $stmt[3] = $con->prepare($query);
+                            $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('ss', $email, $time);
                             $stmt[3]->execute();
                             $name = '';
@@ -761,7 +955,7 @@ class User{
                             if ($stmt[3]->fetch()) {
                                 $stmt[3]->close();
                                 $query =  "UPDATE users SET verifikasi = true WHERE BINARY email = ?";
-                                $stmt[4] = $con->prepare($query);
+                                $stmt[4] = self::$con->prepare($query);
                                 $stmt[4]->bind_param('s', $email);
                                 $stmt[4]->execute();
                                 $affectedRows = $stmt[4]->affected_rows;
@@ -769,7 +963,7 @@ class User{
                                 if ($affectedRows > 0) {
                                     $stmt[4]->close();
                                     $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND deskripsi = 'email'";
-                                    $stmt[5] = $con->prepare($query);
+                                    $stmt[5] = self::$con->prepare($query);
                                     $stmt[5]->bind_param('s', $email);
                                     $result = $stmt[5]->execute();
                                     if($result){
@@ -786,7 +980,7 @@ class User{
                             }else{
                                 $stmt[3]->close();
                                 $query = "DELETE FROM verifikasi WHERE BINARY link = ?";
-                                $stmt[4] = $con->prepare($query);
+                                $stmt[4] = self::$con->prepare($query);
                                 $stmt[4]->bind_param('s', $link);
                                 $result = $stmt[4]->execute();
                                 $stmt[4]->close();
@@ -808,7 +1002,7 @@ class User{
                 $email = $data['email'];
                 $code = $data['code'];
                 $query =  "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? LIMIT 1";
-                $stmt[0] = $con->prepare($query);
+                $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $email);
                 $stmt[0]->execute();
                 $name = '';
@@ -817,7 +1011,7 @@ class User{
                 if ($stmt[0]->fetch()) {
                     $stmt[0]->close();
                     $query =  "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND BINARY kode_otp = ? AND deskripsi = 'email' LIMIT 1";
-                    $stmt[1] = $con->prepare($query);
+                    $stmt[1] = self::$con->prepare($query);
                     $stmt[1]->bind_param('ss', $email, $code);
                     $stmt[1]->execute();
                     $name = '';
@@ -830,7 +1024,7 @@ class User{
                         $time = $now->format('Y-m-d H:i:s');
                         // $time = Carbon::now('Asia/Jakarta')->subMinutes(15)->format('Y-m-d H:i:s');
                         $query =  "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND updated_at >= ? AND deskripsi = 'email' LIMIT 1";
-                        $stmt[2] = $con->prepare($query);
+                        $stmt[2] = self::$con->prepare($query);
                         $stmt[2]->bind_param('ss', $email, $time);
                         $stmt[2]->execute();
                         $name = '';
@@ -839,7 +1033,7 @@ class User{
                         if ($stmt[2]->fetch()) {
                             $stmt[2]->close();
                             $query =  "UPDATE users SET verifikasi = true WHERE BINARY email = ?";
-                            $stmt[3] = $con->prepare($query);
+                            $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('s', $email);
                             $stmt[3]->execute();
                             $affectedRows = $stmt[3]->affected_rows;
@@ -847,7 +1041,7 @@ class User{
                             if ($affectedRows > 0) {
                                 $stmt[3]->close();
                                 $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND deskripsi = 'email'";
-                                $stmt[4] = $con->prepare($query);
+                                $stmt[4] = self::$con->prepare($query);
                                 $stmt[4]->bind_param('s', $email);
                                 $result = $stmt[4]->execute();
                                 if($result){
@@ -864,7 +1058,7 @@ class User{
                         }else{
                             $stmt[2]->close();
                             $query = "DELETE FROM verifikasi WHERE BINARY email = ? AND deskripsi = 'email'";
-                            $stmt[3] = $con->prepare($query);
+                            $stmt[3] = self::$con->prepare($query);
                             $stmt[3]->bind_param('s', $email);
                             $result = $stmt[3]->execute();
                             $stmt[3]->close();
@@ -956,57 +1150,20 @@ class User{
     //             return $responseData;
     //         }
     //     }
-    public function tambahAdmin($data, $con){
+    public function editAdmin_old($data){
         try{
             if (!isset($data['email']) || empty($data['email'])) {
                 return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
                 return ['status'=>'error','message'=>'Email invalid','code'=>400];
             }
-            if (!isset($data['password']) || empty($data['password'])) {
+            if (!isset($data['pass']) || empty($data['pass'])) {
                 return ['status'=>'error','message'=>'Password harus di isi00','code'=>400];
-            } elseif (strlen($data['password']) < 8) {
+            } elseif (strlen($data['pass']) < 8) {
                 return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
-            } elseif (strlen($data['password']) > 25) {
+            } elseif (strlen($data['pass']) > 25) {
                 return ['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400];
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
-                return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
-            }
-            // Validate 'nama' field
-            if (!isset($data['nama']) || empty($data['nama'])) {
-                return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
-            }
-        }catch(Exception $e){
-            $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $erorr->message,
-                );
-            }
-            return $responseData;
-        }
-    }
-    public function editAdmin($data, $con){
-        try{
-            if (!isset($data['email']) || empty($data['email'])) {
-                return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
-            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                return ['status'=>'error','message'=>'Email invalid','code'=>400];
-            }
-            if (!isset($data['password']) || empty($data['password'])) {
-                return ['status'=>'error','message'=>'Password harus di isi00','code'=>400];
-            } elseif (strlen($data['password']) < 8) {
-                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
-            } elseif (strlen($data['password']) > 25) {
-                return ['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400];
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
+            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
                 return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
             }
             // Validate 'nama' field
@@ -1015,7 +1172,7 @@ class User{
             }
             //check role
             $query =  "UPDATE users SET verifikasi = true WHERE BINARY id_user = ?";
-            $stmt[3] = $con->prepare($query);
+            $stmt[3] = self::$con->prepare($query);
             $stmt[3]->bind_param('s', $data['id_user']);
             $stmt[3]->execute();
             $affectedRows = $stmt[3]->affected_rows;
@@ -1040,20 +1197,20 @@ class User{
             return $responseData;
         }
     }
-    public function hapusAdmin($data, $con){
+    public function hapusAdmin($data){
         try{
             if (!isset($data['id_user']) || empty($data['email'])) {
                 return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
                 return ['status'=>'error','message'=>'Email invalid','code'=>400];
             }
-            if (!isset($data['password']) || empty($data['password'])) {
+            if (!isset($data['pass']) || empty($data['pass'])) {
                 return ['status'=>'error','message'=>'Password harus di isi00','code'=>400];
-            } elseif (strlen($data['password']) < 8) {
+            } elseif (strlen($data['pass']) < 8) {
                 return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
-            } elseif (strlen($data['password']) > 25) {
+            } elseif (strlen($data['pass']) > 25) {
                 return ['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400];
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
+            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
                 return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
             }
             // Validate 'nama' field
@@ -1061,10 +1218,10 @@ class User{
                 return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
             }
             $query = "DELETE FROM users WHERE id_user = ? ";
-            $stmt = $con->prepare($query);
+            $stmt = self::$con->prepare($query);
             $stmt->bind_param('i', $data['id_user']);
             if ($stmt->execute()) {
-                echo "<script>alert('')</script>";
+                echo "<script>alert('')</scrip>";
                 exit();
                 // header('Location: /');
             }
@@ -1087,13 +1244,30 @@ class User{
 }
 }
 $user = new User;
-if(isset($_POST['tambahAdmin'])){
-    $user->tambahAdmin($_POST,$con);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if(isset($_POST['tambahAdmin'])){
+        $user->tambahAdmin($_POST);
+    }
+    if(isset($_POST['_method'])){
+        if($_POST['_method'] == 'PUT'){
+            if(isset($_POST['editAdmin'])){
+                $user->editAdmin($_POST);
+            }
+        }
+        if($_POST['_method'] == 'PUT'){
+            if(isset($_POST['hapusAdmin'])){
+                $inputData = file_get_contents('php://input');
+                $user->hapusAdmin($inputData);
+            }
+        }
+    }
 }
-if(isset($_POST['editAdmin'])){
-    $user->editAdmin($_POST,$con);
-}
-if(isset($_POST['hapusAdmin'])){
-    $user->hapusAdmin($_POST,$con);
+if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    if(isset($_SERVER['HTTP_REFERER'])){
+        $previousUrl = $_SERVER['HTTP_REFERER'];
+        $path = parse_url($previousUrl, PHP_URL_PATH);
+    }else{
+        $path = isset($data['uri']) ? $data['uri'] : null;
+    }
 }
 ?>
