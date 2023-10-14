@@ -9,79 +9,82 @@ class UserMobile{
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/public/img/event';
     }
-    //khusus admin 
-    public function tambahAdmin($data){
+    //khusus masyarakat
+    public function createUser($data, $opt){
         try{
             if (!isset($data['email']) || empty($data['email'])) {
-                echo "<script>alert('Email harus di isi !')</script>";
-                exit();
+                throw new Exception('Email harus di isi !');
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                echo "<script>alert('Email invalid !')</script>";
-                exit();
+                throw new Exception('Email invalid !');
             }
-            if (!isset($data['pass']) || empty($data['pass'])) {
-                echo "<script>alert('Password harus di isi !')</script>";
-                exit();
-            } elseif (strlen($data['pass']) < 8) {
-                echo "<script>alert('Password minimal 8 karakter !')</script>";
-                exit();
-            } elseif (strlen($data['pass']) > 25) {
-                echo "<script>alert('Password maksimal 25 karakter !')</script>";
-                exit();
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
-                echo "<script>alert('Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !')</script>";
-                exit();
+            if (!isset($data['password']) || empty($data['password'])) {
+                throw new Exception('Password harus di isi !');
+            } elseif (strlen($data['password']) < 8) {
+                throw new Exception('Password minimal 8 karakter !');
+            } elseif (strlen($data['password']) > 25) {
+                throw new Exception('Password maksimal 25 karakter !');
+            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
+                throw new Exception('Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !');
             }
             if (!isset($data['nama']) || empty($data['nama'])) {
-                echo "<script>alert('Nama lengkap harus di isi !')</script>";
-                exit();
+                throw new Exception('Nama lengkap harus di isi !');
             }
             if (!isset($data['phone']) || empty($data['phone'])) {
-                echo "<script>alert('nomer telepon harus di isi !')</script>";
-                exit();
+                throw new Exception('Nomer telepon harus di isi !');
             }
             if (!isset($data['jenisK']) || empty($data['jenisK'])) {
-                echo "<script>alert('Jenis kelamin harus di isi !')</script>";
-                exit();
+                throw new Exception('Jenis kelamin harus di isi !');
             }
             if(!in_array($data['jenisK'], ['laki-laki','perempuan'])){
-                echo "<script>alert('Invalid jenis kelamin !')</script>";
-                exit();
+                throw new Exception('Jenis kelamin invalid !');
             }
             if (!isset($data['tempatL']) || empty($data['tempatL'])) {
-                echo "<script>alert('Tempat lahir harus di isi !')</script>";
-                exit();
+                throw new Exception('Tempat lahir harus di isi !');
             }
             if (!isset($data['tanggalL']) || empty($data['tanggalL'])) {
-                echo "<script>alert('Tanggal lahir harus di isi !')</script>";
-                exit();
+                throw new Exception('Tanggal lahir harus di isi !');
             }
             if (!isset($data['role']) || empty($data['role'])) {
-                echo "<script>alert('Role harus di isi !')</script>";
-                exit();
+                throw new Exception('Role harus di isi !');
             }
             if(!in_array($data['role'], ['super admin','admin event','admin pentas', 'admin tempat', 'admin seniman'])){
-                echo "<script>alert('Invalid role !')</script>";
-                exit();
+                throw new Exception('Role invalid !');
             }
-            $hashedPassword = password_hash($data['pass'], PASSWORD_DEFAULT);
+            $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
             $query = "INSERT INTO users (email,password, nama_lengkap, no_telpon, jenis_kelamin, tempat_lahir, tanggal_lahir, role, verifikasi) VALUES (?, ?, ?, ?, ? , ?, ?, ?, ?)";
-            $verifikasi = 1;
+            if($opt == 'register'){
+                $verifikasi = 0;
+            }else{
+                $verifikasi = 1;
+            }
             $stmt = self::$con->prepare($query);
             $stmt->bind_param("ssssssssi", $data['email'], $hashedPassword, $data['nama'], $data['phone'], $data['jenisK'],$data['tempatL'], $data['tanggalL'], $data['role'],$verifikasi);
             $stmt->execute();
             if ($stmt->affected_rows > 0) {
+                $email = self::$mailController->createVerifyEmail($data);
                 $stmt->close();
-                header('Location: /admin.php');
-                echo "<script>alert('akun berhasil dibuat')</script>";
+                if($email['status'] == 'error'){
+                    throw new Exception(json_encode(['status'=>'error','message'=>$email['message']]));
+                }else{
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','message'=>$email['message'],'data'=>$email['data']]);
+                    exit();
+                }
             } else {
                 $stmt->close();
-                return ['status'=>'error','message'=>'Akun Gagal Dibuat'];
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Akun gagal dibuat','code'=>500]));
             }
+            // if ($stmt->affected_rows > 0) {
+                //     $stmt->close();
+            //     echo json_encode(['status'=>'success','message'=>'Akun berhasil dibuat']);
+            // } else {
+            //     $stmt->close();
+            //     throw new Exception(json_encode(['status' => 'error', 'message' => 'Akun gagal dibuat','code'=>500]));
+            // }
         }catch(Exception $e){
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
@@ -89,10 +92,11 @@ class UserMobile{
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $erorr->message,
+                    'message' => $errorJson['message'],
                 );
             }
-            echo "<script> alert('$responseData')</script>";
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
             exit();
         }
     }
@@ -335,16 +339,16 @@ class UserMobile{
             // }
             // var_dump($data);
             $email = $data['email'];
-            $pass = $data["password"];
+            $password = $data["password"];
             $pass1 = $data["password_confirm"];
             $link = $data['link'];
             $desc = $data['description'];
-            if($pass !== $pass1){
+            if($password !== $pass1){
                 return ['status'=>'error','message'=>'Password Harus Sama'];
             }else{
                 if(is_null($link) || empty($link)){
                     if($desc == 'createUser'){
-                        $hashedPassword = password_hash($data['pass'], PASSWORD_DEFAULT);
+                        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
                         $query = "INSERT INTO users (email,password, nama_lengkap, verifikasi, role) VALUES (?, ?, ?, ?, ?)";
                         $verifikasi = 1;
                         $stmt = self::$con->prepare($query);
@@ -415,7 +419,7 @@ class UserMobile{
                                     //check time is valid on table verifikasi
                                     if ($stmt[3]->fetch()) {
                                         $stmt[3]->close();
-                                        $newPass = password_hash($pass, PASSWORD_DEFAULT,['cost'=>10]);
+                                        $newPass = password_hash($password, PASSWORD_DEFAULT,['cost'=>10]);
                                         $query = "UPDATE users SET password = ? WHERE BINARY email = ? LIMIT 1";
                                         $stmt[4] = self::$con->prepare($query);
                                         $stmt[4]->bind_param('ss', $newPass, $email);
@@ -505,7 +509,7 @@ class UserMobile{
                                     $stmt[3]->close();
                                     $query = "UPDATE users SET password = ? WHERE BINARY email = ? LIMIT 1";
                                     $stmt[4] = self::$con->prepare($query);
-                                    $newPass = password_hash($pass, PASSWORD_DEFAULT);
+                                    $newPass = password_hash($password, PASSWORD_DEFAULT);
                                     $stmt[4]->bind_param('ss', $newPass, $email);
                                     $stmt[4]->execute();
                                     $affectedRows = $stmt[4]->affected_rows;
@@ -927,98 +931,78 @@ class UserMobile{
     //             return $responseData;
     //         }
     //     }
-    public function editAdmin($data){
+    public function logout($data){
         try{
-            if (!isset($data['email']) || empty($data['email'])) {
-                return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
-            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                return ['status'=>'error','message'=>'Email invalid','code'=>400];
+            $jwtController = new JwtController();
+            $email = $data['email'];
+            $number = $data['number'];
+            if(empty($email) || is_null($email)){
+                throw new Exception('Email harus di isi !');
+            }else if(empty($number) || is_null($number)){
+                throw new Exception('token harus di isi !');
+            }else{
+                $deleted = $jwtController->deleteRefreshWebsite($email,$number);
+                if($deleted['status'] == 'error'){
+                    // setcookie('token1', '', time() - 3600, '/');
+                    // setcookie('token2', '', time() - 3600, '/');
+                    // setcookie('token3', '', time() - 3600, '/');
+                    // header('Location: /login');
+                    exit();
+                }else{
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','message'=>'Anda berhasil keluar silahkan login kembali']);
+                    exit();
+                }
             }
-            if (!isset($data['pass']) || empty($data['pass'])) {
-                return ['status'=>'error','message'=>'Password harus di isi00','code'=>400];
-            } elseif (strlen($data['pass']) < 8) {
-                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
-            } elseif (strlen($data['pass']) > 25) {
-                return ['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400];
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
-                return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
-            }
-            // Validate 'nama' field
-            if (!isset($data['nama']) || empty($data['nama'])) {
-                return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
-            }
-            //check role
-            $query =  "UPDATE users SET verifikasi = true WHERE BINARY id_user = ?";
-            $stmt[3] = self::$con->prepare($query);
-            $stmt[3]->bind_param('s', $data['id_user']);
-            $stmt[3]->execute();
-            $affectedRows = $stmt[3]->affected_rows;
-            //check time is valid on table verifikasi
-            if ($affectedRows > 0) {
-                $stmt[3]->close();
-            }
-        }catch(Exception $e){
+        } catch (Exception $e) {
+            // echo $e->getTraceAsString();
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
                 );
             }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $erorr->message,
-                );
+                if($errorJson['message']){
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $errorJson['message'],
+                    );
+                }else{
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $errorJson->message,
+                    );
+                }
             }
-            return $responseData;
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
         }
     }
-    public function hapusAdmin($data){
-        try{
-            if (!isset($data['id_user']) || empty($data['email'])) {
-                return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
-            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                return ['status'=>'error','message'=>'Email invalid','code'=>400];
-            }
-            if (!isset($data['pass']) || empty($data['pass'])) {
-                return ['status'=>'error','message'=>'Password harus di isi00','code'=>400];
-            } elseif (strlen($data['pass']) < 8) {
-                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
-            } elseif (strlen($data['pass']) > 25) {
-                return ['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400];
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
-                return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
-            }
-            // Validate 'nama' field
-            if (!isset($data['nama']) || empty($data['nama'])) {
-                return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
-            }
-            $query = "DELETE FROM users WHERE id_user = ? ";
-            $stmt = self::$con->prepare($query);
-            $stmt->bind_param('i', $data['id_user']);
-            if ($stmt->execute()) {
-                echo "<script>alert('')</scrip>";
+    public static function handle(){
+        $contentType = $_SERVER["CONTENT_TYPE"];
+        if ($contentType === "application/json") {
+            $rawData = file_get_contents("php://input");
+            $requestData = json_decode($rawData, true);
+            if ($requestData === null && json_last_error() !== JSON_ERROR_NONE) {
+                http_response_code(400);
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
                 exit();
-                // header('Location: /');
             }
-        }catch(Exception $e){
-            $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $erorr->message,
-            );
-            return $responseData;
+            return $requestData;
+        } elseif ($contentType === "application/x-www-form-urlencoded") {
+            $requestData = $_POST;
+            return $requestData;
+        } else {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
+            exit();
         }
     }
-}
 }
 $user = new User;
 if(isset($_POST['tambahAdmin'])){

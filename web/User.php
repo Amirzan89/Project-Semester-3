@@ -5,7 +5,7 @@ class User{
     private static $con;
     private static $folderPath;
     public function __construct(){
-        self::$database = koneksi::getInstance();
+        self::$database = Koneksi::getInstance();
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/public/img/event';
     }
@@ -1100,103 +1100,6 @@ class User{
     }
     public function updateUser(){
     }
-    // public function logout($data,$uri = null){
-    //         try{
-    //             $jwtController = new JwtController();
-    //             $email = $data['email'];
-    //             $number = $data['number'];
-    //             if(empty($email) || is_null($email)){
-    //                 return ['status'=>'error','message'=>'email empty','code'=>400];
-    //             }else if(empty($number) || is_null($number)){
-    //                 return ['status'=>'error','message'=>'token empty','code'=>400];
-    //             }else{
-    //                 $deleted = $jwtController->deleteRefreshWebsite($email,$number);
-    //                 if($deleted['status'] == 'error'){
-    //                     setcookie('token1', '', time() - 3600, '/');
-    //                     setcookie('token2', '', time() - 3600, '/');
-    //                     setcookie('token3', '', time() - 3600, '/');
-    //                     header('Location: /login');
-    //                     exit();
-    //                 }else{
-    //                     setcookie('token1', '', time() - 3600, '/');
-    //                     setcookie('token2', '', time() - 3600, '/');
-    //                     setcookie('token3', '', time() - 3600, '/');
-    //                     header('Location: /login');
-    //                     exit();
-    //                 }
-    //             }
-    //         } catch (Exception $e) {
-    //             // echo $e->getTraceAsString();
-    //             $error = $e->getMessage();
-    //             $erorr = json_decode($error, true);
-    //             if ($erorr === null) {
-    //                 $responseData = array(
-    //                     'status' => 'error',
-    //                     'message' => $error,
-    //                 );
-    //             }else{
-    //                 if($erorr['message']){
-    //                     $responseData = array(
-    //                         'status' => 'error',
-    //                         'message' => $erorr['message'],
-    //                     );
-    //                 }else{
-    //                     $responseData = array(
-    //                         'status' => 'error',
-    //                         'message' => $erorr->message,
-    //                     );
-    //                 }
-    //             }
-    //             return $responseData;
-    //         }
-    //     }
-    public function editAdmin_old($data){
-        try{
-            if (!isset($data['email']) || empty($data['email'])) {
-                return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
-            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                return ['status'=>'error','message'=>'Email invalid','code'=>400];
-            }
-            if (!isset($data['pass']) || empty($data['pass'])) {
-                return ['status'=>'error','message'=>'Password harus di isi00','code'=>400];
-            } elseif (strlen($data['pass']) < 8) {
-                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
-            } elseif (strlen($data['pass']) > 25) {
-                return ['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400];
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
-                return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
-            }
-            // Validate 'nama' field
-            if (!isset($data['nama']) || empty($data['nama'])) {
-                return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
-            }
-            //check role
-            $query =  "UPDATE users SET verifikasi = true WHERE BINARY id_user = ?";
-            $stmt[3] = self::$con->prepare($query);
-            $stmt[3]->bind_param('s', $data['id_user']);
-            $stmt[3]->execute();
-            $affectedRows = $stmt[3]->affected_rows;
-            //check time is valid on table verifikasi
-            if ($affectedRows > 0) {
-                $stmt[3]->close();
-            }
-        }catch(Exception $e){
-            $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $erorr->message,
-                );
-            }
-            return $responseData;
-        }
-    }
     public function hapusAdmin($data){
         try{
             if (!isset($data['id_user']) || empty($data['email'])) {
@@ -1254,10 +1157,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user->editAdmin($_POST);
             }
         }
-        if($_POST['_method'] == 'PUT'){
+        if($_POST['_method'] == 'DELETE'){
             if(isset($_POST['hapusAdmin'])){
-                $inputData = file_get_contents('php://input');
-                $user->hapusAdmin($inputData);
+                $user->hapusAdmin($_POST);
             }
         }
     }

@@ -11,7 +11,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         return ['status'=>'error','message'=>'email empty','code'=>400];
     }else if(empty($number) || is_null($number)){
     }else{
-        $db = koneksi::getInstance();
+        $db = Koneksi::getInstance();
         $con = $db->getConnection();
         $deleted = $jwt->deleteRefreshWebsite($email,$number);
         if($deleted['status'] == 'error'){

@@ -11,7 +11,6 @@
   </a>
 </li>
 <li class="nav-item <?php echo $nav == 'tempat' ? 'active' : ''; ?>">
-<li class="nav-item">
   <a class="nav-link " href="/tempat.php">
     <i class="bi bi-building"></i>
     <span>Penyewaan Tempat</span>

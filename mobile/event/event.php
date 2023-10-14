@@ -24,54 +24,55 @@ class EventMobile{
     public function tambahEventMasyarakat($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                throw new Exception('ID User harus di isi');
+                throw new Exception('ID User harus di isi !');
+            }
+            if (!isset($data['nama_pengirim']) || empty($data['nama_pengirim'])) {
+                throw new Exception('Nama event harus di isi !');
             }
             if (!isset($data['nama_event']) || empty($data['nama_event'])) {
-                throw new Exception('Nama event harus di isi');
-            } elseif (strlen($data['nama_event']) < 5) {
-                throw new Exception('Nama event minimal 5 karakter');
-            } elseif (strlen($data['nama_event']) > 50) {
-                throw new Exception('Nama event maksimal 50 karakter');
+                throw new Exception('Nama event harus di isi !');
             }
-            if (strlen($data['deskripsi']) > 4000) {
-                throw new Exception('deskripsi event maksimal 4000 karakter');
+            if (strlen($data['nama_event']) < 5) {
+                throw new Exception('Nama event minimal 5 karakter !');
+            }
+            if (strlen($data['nama_event']) > 50) {
+                throw new Exception('Nama event maksimal 50 karakter !');
+            }
+            if (isset($data['deskripsi']) & !empty($data['deskripsi'])) {
+                if (strlen($data['deskripsi']) > 4000) {
+                    throw new Exception('deskripsi event maksimal 4000 karakter !');
+                }
             }
             if (!isset($data['kategori_event']) || empty($data['kategori_event'])) {
-                throw new Exception('Kategori event harus di isi');
-            }else if(!in_array($data['kategori_event'],['olahraga','seni','budaya'])){
-                throw new Exception('Kategori salah');
+                throw new Exception('Kategori event harus di isi !');
+            }
+            if(!in_array($data['kategori_event'],['olahraga','seni','budaya'])){
+                throw new Exception('Kategori salah !');
             }
             if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
-                throw new Exception('Tanggal awal harus di isi');
-            }else if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
-                throw new Exception('Tanggal akhir harus di isi');
+                throw new Exception('Tanggal awal harus di isi !');
             }
-            // $tanggal_awal = date('Y-m-d H:i:s',strtotime($data['tanggal_awal']));
-            // $tanggal_akhir = date('Y-m-d H:i:s',strtotime($data['tanggal_akhir']));
+            if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
+                throw new Exception('Tanggal akhir harus di isi !');
+            }
             date_default_timezone_set('Asia/Jakarta');
             $tanggal_awal = strtotime($data['tanggal_awal']);
+            $tanggal_awalDB = date('Y-m-d H:i:s', $tanggal_awal);
             $tanggal_akhir = strtotime($data['tanggal_akhir']);
+            $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
             $tanggal_sekarang = date('Y-m-d H:i:s');
             $tanggal_sekarang = strtotime($tanggal_sekarang);
-            echo "<br>";
-            echo 'tanggal baru sekarang '.$tanggal_sekarang;
-            echo "<br>";
-            // Check if the date formats are valid
-            echo 'hasil ';
-            var_dump($tanggal_awal < $tanggal_sekarang);
-            exit();
-            echo "<br>";    
             if (!$tanggal_awal) {
-                throw new Exception('Format tanggal awal tidak valid');
+                throw new Exception('Format tanggal awal tidak valid !');
             }else if (!$tanggal_akhir) {
-                throw new Exception('Format tanggal akhir tidak valid');
+                throw new Exception('Format tanggal akhir tidak valid !');
             }
             // Compare the dates
             if ($tanggal_awal > $tanggal_akhir) {
-                throw new Exception('Tanggal akhir tidak boleh lebih awal dari tanggal awal');
+                throw new Exception('Tanggal akhir tidak boleh lebih awal dari tanggal awal !');
             }
             if ($tanggal_awal < $tanggal_sekarang){
-                throw new Exception('Tanggal tidak boleh lebih kurang dari sekarang');
+                throw new Exception('Tanggal tidak boleh lebih kurang dari sekarang !');
             }
             //check id_user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -80,50 +81,58 @@ class EventMobile{
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
-            if ($stmt[0]->fetch()) {
-                if($role == 'masyarakat'){
-                    $stmt[0]->close();
-                    $bulan = date_format(new DateTime($tanggal_awal), "m");
-                    $tahun = date_format(new DateTime($tanggal_awal), "Y");
-                    $base64Image = $data['poster_event'];
-                    $base64Image = str_replace('data:image/jpeg;base64,', '', $base64Image);
-                    $imageData = base64_decode($base64Image);
-                    if ($imageData === false) {
-                        throw new Exception(json_encode(['status' => 'error', 'message' => 'Error decoding image','code'=>500]));
-                    } else {
-                        $fileTime = '/'.$tahun.'/'.$bulan;
-                        $nameFile = '/'.$data['nama_event'].'.jpg';
-                        $filePath = self::$folderPath.$fileTime.$nameFile;
-                        if (!is_dir(self::$folderPath.$fileTime)) {
-                            mkdir(self::$folderPath.$fileTime, 0777, true);
-                        }
-                        if (file_put_contents($filePath, $imageData)) {
-                            $query = "INSERT INTO events (nama_event,deskripsi_event, kategori_event, tanggal_awal_event, tanggal_akhir_event, link_pendaftaran, poster_event,id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                            $stmt = self::$con->prepare($query);
-                            // $status = 'terkirim';
-                            $data['kategori_event'] = strtoupper($data['kategori_event']);
-                            $fileDb = $fileTime.$nameFile;
-                            $stmt->bind_param("ssssssss", $data['nama_event'], $data[  'deskripsi'], $data['kategori_event'],$tanggal_awal, $tanggal_akhir, $data['link'],$fileDb,$data['id_user']);
-                            $stmt->execute();
-                            if ($stmt->affected_rows > 0) {
-                                echo json_encode(['status'=>'success','message'=>'event berhasil ditambahkan']);
-                                exit();
-                            } else {
-                                $stmt->close();
-                                throw new Exception(json_encode(['status' => 'error', 'message' => 'event gagal ditambahkan','code'=>500]));
-                            }
-                        } else {
-                            throw new Exception(json_encode(['status' => 'error', 'message' => 'Failed to save image','code'=>500]));
-                        }
-                    }
-                }else{
-                    $stmt[0]->close();
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'anda bukan masyarakat','code'=>400]));
-                }
-            }else{
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'User tidak ditemukan','code'=>500]));
             }
+            $stmt[0]->close();
+            if($role != 'masyarakat'){
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'anda bukan masyarakat','code'=>400]));
+            }
+            //get last id event
+            $query = "SELECT id_event FROM events ORDER BY id_event DESC LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->execute();
+            $idEvent = 1;
+            $stmt[1]->bind_result($idEvent);
+            if($stmt[1]->fetch()){
+                $idEvent += 1;
+            }
+            $stmt[1]->close();
+            //proses file
+            $bulan = date_format(new DateTime($data['tanggal_awal']), "m");
+            $tahun = date_format(new DateTime($data['tanggal_awal']), "Y");
+            $base64Image = $data['poster_event'];
+            $base64Image = str_replace('data:image/jpeg;base64,', '', $base64Image);
+            $imageData = base64_decode($base64Image);
+            if ($imageData === false) {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Error decoding image','code'=>500]));
+            }
+            $fileTime = '/'.$tahun.'/'.$bulan;
+            $nameFile = '/'.$idEvent.'.jpg';
+            $filePath = self::$folderPath.$fileTime.$nameFile;
+            if (!is_dir(self::$folderPath.$fileTime)) {
+                mkdir(self::$folderPath.$fileTime, 0777, true);
+            }
+            if (!file_put_contents($filePath, $imageData)) {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Failed to save image','code'=>500]));
+            }
+            $query = "INSERT INTO events (nama_pengirim, nama_event,deskripsi_event, kategori_event, tanggal_awal_event, tanggal_akhir_event, link_pendaftaran, poster_event, status, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = self::$con->prepare($query);
+            $status = 'terkirim';
+            $data['kategori_event'] = strtoupper($data['kategori_event']);
+            $fileDb = $fileTime.$nameFile;
+            $stmt->bind_param("ssssssssss", $data['nama_pengirim'],$data['nama_event'], $data[  'deskripsi'], $data['kategori_event'],$tanggal_awalDB, $tanggal_akhirDB, $data['link'],$fileDb, $status,    $data['id_user']);
+            $stmt->execute();
+            if ($stmt->affected_rows > 0) {
+                echo json_encode(['status'=>'success','message'=>'event berhasil ditambahkan']);
+                exit();
+            } else {
+                $stmt->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'event gagal ditambahkan','code'=>500]));
+            }
         }catch(Exception $e){
+            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -137,6 +146,7 @@ class EventMobile{
                     'message' => $errorJson['message'],
                 );
             }
+            header('Content-Type: application/json');
             isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
             echo json_encode($responseData);
             exit();
@@ -145,72 +155,118 @@ class EventMobile{
     public static function editEvent($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi')</script>";
-                exit();
+                throw new Exception('ID User harus di isi !');
             }
             if(!isset($data['id_event']) || empty($data['id_event'])){
-                echo "<script>alert('ID event harus di isi')</script>";
-                exit();
+                throw new Exception('ID event harus di isi !');
             }
             if (!isset($data['nama_event']) || empty($data['nama_event'])) {
-                echo "<script>alert('Nama event harus di isi')</script>";
-                exit();
-            } elseif (strlen($data['nama_event']) < 5) {
-                echo "<script>alert('Nama event minimal 5 karakter')</script>";
-                exit();
-            } elseif (strlen($data['nama_event']) > 50) {
-                echo "<script>alert('Nama event maksimal 50 karakter')</script>";
-                exit();
+                throw new Exception('Nama event harus di isi !');
             }
-            if (strlen($data['deskripsi_event']) > 4000) {
-                echo "<script>alert('Deskripsi event maksimal 4000 karakter')</script>";
-                exit();
+            if (strlen($data['nama_event']) < 5) {
+                throw new Exception('Nama event minimal 5 karakter !');
+            }
+            if (strlen($data['nama_event']) > 50) {
+                throw new Exception('Nama event maksimal 50 karakter !');
+            }
+            if (isset($data['deskripsi']) & !empty($data['deskripsi'])) {
+                if (strlen($data['deskripsi']) > 4000) {
+                    throw new Exception('deskripsi event maksimal 4000 karakter !');
+                }
             }
             if (!isset($data['kategori_event']) || empty($data['kategori_event'])) {
-                echo "<script>alert('Kategori event harus di isi')</script>";
-                exit();
-            }else if(!in_array($data['kategori_event'],['olahraga','seni','budaya'])){
-                echo "<script>alert('Kategori salah')</script>";
-                exit();
+                throw new Exception('Kategori event harus di isi !');
             }
-            if (!isset($data['tanggal_awal_event']) || empty($data['tanggal_awal_event'])) {
-                echo "<script>alert('Tanggal awal harus di isi')</script>";
-                exit();
-            }else if (!isset($data['tanggal_akhir_event']) || empty($data['tanggal_akhir_event'])) {
-                echo "<script>alert('Tanggal akhir harus di isi')</script>";
-                exit();
+            if(!in_array($data['kategori_event'],['olahraga','seni','budaya'])){
+                throw new Exception('Kategori salah !');
             }
-            $tanggal_awal = date('Y-m-d H:i:s',strtotime($data['tanggal_awal_event']));
-            $tanggal_akhir = date('Y-m-d H:i:s',strtotime($data['tanggal_akhir_event']));
+            if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
+                throw new Exception('Tanggal awal harus di isi !');
+            }
+            if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
+                throw new Exception('Tanggal akhir harus di isi !');
+            }
+            date_default_timezone_set('Asia/Jakarta');
+            $tanggal_awal = strtotime($data['tanggal_awal']);
+            $tanggal_awalDB = date('Y-m-d H:i:s', $tanggal_awal);
+            $tanggal_akhir = strtotime($data['tanggal_akhir']);
+            $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
+            $tanggal_sekarang = date('Y-m-d H:i:s');
+            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            // $tanggal_awal = date('Y-m-d H:i:s',strtotime($data['tanggal_awal_event']));
+            // $tanggal_akhir = date('Y-m-d H:i:s',strtotime($data['tanggal_akhir_event']));
+            // $tanggal_sekarang = date('Y-m-d H:i:s');
+            // $tanggal_sekarang = strtotime($tanggal_sekarang);
             // Check if the date formats are valid
             if (!$tanggal_awal) {
-                echo "<script>alert('Format tanggal awal tidak valid')</script>";
-                exit();
+                throw new Exception('Format tanggal awal tidak valid !');
             }else if (!$tanggal_akhir) {
-                echo "<script>alert('Format tanggal akhir tidak valid')</script>";
-                exit();
+                throw new Exception('Format tanggal akhir tidak valid !');
             }
             // Compare the dates
             if ($tanggal_awal > $tanggal_akhir) {
-                echo "<script>alert('Tanggal akhir tidak boleh lebih awal dari tanggal awal')</script>";
-                exit();
+                throw new Exception('Tanggal akhir tidak boleh lebih awal dari tanggal awal !');
             }
-            $query = "UPDATE events SET nama_event = ?, deskripsi_event = ?, kategori_event = ?, tanggal_awal_event = ?, tanggal_akhir_event = ?, link_pendaftaran = ?, poster_event = ?, status = ? WHERE id_user = ? AND id_event = ?";
-            $stmt = self::$con->prepare($query);
+            if ($tanggal_awal > $tanggal_sekarang){
+                throw new Exception('Tanggal tidak boleh lebih kurang dari sekarang !');
+            }
+            //check id_user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'User tidak ditemukan','code'=>500]));
+            }
+            $stmt[0]->close();
+            if($role != 'masyarakat'){
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'anda bukan masyarakat','code'=>400]));
+            }
+            //check data event
+            $query = "SELECT poster_event FROM events WHERE BINARY id_event = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_event']);
+            $stmt[1]->execute();
+            $path = '';
+            $stmt[1]->bind_result($path);
+            if(!$stmt[1]->fetch()){
+                $stmt[1]->close();
+                throw new Exception('Data event tidak ditemukan');
+            }
+            $stmt[1]->close();
+            if (isset($data['poster_event']) & !empty($data['poster_event'])) {
+                $base64Image = $data['poster_event'];
+                $base64Image = str_replace('data:image/jpeg;base64,', '', $base64Image);
+                $imageData = base64_decode($base64Image);
+                if ($imageData === false) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Error decoding image','code'=>500]));
+                }
+                $filePath = self::$folderPath.$path;
+                //save file
+                if (!file_put_contents($filePath, $imageData)) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Failed to save image','code'=>500]));
+                }
+            }
+            //update database 
+            $query = "UPDATE events SET nama_event = ?, deskripsi_event = ?, kategori_event = ?, tanggal_awal_event = ?, tanggal_akhir_event = ?, link_pendaftaran = ?, status = ? WHERE id_event = ?";
+            $stmt[2] = self::$con->prepare($query);
             $status = 'terkirim';
             $data['kategori_event'] = strtoupper($data['kategori_event']);
-            $stmt->bind_param("ssssssssii", $data['nama_event'], $data['deskripsi_event'], $data['kategori_event'], $tanggal_awal, $tanggal_akhir, $data['link_pendaftaran'], $data['poster_event'], $status, $data['id_user'], $data['id_event']);
-            $stmt->execute();
-            if ($stmt->affected_rows > 0) {
-                $stmt->close();
-                echo "<script>alert('event berhasil diupdate')</script>";
+            $stmt[2]->bind_param("sssssssi", $data['nama_event'], $data['deskripsi'], $data['kategori_event'], $tanggal_awalDB, $tanggal_akhirDB, $data['link_pendaftaran'], $status, $data['id_event']);
+            $stmt[2]->execute();
+            if ($stmt[2]->affected_rows > 0) {
+                $stmt[2]->close();
+                echo json_encode(['status'=>'success','message'=>'event berhasil diupdate']);
                 exit();
             } else {
-                $stmt->close();
-                echo "<script>alert('event gagal diupdate')</script>";
-                exit();
+                $stmt[2]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'event gagal diupdate','code'=>500]));
             }
         }catch(Exception $e){
+            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -224,6 +280,7 @@ class EventMobile{
                     'message' => $errorJson->message,
                 );
             }
+            header('Content-Type: application/json');
             isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
             echo json_encode($responseData);
             exit();
@@ -232,16 +289,16 @@ class EventMobile{
     public static function hapusEvent($data, $uri = null){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi')</script>";
+                echo "<script>alert('ID User harus di isi')</scrip>";
                 exit();
             }
             if(!isset($data['id_event']) || empty($data['id_event'])){
                 echo "<script>alert('ID event harus di isi')</script>";
                 exit();
             }
-            $query = "DELETE FROM event WHERE id_event = ? AND id_user = ?";
+            $query = "DELETE FROM event WHERE id_event = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param('ss', $data['id_event'],$data['id_user']);
+            $stmt[2]->bind_param('s', $data['id_event']);
             if ($stmt[2]->execute()) {
                 $stmt[2]->close();
                 echo "<script>alert('event berhasil dihapus')</script>";
@@ -276,6 +333,7 @@ class EventMobile{
             $requestData = json_decode($rawData, true);
             if ($requestData === null && json_last_error() !== JSON_ERROR_NONE) {
                 http_response_code(400);
+                header('Content-Type: application/json');
                 echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
                 exit();
             }
@@ -285,6 +343,7 @@ class EventMobile{
             return $requestData;
         } else {
             http_response_code(400);
+            header('Content-Type: application/json');
             echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
             exit();
         }
@@ -296,7 +355,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 }
 if($_SERVER['REQUEST_METHOD'] == 'PUT'){
     $EventMobile = new EventMobile();
-    EventMobile::editEvent(EventMobile::handle());
+    $EventMobile->editEvent(EventMobile::handle());
 }
 if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
     $EventMobile = new EventMobile();

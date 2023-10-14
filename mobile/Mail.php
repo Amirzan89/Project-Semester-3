@@ -1,11 +1,12 @@
 <?php
+require(__DIR__.'/../web/koneksi.php');
 // namespace Controllers\Mail;
 // require_once 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Database\Database;
 use Carbon\Carbon;
-class MailWebsite{ 
+class MailMobile{ 
     protected $mail;
     private static $database;
     private static $con;

@@ -94,6 +94,7 @@ class SenimanMobile{
             $folderKtp = '/ktp';
             $folderPassFoto = '/pass_foto';
             $folderSurat = '/surat_keterangan';
+            //create folder
             if (!is_dir(self::$folderPath.$folderKtp)) {
                 mkdir(self::$folderPath.$folderKtp, 0777, true);
             }

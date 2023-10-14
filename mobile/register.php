@@ -4,42 +4,30 @@ require(__DIR__.'/../web/User.php');
 function Register($data,$con){
     try{
         if (!isset($data['email']) || empty($data['email'])) {
-            echo "<script>alert('Email harus di isi')</script>";
-            exit();
+            throw new Exception('Email harus di isi !');
         } else if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            echo "<script>alert('Email yang anda masukkan invalid')</script>";
-            exit();
+            throw new Exception('Email invalid !');
         }
         if (!isset($data['password']) || empty($data['password'])) {
-            echo "<script>alert('Password harus di isi')</script>";
-            exit();
+            throw new Exception('Password harus di isi !');
         } else if (strlen($data['password']) < 8) {
-            echo "<script>alert('Password minimal 8 karakter')</script>";
-            exit();
+            throw new Exception('Password minimal 8 karakter !');
         } else if (strlen($data['password']) > 25) {
-            echo "<script>alert('Password maksimal 25 karakter')</script>";
-            exit();
+            throw new Exception('Password maksimal 25 karakter !');
         } else if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password'])) {
-            echo "<script>alert('Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka')</script>";
-            exit();
+            throw new Exception('Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !');
         }
         if (!isset($data['password_confirm']) || empty($data['password_confirm'])) {
-            echo "<script>alert('Password konfirmasi harus di isi')</script>";
-            exit();
+            throw new Exception('Password konfirmasi harus di isi');
         } else if (strlen($data['password_confirm']) < 8) {
-            echo "<script>alert('Password minimal 8 karakter')</script>";
-            exit();
+            throw new Exception('Password konfirmasi minimal 8 karakter !');
         } else if (strlen($data['password_confirm']) > 25) {
-            echo "<script>alert('Password maksimal 25 karakter')</script>";
-            exit();
+            throw new Exception('Password konfirmasi maksimal 25 karakter !');
         } else if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password_confirm'])) {
-            echo "<script>alert('Password konfirmasi harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka')</script>";
-            exit();
+            throw new Exception('Password konfirmasi harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !');
         }
         if (!isset($data['nama']) || empty($data['nama'])) {
-            echo "<script>alert('Nama harus di isi')</script>";
-            header('Location:/register.php');
-            exit();
+            throw new Exception('Nama harus di isi');
         }
         $email = $data['email'];
         $pass = $data["password"];
@@ -55,43 +43,44 @@ function Register($data,$con){
         if (!$stmt->fetch()) {
             $stmt->close();
             if($pass !== $pass1){
-                header('Location:/register.php');
-                echo "<script>alert('Password harus sama')</script>";
-                exit();
+                throw new Exception('Password harus sama');
             }else{
-                echo 'tambah database';
-                return createUser($data,'register',$con);
+                $user = new UserMobile();
+                // echo 'tambah database';
+                return $user->createUser($data,'register');
             }
         }else{
-            return ['status'=>'error','message'=>'Email sudah digunakan','code'=>400];
+            throw new Exception('Email sudah digunakan');
         }
-    }catch(\Exception $e){
+    }catch(Exception $e){
         echo $e->getTraceAsString();
         $error = $e->getMessage();
-        $erorr = json_decode($error, true);
-        if ($erorr === null) {
+        $errorJson = json_decode($error, true);
+        if ($errorJson === null) {
             $responseData = array(
                 'status' => 'error',
                 'message' => $error,
             );
         }else{
-            if($erorr['message']){
+            if($errorJson['message']){
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $erorr['message'],
+                    'message' => $errorJson['message'],
                 );
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $erorr->message,
+                    'message' => $errorJson->message,
                 );
             }
         }
-        return $responseData;
+        header('Content-Type: application/json');
+        isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+        echo json_encode($responseData);
+        exit();
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo 'kenek sakjane';
     $input_data = file_get_contents("php://input");
     $data = json_decode($input_data, true);
     Register($data,$con);

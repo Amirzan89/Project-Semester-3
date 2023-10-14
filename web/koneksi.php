@@ -1,5 +1,5 @@
 <?php
-class koneksi{
+class Koneksi{
     private static $instance;
     private static function loadEnv($path = null){
         if($path == null){

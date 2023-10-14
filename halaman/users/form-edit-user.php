@@ -116,14 +116,12 @@ if (isset($_GET['id_user'])) {
                   <div class="col-sm-10">
                     <div class="form-check">
                     <input class="form-check-input" type="radio" name="jenisK" value="laki-laki" <?php echo ($users['jenis_kelamin'] == 'laki-laki') ? 'checked' : ''; ?>>
-                    <!-- <input class="form-check-input" type="radio" name="jenisK" value="Laki-laki" checked value=""> -->
                     <label class="form-check-label" for="gridRadios1">
                       Laki-Laki
                     </label>
                   </div>
                   <div class="form-check">
                       <input class="form-check-input" type="radio" name="jenisK" value="perempuan" <?php echo ($users['jenis_kelamin'] == 'perempuan') ? 'checked' : ''; ?>>
-                      <!-- <input class="form-check-input" type="radio" name="jenisK" value="perempuan" value="<?php echo $users['jenis_kelamin']; ?>"> -->
                       <label class="form-check-label" for="gridRadios2">
                         Perempuan
                       </label>
