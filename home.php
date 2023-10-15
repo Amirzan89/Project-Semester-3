@@ -171,7 +171,7 @@ $userAuth = authenticate($_POST,[
               </div>
             </div>
           </div>
-          <a href="LandingPage1.php" class="btn-learn-more">Lainnya</a>
+          <a href="/home1.php" class="btn-learn-more">Lainnya</a>
 
         </div>
 
@@ -198,7 +198,7 @@ $userAuth = authenticate($_POST,[
               <p>Tempat Wisata</p>
               <a href="/public/assets/img/LandingPage/gedung1.png" data-gallery="portfolioGallery"
                 class="portfolio-lightbox preview-link" title="Museum Anjuk Ladang"><i class="bx bx-plus"></i></a>
-              <a href="LandingPage2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
+              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
             </div>
           </div>
 
@@ -209,7 +209,7 @@ $userAuth = authenticate($_POST,[
               <p>Gedung</p>
               <a href="/public/assets/img/LandingPage/gedung2.png" data-gallery="portfolioGallery"
                 class="portfolio-lightbox preview-link" title="Balai Budaya"><i class="bx bx-plus"></i></a>
-              <a href="LandingPage2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
+              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
             </div>
           </div>
 
@@ -220,7 +220,7 @@ $userAuth = authenticate($_POST,[
               <p>Tempat Wisata</p>
               <a href="/public/assets/img/LandingPage/gedung3.png" data-gallery="portfolioGallery"
                 class="portfolio-lightbox preview-link" title="Museum Dr. Soetomo"><i class="bx bx-plus"></i></a>
-              <a href="LandingPage2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
+              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
             </div>
           </div>
 
@@ -231,7 +231,7 @@ $userAuth = authenticate($_POST,[
               <p>Tempat Wisata</p>
               <a href="/public/assets/img/LandingPage/gedung4.png" data-gallery="portfolioGallery"
                 class="portfolio-lightbox preview-link" title="Air Terjun Sedudo"><i class="bx bx-plus"></i></a>
-              <a href="LandingPage2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
+              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
             </div>
           </div>
 
@@ -242,7 +242,7 @@ $userAuth = authenticate($_POST,[
               <p>Tempat Wisata</p>
               <a href="/public/assets/img/LandingPage/gedung5.png" data-gallery="portfolioGallery"
                 class="portfolio-lightbox preview-link" title="Goa Margo Tresno"><i class="bx bx-plus"></i></a>
-              <a href="LandingPage2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
+              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
             </div>
           </div>
 
@@ -253,7 +253,7 @@ $userAuth = authenticate($_POST,[
               <p>Tempat Wisata</p>
               <a href="/public/assets/img/LandingPage/gedung6.png" data-gallery="portfolioGallery"
                 class="portfolio-lightbox preview-link" title="Air Terjun Roro Kuning"><i class="bx bx-plus"></i></a>
-              <a href="LandingPage2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
+              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
             </div>
           </div>
         </div>
@@ -279,7 +279,7 @@ $userAuth = authenticate($_POST,[
                 <p>Masyrakar dapat mengupload event atau kegiatan yang akan dilaksanakan.</p>
                 <br>
                 <div>
-                  <a href="LandingPage3.php" class="btn-baca">Baca Selengkapnya</a>
+                  <a href="/home3.php" class="btn-baca">Baca Selengkapnya</a>
                 </div>
               </div>
             </div>
@@ -294,7 +294,7 @@ $userAuth = authenticate($_POST,[
                 </p>
                 <br>
                 <div>
-                  <a href="LandingPage5.php" class="btn-baca">Baca Selengkapnya</a>
+                  <a href="/home5.php" class="btn-baca">Baca Selengkapnya</a>
                 </div>
               </div>
             </div>
@@ -308,7 +308,7 @@ $userAuth = authenticate($_POST,[
                 <p>Masyarakat dapat mendaftarkan nomer induk seniman dan memperpanjang masa berlaku kartu.</p>
                 <br>
                 <div>
-                  <a href="LandingPage4.php" class="btn-baca">Baca Selengkapnya</a>
+                  <a href="/home4.php" class="btn-baca">Baca Selengkapnya</a>
                 </div>
               </div>
             </div>
@@ -322,7 +322,7 @@ $userAuth = authenticate($_POST,[
                 <p>Masyarakat dapat mengajukan surat advis / surat perizinan pentas kesenian.</p>
                 <br>
                 <div>
-                  <a href="LandingPage6.php" class="btn-baca">Baca Selengkapnya</a>
+                  <a href="/home6.php" class="btn-baca">Baca Selengkapnya</a>
                 </div>
               </div>
             </div>

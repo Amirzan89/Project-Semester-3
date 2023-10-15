@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
 class TempatMobile{
+    private static $sizeFile = 5 * 1024 * 1024;
     private static $database;
     private static $con;
     private static $folderPath;
@@ -9,64 +10,90 @@ class TempatMobile{
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/../../private/tempat';
     }
-    public static function pinjamTempat($data){
+    public function sewaTempat($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                throw new Exception('ID User harus di isi');
+                throw new Exception('ID User harus di isi !');
             }
-            if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
-                throw new Exception('Nama tempat harus di isi');
+            if(!isset($data['id_tempat']) || empty($data['id_tempat'])){
+                throw new Exception('ID tempat harus di isi !');
             }
-            if (!isset($data['nik_seniman']) || empty($data['nik_seniman'])) {
-                throw new Exception('nik tempat harus di isi');
+            if (!isset($data['nama_tempat']) || empty($data['nama_tempat'])) {
+                throw new Exception('Nama tempat harus di isi !');
             }
-            if (!isset($data['alamat']) || empty($data['alamat'])) {
-                throw new Exception('Alamat harus di isi');
+            if (!isset($data['nik_penyewa']) || empty($data['nik_penyewa'])) {
+                throw new Exception('Nik penyewa harus di isi !');
             }
-            if (!isset($data['no_telpon']) || empty($data['no_telpon'])) {
-                throw new Exception('Nomor telpon harus di isi');
+            if (!is_numeric($data['nik_penyewa'])) {
+                throw new Exception('Nik penyewa harus berisi hanya angka !');
             }
-            if (strlen($data['no_telpon']) > 16) {
-                throw new Exception('Nama event maksimal 16 karakter');
+            if (strlen($data['nik_penyewa']) > 16) {
+                throw new Exception('Nik penyewa maksimal 16 angka !');
             }
-            if (!isset($data['jenis_kelamin_seniman']) || empty($data['jenis_kelamin_seniman'])) {
-                throw new Exception('Jenis kelamin harus di isi');
-            }else if(!in_array($data['jenis_kelamin_seniman'],['laki-laki','perempuan'])){
-                throw new Exception('Jenis kelamin salah');
+            // if (substr($data['nik_penyewa'], 0, 2) !== '08') {
+                // throw new Exception('Nik penyewa invalid !');
+                //     echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
+            //     echo "<script>window.history.back();</script>";
+            //     exit();
+            // }
+            if (!isset($data['nama_peminjam']) || empty($data['nama_peminjam'])) {
+                throw new Exception('Nama peminjam harus di isi !');
             }
-            if (!isset($data['tempat_lahir']) || empty($data['tempat_lahir'])) {
-                throw new Exception('Tempat lahir harus di isi');
+            if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
+                throw new Exception('Deskripsi sewa tempat harus di isi !');
             }
-            if (!isset($data['tanggal_lahir']) || empty($data['tanggal_lahir'])) {
-                throw new Exception('Tanggal lahir harus di isi');
+            if (strlen($data['deskripsi']) > 100) {
+                throw new Exception('Deskripsi sewa tempat maksimal 100 karakter !');
             }
-            if (!isset($data['nama_organisasi']) || empty($data['nama_organisasi'])) {
-                throw new Exception('Nama organisasi harus di isi');
+            if (!isset($data['nama_kegiatan_sewa']) || empty($data['nama_kegiatan_sewa'])) {
+                throw new Exception('Nama kegiatan harus di isi !');
             }
-            if (!isset($data['anggota_organisasi']) || empty($data['anggota_organisasi'])) {
-                throw new Exception('Jumlah anggota harus di isi');
+            if (strlen($data['nama_kegiatan_sewa']) > 50) {
+                throw new Exception('Nama kegiatan maksimal 50 karakter !');
             }
-            if (!isset($_FILES['foto_ktp']) || empty($_FILES['foto_ktp'])) {
-                throw new Exception('foto ktp harus di isi');
+            if (!isset($data['jumlah_peserta']) || empty($data['jumlah_peserta'])) {
+                throw new Exception('Jumlah peserta harus di isi !');
             }
-            if (!isset($_FILES['pass_foto']) || empty($_FILES['pass_foto'])) {
-                throw new Exception('pass foto harus di isi');
+            if (!is_numeric($data['jumlah_peserta'])) {
+                throw new Exception('Jumlah peserta harus berisi hanya angka !');
+            }
+            if (strlen($data['jumlah_peserta']) > 10) {
+                throw new Exception('Jumlah peserta maksimal 10 angka !');
+            }
+            if (!isset($data['instansi']) || empty($data['instansi'])) {
+                $data['instansi'] = '';
+            }
+            if (!isset($data['tanggal_awal_sewa']) || empty($data['tanggal_awal_sewa'])) {
+                throw new Exception('Tanggal awal sewa harus di isi !');
+            }
+            if (!isset($data['tanggal_akhir_sewa']) || empty($data['tanggal_akhir_sewa'])) {
+                throw new Exception('Tanggal akhir sewa harus di isi !');
             }
             if (!isset($_FILES['surat_keterangan']) || empty($_FILES['surat_keterangan'])) {
-                throw new Exception('Surat keternangan harus di isi');
-            }
-            if ($_FILES['foto_ktp']['error'] !== UPLOAD_ERR_OK) {
-                throw new Exception('gagal upload ktp file');
-            }
-            if ($_FILES['pass_foto']['error'] !== UPLOAD_ERR_OK) {
-                throw new Exception('gagal upload foto file');
+                throw new Exception('Surat keternangan harus di isi !');
             }
             if ($_FILES['surat_keterangan']['error'] !== UPLOAD_ERR_OK) {
-                throw new Exception('gagal upload pdf file');
+                throw new Exception('gagal upload file !');
             }
-            $tanggal_lahir = date('Y-m-d H:i:s',strtotime($data['tanggal_lahir']));
-            if (!$tanggal_lahir) {
-                throw new Exception('Format tanggal lahir tidak valid');
+            date_default_timezone_set('Asia/Jakarta');
+            $tanggal_awal = strtotime($data['tanggal_awal_sewa']);
+            $tanggal_awalDB = date('Y-m-d H:i:s', $tanggal_awal);
+            $tanggal_akhir = strtotime($data['tanggal_akhir_sewa']);
+            $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
+            $tanggal_sekarang = date('Y-m-d H:i:s');
+            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            // Check if the date formats are valid
+            if (!$tanggal_awal) {
+                throw new Exception('Format tanggal awal tidak valid !');
+            }else if (!$tanggal_akhir) {
+                throw new Exception('Format tanggal akhir tidak valid !');
+            }
+            // Compare the dates
+            if ($tanggal_awal > $tanggal_akhir) {
+                throw new Exception('Tanggal akhir tidak boleh lebih awal dari tanggal awal !');
+            }
+            if ($tanggal_awal < $tanggal_sekarang){
+                throw new Exception('Tanggal tidak boleh kurang dari sekarang !');
             }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -83,100 +110,67 @@ class TempatMobile{
             if($role != 'masyarakat'){
                 throw new Exception('invalid role');
             }
-            //get last id tempat
-            $query = "SELECT id_seniman FROM tempat ORDER BY id_seniman DESC LIMIT 1";
+            //check id tempat
+            $query = "SELECT id_tempat FROM list_tempat WHERE id_tempat = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_tempat']);
+            $stmt[1]->execute();
+            if(!$stmt[1]->fetch()){
+                $stmt[1]->close();
+                throw new Exception('Data tempat tidak ditemukan');
+            }
+            $stmt[1]->close();
+            //get last id sewa
+            $query = "SELECT id_sewa FROM sewa_tempat ORDER BY id_sewa DESC LIMIT 1";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->execute();
-            $idSeniman = 1;
-            $stmt[1]->bind_result($idSeniman);
-            $stmt[1]->fetch();
+            $idSewa = 1;
+            $stmt[1]->bind_result($idSewa);
+            if($stmt[1]->fetch()){
+                $idSewa += 1;
+            }
             $stmt[1]->close();
-            $folderKtp = '/ktp';
-            $folderPassFoto = '/pass_foto';
+            //create folder
+            $bulan = date_format(new DateTime($data['tanggal_awal_sewa']), "m");
+            $tahun = date_format(new DateTime($data['tanggal_awal_sewa']), "Y");
+            $fileTime = '/'.$tahun.'/'.$bulan;
             $folderSurat = '/surat_keterangan';
-            if (!is_dir(self::$folderPath.$folderKtp)) {
-                mkdir(self::$folderPath.$folderKtp, 0777, true);
+            if (!is_dir(self::$folderPath.$folderSurat.$fileTime)) {
+                mkdir(self::$folderPath.$folderSurat.$fileTime, 0777, true);
             }
-            if (!is_dir(self::$folderPath.$folderPassFoto)) {
-                mkdir(self::$folderPath.$folderPassFoto, 0777, true);
-            }
-            if (!is_dir(self::$folderPath.$folderSurat)) {
-                mkdir(self::$folderPath.$folderSurat, 0777, true);
-            }
-            //proses file
-            $fileKtp = $_FILES['foto_ktp'];
-            $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileKtp['name']);
-            if (in_array($extension,['png','jpeg','jpg'])) {
-                if ($size >= 5 * 1024 * 1024) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
-                }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
-            }
-            //simpan file
-            $nameFile = '/'.$idSeniman.'.'.$extension;  
-            $fileKtpPath = self::$folderPath.$folderKtp.$nameFile;
-            $fileKtpDB = $folderKtp.$nameFile;
-            if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
-            }
-
-            //proses file
-            $fileFoto = $_FILES['pass_foto'];
-            $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileFoto['name']);
-            if (in_array($extension,['png','jpeg','jpg'])) {
-                if ($size >= 5 * 1024 * 1024) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
-                }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
-            }
-            //simpan file
-            $nameFile = '/'.$idSeniman.'.'.$extension;
-            $fileFotoPath = self::$folderPath.$folderPassFoto.$nameFile;
-            $fileFotoDB = $folderPassFoto.$nameFile;
-            if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
-                unlink($fileKtpPath);
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
-            }
-
             //proses file
             $fileSurat = $_FILES['surat_keterangan'];
             $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
             $size = filesize($fileSurat['name']);
-            if ($extension === 'pdf' || $extension === 'docx') {
-                if ($size >= 5 * 1024 * 1024) {
+            if (in_array($extension,['jpg','jpeg','png','pdf','docx'])) {
+                if ($size >= self::$sizeFile) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
             } else {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
             }
             //simpan file
-            $nameFile = '/'.$idSeniman.'.'.$extension;
-            $fileSuratPath = self::$folderPath.$folderSurat.$nameFile;
-            $fileSuratDB = $folderSurat.$nameFile;
+            $nameFile = '/'.$idSewa.'.'.$extension;
+            $fileSuratPath = self::$folderPath.$folderSurat.$fileTime.$nameFile;
+            $fileSuratDB = $folderSurat.$fileTime.$nameFile;
             if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
-                unlink($fileKtpPath);
-                unlink($fileFotoPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
-            $query = "INSERT INTO tempat (nomor_induk, nik, nama_seniman,jenis_kelamin, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi,jumlah_anggota,ktp_seniman,pass_foto, surat_keterangan, tgl_pembuatan,tgl_berlaku,status, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?)";
+            //save data
+            $query = "INSERT INTO sewa_tempat (nik_sewa, nama_tempat, nama_peminjam, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, surat_ket_sewa, tgl_awal_peminjaman, tgl_akhir_peminjaman, status, id_tempat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
             $status = 'terkirim';
-            $data['kategori_event'] = strtoupper($data['kategori_event' ]);
-            $nomerInduk = rand(1,9999);
-            $now = date('Y-m-d');
-            $stmt[2]->bind_param("sssssssssssssssss", $nomerInduk, $data['nik_seniman'], $data['nama_seniman'], $data['jenis_kelamin_seniman'],$data['tempat_lahir'],$data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$fileKtpDB,$fileFotoDB, $fileSuratDB,$now,$now, $status, $data['id_user']);
+            $stmt[2]->bind_param("sssssssssssi", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'],$data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $status, $data['id_tempat']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
-                echo json_encode(['status'=>'success','message'=>'event berhasil ditambahkan']);
+                header('Content-Type: application/json');
+                echo json_encode(['status'=>'success','message'=>'Data tempat berhasil ditambahkan']);
                 exit();
             } else {
                 $stmt[2]->close();
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'event gagal ditambahkan','code'=>500]));
+                unlink($fileSuratPath);
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data tempat gagal ditambahkan','code'=>500]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -192,181 +186,162 @@ class TempatMobile{
                     'message' => $errorJson['message'],
                 );
             }
+            header('Content-Type: application/json');
             isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
             echo json_encode($responseData);
             exit();
         }
     }
-    public static function editSeniman($data){
+    public function editSewaTempat($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                throw new Exception('ID User harus di isi');
+                throw new Exception('ID User harus di isi !');
             }
-            if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
-                throw new Exception('Nama tempat harus di isi');
+            if(!isset($data['id_sewa']) || empty($data['id_sewa'])){
+                throw new Exception('ID sewa harus di isi !');
             }
-            if (!isset($data['nik_seniman']) || empty($data['nik_seniman'])) {
-                throw new Exception('nik tempat harus di isi');
+            if(!isset($data['id_tempat']) || empty($data['id_tempat'])){
+                throw new Exception('ID tempat harus di isi !');
             }
-            if (!isset($data['alamat']) || empty($data['alamat'])) {
-                throw new Exception('Alamat harus di isi');
+            if (!isset($data['nama_tempat']) || empty($data['nama_tempat'])) {
+                throw new Exception('Nama tempat harus di isi !');
             }
-            if (!isset($data['no_telpon']) || empty($data['no_telpon'])) {
-                throw new Exception('Nomor telpon harus di isi');
+            if (!isset($data['nik_penyewa']) || empty($data['nik_penyewa'])) {
+                throw new Exception('Nik penyewa harus di isi !');
             }
-            if (strlen($data['no_telpon']) > 16) {
-                throw new Exception('Nama event maksimal 16 karakter');
+            if (!is_numeric($data['nik_penyewa'])) {
+                throw new Exception('Nik penyewa harus berisi hanya angka !');
             }
-            if (!isset($data['jenis_kelamin_seniman']) || empty($data['jenis_kelamin_seniman'])) {
-                throw new Exception('Jenis kelamin harus di isi');
-            }else if(!in_array($data['jenis_kelamin_seniman'],['laki-laki','perempuan'])){
-                throw new Exception('Jenis kelamin salah');
+            if (strlen($data['nik_penyewa']) > 16) {
+                throw new Exception('Nik penyewa maksimal 16 angka !');
             }
-            if (!isset($data['tempat_lahir']) || empty($data['tempat_lahir'])) {
-                throw new Exception('Tempat lahir harus di isi');
+            // if (substr($data['nik_penyewa'], 0, 2) !== '08') {
+                // throw new Exception('Nik penyewa invalid !');
+                //     echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
+            //     echo "<script>window.history.back();</script>";
+            //     exit();
+            // }
+            if (!isset($data['nama_peminjam']) || empty($data['nama_peminjam'])) {
+                throw new Exception('Nama peminjam harus di isi !');
             }
-            if (!isset($data['tanggal_lahir']) || empty($data['tanggal_lahir'])) {
-                throw new Exception('Tanggal lahir harus di isi');
+            if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
+                throw new Exception('Deskripsi sewa tempat harus di isi !');
             }
-            if (!isset($data['nama_organisasi']) || empty($data['nama_organisasi'])) {
-                throw new Exception('Nama organisasi harus di isi');
+            if (strlen($data['deskripsi']) > 100) {
+                throw new Exception('Deskripsi sewa tempat maksimal 100 karakter !');
             }
-            if (!isset($data['anggota_organisasi']) || empty($data['anggota_organisasi'])) {
-                throw new Exception('Jumlah anggota harus di isi');
+            if (!isset($data['nama_kegiatan_sewa']) || empty($data['nama_kegiatan_sewa'])) {
+                throw new Exception('Nama kegiatan harus di isi !');
             }
-            if (!isset($_FILES['foto_ktp']) || empty($_FILES['foto_ktp'])) {
-                throw new Exception('foto ktp harus di isi');
+            if (strlen($data['nama_kegiatan_sewa']) > 50) {
+                throw new Exception('Nama kegiatan maksimal 50 karakter !');
             }
-            if (!isset($_FILES['pass_foto']) || empty($_FILES['pass_foto'])) {
-                throw new Exception('pass foto harus di isi');
+            if (!isset($data['jumlah_peserta']) || empty($data['jumlah_peserta'])) {
+                throw new Exception('Jumlah peserta harus di isi !');
+            }
+            if (!is_numeric($data['jumlah_peserta'])) {
+                throw new Exception('Jumlah peserta harus berisi hanya angka !');
+            }
+            if (strlen($data['jumlah_peserta']) > 10) {
+                throw new Exception('Jumlah peserta maksimal 10 angka !');
+            }
+            if (!isset($data['instansi']) || empty($data['instansi'])) {
+                $data['instansi'] = '';
+            }
+            if (!isset($data['tanggal_awal_sewa']) || empty($data['tanggal_awal_sewa'])) {
+                throw new Exception('Tanggal awal sewa harus di isi !');
+            }
+            if (!isset($data['tanggal_akhir_sewa']) || empty($data['tanggal_akhir_sewa'])) {
+                throw new Exception('Tanggal akhir sewa harus di isi !');
             }
             if (!isset($_FILES['surat_keterangan']) || empty($_FILES['surat_keterangan'])) {
-                throw new Exception('Surat keternangan harus di isi');
-            }
-            if ($_FILES['foto_ktp']['error'] !== UPLOAD_ERR_OK) {
-                throw new Exception('gagal upload ktp file');
-            }
-            if ($_FILES['pass_foto']['error'] !== UPLOAD_ERR_OK) {
-                throw new Exception('gagal upload foto file');
+                throw new Exception('Surat keternangan harus di isi !');
             }
             if ($_FILES['surat_keterangan']['error'] !== UPLOAD_ERR_OK) {
-                throw new Exception('gagal upload pdf file');
+                throw new Exception('gagal upload file !');
             }
-            $tanggal_lahir = date('Y-m-d H:i:s',strtotime($data['tanggal_lahir']));
-            if (!$tanggal_lahir) {
-                throw new Exception('Format tanggal lahir tidak valid');
+            date_default_timezone_set('Asia/Jakarta');
+            $tanggal_awal = strtotime($data['tanggal_awal_sewa']);
+            $tanggal_awalDB = date('Y-m-d H:i:s', $tanggal_awal);
+            $tanggal_akhir = strtotime($data['tanggal_akhir_sewa']);
+            $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
+            $tanggal_sekarang = date('Y-m-d H:i:s');
+            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            // Check if the date formats are valid
+            if (!$tanggal_awal) {
+                throw new Exception('Format tanggal awal tidak valid !');
+            }else if (!$tanggal_akhir) {
+                throw new Exception('Format tanggal akhir tidak valid !');
             }
-            //check id tempat
-            $query = "SELECT id_seniman FROM tempat WHERE BINARY id_user = ? LIMIT 1";
+            // Compare the dates
+            if ($tanggal_awal > $tanggal_akhir) {
+                throw new Exception('Tanggal akhir tidak boleh lebih awal dari tanggal awal !');
+            }
+            if ($tanggal_awal < $tanggal_sekarang){
+                throw new Exception('Tanggal tidak boleh kurang dari sekarang !');
+            }
+            //check user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
             $stmt[0]->bind_param('s', $data['id_user']);
             $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
             if(!$stmt[0]->fetch()){
                 $stmt[0]->close();
-                throw new Exception('Data tempat tidak ditemukan');
+                throw new Exception('user tidak ditemukan');
             }
             $stmt[0]->close();
-            $folderKtp = '/ktp';
-            $folderPassFoto = '/pass_foto';
+            if($role != 'masyarakat'){
+                throw new Exception('invalid role');
+            }
+            //check id tempat
+            $query = "SELECT id_tempat FROM list_tempat WHERE id_tempat = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_tempat']);
+            $stmt[1]->execute();
+            if(!$stmt[1]->fetch()){
+                $stmt[1]->close();
+                throw new Exception('Data tempat tidak ditemukan');
+            }
+            $stmt[1]->close();
+            //proses file
+            $bulan = date_format(new DateTime($data['tanggal_awal_sewa']), "m");
+            $tahun = date_format(new DateTime($data['tanggal_awal_sewa']), "Y");
+            $fileTime = '/'.$tahun.'/'.$bulan;
             $folderSurat = '/surat_keterangan';
-            if (!is_dir(self::$folderPath.$folderKtp)) {
-                mkdir(self::$folderPath.$folderKtp, 0777, true);
-            }
-            if (!is_dir(self::$folderPath.$folderPassFoto)) {
-                mkdir(self::$folderPath.$folderPassFoto, 0777, true);
-            }
-            if (!is_dir(self::$folderPath.$folderSurat)) {
-                mkdir(self::$folderPath.$folderSurat, 0777, true);
-            }
-            //proses file
-            $fileKtp = $_FILES['foto_ktp'];
-            $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileKtp['name']);
-            if (in_array($extension,['png','jpeg','jpg'])) {
-                if ($size >= 5 * 1024 * 1024) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
-                }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
-            }
-            //simpan file
-            $nameFile = '/'.$data['id_seniman'].'.'.$extension;  
-            $fileKtpPath = self::$folderPath.$folderKtp.$nameFile;
-            $fileKtpDB = $folderKtp.$nameFile;
-            if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
-            }
-
-            //proses file
-            $fileFoto = $_FILES['pass_foto'];
-            $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileFoto['name']);
-            if (in_array($extension,['png','jpeg','jpg'])) {
-                if ($size >= 5 * 1024 * 1024) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
-                }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
-            }
-            //simpan file
-            $nameFile = '/'.$data['id_seniman'].'.'.$extension;
-            $fileFotoPath = self::$folderPath.$folderPassFoto.$nameFile;
-            $fileFotoDB = $folderPassFoto.$nameFile;
-            if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
-                unlink($fileKtpPath);
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
-            }
-
-            //proses file
             $fileSurat = $_FILES['surat_keterangan'];
             $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileSurat['name']);
-            if ($extension === 'pdf' || $extension === 'docx') {
-                if ($size >= 5 * 1024 * 1024) {
+            $size = filesize($fileSurat['tmp_name']);
+            if (in_array($extension,['jpg','jpeg','png','pdf','docx'])) {
+                if ($size >= self::$sizeFile) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
             } else {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
             }
             //simpan file
-            $nameFile = '/'.$data['id_seniman'].'.'.$extension;
-            $fileSuratPath = self::$folderPath.$folderSurat.$nameFile;
-            $fileSuratDB = $folderSurat.$nameFile;
+            $nameFile = '/'.$data['id_sewa'].'.'.$extension;
+            $fileSuratPath = self::$folderPath.$folderSurat.$fileTime.$nameFile;
+            $fileSuratDB = $folderSurat.$fileTime.$nameFile;
             if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
-                unlink($fileKtpPath);
-                unlink($fileFotoPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
-            $query = "UPDATE tempat SET nama_seniman = ?, jenis_kelamin = ?, tempat_lahir = ?, tanggal_lahir = ?, alamat_seniman = ?, no_telpon = ?, nama_organisasi = ?, jumlah_anggota = ?, ktp_seniman = ?, pass_foto = ?, surat_keterangan = ?, tgl_pembuatan = ?, tgl_berlaku = ?, status = ? WHERE id_user = ? AND id_seniman = ?";
-            $stmt[1] = self::$con->prepare($query);
+            //update data
+            $query = "UPDATE sewa_tempat SET nik_sewa = ?, nama_tempat = ?, nama_peminjam = ?, deskripsi_sewa_tempat = ?, nama_kegiatan_sewa = ?, jumlah_peserta = ?, instansi = ?, surat_ket_sewa = ?, tgl_awal_peminjaman = ?, tgl_akhir_peminjaman = ?, status = ? WHERE id_tempat = ?";
+            $stmt[2] = self::$con->prepare($query);
             $status = 'terkirim';
-            $now = date('Y-m-d');
-            $stmt[1]->bind_param("ssssssssssssssss", $data['nama_seniman'], $data['jenis_kelamin_seniman'],$data['tempat_lahir'],$data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$fileKtpDB,$fileFotoDB, $fileSuratDB,$now,$now, $status, $data['id_user'],$data['id_seniman']);
-            $stmt[1]->execute();
-            if ($stmt[1]->affected_rows > 0) {
-                $stmt[1]->close();
-                echo json_encode(['status'=>'success','message'=>'tempat berhasil dubah']);
+            $stmt[2]->bind_param("sssssssssssi", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'], $data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $status, $data['id_tempat']);
+            $stmt[2]->execute();
+            if ($stmt[2]->affected_rows > 0) {
+                $stmt[2]->close();
+                header('Content-Type: application/json');
+                echo json_encode(['status'=>'success','message'=>'Data tempat berhasil diubah']);
                 exit();
             } else {
-                $stmt[1]->close();
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'tempat gagal diubah','code'=>500]));
+                $stmt[2]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data tempat gagal diubah','code'=>500]));
             }
-            // $query = "INSERT INTO tempat (nomor_induk,nama_seniman,jenis_kelamin, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi,jumlah_anggota,ktp_seniman,pass_foto, surat_keterangan, tgl_pembuatan,tgl_berlaku,status, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?)";
-            // $stmt[1] = self::$con->prepare($query);
-            // $status = 'terkirim';
-            // $data['kategori_event'] = strtoupper($data['kategori_event' ]);
-            // $nomerInduk = rand(1,9999);
-            // $now = date('Y-m-d');
-            // $stmt[1]->bind_param("ssssssssssssssss", $nomerInduk, $data['nama_seniman'], $data['jenis_kelamin_seniman'],$data['tempat_lahir'],$data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$fileKtpDB,$fileFotoDB, $fileSuratDB,$now,$now, $status, $data['id_user']);
-            // $stmt[1]->execute();
-            // if ($stmt[1]->affected_rows > 0) {
-            //     $stmt[1]->close();
-            //     echo json_encode(['status'=>'success','message'=>'event berhasil ditambahkan']);
-            //     exit();
-            // } else {
-            //     $stmt[1]->close();
-            //     throw new Exception(json_encode(['status' => 'error', 'message' => 'event gagal ditambahkan','code'=>500]));
-            // }
         }catch(Exception $e){
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
@@ -386,28 +361,60 @@ class TempatMobile{
             exit();
         }
     }
-    public static function hapusSeniman($data, ){
+    public function hapusSewaTempat($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                exit();
+                throw new Exception('ID User harus di isi !');
             }
-            if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
-                exit();
+            if(!isset($data['id_sewa']) || empty($data['id_sewa'])){
+                throw new Exception('ID sewa harus di isi !');
             }
-            $query = "DELETE FROM tempat WHERE id_seniman = ? AND id_user = ?";
+            //check id_user
+            $query = "SELECT role FROM users WHERE id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if(!in_array($role,['super admin','admin tempat'])){
+                throw new Exception('Anda bukan admin');
+            }
+            //check id_sewa
+            $query = "SELECT surat_ket_sewa FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_sewa']);
+            $stmt[0]->execute();
+            $path = '';
+            $stmt[0]->bind_result($path);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('Data sewa tempat tidak ditemukan');
+            }
+            $stmt[0]->close();
+            //delete file
+            $fileSuratPath = self::$folderPath.$path;
+            unlink($fileSuratPath);
+            $query = "DELETE FROM sewa_tempat WHERE id_tempat = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param('ss', $data['id_seniman'],$data['id_user']);
+            $stmt[2]->bind_param('ss', $data['id_tempat']);
             if ($stmt[2]->execute()) {
                 $stmt[2]->close();
+                header('Content-Type: application/json');
+                echo json_encode(['status'=>'success','message'=>'Data tempat berhasil dihapus']);
                 exit();
             } else {
                 $stmt[2]->close();
-                exit();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data tempat gagal dihapus','code'=>500]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
@@ -415,65 +422,13 @@ class TempatMobile{
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $erorr->message,
+                    'message' => $errorJson['message'],
                 );
             }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
             exit();
-        }
-    }
-    //khusus admin tempat dan super admin
-    public static function prosesSeniman($data, ){
-        if(!isset($data['id_user']) || empty($data['id_user'])){
-            exit();
-        }
-        if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
-            return ['status'=>'error','message'=>'Nama tempat harus di isi','code'=>400];
-        } elseif (strlen($data['nama_seniman']) < 5) {
-            return ['status'=>'error','message'=>'Nama tempat minimal 5 karakter','code'=>400];
-        } elseif (strlen($data['nama_seniman']) > 50) {
-            return ['status'=>'error','message'=>'Nama tempat maksimal 50 karakter','code'=>400];
-        }
-        if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
-            return ['status'=>'error','message'=>'Deskripsi tempat harus di isi','code'=>400];
-        } elseif (strlen($data['deskripsi']) > 4000) {
-            return ['status'=>'error','message'=>'deskripsi tempat maksimal 4000 karakter','code'=>400];
-        }
-        if (!isset($data['kategori']) || empty($data['kategori'])) {
-            return ['status'=>'error','message'=>'Kategori tempat harus di isi','code'=>400];
-        }else if(!in_array($data['kategori'],['olahraga','seni'])){
-            return ['status'=>'error','message'=>'Kategori salah','code'=>400];
-        }
-        if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
-            return ['status'=>'error','message'=>'Tanggal awal harus di isi','code'=>400];
-        }else if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
-            return ['status'=>'error','message'=>'Tanggal akhir harus di isi','code'=>400];
-        }
-    }
-    public static function verfikasiSeniman($data, ){
-        if(!isset($data['id_user']) || empty($data['id_user'])){
-            return ['status'=>'error','message'=>'ID User harus di isi','code'=>400];
-        }
-        if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
-            return ['status'=>'error','message'=>'Nama tempat harus di isi','code'=>400];
-        } elseif (strlen($data['nama_seniman']) < 5) {
-            return ['status'=>'error','message'=>'Nama tempat minimal 5 karakter','code'=>400];
-        } elseif (strlen($data['nama_seniman']) > 50) {
-            return ['status'=>'error','message'=>'Nama tempat maksimal 50 karakter','code'=>400];
-        }
-        if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
-            return ['status'=>'error','message'=>'Deskripsi tempat harus di isi','code'=>400];
-        } elseif (strlen($data['deskripsi']) > 4000) {
-            return ['status'=>'error','message'=>'deskripsi tempat maksimal 4000 karakter','code'=>400];
-        }
-        if (!isset($data['kategori']) || empty($data['kategori'])) {
-            return ['status'=>'error','message'=>'Kategori tempat harus di isi','code'=>400];
-        }else if(!in_array($data['kategori'],['olahraga','seni'])){
-            return ['status'=>'error','message'=>'Kategori salah','code'=>400];
-        }
-        if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
-            return ['status'=>'error','message'=>'Tanggal awal harus di isi','code'=>400];
-        }else if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
-            return ['status'=>'error','message'=>'Tanggal akhir harus di isi','code'=>400];
         }
     }
     public static function handle(){
@@ -507,26 +462,25 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
     echo 'ilang';
 }
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    SenimanMobile::regisrasiSeniman(SenimanMobile::handle());
+    $tempatMobile = new TempatMobile();
+    $data = TempatMobile::handle();
+    if(isset($data['_method'])){
+        if($data['_method'] == 'PUT'){
+            $tempatMobile->editSewaTempat($data);
+        }
+        if($data['_method'] == 'DELETE'){
+            $tempatMobile->hapusSewaTempat($data);
+        }
+    }else{
+        $tempatMobile->sewaTempat($data);
+    }
 }
 if($_SERVER['REQUEST_METHOD'] == 'PUT'){
-    SenimanMobile::editSeniman(SenimanMobile::handle());
+    $tempatMobile = new TempatMobile();
+    $tempatMobile->editSewaTempat(TempatMobile::handle());
 }
 if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-    SenimanMobile::hapusSeniman(SenimanMobile::handle());
+    $tempatMobile = new TempatMobile();
+    $tempatMobile->hapusSewaTempat(TempatMobile::handle());
 }
-// if(isset($_POST['tambah'])){
-
-//     // if (is_uploaded_file($_FILES['file']['tmp_name'])) { 
-//     tambahSeniman($_POST);
-// }
-// if(isset($_POST['edit'])){
-//     editSeniman($_POST);
-// }
-// if(isset($_POST['hapus'])){
-//     hapusSeniman($_POST);
-// }
-// if(isset($_POST['proses'])){
-//     prosesSeniman($_POST);
-// }
 ?>

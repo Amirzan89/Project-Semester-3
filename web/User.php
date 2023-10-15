@@ -98,6 +98,21 @@ class User{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
+            //check user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                throw new Exception('user tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if($role != 'masyarakat'){
+                throw new Exception('invalid role');
+            }
             //check tanggal
             date_default_timezone_set('Asia/Jakarta');
             $tanggal_lahir = strtotime($data['tanggalL']);
@@ -250,6 +265,21 @@ class User{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
+            //check user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                throw new Exception('user tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if($role != 'masyarakat'){
+                throw new Exception('invalid role');
+            }
             //check tanggal
             date_default_timezone_set('Asia/Jakarta');
             $tanggal_lahir = strtotime($data['tanggalL']);
@@ -319,6 +349,45 @@ class User{
             exit();
         }
     }
+    public function hapusAdmin($data){
+        try{
+            if (!isset($data['id_admin']) || empty($data['id_admin'])) {
+                echo "<script>alert('ID admin harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['nama']) || empty($data['nama'])) {
+                return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
+            }
+            $query = "DELETE FROM users WHERE id_user = ? ";
+            $stmt = self::$con->prepare($query);
+            $stmt->bind_param('i', $data['id_user']);
+            if ($stmt->execute()) {
+                echo "<script>alert('akun berhasil dihapus')</script>";
+                echo "<script>window.location.href = '/admin.php';</script>";
+                exit();
+            }else{
+                echo "<script>alert('akun gagal dihapus')</script>";
+                echo "<script>window.location.href = '/admin.php';</script>";
+                exit();
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $erorr = json_decode($error, true);
+            if ($erorr === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $erorr->message,
+            );
+            return $responseData;
+        }
+    }
+}
     public function isExistUser($email){
         if(empty($email) || is_null($email)){
             return ['status'=>'error','message'=>'email empty'];
@@ -1100,51 +1169,6 @@ class User{
     }
     public function updateUser(){
     }
-    public function hapusAdmin($data){
-        try{
-            if (!isset($data['id_user']) || empty($data['email'])) {
-                return ['status'=>'error','message'=>'Email harus di isi','code'=>400];
-            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                return ['status'=>'error','message'=>'Email invalid','code'=>400];
-            }
-            if (!isset($data['pass']) || empty($data['pass'])) {
-                return ['status'=>'error','message'=>'Password harus di isi00','code'=>400];
-            } elseif (strlen($data['pass']) < 8) {
-                return ['status'=>'error','message'=>'Password minimal 8 karakter','code'=>400];
-            } elseif (strlen($data['pass']) > 25) {
-                return ['status'=>'error','message'=>'Password maksimal 8 karakter','code'=>400];
-            } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
-                return ['status' => 'error', 'message' => 'Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka', 'code' => 400];
-            }
-            // Validate 'nama' field
-            if (!isset($data['nama']) || empty($data['nama'])) {
-                return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
-            }
-            $query = "DELETE FROM users WHERE id_user = ? ";
-            $stmt = self::$con->prepare($query);
-            $stmt->bind_param('i', $data['id_user']);
-            if ($stmt->execute()) {
-                echo "<script>alert('')</scrip>";
-                exit();
-                // header('Location: /');
-            }
-        }catch(Exception $e){
-            $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $erorr->message,
-            );
-            return $responseData;
-        }
-    }
-}
 }
 $user = new User;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

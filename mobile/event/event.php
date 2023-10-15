@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
 class EventMobile{
+    private static $sizeFile = 5 * 1024 * 1024;
     private static $database;
     private static $con;
     private static $folderPath;
@@ -122,13 +123,15 @@ class EventMobile{
             $status = 'terkirim';
             $data['kategori_event'] = strtoupper($data['kategori_event']);
             $fileDb = $fileTime.$nameFile;
-            $stmt->bind_param("ssssssssss", $data['nama_pengirim'],$data['nama_event'], $data[  'deskripsi'], $data['kategori_event'],$tanggal_awalDB, $tanggal_akhirDB, $data['link'],$fileDb, $status,    $data['id_user']);
+            $stmt->bind_param("ssssssssss", $data['nama_pengirim'],$data['nama_event'], $data[  'deskripsi'], $data['kategori_event'],$tanggal_awalDB, $tanggal_akhirDB, $data['link'],$fileDb, $status, $data['id_user']);
             $stmt->execute();
             if ($stmt->affected_rows > 0) {
+                header('Content-Type: application/json');
                 echo json_encode(['status'=>'success','message'=>'event berhasil ditambahkan']);
                 exit();
             } else {
                 $stmt->close();
+                unlink($filePath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'event gagal ditambahkan','code'=>500]));
             }
         }catch(Exception $e){
@@ -193,10 +196,6 @@ class EventMobile{
             $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
             $tanggal_sekarang = date('Y-m-d H:i:s');
             $tanggal_sekarang = strtotime($tanggal_sekarang);
-            // $tanggal_awal = date('Y-m-d H:i:s',strtotime($data['tanggal_awal_event']));
-            // $tanggal_akhir = date('Y-m-d H:i:s',strtotime($data['tanggal_akhir_event']));
-            // $tanggal_sekarang = date('Y-m-d H:i:s');
-            // $tanggal_sekarang = strtotime($tanggal_sekarang);
             // Check if the date formats are valid
             if (!$tanggal_awal) {
                 throw new Exception('Format tanggal awal tidak valid !');
@@ -259,6 +258,7 @@ class EventMobile{
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
+                header('Content-Type: application/json');
                 echo json_encode(['status'=>'success','message'=>'event berhasil diupdate']);
                 exit();
             } else {
@@ -277,7 +277,7 @@ class EventMobile{
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $errorJson->message,
+                    'message' => $errorJson['message'],
                 );
             }
             header('Content-Type: application/json');
@@ -286,32 +286,60 @@ class EventMobile{
             exit();
         }
     }
-    public static function hapusEvent($data, $uri = null){
+    public function hapusEvent($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi')</scrip>";
-                exit();
+                throw new Exception('ID User harus di isi !');
             }
             if(!isset($data['id_event']) || empty($data['id_event'])){
-                echo "<script>alert('ID event harus di isi')</script>";
-                exit();
+                throw new Exception('ID event harus di isi !');
             }
-            $query = "DELETE FROM event WHERE id_event = ?";
+            //check id_user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if(!in_array($role,['super admin','admin tempat'])){
+                throw new Exception('Anda bukan admin');
+            }
+            //check id_event
+            $query = "SELECT poster_event FROM events WHERE BINARY id_event = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_event']);
+            $stmt[0]->execute();
+            $path = '';
+            $stmt[0]->bind_result($path);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('Data event tidak ditemukan');
+            }
+            $stmt[0]->close();
+            //delete file
+            $fileSuratPath = self::$folderPath.$path;
+            unlink($fileSuratPath);
+            $query = "DELETE FROM events WHERE id_event = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param('s', $data['id_event']);
+            $stmt[2]->bind_param('ss', $data['id_event']);
             if ($stmt[2]->execute()) {
                 $stmt[2]->close();
-                echo "<script>alert('event berhasil dihapus')</script>";
+                header('Content-Type: application/json');
+                echo json_encode(['status'=>'success','message'=>'Data event berhasil dihapus']);
                 exit();
             } else {
                 $stmt[2]->close();
-                echo "<script>alert('event gagal dihapus')</script>";
-                exit();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data event gagal dihapus','code'=>500]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
@@ -319,10 +347,12 @@ class EventMobile{
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $erorr->message,
+                    'message' => $errorJson['message'],
                 );
             }
-            echo "<script>alert('$responseData')</script>";
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
             exit();
         }
     }
@@ -359,6 +389,6 @@ if($_SERVER['REQUEST_METHOD'] == 'PUT'){
 }
 if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
     $EventMobile = new EventMobile();
-    EventMobile::hapusEvent(EventMobile::handle());
+    $EventMobile->hapusEvent(EventMobile::handle());
 }
 ?>

@@ -74,13 +74,6 @@ class UserMobile{
                 $stmt->close();
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Akun gagal dibuat','code'=>500]));
             }
-            // if ($stmt->affected_rows > 0) {
-                //     $stmt->close();
-            //     echo json_encode(['status'=>'success','message'=>'Akun berhasil dibuat']);
-            // } else {
-            //     $stmt->close();
-            //     throw new Exception(json_encode(['status' => 'error', 'message' => 'Akun gagal dibuat','code'=>500]));
-            // }
         }catch(Exception $e){
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
