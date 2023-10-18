@@ -399,6 +399,7 @@ class TempatMobile{
             //delete file
             $fileSuratPath = self::$folderPath.$path;
             unlink($fileSuratPath);
+            //delete data
             $query = "DELETE FROM sewa_tempat WHERE id_tempat = ?";
             $stmt[2] = self::$con->prepare($query);
             $stmt[2]->bind_param('ss', $data['id_tempat']);
@@ -445,9 +446,6 @@ class TempatMobile{
         } elseif ($contentType === "application/x-www-form-urlencoded") {
             $requestData = $_POST;
             return $requestData;
-        // } elseif ($contentType === "multipart/form-data") {
-        //     $requestData = $_POST;
-        //     return $requestData;
         } elseif (strpos($contentType, 'multipart/form-data') !== false) {
             $requestData = $_POST;
             return $requestData;

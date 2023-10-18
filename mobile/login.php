@@ -18,13 +18,13 @@ $loadEnv = function($path = null){
 };
 function Login($data,$loadEnv){
     try{
-        $email = $_POST["email"];
+        $email = $data["email"];
         // $email = "Admin@gmail.com";
-        $pass = $_POST["password"];
+        $pass = $data["password"];
         $pass = "Admin@1234567890";
         if(!isset($email) || empty($email)){
             throw new Exception('Email harus di isi !');
-        } else if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+        } else if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             throw new Exception('Email invalid !');
         }else if(!isset($pass) || empty($pass)){
             throw new Exception('Password harus di isi !');
@@ -43,7 +43,7 @@ function Login($data,$loadEnv){
                     throw new Exception('Password salah !');
                 }else{
                     $stmt[0]->close();
-                    $result = Jwt::createToken($_POST,$con,$loadEnv);
+                    $result = Jwt::createToken($data,$con,$loadEnv);
                     if(is_null($result)){
                         throw new Exception(json_encode(['status' => 'error', 'message' => 'create token error','code'=>500]));
                     }else{
@@ -98,6 +98,8 @@ function Login($data,$loadEnv){
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input_data = file_get_contents("php://input");
     $data = json_decode($input_data, true);
+    // echo json_encode($data);
+    // exit();
     Login($data,$loadEnv);
 }
 //protection

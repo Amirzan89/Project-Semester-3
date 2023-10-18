@@ -22,7 +22,7 @@ function authenticate($request,$data,$con = null){
         if(in_array(ltrim($data['uri'],'/'),$authPage) && $data['method'] == "GET"){
             $auth = ['/login.php','/register.php','/password/reset','/verify/password','/verify/email','/auth/redirect','/auth/google','/'];
             if (in_array(ltrim($path,'/'), $authPage)) {
-                header('Location: /dashboard');
+                header('Location: /dashboard.php');
             } else {
                 header("Location: $path");
             }
@@ -48,14 +48,14 @@ function authenticate($request,$data,$con = null){
                 setcookie('token1', '', time() - 3600, '/');
                 setcookie('token2', '', time() - 3600, '/');
                 setcookie('token3', '', time() - 3600, '/');
-                header('Location: /login.html');
+                header('Location: /login.php');
                 exit();
             }else{
                 if(!$exist['data']){
                     setcookie('token1', '', time() - 3600, '/');
                     setcookie('token2', '', time() - 3600, '/');
                     setcookie('token3', '', time() - 3600, '/');
-                    header('Location: /login.html');
+                    header('Location: /login.php');
                     exit();
                 }else{
                     //check token if exist in database
@@ -66,13 +66,13 @@ function authenticate($request,$data,$con = null){
                                 setcookie('token1', '', time() - 3600, '/');
                                 setcookie('token2', '', time() - 3600, '/');
                                 setcookie('token3', '', time() - 3600, '/');
-                                header('Location: /login.html');
+                                header('Location: /login.php');
                                 exit();
                             }else if($decodedRefresh['message'] == 'invalid email'){
                                 setcookie('token1', '', time() - 3600, '/');
                                 setcookie('token2', '', time() - 3600, '/');
                                 setcookie('token3', '', time() - 3600, '/');
-                                header('Location: /login.html');
+                                header('Location: /login.php');
                                 exit();
                             }
                         //if token refresh success decoded and not expired
@@ -136,13 +136,13 @@ function authenticate($request,$data,$con = null){
                             setcookie('token1', '', time() - 3600, '/');
                             setcookie('token2', '', time() - 3600, '/');
                             setcookie('token3', '', time() - 3600, '/');
-                            header('Location: /login.html');
+                            header('Location: /login.php');
                             exit();
                         }else{
                             setcookie('token1', '', time() - 3600, '/');
                             setcookie('token2', '', time() - 3600, '/');
                             setcookie('token3', '', time() - 3600, '/');
-                            header('Location: /login.html');
+                            header('Location: /login.php');
                             exit();
                         }
                     }

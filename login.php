@@ -1,11 +1,21 @@
-<?php 
-// require('web/koneksi.php');
-// require('web/authenticate.php'); 
-// authenticate($_POST,[
-//     'uri'=>$_SERVER['REQUEST_URI'],
-//     'method'=>$_SERVER['REQUEST_METHOD'
-//     ]
-// ]);
+<?php
+require_once('web/koneksi.php');
+require_once('web/authenticate.php');
+$database = koneksi::getInstance();
+$conn = $database->getConnection();
+$userAuth = authenticate($_POST,[
+    'uri'=>$_SERVER['REQUEST_URI'],
+    'method'=>$_SERVER['REQUEST_METHOD']
+],$conn);
+if($userAuth['status'] == 'error'){
+	header('Location: /login.php');
+}else{
+	$userAuth = $userAuth['data'];
+  // if($userAuth['role'] != 'super admin'){
+  //   header('Location: /dashboard.php');
+  // }
+}
+$csrf = $GLOBALS['csrf'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,6 +46,5 @@
         <div id="preloader" style="display: none;"></div>
         <div id="greenPopup" style="display:none"></div>
         <div id="redPopup" style="display:none"></div>
-        <!-- <script src="/public/js/utama/login.js?"></script> -->
 </body>
 </html>

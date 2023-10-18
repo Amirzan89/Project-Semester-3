@@ -80,12 +80,12 @@ $csrf = $GLOBALS['csrf'];
   <main id="main" class="main">
 
   <div class="pagetitle">
-      <h1>Daftar Pengguna</h1>
+      <h1>Kelola Admin</h1>
       <nav>
         <ol class="breadcrumb">
-          <!-- <li class="breadcrumb-item"><a href="index.html">Home</a></li> -->
+          <!-- <li class="breadcrumb-item"><a href="/dashboard.php">Home</a></li> -->
           <li class="breadcrumb-item">Tabel</li>
-          <li class="breadcrumb-item active">Pengguna</li>
+          <li class="breadcrumb-item active">Admin</li>
         </ol>
       </nav>
   </div><!-- End Page Title -->

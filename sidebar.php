@@ -36,9 +36,18 @@
 
 <?php if($userAuth['role'] == 'super admin' || $userAuth['role'] == 'admin pentas'){ ?>
 <li class="nav-item <?php echo $nav == 'pentas' ? 'active' : ''; ?>">
-  <a class="nav-link " href="/halaman/SuratAdvis/MenuUtama.php">
+  <a class="nav-link " href="/pentas.php">
     <i class="bi bi-megaphone"></i>
     <span>Kelola Izin Pentas</span>
+  </a>
+</li>
+<?php }?>
+
+<?php if(in_array($userAuth['role'],['super admin','admin event','admin pentas','admin seniman','admin tempat'])){ ?>
+<li class="nav-item <?php echo $nav == 'pengguna' ? 'active' :  ''?>">
+  <a class="nav-link " href="/pengguna.php">
+    <i class="bi bi-people"></i>
+    <span>Kelola Pengguna</span>
   </a>
 </li>
 <?php }?>

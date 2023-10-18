@@ -400,7 +400,7 @@ class SenimanMobile{
             $pathKTP = '';
             $pathFoto = '';
             $pathSurat = '';
-            $stmt[1]->bind_result($fileKtpPath, $pathFoto,$pathSurat);
+            $stmt[1]->bind_result($pathKTP, $pathFoto,$pathSurat);
             if (!$stmt[1]->fetch()) {
                 $stmt[1]->close();
                 throw new Exception('Data seniman tidak ditemukan');
@@ -413,6 +413,7 @@ class SenimanMobile{
             unlink($fileKtpPath);
             unlink($fileFotoPath);
             unlink($fileSuratPath);
+            //delete data
             $query = "DELETE FROM seniman WHERE id_seniman = ?";
             $stmt[2] = self::$con->prepare($query);
             $stmt[2]->bind_param('ss', $data['id_seniman']);
