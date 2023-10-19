@@ -1,3 +1,19 @@
+<?php 
+require_once('web/koneksi.php');
+require_once('web/authenticate.php');
+$database = koneksi::getInstance();
+$con = $database->getConnection();
+if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
+  $id  = $_GET['id_tempat'];
+  $sql  = mysqli_query($con, "SELECT nama_tempat, alamat_tempat, deskripsi_tempat, foto_tempat FROM list_tempat WHERE `id_tempat` = '" . $id . "'");
+  $tempat = mysqli_fetch_assoc($sql);
+  if(!$tempat){
+    header("Location: /home.php");
+  }
+}else{
+  header('Location: /home.php');
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -44,12 +60,12 @@
       <h1 class="logo me-auto"><a href="index.html">DISPORABUDPAR</a></h1>
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="LandingPage.html">Beranda</a></li>
-          <li><a class="nav-link scrollto" href="#event">Event</a></li>
-          <li><a class="nav-link scrollto" href="LandingPage.html">Informasi</a></li>
-          <li><a class="nav-link scrollto" href="LandingPage.html">Layanan</a></li>
-          <li><a class="nav-link   scrollto" href="LandingPage.html">Profil</a></li>
-          <li><a class="getstarted scrollto" href="">Masuk</a></li>
+          <li><a class="nav-link scrollto active" href="/home.php#hero">Beranda</a></li>
+          <li><a class="nav-link scrollto" href="/home.php#event">Event</a></li>
+          <li><a class="nav-link scrollto" href="/home.php#about">Informasi</a></li>
+          <li><a class="nav-link scrollto" href="/home.php#layanan">Layanan</a></li>
+          <li><a class="nav-link   scrollto" href="/home.php#profil">Profil</a></li>
+          <li><a class="getstarted scrollto" href="/login.php">Masuk</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav>
@@ -72,7 +88,8 @@
               <div class="swiper-wrapper align-items-center">
 
                 <div class="swiper-slide">
-                  <img src="/public/assets/img/LandingPage/gedung5.png" alt="">
+                  <img src="/public/img/tempat<?php echo $tempat['foto_tempat']?>" alt="">
+                  <!-- <img src="/public/assets/img/LandingPage/gedung5.png" alt=""> -->
                 </div>
               </div>
               <div class="swiper-pagination"></div>
@@ -81,17 +98,19 @@
 
           <div class="col-lg-4">
             <div class="portfolio-info">
-              <h3>Air Terjun Sedudo</h3>
+              <!-- <h3>Air Terjun Sedudo</h3> -->
+              <h3><?php echo $tempat['nama_tempat'];?></h3>
               <p><strong>Alamat</strong></p><br>
-              <p>Jl. Sedudo, Hutan, Sawahan, Kec. Sawahan, Kabupaten Nganjuk, Jawa Timur 64475</p>
+              <p><?php echo $tempat['alamat_tempat'];?></p>
+              <!-- <p>Jl. Sedudo, Hutan, Sawahan, Kec. Sawahan, Kabupaten Nganjuk, Jawa Timur 64475</p> -->
             </div>
             <div class="portfolio-description">
-              <!-- <h2>This is an example of portfolio detail</h2> -->
-              <p>
+              <p><?php echo $tempat['deskripsi_tempat'];?></p>
+              <!-- <p>
                 Air Terjun Sedudo adalah sebuah air terjun dan objek wisata yang terletak di Desa Ngliman Kecamatan Sawahan, Kabupaten Nganjuk, Jawa Timur. 
                 Jaraknya sekitar 30 km arah selatan ibu kota kabupaten Nganjuk. Berada pada ketinggian 1.438 meter dpl, ketinggian air terjun ini sekitar 105 meter. Tempat wisata ini memiliki fasilitas yang cukup baik, 
                 dan jalur transportasi yang mudah diakses.[1]
-              </p>
+              </p> -->
             </div>
           </div>
 

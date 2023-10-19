@@ -190,74 +190,22 @@ $userAuth = authenticate($_POST,[
         </div>
 
         <div class="row portfolio-container" data-aos="fade-up" data-aos-delay="200">
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-            <div class="portfolio-img"><img src="/public/assets/img/LandingPage/gedung1.png" class="img-fluid" alt=""></div>
-            <div class="portfolio-info">
-              <h4>Museum Anjuk Ladang</h4>
-              <p>Tempat Wisata</p>
-              <a href="/public/assets/img/LandingPage/gedung1.png" data-gallery="portfolioGallery"
-                class="portfolio-lightbox preview-link" title="Museum Anjuk Ladang"><i class="bx bx-plus"></i></a>
-              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
+          <?php
+          $query = mysqli_query($con, "SELECT id_tempat, nama_tempat, alamat_tempat, foto_tempat FROM list_tempat");
+          while ($tempat = mysqli_fetch_array($query)) {
+          ?>
+            <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+              <div class="portfolio-img"><img src="/public/img/tempat<?php echo $tempat['foto_tempat']?>" class="img-fluid" alt=""></div>
+              <div class="portfolio-info">
+                <h4><?php echo $tempat['nama_tempat']?></h4>
+                <!-- <p>Gedung</p> -->
+                <a href="/public/img/tempat<?php echo $tempat['foto_tempat']?>" data-gallery="portfolioGallery"
+                  class="portfolio-lightbox preview-link" title="Balai Budaya"><i class="bx bx-plus"></i></a>
+                <a href="/home2.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
+              </div>
             </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-            <div class="portfolio-img"><img src="/public/assets/img/LandingPage/gedung2.png" class="img-fluid" alt=""></div>
-            <div class="portfolio-info">
-              <h4>Balai Budaya</h4>
-              <p>Gedung</p>
-              <a href="/public/assets/img/LandingPage/gedung2.png" data-gallery="portfolioGallery"
-                class="portfolio-lightbox preview-link" title="Balai Budaya"><i class="bx bx-plus"></i></a>
-              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-            <div class="portfolio-img"><img src="/public/assets/img/LandingPage/gedung3.png" class="img-fluid" alt=""></div>
-            <div class="portfolio-info">
-              <h4>Museum Dr. Soetomo</h4>
-              <p>Tempat Wisata</p>
-              <a href="/public/assets/img/LandingPage/gedung3.png" data-gallery="portfolioGallery"
-                class="portfolio-lightbox preview-link" title="Museum Dr. Soetomo"><i class="bx bx-plus"></i></a>
-              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-card">
-            <div class="portfolio-img"><img src="/public/assets/img/LandingPage/gedung4.png" class="img-fluid" alt=""></div>
-            <div class="portfolio-info">
-              <h4>Air Terjun Sedudo</h4>
-              <p>Tempat Wisata</p>
-              <a href="/public/assets/img/LandingPage/gedung4.png" data-gallery="portfolioGallery"
-                class="portfolio-lightbox preview-link" title="Air Terjun Sedudo"><i class="bx bx-plus"></i></a>
-              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-            <div class="portfolio-img"><img src="/public/assets/img/LandingPage/gedung5.png" class="img-fluid" alt=""></div>
-            <div class="portfolio-info">
-              <h4>Goa Margo Tresno</h4>
-              <p>Tempat Wisata</p>
-              <a href="/public/assets/img/LandingPage/gedung5.png" data-gallery="portfolioGallery"
-                class="portfolio-lightbox preview-link" title="Goa Margo Tresno"><i class="bx bx-plus"></i></a>
-              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-            <div class="portfolio-img"><img src="/public/assets/img/LandingPage/gedung6.png" class="img-fluid" alt=""></div>
-            <div class="portfolio-info">
-              <h4>Air Terjun Roro Kuning</h4>
-              <p>Tempat Wisata</p>
-              <a href="/public/assets/img/LandingPage/gedung6.png" data-gallery="portfolioGallery"
-                class="portfolio-lightbox preview-link" title="Air Terjun Roro Kuning"><i class="bx bx-plus"></i></a>
-              <a href="/home2.php" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
-            </div>
-          </div>
+          <?php } ?>
         </div>
-
       </div>
     </section>
     <!-- End Tempat Section -->

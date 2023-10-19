@@ -160,8 +160,8 @@ class User{
             }
         }catch(Exception $e){
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
@@ -169,7 +169,7 @@ class User{
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $erorr->message,
+                    'message' => $errorJson['message'],
                 );
             }
             echo "<script> alert('$responseData');</script>";
@@ -277,9 +277,9 @@ class User{
                 throw new Exception('user tidak ditemukan');
             }
             $stmt[0]->close();
-            if($role != 'masyarakat'){
-                throw new Exception('invalid role');
-            }
+            // if($role != 'masyarakat'){
+            //     throw new Exception('invalid role');
+            // }
             //check tanggal
             date_default_timezone_set('Asia/Jakarta');
             $tanggal_lahir = strtotime($data['tanggalL']);
@@ -333,8 +333,8 @@ class User{
             }
         }catch(Exception $e){
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
@@ -342,7 +342,7 @@ class User{
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $erorr->message,
+                    'message' => $errorJson['message'],
                 );
             }
             echo "<script> alert('$responseData')</script>";
@@ -373,8 +373,8 @@ class User{
             }
         }catch(Exception $e){
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
@@ -382,7 +382,7 @@ class User{
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $erorr->message,
+                    'message' => $errorJson['message'],
             );
             return $responseData;
         }
@@ -560,22 +560,22 @@ class User{
         } catch (Exception $e) {
             echo $e->getTraceAsString();
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
                 );
             }else{
-                if($erorr['message']){
+                if($errorJson['message']){
                     $responseData = array(
                         'status' => 'error',
-                        'message' => $erorr['message'],
+                        'message' => $errorJson['message'],
                     );
                 }else{
                     $responseData = array(
                         'status' => 'error',
-                        'message' => $erorr->message,
+                        'message' => $errorJson->message,
                     );
                 }
             }
@@ -845,22 +845,22 @@ class User{
         } catch (Exception $e) {
             echo $e->getTraceAsString();
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
                 );
             }else{
-                if($erorr['message']){
+                if($errorJson['message']){
                     $responseData = array(
                         'status' => 'error',
-                        'message' => $erorr['message'],
+                        'message' => $errorJson['message'],
                     );
                 }else{
                     $responseData = array(
                         'status' => 'error',
-                        'message' => $erorr->message,
+                        'message' => $errorJson->message,
                     );
                 }
             }
@@ -934,22 +934,22 @@ class User{
         } catch (Exception $e) {
             // echo $e->getTraceAsString();
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
                 );
             }else{
-                if($erorr['message']){
+                if($errorJson['message']){
                     $responseData = array(
                         'status' => 'error',
-                        'message' => $erorr['message'],
+                        'message' => $errorJson['message'],
                     );
                 }else{
                     $responseData = array(
                         'status' => 'error',
-                        'message' => $erorr->message,
+                        'message' => $errorJson->message,
                     );
                 }
             }
@@ -1145,22 +1145,22 @@ class User{
         } catch (Exception $e) {
             // echo $e->getTraceAsString();
             $error = $e->getMessage();
-            $erorr = json_decode($error, true);
-            if ($erorr === null) {
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
                     'message' => $error,
                 );
             }else{
-                if($erorr['message']){
+                if($errorJson['message']){
                     $responseData = array(
                         'status' => 'error',
-                        'message' => $erorr['message'],
+                        'message' => $errorJson['message'],
                     );
                 }else{
                     $responseData = array(
                         'status' => 'error',
-                        'message' => $erorr->message,
+                        'message' => $errorJson->message,
                     );
                 }
             }

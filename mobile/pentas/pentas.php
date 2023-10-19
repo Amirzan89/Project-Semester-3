@@ -27,36 +27,43 @@ class AdvisMobile{
             if (strlen($data['alamat']) > 25) {
                 throw new Exception(' Alamat maksimal 25 angka !');
             }
+            if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
+                throw new Exception(' Deskripsi harus di isi !');
+            }
+            if (strlen($data['deskripsi']) > 25) {
+                throw new Exception(' Deskripsi maksimal 25 angka !');
+            }
             if(!isset($data['nama_pentas']) || empty($data['nama_pentas'])){
                 throw new Exception('Nama pentas harus di isi !');
             }
-            if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
-                throw new Exception('Tanggal awal harus di isi !');
+            if (!isset($data['tanggal']) || empty($data['tanggal'])) {
+                throw new Exception('Tanggal harus di isi !');
             }
-            if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
-                throw new Exception('Tanggal akhir harus di isi !');
-            }
+            // if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
+            //     throw new Exception('Tanggal akhir harus di isi !');
+            // }
             if (!isset($data['alamat_pentas']) || empty($data['alamat_pentas'])) {
                 throw new Exception(' Alamat pentas harus di isi !');
             }
             date_default_timezone_set('Asia/Jakarta');
-            $tanggal_awal = strtotime($data['tanggal_awal']);
-            $tanggal_awalDB = date('Y-m-d H:i:s', $tanggal_awal);
-            $tanggal_akhir = strtotime($data['tanggal_akhir']);
-            $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
+            $tanggal = strtotime($data['tanggal']);
+            $tanggalDB = date('Y-m-d H:i:s', $tanggal);
+            // $tanggal_akhir = strtotime($data['tanggal_akhir']);
+            // $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
             $tanggal_sekarang = date('Y-m-d H:i:s');
             $tanggal_sekarang = strtotime($tanggal_sekarang);
             // Check if the date formats are valid
-            if (!$tanggal_awal) {
+            if (!$tanggal) {
                 throw new Exception('Format tanggal awal tidak valid !');
-            }else if (!$tanggal_akhir) {
-                throw new Exception('Format tanggal akhir tidak valid !');
             }
+            // if (!$tanggal_akhir) {
+            //     throw new Exception('Format tanggal akhir tidak valid !');
+            // }
             // Compare the dates
-            if ($tanggal_awal > $tanggal_akhir) {
-                throw new Exception('Tanggal akhir tidak boleh lebih awal dari tanggal awal !');
-            }
-            if ($tanggal_awal < $tanggal_sekarang){
+            // if ($tanggal_awal > $tanggal_akhir) {
+            //     throw new Exception('Tanggal akhir tidak boleh lebih awal dari tanggal awal !');
+            // }
+            if ($tanggal < $tanggal_sekarang){
                 throw new Exception('Tanggal tidak boleh kurang dari sekarang !');
             }
             //check user
@@ -124,7 +131,7 @@ class AdvisMobile{
             $query = "INSERT INTO surat_advis (nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_advis, tempat_advis, status, id_user) VALUES ()";
             $stmt[2] = self::$con->prepare($query);
             $status = 'terkirim';
-            $stmt[2]->bind_param("sssssssssssi", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'],$data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $status, $data['id_tempat']);
+            $stmt[2]->bind_param("sssssssi", $data['nis'], $data['nama'], $data['alamat_pentas'], $data['deskripsi'], $tanggalDB, $status, $data['id_user']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();

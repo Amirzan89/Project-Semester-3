@@ -20,7 +20,7 @@
 <li class="nav-item <?php echo $nav == 'tempat' ? 'active' : ''; ?>">
   <a class="nav-link " href="/tempat.php">
     <i class="bi bi-building"></i>
-    <span>Penyewaan Tempat</span>
+    <span>Kelola Tempat</span>
   </a>
 </li>
 <?php }?>

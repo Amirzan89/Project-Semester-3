@@ -30,12 +30,6 @@ class TempatMobile{
             if (strlen($data['nik_penyewa']) > 16) {
                 throw new Exception('Nik penyewa maksimal 16 angka !');
             }
-            // if (substr($data['nik_penyewa'], 0, 2) !== '08') {
-                // throw new Exception('Nik penyewa invalid !');
-                //     echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
-            //     echo "<script>window.history.back();</script>";
-            //     exit();
-            // }
             if (!isset($data['nama_peminjam']) || empty($data['nama_peminjam'])) {
                 throw new Exception('Nama peminjam harus di isi !');
             }
@@ -215,12 +209,6 @@ class TempatMobile{
             if (strlen($data['nik_penyewa']) > 16) {
                 throw new Exception('Nik penyewa maksimal 16 angka !');
             }
-            // if (substr($data['nik_penyewa'], 0, 2) !== '08') {
-                // throw new Exception('Nik penyewa invalid !');
-                //     echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
-            //     echo "<script>window.history.back();</script>";
-            //     exit();
-            // }
             if (!isset($data['nama_peminjam']) || empty($data['nama_peminjam'])) {
                 throw new Exception('Nama peminjam harus di isi !');
             }
