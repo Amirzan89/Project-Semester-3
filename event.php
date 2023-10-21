@@ -87,6 +87,51 @@ $csrf = $GLOBALS['csrf'];
       <div class="row">
         <div class="col-lg-12">
           <div class="row">
+          <div class="col-xxl-4 col-md-4">
+              <div class="card success-card revenue-card">
+                <div class="card-body">
+                  <h5 class="card-title">Formulir</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-file-earmark-text-fill"></i>
+                    </div>
+                    <div class="ps-1">
+                      <h4>145</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xxl-4 col-md-4">
+              <div class="card success-card revenue-card">
+                <div class="card-body">
+                  <h5 class="card-title">Pengajuan</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-bell-fill"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h4>145</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xxl-4 col-md-4">
+              <div class="card success-card revenue-card">
+                <div class="card-body">
+                  <h5 class="card-title">Riwayat</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-clock-fill"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h4>145</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="col-xxl-4 col-md-4">
               <div class="card success-card revenue-card">
                 <div class="card-body">
@@ -109,7 +154,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/verif.php">Verifikasi Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/halaman/event/pengajuan_event.php">Verifikasi Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
@@ -123,7 +168,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/riwayat.php">Riwayat Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/halaman/event/riwayat_event.php">Riwayat Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>

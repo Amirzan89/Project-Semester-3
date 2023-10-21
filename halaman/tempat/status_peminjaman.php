@@ -82,7 +82,6 @@ $csrf = $GLOBALS['csrf'];
         <section class="section">
             <div class="row">
                 <div class="col-lg-12">
-
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title"></h5>
@@ -125,26 +124,6 @@ $csrf = $GLOBALS['csrf'];
                                     </tr>
                                   <?php $no++;
                                   } ?>
-                                    <!-- <tr>
-                                        <td>2</td>
-                                        <td>Brian Aksani</td>
-                                        <td>Balai Budaya</td>
-                                        <td>05 Juli 2023</td>
-                                        <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i>
-                                                lihat
-                                            </button>
-                                        </td>
-                                    </tr> -->
-                                    <!-- <tr>
-                                        <td>3</td>
-                                        <td>Raniya Aulia</td>
-                                        <td>Air Terjun Sedudo</td>
-                                        <td>01 Oktober 2023</td>
-                                        <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i>
-                                                lihat
-                                            </button>
-                                        </td>
-                                    </tr> -->
                                 </tbody>
                             </table>
                         </div>

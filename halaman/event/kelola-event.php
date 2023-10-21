@@ -3,15 +3,15 @@ require_once('../../web/koneksi.php');
 require_once('../../web/authenticate.php');
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
-$userAuth = authenticate($_POST,[
-  'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD']
-],$conn);
-if($userAuth['status'] == 'error'){
-	header('Location: /login.php');
-}else{
-	$userAuth = $userAuth['data'];
-  if($userAuth['role'] != 'super admin'){
+$userAuth = authenticate($_POST, [
+  'uri' => $_SERVER['REQUEST_URI'],
+  'method' => $_SERVER['REQUEST_METHOD']
+], $conn);
+if ($userAuth['status'] == 'error') {
+  header('Location: /login.php');
+} else {
+  $userAuth = $userAuth['data'];
+  if ($userAuth['role'] != 'super admin') {
     echo "<script>alert('Anda bukan super admin !')</script>";
     echo "<script>window.location.href = '/dashboard.php';</script>";
     exit();
@@ -21,6 +21,7 @@ $csrf = $GLOBALS['csrf'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -31,7 +32,7 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- Favicons -->
   <link href="/public/assets/img/landing-page/favicon.png" rel="icon">
-    <link href="/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -51,12 +52,12 @@ $csrf = $GLOBALS['csrf'];
 
 <body>
   <script>
-		var csrfToken = "<?php echo $csrf ?>";
+    var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
     var number = "<?php echo $userAuth['number'] ?>";
     var role = "<?php echo $userAuth['role'] ?>";
-	</script>
+  </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../../header.php');
@@ -66,9 +67,9 @@ $csrf = $GLOBALS['csrf'];
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php 
-        $nav = 'event';
-        include('../../sidebar.php');
+      <?php
+      $nav = 'event';
+      include('../../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
@@ -87,71 +88,109 @@ $csrf = $GLOBALS['csrf'];
     </div><!-- End Page Title -->
 
     <section class="section dashboard">
-            <div class="row">
+      <div class="row">
 
-            <div class="col-lg-12">
-                <div class="row">
-                <div class="col-xxl-4 col-md-4">
-                    <div class="card success-card revenue-card">
-                        <div class="card-body">
-                            <h5 class="card-title">Formulir</h5>
-
-                            <div class="d-flex align-items-center">
-                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-file-earmark-text-fill"></i>
-                                </div>
-                                <div class="ps-1">
-                                    <h4>145</h4>
-
-                                </div>
-                            </div>
-                        </div>
-
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-xxl-4 col-md-4">
+              <div class="card success-card revenue-card">
+                <div class="card-body">
+                  <h5 class="card-title">Formulir</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-file-earmark-text-fill"></i>
                     </div>
-                </div>
-
-                <div class="col-xxl-4 col-md-4">
-                    <div class="card success-card revenue-card">
-                        <div class="card-body">
-                            <h5 class="card-title">Pengajuan</h5>
-
-                            <div class="d-flex align-items-center">
-                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-bell-fill"></i>
-                                </div>
-                                <div class="ps-3">
-                                    <h4>145</h4>
-
-                                </div>
-                            </div>
-                        </div>
-
+                    <div class="ps-1">
+                      <h4>145</h4>
                     </div>
+                  </div>
                 </div>
-
-                <div class="col-xxl-4 col-md-4">
-                    <div class="card success-card revenue-card">
-                        <div class="card-body">
-                            <h5 class="card-title">Riwayat</h5>
-
-                            <div class="d-flex align-items-center">
-                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-clock-fill"></i>
-                                </div>
-                                <div class="ps-3">
-                                    <h4>145</h4>
-
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                </div>
+              </div>
             </div>
-
+            <div class="col-xxl-4 col-md-4">
+              <div class="card success-card revenue-card">
+                <div class="card-body">
+                  <h5 class="card-title">Pengajuan</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-bell-fill"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h4>145</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-        </section>
+            <div class="col-xxl-4 col-md-4">
+              <div class="card success-card revenue-card">
+                <div class="card-body">
+                  <h5 class="card-title">Riwayat</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-clock-fill"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h4>145</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xxl-4 col-md-4">
+              <div class="card success-card revenue-card">
+                <div class="card-body">
+                  <h5 class="card-title">Formulir</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-file-earmark-text-fill"></i>
+                    </div>
+                    <div class="ps-1">
+                      <h4>145</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xxl-4 col-md-4">
+              <div class="card success-card revenue-card">
+                <div class="card-body">
+                  <h5 class="card-title">Pengajuan</h5>
+
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-bell-fill"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h4>145</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xxl-4 col-md-4">
+              <div class="card success-card revenue-card">
+                <div class="card-body">
+                  <h5 class="card-title">Riwayat</h5>
+
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-clock-fill"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h4>145</h4>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
 
 
 

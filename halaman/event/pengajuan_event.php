@@ -105,14 +105,46 @@ $csrf = $GLOBALS['csrf'];
                   </tr>
                   </thead>
                   <tbody>
-                  <tr>
+                    <?php
+                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, tanggal_awal, tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses'");
+                    // SELECT s.id_sewa, s.nama_peminjam, t.nama_tempat, s.tgl_awal_peminjaman, s.status
+                    // FROM sewa_tempat s
+                    // JOIN tempat t ON s.id_tempat = t.id_tempat
+                    // WHERE s.status = 'diajukan' OR s.status = 'proses';
+                      // $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, status FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses'");
+                      $no = 1;
+                      while ($event = mysqli_fetch_array($query)) {
+                    ?>
+                      <tr>
+                          <td><?php echo $no; ?></td>
+                          <td><?php echo $event['nama_peminjam']?></td>
+                          <td><?php echo $event['nama_event']?></td>
+                          <td><?php echo $event['tgl_awal_peminjaman']?></td>
+                          <td>
+                            <?php if($event['status'] == 'diajukan'){ ?>
+                              <button type="button" class="btn btn-success">
+                                <i class="bi bi-check-circle">Diajukan</i>
+                              </button>
+                            <?php }else if($event['status'] == 'proses'){ ?>
+                            <button type="button" class="btn btn-danger">
+                              <i class="bi bi-x-circle">proses</i>
+                            </button>
+                            <?php } ?>
+                          </td>
+                          <td>
+                            <a href="/halaman/event/detail_event.php?id_event=<?= $event['id_sewa'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                          </td>
+                      </tr>
+                    <?php $no++;
+                    } ?>
+                  <!-- <tr>
                     <td>1</td>
                     <td>Puji Utami</td>
                     <td>Siraman Sedudo</td>
                     <td>1 Oktober 2023</td>
                     <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i>  lihat
                     </button>
-                    </td>
+                    </td> -->
                   </tr>
                </tbody>
               </table>

@@ -4,27 +4,27 @@ require_once('../../web/authenticate.php');
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
 $userAuth = authenticate($_POST,[
-    'uri'=>$_SERVER['REQUEST_URI'],
-    'method'=>$_SERVER['REQUEST_METHOD'
-    ]
+  'uri'=>$_SERVER['REQUEST_URI'],
+  'method'=>$_SERVER['REQUEST_METHOD'
+  ]
 ],$conn);
 if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
 }else{
 	$userAuth = $userAuth['data'];
-    if($userAuth['role'] != 'super admin'){
-        echo "<script>alert('Anda bukan super admin !')</script>";
-        echo "<script>window.location.href = '/dashboard.php';</script>";
-        exit();
-    }
+  if($userAuth['role'] != 'super admin'){
+    echo "<script>alert('Anda bukan super admin !')</script>";
+    echo "<script>window.location.href = '/dashboard.php';</script>";
+    exit();
+  }
 }
 $csrf = $GLOBALS['csrf'];
-if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
-    $id  = $_GET['id_sewa'];
-    $sql  = mysqli_query($conn, "SELECT * FROM sewa_tempat WHERE `id_sewa` = '" . $id . "'");
-    $sewa = mysqli_fetch_assoc($sql);
+if (isset($_GET['id_event']) && !empty($_GET['id_event'])) {
+  $id  = $_GET['id_event'];
+  $sql  = mysqli_query($conn, "SELECT * FROM sewa_tempat WHERE id_event = '" . $id . "'");
+  $sewa = mysqli_fetch_assoc($sql);
 }else{
-    header('Location: /halaman/tempat/status_pengajuan.php');
+    header('Location: /halaman/tempat/data_tempat.php');
 }
 ?>
 <!DOCTYPE html>
@@ -72,14 +72,14 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
     </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar">
-  <ul class="sidebar-nav" id="sidebar-nav">
+<aside id="sidebar" class="sidebar">
+    <ul class="sidebar-nav" id="sidebar-nav">
     <?php 
-    $nav = 'tempat';
-    include('../../sidebar.php');
+        $nav = 'tempat';
+        include('../../sidebar.php');
     ?>
     </ul>
-  </aside><!-- End Sidebar-->
+</aside><!-- End Sidebar-->
 
     <main id="main" class="main">
         <div class="pagetitle">
