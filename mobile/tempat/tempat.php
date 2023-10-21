@@ -10,6 +10,21 @@ class TempatMobile{
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/../../private/tempat';
     }
+    private static function loadEnv($path = null){
+        if($path == null){
+            $path = ".env";
+        }
+        if (file_exists($path)) {
+            $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+                    list($key, $value) = explode('=', $line, 2);
+                    $_ENV[trim($key)] = trim($value);
+                    $_SERVER[trim($key)] = trim($value);
+                }
+            }
+        }
+    }
     public function sewaTempat($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
@@ -76,6 +91,8 @@ class TempatMobile{
             $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
             $tanggal_sekarang = date('Y-m-d H:i:s');
             $tanggal_sekarang = strtotime($tanggal_sekarang);
+            //tambah 1 minggu
+            $tanggal_sekarang = strtotime('+1 week', $tanggal_sekarang);
             // Check if the date formats are valid
             if (!$tanggal_awal) {
                 throw new Exception('Format tanggal awal tidak valid !');
@@ -87,7 +104,7 @@ class TempatMobile{
                 throw new Exception('Tanggal akhir tidak boleh lebih awal dari tanggal awal !');
             }
             if ($tanggal_awal < $tanggal_sekarang){
-                throw new Exception('Tanggal tidak boleh kurang dari sekarang !');
+                throw new Exception('Tanggal harus kurang dari 7 hari dari sekarang !');
             }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -114,15 +131,14 @@ class TempatMobile{
                 throw new Exception('Data tempat tidak ditemukan');
             }
             $stmt[1]->close();
+            self::loadEnv();
             //get last id sewa
-            $query = "SELECT id_sewa FROM sewa_tempat ORDER BY id_sewa DESC LIMIT 1";
+            $query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '".$_SERVER['DB_DATABASE']."' AND TABLE_NAME = 'sewa_tempat' ";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->execute();
             $idSewa = 1;
             $stmt[1]->bind_result($idSewa);
-            if($stmt[1]->fetch()){
-                $idSewa += 1;
-            }
+            $stmt[1]->fetch();
             $stmt[1]->close();
             //create folder
             $bulan = date_format(new DateTime($data['tanggal_awal_sewa']), "m");
@@ -255,6 +271,8 @@ class TempatMobile{
             $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
             $tanggal_sekarang = date('Y-m-d H:i:s');
             $tanggal_sekarang = strtotime($tanggal_sekarang);
+            //tambah 1 minggu
+            $tanggal_sekarang = strtotime('+1 week', $tanggal_sekarang);
             // Check if the date formats are valid
             if (!$tanggal_awal) {
                 throw new Exception('Format tanggal awal tidak valid !');
@@ -266,7 +284,7 @@ class TempatMobile{
                 throw new Exception('Tanggal akhir tidak boleh lebih awal dari tanggal awal !');
             }
             if ($tanggal_awal < $tanggal_sekarang){
-                throw new Exception('Tanggal tidak boleh kurang dari sekarang !');
+                throw new Exception('Tanggal harus kurang dari 7 hari dari sekarang !');
             }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
