@@ -19,10 +19,10 @@ if($userAuth['status'] == 'error'){
   }
 }
 $csrf = $GLOBALS['csrf'];
-if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
-  $id  = $_GET['id_tempat'];
-  $sql  = mysqli_query($conn, "SELECT * FROM list_tempat WHERE `id_tempat` = '" . $id . "'");
-  $tempat = mysqli_fetch_assoc($sql);
+if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
+  $id  = $_GET['id_sewa'];
+  $sql  = mysqli_query($conn, "SELECT * FROM sewa_tempat WHERE `id_sewa` = '" . $id . "'");
+  $sewa = mysqli_fetch_assoc($sql);
 }else{
     header('Location: /halaman/tempat/data_tempat.php');
 }
@@ -106,19 +106,19 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Nama Tempat</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $tempat['nama_tempat']?>" readonly>
+                                        <input type="text" class="form-control" value="<?php echo $sewa['nama_tempat']?>" readonly>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Alamat Tempat</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $tempat['alamat_tempat']?>" readonly>
+                                        <input type="text" class="form-control" value="<?php echo $sewa['alamat_tempat']?>" readonly>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Deskripsi Kegiatan</label>
                                     <div class="col-sm-10">
-                                        <textarea class="form-control" style="height: 100px" readonly><?php echo $tempat['deskripsi_tempat']?></textarea>
+                                        <textarea class="form-control" style="height: 100px" readonly><?php echo $sewa['deskripsi_tempat']?></textarea>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -129,10 +129,17 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
                                 </div>
                                 <div class="row mb-3 justify-content-end">
                                     <div class="col-sm-10 text-end">
-                                        <a href="/halaman/tempat/edit_detail_tempat.php?id_tempat=<?= $id ?>" class="btn btn-info"><i class="bi bi-pencil-square">edit</i></a>
-                                            <!-- <button class="btn btn-primary">Edit</button> -->
-                                        </a>
-                                        <a href="/halaman/users/proses-hapus-user.php?id_user=<?= $tempat['id_user'] ?>" onclick="return confirm('Anda yakin ingin menghapus data <?php echo $tempat['nama_lengkap']; ?>?');" class="btn btn-danger"><i class="bi bi-trash-fill">Hapus</i></a>
+                                        <a href="/halaman/tempat/status_peminjaman.php" class="btn btn-info"><i>kembali</i></a>
+                                        <?php if($sewa['status'] == 'diajukan'){?>
+                                            <a href="/halaman/tempat/edit_detail_tempat.php?id_tempat=<?= $id ?>" class="btn btn-info"><i>Proses</i></a>
+                                        <?php }else if($sewa['status'] == 'proses'){?>
+                                            <button type="button" class="btn btn-success">
+                                                <i class="bi bi-check-circle">Setuju</i>
+                                            </button>
+                                            <button type="button" class="btn btn-danger">
+                                                <i class="bi bi-x-circle">Tolak</i>
+                                            </button>
+                                        <?php }?>
                                     </div>
                                 </div>
                             </form>

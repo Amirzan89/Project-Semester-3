@@ -45,7 +45,7 @@ $csrf = $GLOBALS['csrf'];
 
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/tempat.css" rel="stylesheet">
+  <link href="/public/assets/css/event.css" rel="stylesheet">
 
 </head>
 
@@ -67,74 +67,99 @@ $csrf = $GLOBALS['csrf'];
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php 
-      $nav = 'tempat';
-      include('../../sidebar.php');
+        $nav = 'event';
+        include('../../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
-    <main id="main" class="main">
+
+
+  <main id="main" class="main">
+
     <div class="pagetitle">
-            <h1>Data Tempat</h1>
-            <nav>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-                    <li class="breadcrumb-item active">Data Tempat</li>
-                </ol>
-            </nav>
-        </div><!-- End Page Title -->
+      <h1>Kelola Event</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="nis1.php">Kelola Event</a></li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-        <section class="section">
+    <section class="section dashboard">
             <div class="row">
-                <div class="col-lg-12">
 
-                    <div class="card">
+            <div class="col-lg-12">
+                <div class="row">
+                <div class="col-xxl-4 col-md-4">
+                    <div class="card success-card revenue-card">
                         <div class="card-body">
-                          <h4 class="card-title">Data Tempat</h4>
-                          <a href="/halaman/tempat/tambah_tempat.php">
-                            <button type="button" class="btn btn-success">
-                                <i class="bi bi-person-plus-fill"></i> Tambah Tempat
-                            </button>
-                          </a>
-                            <table class="table datatable">
-                                <thead>
-                                    <tr>
-                                        <th class="col"><strong>No.</th>
-                                        <th scope="col">Nama Tempat</th>
-                                        <th scope="col">Alamat Tempat</th>
-                                        <th scope="col">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                  <?php
-                                    $query = mysqli_query($conn, "SELECT id_tempat, nama_tempat, alamat_tempat, deskripsi_tempat FROM list_tempat ");
-                                    $no = 1;
-                                    while ($tempat = mysqli_fetch_array($query)) {
-                                  ?>
-                                      <tr>
-                                        <td><?php echo $no?></td>
-                                        <td><?php echo $tempat['nama_tempat'] ?></td>
-                                        <td><?php echo $tempat['alamat_tempat'] ?></td>
-                                        <td>
-                                          <a href="/halaman/tempat/detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
-                                        </td>
-                                      </tr>
-                                    <?php $no++;
-                                  } ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                            <h5 class="card-title">Formulir</h5>
 
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-file-earmark-text-fill"></i>
+                                </div>
+                                <div class="ps-1">
+                                    <h4>145</h4>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
+
+                <div class="col-xxl-4 col-md-4">
+                    <div class="card success-card revenue-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Pengajuan</h5>
+
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-bell-fill"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h4>145</h4>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-xxl-4 col-md-4">
+                    <div class="card success-card revenue-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Riwayat</h5>
+
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h4>145</h4>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+
             </div>
         </section>
 
-    </main><!-- End #main -->
+
+
+  </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include('../../footer.php');
+    <?php include('../footer.php');
     ?>
   </footer>
 

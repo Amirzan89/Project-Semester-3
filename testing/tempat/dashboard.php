@@ -61,7 +61,7 @@ $tPath = '';
             ?>
             </tbody>
         </table>
-        <div id="divTambahEvent" style="display:none">
+        <div id="divTambahEvent" style="display:block">
             <div class="bg" onclick="closeForm('tambah')"></div>
             <div class="content">
             <form id="" action="/mobile/tempat/tempat.php" method="POST" enctype="multipart/form-data">
@@ -116,8 +116,8 @@ $tPath = '';
                     <input type="submit" value="Kirim">
                 </form>
             </div>
-        </div>
-        <div id="divTambahEvent" style="display:block">
+        </div><br><br>
+        <div id="divEditSewa" style="display:block">
             <div class="bg" onclick="closeForm('tambah')"></div>
             <div class="content">
             <form id="" action="/mobile/tempat/tempat.php" method="POST" enctype="multipart/form-data">
@@ -175,16 +175,25 @@ $tPath = '';
                         <label>surat_keterangan</label>
                         <input type="file" name="surat_keterangan" id="inpPosterEvent">
                     </div>
-                    <input type="submit" value="Kirim">
+                    <input type="submit" value="edit">
                 </form>
             </div>
-        </div>
-        <div id="divHapusEvent" style="display:none">
+        </div><br><br>
+        <div id="divHapusEvent" style="display:block">
             <div class="bg"></div>
             <div class="content">
-                <span>apakah anda mau menghapus</span>
-                <button id="btnHapusEvent" onclick="hapusEvent()">hapus</button>
-                <button onclick="closeForm('hapus')">batal</button>
+            <form id="" action="/mobile/tempat/tempat.php" method="POST" enctype="multipart/form-data">
+                    <div class="header">
+                        <h1>hapus tempat</h1>
+                    </div>
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="id_user" value="32">
+                    <div class="row">
+                        <label>ID sewa</label>
+                        <input type="text" name="id_sewa" id="nama_tempat">
+                    </div>
+                    <input type="submit" value="hapus">
+                </form>
             </div>
         </div>
         <button onclick="showForm('tambah')"> tambah event</button>

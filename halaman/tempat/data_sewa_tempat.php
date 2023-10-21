@@ -109,14 +109,14 @@ $csrf = $GLOBALS['csrf'];
                                   <?php
                                     $query = mysqli_query($conn, "SELECT id_tempat, nama_tempat, alamat_tempat, deskripsi_tempat FROM list_tempat ");
                                     $no = 1;
-                                    while ($tempat = mysqli_fetch_array($query)) {
+                                    while ($users = mysqli_fetch_array($query)) {
                                   ?>
                                       <tr>
                                         <td><?php echo $no?></td>
-                                        <td><?php echo $tempat['nama_tempat'] ?></td>
-                                        <td><?php echo $tempat['alamat_tempat'] ?></td>
+                                        <td><?php echo $users['nama_tempat'] ?></td>
+                                        <td><?php echo $users['alamat_tempat'] ?></td>
                                         <td>
-                                          <a href="/halaman/tempat/detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                                          <a href="/halaman/tempat/detail_tempat.php?id_tempat=<?= $users['id_tempat'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
                                         </td>
                                       </tr>
                                     <?php $no++;

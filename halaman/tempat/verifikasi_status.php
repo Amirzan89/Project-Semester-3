@@ -1,34 +1,7 @@
-<?php
-require_once('../../web/koneksi.php');
-require_once('../../web/authenticate.php');
-$database = koneksi::getInstance();
-$conn = $database->getConnection();
-$userAuth = authenticate($_POST,[
-  'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD'
-  ]
-],$conn);
-if($userAuth['status'] == 'error'){
-	header('Location: /login.php');
-}else{
-	$userAuth = $userAuth['data'];
-  if($userAuth['role'] != 'super admin'){
-    echo "<script>alert('Anda bukan super admin !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
-}
-$csrf = $GLOBALS['csrf'];
-if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
-  $id  = $_GET['id_tempat'];
-  $sql  = mysqli_query($conn, "SELECT * FROM list_tempat WHERE `id_tempat` = '" . $id . "'");
-  $tempat = mysqli_fetch_assoc($sql);
-}else{
-    header('Location: /halaman/tempat/data_tempat.php');
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
+
+
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -54,7 +27,6 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
 
   <!-- Template Main CSS File -->
   <link href="/public/assets/css/tempat.css" rel="stylesheet">
-
 </head>
 
 <body>
@@ -64,78 +36,114 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
         var idUser = "<?php echo $userAuth['id_user'] ?>";
         var number = "<?php echo $userAuth['number'] ?>";
         var role = "<?php echo $userAuth['role'] ?>";
-    </script>
+	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../../header.php');
     ?>
-    </header><!-- End Header -->
+  </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
-  <ul class="sidebar-nav" id="sidebar-nav">
-    <?php 
-    $nav = 'tempat';
-    include('../../sidebar.php');
-    ?>
+    <ul class="sidebar-nav" id="sidebar-nav">
+        <?php
+        $nav = 'tempat';
+        include('../../sidebar.php');
+        ?>
     </ul>
   </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Detail Data Tempat</h1>
+            <h1>Verifikasi Status Peminjaman</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-                    <li class="breadcrumb-item"><a href="/halaman/tempat/data_tempat.php">Data tempat</a></li>
-                    <li class="breadcrumb-item active">Detail Data Tempat</li>
+                    <li class="breadcrumb-item"><a href="index.html">Beranda</a></li>
+                    <li class="breadcrumb-item"><a href="peminjaman_tempat.html">Peminjaman Tempat</a></li>
+                    <li class="breadcrumb-item"><a href="status_peminjaman.html">Status</a></li>
+                    <li class="breadcrumb-item active">Verifikasi Status Peminjaman</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
+
+
         <section class="section dashboard">
             <div class="row">
                 <div class="col-lg-12">
+
                     <div class="card">
                         <div class="card-body">
                             <div class="card-body d-flex justify-content-center align-items-center">
-                                <h5 class="card-title text-center">Data Detail Tempat</h5>
+                                <h5 class="card-title text-center">Formulir Peminjaman Tempat</h5>
                             </div>
+
                             <!-- General Form Elements -->
                             <form>
                                 <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Nama Tempat</label>
+                                    <label for="inputText" class="col-sm-2 col-form-label">Nama Lengkap</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $tempat['nama_tempat']?>" readonly>
+                                        <input type="text" class="form-control">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Alamat Tempat</label>
+                                    <label for="inputText" class="col-sm-2 col-form-label">No. KTP</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $tempat['alamat_tempat']?>" readonly>
+                                        <input type="email" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Instansi</label>
+                                    <div class="col-sm-10">
+                                        <input type="password" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Nama Kegiatan</label>
+                                    <div class="col-sm-10">
+                                        <input type="number" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputNumber" class="col-sm-2 col-form-label">Jumlah Peserta</label>
+                                    <div class="col-sm-10">
+                                        <input type="number" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Tempat</label>
+                                    <div class="col-sm-10">
+                                        <input type="number" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputDate" class="col-sm-2 col-form-label">Tanggal</label>
+                                    <div class="col-sm-3">
+                                        <input type="date" class="form-control">
+                                    </div>
+                                    <div class="col-sm-1 text-center">-</div>
+                                    <div class="col-sm-3">
+                                        <input type="date" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputNumber" class="col-sm-2 col-form-label">File Upload</label>
+                                    <div class="col-sm-10">
+                                        <input class="form-control" type="file" id="formFile">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Deskripsi Kegiatan</label>
                                     <div class="col-sm-10">
-                                        <textarea class="form-control" style="height: 100px" readonly><?php echo $tempat['deskripsi_tempat']?></textarea>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputNumber" class="col-sm-2 col-form-label">Gambar tempat</label>
-                                    <div class="col-sm-10">
-                                        <input class="form-control" type="file" id="formFile" readonly>
+                                        <textarea class="form-control" style="height: 100px"></textarea>
                                     </div>
                                 </div>
                                 <div class="row mb-3 justify-content-end">
                                     <div class="col-sm-10 text-end">
-                                        <a href="/halaman/tempat/edit_detail_tempat.php?id_tempat=<?= $id ?>" class="btn btn-info"><i class="bi bi-pencil-square">edit</i></a>
-                                            <!-- <button class="btn btn-primary">Edit</button> -->
-                                        </a>
-                                        <a href="/halaman/users/proses-hapus-user.php?id_user=<?= $tempat['id_user'] ?>" onclick="return confirm('Anda yakin ingin menghapus data <?php echo $tempat['nama_lengkap']; ?>?');" class="btn btn-danger"><i class="bi bi-trash-fill">Hapus</i></a>
+                                        <button type="submit" class="btn btn-primary">Terima</button>
+                                        <button type="button" class="btn btn-danger">Tolak</button>
                                     </div>
                                 </div>
-                            </form>
+                            </form><!-- End General Form Elements -->
                         </div>
                     </div>
                 </div>

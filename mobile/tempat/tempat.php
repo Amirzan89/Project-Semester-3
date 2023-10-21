@@ -151,10 +151,10 @@ class TempatMobile{
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
             //save data
-            $query = "INSERT INTO sewa_tempat (nik_sewa, nama_tempat, nama_peminjam, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, surat_ket_sewa, tgl_awal_peminjaman, tgl_akhir_peminjaman, status, id_tempat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO sewa_tempat (nik_sewa, nama_tempat, nama_peminjam, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, surat_ket_sewa, tgl_awal_peminjaman, tgl_akhir_peminjaman, status, id_tempat, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
-            $status = 'terkirim';
-            $stmt[2]->bind_param("sssssssssssi", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'],$data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $status, $data['id_tempat']);
+            $status = 'diajukan';
+            $stmt[2]->bind_param("sssssssssssii", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'],$data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $status, $data['id_tempat'], $data['id_user']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -293,6 +293,23 @@ class TempatMobile{
                 throw new Exception('Data tempat tidak ditemukan');
             }
             $stmt[1]->close();
+            //check id sewa
+            $query = "SELECT status FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
+            $stmt[2] = self::$con->prepare($query);
+            $stmt[2]->bind_param('s', $data['id_sewa']);
+            $stmt[2]->execute();
+            $statusDB = '';
+            $stmt[2]->bind_result($statusDB);
+            if(!$stmt[2]->fetch()){
+                $stmt[2]->close();
+                throw new Exception('Data tempat tidak ditemukan');
+            }
+            $stmt[2]->close();
+            if($statusDB == 'proses'){
+                throw new Exception('Data sedang diproses');
+            }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
+                throw new Exception('Data sudah diverifikasi');
+            }
             //proses file
             $bulan = date_format(new DateTime($data['tanggal_awal_sewa']), "m");
             $tahun = date_format(new DateTime($data['tanggal_awal_sewa']), "Y");
@@ -316,18 +333,17 @@ class TempatMobile{
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
             //update data
-            $query = "UPDATE sewa_tempat SET nik_sewa = ?, nama_tempat = ?, nama_peminjam = ?, deskripsi_sewa_tempat = ?, nama_kegiatan_sewa = ?, jumlah_peserta = ?, instansi = ?, surat_ket_sewa = ?, tgl_awal_peminjaman = ?, tgl_akhir_peminjaman = ?, status = ? WHERE id_tempat = ?";
-            $stmt[2] = self::$con->prepare($query);
-            $status = 'terkirim';
-            $stmt[2]->bind_param("sssssssssssi", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'], $data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $status, $data['id_tempat']);
-            $stmt[2]->execute();
-            if ($stmt[2]->affected_rows > 0) {
-                $stmt[2]->close();
+            $query = "UPDATE sewa_tempat SET nik_sewa = ?, nama_tempat = ?, nama_peminjam = ?, deskripsi_sewa_tempat = ?, nama_kegiatan_sewa = ?, jumlah_peserta = ?, instansi = ?, surat_ket_sewa = ?, tgl_awal_peminjaman = ?, tgl_akhir_peminjaman = ? WHERE id_sewa = ?";
+            $stmt[3] = self::$con->prepare($query);
+            $stmt[3]->bind_param("ssssssssssi", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'], $data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $data['id_sewa']);
+            $stmt[3]->execute();
+            if ($stmt[3]->affected_rows > 0) {
+                $stmt[3]->close();
                 header('Content-Type: application/json');
                 echo json_encode(['status'=>'success','message'=>'Data tempat berhasil diubah']);
                 exit();
             } else {
-                $stmt[2]->close();
+                $stmt[3]->close();
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Data tempat gagal diubah','code'=>500]));
             }
         }catch(Exception $e){
@@ -369,28 +385,34 @@ class TempatMobile{
                 throw new Exception('User tidak ditemukan');
             }
             $stmt[0]->close();
-            if(!in_array($role,['super admin','admin tempat'])){
-                throw new Exception('Anda bukan admin');
+            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+                throw new Exception('Harus masyarakat');
             }
             //check id_sewa
-            $query = "SELECT surat_ket_sewa FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
+            $query = "SELECT surat_ket_sewa,status FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
             $stmt[0]->bind_param('s', $data['id_sewa']);
             $stmt[0]->execute();
             $path = '';
-            $stmt[0]->bind_result($path);
+            $statusDB = '';
+            $stmt[0]->bind_result($path,$statusDB);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
                 throw new Exception('Data sewa tempat tidak ditemukan');
             }
             $stmt[0]->close();
+            if($statusDB == 'proses'){
+                throw new Exception('Data sedang diproses');
+            }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
+                throw new Exception('Data sudah diverifikasi');
+            }
             //delete file
             $fileSuratPath = self::$folderPath.$path;
             unlink($fileSuratPath);
             //delete data
-            $query = "DELETE FROM sewa_tempat WHERE id_tempat = ?";
+            $query = "DELETE FROM sewa_tempat WHERE id_sewa = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param('ss', $data['id_tempat']);
+            $stmt[2]->bind_param('s', $data['id_sewa']);
             if ($stmt[2]->execute()) {
                 $stmt[2]->close();
                 header('Content-Type: application/json');

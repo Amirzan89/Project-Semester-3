@@ -128,10 +128,33 @@ $userAuth = authenticate($_POST,[
         <div class="section-title">
           <h2>EVENT</h2>
         </div>
-
         <div class="row content">
           <div class="row row-cols-1 row-cols-md-3 g-3">
+          <?php
+          $currentDateTime = date('Y-m-d H:i:s');
+          $query = mysqli_query($con, "SELECT nama_event, tanggal_awal, tempat_event FROM detail_events WHERE tanggal_awal >= '$currentDateTime' ORDER BY ABS(TIMESTAMPDIFF(SECOND, '$currentDateTime', tanggal_awal)) LIMIT 3");
+          while ($events = mysqli_fetch_array($query)) {
+          // $query = mysqli_query($con, "SELECT nama_event, tanggal_awal, tempat_event FROM detail_events");
+          // while ($tempat = mysqli_fetch_array($query)) {
+          ?>
             <div class="col">
+              <div class="card">
+                <img src="/public/assets/img/LandingPage/event1.png" class="card-img-top" alt="Hollywood Sign on The Hill" />
+                <div class="card-body">
+                  <h5 class="card-title"><?php echo $events['nama_event']?></h5>
+                  <!-- <h5 class="card-title">FESTIVAL PULANG KAMPUNG</h5> -->
+                  <p class="card-text">
+                    Tanggal Pelaksanaan : <?php echo $events['tanggal_awal']?>
+                    <!-- Tanggal Pelaksanaan : 19 September 2023 -->
+                    <br>
+                    Tempat : <?php echo $events['tempat_event'] ?>
+                    <!-- Tempat : Alun - Alun Kota Nganjuk -->
+                  </p>
+                </div>
+              </div>
+            </div>
+          <?php } ?>
+            <!-- <div class="col">
               <div class="card">
                 <img src="/public/assets/img/LandingPage/event1.png" class="card-img-top" alt="Hollywood Sign on The Hill" />
                 <div class="card-body">
@@ -143,8 +166,8 @@ $userAuth = authenticate($_POST,[
                   </p>
                 </div>
               </div>
-            </div>
-            <div class="col">
+            </div> -->
+            <!-- <div class="col">
               <div class="card">
                 <img src="/public/assets/img/LandingPage/event2.png" class="card-img-top" alt="Los Angeles Skyscrapers" />
                 <div class="card-body">
@@ -156,8 +179,8 @@ $userAuth = authenticate($_POST,[
                   </p>
                 </div>
               </div>
-            </div>
-            <div class="col">
+            </div> -->
+            <!-- <div class="col">
               <div class="card">
                 <img src="/public/assets/img/LandingPage/event3.png" class="card-img-top" alt="Skyscrapers" />
                 <div class="card-body">
@@ -169,10 +192,9 @@ $userAuth = authenticate($_POST,[
                   </p>
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
           <a href="/home1.php" class="btn-learn-more">Lainnya</a>
-
         </div>
 
       </div>

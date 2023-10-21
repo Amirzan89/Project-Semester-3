@@ -50,13 +50,7 @@ $csrf = $GLOBALS['csrf'];
 </head>
 
 <body>
-  <script>
-		var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-	</script>
+
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../../header.php');
@@ -72,17 +66,18 @@ $csrf = $GLOBALS['csrf'];
       ?>
     </ul>
   </aside><!-- End Sidebar-->
+
     <main id="main" class="main">
-    <div class="pagetitle">
-            <h1>Data Tempat</h1>
+        <div class="pagetitle">
+            <h1>Status</h1>
             <nav>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-                    <li class="breadcrumb-item active">Data Tempat</li>
-                </ol>
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+                <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
+                <li class="breadcrumb-item active">Status sewa</li>
+              </ol>
             </nav>
-        </div><!-- End Page Title -->
+          </div><!-- End Page Title -->
 
         <section class="section">
             <div class="row">
@@ -90,37 +85,66 @@ $csrf = $GLOBALS['csrf'];
 
                     <div class="card">
                         <div class="card-body">
-                          <h4 class="card-title">Data Tempat</h4>
-                          <a href="/halaman/tempat/tambah_tempat.php">
-                            <button type="button" class="btn btn-success">
-                                <i class="bi bi-person-plus-fill"></i> Tambah Tempat
-                            </button>
-                          </a>
+                            <h5 class="card-title"></h5>
                             <table class="table datatable">
                                 <thead>
                                     <tr>
                                         <th class="col"><strong>No.</th>
+                                        <th scope="col">Nama Peminjam</th>
                                         <th scope="col">Nama Tempat</th>
-                                        <th scope="col">Alamat Tempat</th>
+                                        <th scope="col">Tanggal</th>
+                                        <th scope="col">Status</th>
                                         <th scope="col">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                   <?php
-                                    $query = mysqli_query($conn, "SELECT id_tempat, nama_tempat, alamat_tempat, deskripsi_tempat FROM list_tempat ");
+                                    $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, status FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses'");
                                     $no = 1;
-                                    while ($tempat = mysqli_fetch_array($query)) {
+                                    while ($sewa = mysqli_fetch_array($query)) {
                                   ?>
-                                      <tr>
-                                        <td><?php echo $no?></td>
-                                        <td><?php echo $tempat['nama_tempat'] ?></td>
-                                        <td><?php echo $tempat['alamat_tempat'] ?></td>
+                                    <tr>
+                                        <td><?php echo $no; ?></td>
+                                        <td><?php echo $sewa['nama_peminjam']?></td>
+                                        <td><?php echo $sewa['nama_tempat']?></td>
+                                        <td><?php echo $sewa['tgl_awal_peminjaman']?></td>
                                         <td>
-                                          <a href="/halaman/tempat/detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                                          <?php if($sewa['status'] == 'diajukan'){ ?>
+                                            <button type="button" class="btn btn-success">
+                                              <i class="bi bi-check-circle">Diajukan</i>
+                                            </button>
+                                          <?php }else if($sewa['status'] == 'proses'){ ?>
+                                          <button type="button" class="btn btn-danger">
+                                            <i class="bi bi-x-circle">proses</i>
+                                          </button>
+                                          <?php } ?>
                                         </td>
-                                      </tr>
-                                    <?php $no++;
+                                        <td>
+                                          <a href="/halaman/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                                        </td>
+                                    </tr>
+                                  <?php $no++;
                                   } ?>
+                                    <!-- <tr>
+                                        <td>2</td>
+                                        <td>Brian Aksani</td>
+                                        <td>Balai Budaya</td>
+                                        <td>05 Juli 2023</td>
+                                        <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i>
+                                                lihat
+                                            </button>
+                                        </td>
+                                    </tr> -->
+                                    <!-- <tr>
+                                        <td>3</td>
+                                        <td>Raniya Aulia</td>
+                                        <td>Air Terjun Sedudo</td>
+                                        <td>01 Oktober 2023</td>
+                                        <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i>
+                                                lihat
+                                            </button>
+                                        </td>
+                                    </tr> -->
                                 </tbody>
                             </table>
                         </div>

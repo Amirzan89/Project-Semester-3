@@ -233,9 +233,10 @@ class TempatWebsite{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check last id Tempat
+            //check id Tempat
             $query = "SELECT id_tempat FROM list_tempat WHERE id_tempat = ?";
             $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_tempat']);
             $stmt[1]->execute();
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
@@ -247,7 +248,7 @@ class TempatWebsite{
             //proses file
             $fileFoto = $_FILES['foto'];
             $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileFoto['name']);
+            $size = filesize($fileFoto['tmp_name']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= 4 * 1024 * 1024) {
                     echo "<script>alert('File terlalu besar')</script>";
@@ -267,6 +268,7 @@ class TempatWebsite{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
+            //update data
             $query = "UPDATE list_tempat SET nama_tempat = ?, alamat_tempat = ?, deskripsi_tempat = ?, foto_tempat = ? WHERE id_tempat = ?
             ";
             $stmt[2] = self::$con->prepare($query);
@@ -371,6 +373,7 @@ class TempatWebsite{
             exit();
         }
     }
+    //tambah sewa tempat
     public function sewaTempat($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
@@ -782,19 +785,22 @@ class TempatWebsite{
         }
     }
     //khusus admin Tempat dan super admin
-    public function prosesTempat($data){
+    public static function prosesSewaTempat($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                throw new Exception('id user harus di isi');
+                echo "<script>alert('ID User harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
-            if (!isset($data['id_Tempat']) || empty($data['id_Tempat'])) {
-                throw new Exception('id Tempat harus di isi');
+            if(!isset($data['id_sewa']) || empty($data['id_sewa'])){
+                echo "<script>alert('ID sewa harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
-            if (!isset($data['keterangan']) || empty($data['keterangan'])) {
-                throw new Exception('keterangan harus di isi');
-            }
-            if($data['keterangan'] != 'proses'){
-                throw new Exception('keterangan invalid');
+            if(!isset($data['keterangan']) || empty($data['keterangan'])){
+                echo "<script>alert('Keterangan harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -805,34 +811,57 @@ class TempatWebsite{
             $stmt[0]->bind_result($role);
             if(!$stmt[0]->fetch()){
                 $stmt[0]->close();
-                throw new Exception('user tidak ditemukan');
+                echo "<script>alert('User tidak ditemukan')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
             $stmt[0]->close();
-            if($role == 'super admin' || $role == 'admin Tempat'){
-                throw new Exception('invalid role');
+            if(($role != 'admin tempat' && $role != 'super admin') || $role == 'masyarakat'){
+                echo "<script>alert('Invalid role !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
-            //check id Tempat
-            $query = "SELECT id_Tempat FROM Tempat WHERE BINARY id_user = ? LIMIT 1";
+            //check id sewa
+            $query = "SELECT id_sewa FROM sewa_tempat WHERE id_sewa = ?";
             $stmt[1] = self::$con->prepare($query);
-            $stmt[1]->bind_param('s', $data['id_user']);
+            $stmt[1]->bind_param('s', $data['id_event']);
             $stmt[1]->execute();
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
-                throw new Exception('Data Tempat tidak ditemukan');
+                echo "<script>alert('Data sewa tempat tidak ditemukan')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
-            //update status
-            $query = "UPDATE Tempat SET status = ? WHERE id_Tempat = ?";
+            $stmt[1]->close();
+            //update data
+            $query = "UPDATE sewa_tempat SET status = ?, catatan = ?, WHERE id_sewa = ?";
             $stmt[2] = self::$con->prepare($query);
-            $status = 'proses';
-            $stmt[2]->bind_param("ss", $status, $data['id_Tempat']);
+            if($data['keterangan'] == 'proses'){
+                $status = 'proses';
+            }else if($data['keterangan'] == 'diterima'){
+                $status = 'diterima';
+            }else if($data['keterangan'] == 'ditolak'){
+                if(!isset($data['catatan']) || empty($data['catatan'])){
+                    echo "<script>alert('Catatan harus di isi !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }else{
+                    $data['catatan'] = '';
+                }
+                $status = 'ditolak';
+            }
+            $stmt[2]->bind_param("si", $status, $data['catatan'], $data['id_sewa']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
-                echo json_encode(['status'=>'success','message'=>'Tempat berhasil dubah']);
+                echo "<script>alert('Status berhasil diubah')</script>";
+                echo "<script>window.location.href = '/halaman/event/data_event.php';</script>";
                 exit();
             } else {
                 $stmt[2]->close();
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Tempat gagal diubah','code'=>500]));
+                echo "<script>alert('Status gagal diubah')</script>";
+                echo "<script>window.location.href = '/halaman/event/data_event.php';</script>";
+                exit();
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -845,107 +874,11 @@ class TempatWebsite{
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $errorJson['message'],
+                    'message' => $errorJson->message,
                 );
             }
-            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
-            echo json_encode($responseData);
-            exit();
-        }
-    }
-    public function verifikasiTempat($data){
-        try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                throw new Exception('id user harus di isi');
-            }
-            if (!isset($data['id_Tempat']) || empty($data['id_Tempat'])) {
-                throw new Exception('id Tempat harus di isi');
-            }
-            if (!isset($data['keterangan']) || empty($data['keterangan'])) {
-                throw new Exception('keterangan harus di isi');
-            }
-            if($data['keterangan'] != 'setuju'){
-                throw new Exception('keterangan invalid');
-            }else{
-                $status = 'diterima';
-            }
-            if($data['keterangan'] != 'tolak'){
-                throw new Exception('keterangan invalid');
-            }else{
-                if (!isset($data['catatan']) || empty($data['catata'])) {
-                    throw new Exception('catatan harus di isi');
-                }else{
-                    $status = 'ditolak';
-                }
-            }
-            //check user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
-            $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
-            $stmt[0]->execute();
-            $role = '';
-            $stmt[0]->bind_result($role);
-            if(!$stmt[0]->fetch()){
-                $stmt[0]->close();
-                throw new Exception('user tidak ditemukan');
-            }
-            $stmt[0]->close();
-            if($role == 'super admin' || $role == 'admin Tempat'){
-                throw new Exception('invalid role');
-            }
-            //check id Tempat
-            $query = "SELECT id_Tempat FROM Tempat WHERE BINARY id_user = ? LIMIT 1";
-            $stmt[1] = self::$con->prepare($query);
-            $stmt[1]->bind_param('s', $data['id_user']);
-            $stmt[1]->execute();
-            if(!$stmt[1]->fetch()){
-                $stmt[1]->close();
-                throw new Exception('Data Tempat tidak ditemukan');
-            }
-            //update status
-            if($status == 'diterima'){
-                $query = "UPDATE Tempat SET status = ? WHERE id_Tempat = ?";
-                $stmt[2] = self::$con->prepare($query);
-                $stmt[2]->bind_param("ss", $status, $data['id_Tempat']);
-                $stmt[2]->execute();
-                if ($stmt[2]->affected_rows > 0) {
-                    $stmt[2]->close();
-                    echo json_encode(['status'=>'success','message'=>'Tempat berhasil dubah']);
-                    exit();
-                } else {
-                    $stmt[2]->close();
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Tempat gagal diubah','code'=>500]));
-                }
-            }else if($status == 'ditolak'){
-                $query = "UPDATE Tempat SET status = ?, catatan = ? WHERE id_Tempat = ?";
-                $stmt[2] = self::$con->prepare($query);
-                $stmt[2]->bind_param("ss", $status, $data['catatan'], $data['id_Tempat']);
-                $stmt[2]->execute();
-                if ($stmt[2]->affected_rows > 0) {
-                    $stmt[2]->close();
-                    echo json_encode(['status'=>'success','message'=>'Tempat berhasil dubah']);
-                    exit();
-                } else {
-                    $stmt[2]->close();
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Tempat gagal diubah','code'=>500]));
-                }
-            }
-        }catch(Exception $e){
-            $error = $e->getMessage();
-            $errorJson = json_decode($error, true);
-            if ($errorJson === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $errorJson['message'],
-                );
-            }
-            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
-            echo json_encode($responseData);
+            echo "<script>alert('$error')</script>";
+            echo "<script>window.history.back();</script>";
             exit();
         }
     }
@@ -980,11 +913,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $tempatWeb = new TempatWebsite();
     $data = TempatWebsite::handle();
     if(isset($data['keterangan'])){
-        if($data['keterangan'] == 'proses'){
-            $tempatWeb->prosesTempat($data);
-        }else{
-            $tempatWeb->verifikasiTempat($data);
-        }
+        $tempatWeb->prosesSewaTempat($data);
     }
     if(isset($_POST['_method'])){
         if($_POST['_method'] == 'PUT'){

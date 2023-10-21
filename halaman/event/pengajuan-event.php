@@ -45,7 +45,7 @@ $csrf = $GLOBALS['csrf'];
 
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/tempat.css" rel="stylesheet">
+  <link href="/public/assets/css/event.css" rel="stylesheet">
 
 </head>
 
@@ -67,70 +67,66 @@ $csrf = $GLOBALS['csrf'];
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php 
-      $nav = 'tempat';
-      include('../../sidebar.php');
+        $nav = 'event';
+        include('../../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
-    <main id="main" class="main">
+
+  <main id="main" class="main">
+
     <div class="pagetitle">
-            <h1>Data Tempat</h1>
-            <nav>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-                    <li class="breadcrumb-item active">Data Tempat</li>
-                </ol>
-            </nav>
-        </div><!-- End Page Title -->
+      <h1>Pengajuan Event</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="nis1.php">Kelola Event</a></li>
+          <li class="breadcrumb-item active">Pengajuan Event</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
 
-        <section class="section">
-            <div class="row">
-                <div class="col-lg-12">
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
 
-                    <div class="card">
-                        <div class="card-body">
-                          <h4 class="card-title">Data Tempat</h4>
-                          <a href="/halaman/tempat/tambah_tempat.php">
-                            <button type="button" class="btn btn-success">
-                                <i class="bi bi-person-plus-fill"></i> Tambah Tempat
-                            </button>
-                          </a>
-                            <table class="table datatable">
-                                <thead>
-                                    <tr>
-                                        <th class="col"><strong>No.</th>
-                                        <th scope="col">Nama Tempat</th>
-                                        <th scope="col">Alamat Tempat</th>
-                                        <th scope="col">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                  <?php
-                                    $query = mysqli_query($conn, "SELECT id_tempat, nama_tempat, alamat_tempat, deskripsi_tempat FROM list_tempat ");
-                                    $no = 1;
-                                    while ($tempat = mysqli_fetch_array($query)) {
-                                  ?>
-                                      <tr>
-                                        <td><?php echo $no?></td>
-                                        <td><?php echo $tempat['nama_tempat'] ?></td>
-                                        <td><?php echo $tempat['alamat_tempat'] ?></td>
-                                        <td>
-                                          <a href="/halaman/tempat/detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
-                                        </td>
-                                      </tr>
-                                    <?php $no++;
-                                  } ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title"></h5>
 
-                </div>
+              <table class="table datatable">
+              <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Nama Pengirim</th>
+                    <th>Nama Event</th>
+                    <th>Tanggal Pengajuan</th>
+                    <th>Aksi</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>Puji Utami</td>
+                    <td>Siraman Sedudo</td>
+                    <td>1 Oktober 2023</td>
+                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i>  lihat
+                    </button>
+                    </td>
+                  </tr>
+               </tbody>
+              </table>
             </div>
-        </section>
+          </div>
 
-    </main><!-- End #main -->
+        </div>
+      </div>
+    </section>
+
+
+
+  </main><!-- End #main -->
+
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">

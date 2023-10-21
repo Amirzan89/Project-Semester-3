@@ -18,9 +18,9 @@ function authenticate($request,$data,$con = null){
         $tokenDecode1 = json_decode(base64_decode($token1),true);
         $email = $tokenDecode1['email'];
         $number = $tokenDecode1['number'];
-        $authPage = ['login.php','register.php','password/reset','verify/password','verify/email','auth/redirect','auth/google','/'];
+        $authPage = ['login.php','home.php' ,'home.php', 'home.php','home.php','password/reset','verify/password','verify/email','auth/redirect','auth/google','/'];
         if(in_array(ltrim($data['uri'],'/'),$authPage) && $data['method'] == "GET"){
-            $auth = ['/login.php','/register.php','/password/reset','/verify/password','/verify/email','/auth/redirect','/auth/google','/'];
+            $auth = ['/login.php','/register.php','/home.php','/password/reset','/verify/password','/verify/email','/auth/redirect','/auth/google','/'];
             if (in_array(ltrim($path,'/'), $authPage)) {
                 header('Location: /dashboard.php');
             } else {

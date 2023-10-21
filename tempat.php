@@ -78,7 +78,7 @@ $csrf = $GLOBALS['csrf'];
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item active">Nomor Induk Seniman</li>
+          <li class="breadcrumb-item active">Kelola Tempat</li>
         </ol>
       </nav>
     </div>
@@ -176,7 +176,8 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/verif.php">Verifikasi Pengajuan</a></h5>
+                      <!-- <h5 class="card-title"><a href="/halaman/nis/verif.php">Verifikasi Pengajuan</a></h5> -->
+                      <h5 class="card-title"><a href="/halaman/tempat/status_peminjaman.php">Verifikasi Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
@@ -190,13 +191,13 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/riwayat.php">Riwayat Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/halaman/tempat/riwayat_tempat.php">Riwayat Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-xxl-4 col-md-4">
+            <!-- <div class="col-xxl-4 col-md-4">
               <div class="card success-card revenue-card">
                 <div class="card-body">
                   <div class="d-flex align-items-center">
@@ -209,7 +210,7 @@ $csrf = $GLOBALS['csrf'];
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
