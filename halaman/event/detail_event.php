@@ -5,8 +5,7 @@ $database = koneksi::getInstance();
 $conn = $database->getConnection();
 $userAuth = authenticate($_POST,[
   'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD'
-  ]
+  'method'=>$_SERVER['REQUEST_METHOD']
 ],$conn);
 if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
@@ -19,13 +18,6 @@ if($userAuth['status'] == 'error'){
   }
 }
 $csrf = $GLOBALS['csrf'];
-if (isset($_GET['id_event']) && !empty($_GET['id_event'])) {
-  $id  = $_GET['id_event'];
-  $sql  = mysqli_query($conn, "SELECT * FROM sewa_tempat WHERE id_event = '" . $id . "'");
-  $sewa = mysqli_fetch_assoc($sql);
-}else{
-    header('Location: /halaman/tempat/data_tempat.php');
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,103 +45,101 @@ if (isset($_GET['id_event']) && !empty($_GET['id_event'])) {
 
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/tempat.css" rel="stylesheet">
+  <link href="/public/assets/css/event.css" rel="stylesheet">
 
 </head>
 
 <body>
-    <script>
+  <script>
 		var csrfToken = "<?php echo $csrf ?>";
-        var email = "<?php echo $userAuth['email'] ?>";
-        var idUser = "<?php echo $userAuth['id_user'] ?>";
-        var number = "<?php echo $userAuth['number'] ?>";
-        var role = "<?php echo $userAuth['role'] ?>";
-    </script>
+    var email = "<?php echo $userAuth['email'] ?>";
+    var idUser = "<?php echo $userAuth['id_user'] ?>";
+    var number = "<?php echo $userAuth['number'] ?>";
+    var role = "<?php echo $userAuth['role'] ?>";
+	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../../header.php');
     ?>
-    </header><!-- End Header -->
+  </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
-<aside id="sidebar" class="sidebar">
+  <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-    <?php 
-        $nav = 'tempat';
-        include('../../sidebar.php');
-    ?>
+      <?php
+      $nav = 'event'; 
+      include('../../sidebar.php');
+      ?>
     </ul>
-</aside><!-- End Sidebar-->
+  </aside><!-- End Sidebar-->
 
-    <main id="main" class="main">
-        <div class="pagetitle">
-            <h1>Detail Data Tempat</h1>
-            <nav>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-                    <li class="breadcrumb-item"><a href="/halaman/tempat/data_tempat.php">Data tempat</a></li>
-                    <li class="breadcrumb-item active">Detail Data Tempat</li>
-                </ol>
-            </nav>
-        </div><!-- End Page Title -->
-        <section class="section dashboard">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="card-body d-flex justify-content-center align-items-center">
-                                <h5 class="card-title text-center">Data Detail Tempat</h5>
-                            </div>
-                            <!-- General Form Elements -->
-                            <form>
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Nama Tempat</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $sewa['nama_tempat']?>" readonly>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Alamat Tempat</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $sewa['alamat_tempat']?>" readonly>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Deskripsi Kegiatan</label>
-                                    <div class="col-sm-10">
-                                        <textarea class="form-control" style="height: 100px" readonly><?php echo $sewa['deskripsi_tempat']?></textarea>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputNumber" class="col-sm-2 col-form-label">Gambar tempat</label>
-                                    <div class="col-sm-10">
-                                        <input class="form-control" type="file" id="formFile" readonly>
-                                    </div>
-                                </div>
-                                <div class="row mb-3 justify-content-end">
-                                    <div class="col-sm-10 text-end">
-                                        <a href="/halaman/tempat/status_peminjaman.php" class="btn btn-info"><i>kembali</i></a>
-                                        <?php if($sewa['status'] == 'diajukan'){?>
-                                            <a href="/halaman/tempat/edit_detail_tempat.php?id_tempat=<?= $id ?>" class="btn btn-info"><i>Proses</i></a>
-                                        <?php }else if($sewa['status'] == 'proses'){?>
-                                            <button type="button" class="btn btn-success">
-                                                <i class="bi bi-check-circle">Setuju</i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger">
-                                                <i class="bi bi-x-circle">Tolak</i>
-                                            </button>
-                                        <?php }?>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Formulir Pengajuan</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="nis1.php">Kelola Event</a></li>
+          <li class="breadcrumb-item active">Formulir Pengajuan</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">FORMULIR UPLOAD EVENT</h5>
+
+              <form class="row g-3">
+                <div class="col-md-12">
+                  <label for="inputText" class="form-label">Nama Pengirim :</label>
+                  <input type="text" class="form-control" id="inputText">
                 </div>
-            </div>
-        </section>
+                <div class="col-md-12">
+                  <label for="inputText" class="form-label">Nama Event : </label>
+                  <input type="text" class="form-control" id="inputText">
+                </div>
+                <div class="col-md-4">
+                    <label for="inputDate" class="form-label">Tanggal :</label>
+                    <input type="date" class="form-control" id="inputDate">
+                  </div>
+                <div class="col-md-8">
+                  <label for="inputText" class="form-label">Tempat :</label>
+                  <input type="text" class="form-control" id="inputText">
+                </div>
+                <div class="col-12">
+                  <label for="inputText" class="form-label">Deskripsi Event :</label>
+                  <textarea class="form-control" id="inputTextarea" style="height: 100px;"></textarea>
+                </div>
+                <div class="col-12">
+                  <label for="inputLink" class="form-label">Link Pendaftaran :</label>
+                  <input type="link" class="form-control" id="inputLink">
+                </div>
+                <div class="col-12">
+                  <label for="inputFile" class="form-label">Poster Event :</label>
+                  <input type="file" class="form-file-input form-control" id="inputFile">
+                </div>
+                <div class="text-center">
+                  <button type="kirim" class="btn btn-warning">Kirim</button>
+                </div>
+              </form>
+              
+              <!-- End General Form Elements -->
 
-    </main><!-- End #main -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <?php include('../../footer.php');

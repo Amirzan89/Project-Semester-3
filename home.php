@@ -130,25 +130,19 @@ $userAuth = authenticate($_POST,[
         </div>
         <div class="row content">
           <div class="row row-cols-1 row-cols-md-3 g-3">
-          <?php
-          $currentDateTime = date('Y-m-d H:i:s');
-          $query = mysqli_query($con, "SELECT nama_event, tanggal_awal, tempat_event FROM detail_events WHERE tanggal_awal >= '$currentDateTime' ORDER BY ABS(TIMESTAMPDIFF(SECOND, '$currentDateTime', tanggal_awal)) LIMIT 3");
-          while ($events = mysqli_fetch_array($query)) {
-          // $query = mysqli_query($con, "SELECT nama_event, tanggal_awal, tempat_event FROM detail_events");
-          // while ($tempat = mysqli_fetch_array($query)) {
+          <?php 
+            $query = mysqli_query($con, "SELECT events.id_detail, nama_event, deskripsi, tempat_event, DATE_FORMAT(tanggal_awal, '%d %M %Y')AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, poster_event FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' ORDER BY ABS(TIMESTAMPDIFF(SECOND, NOW(), tanggal_awal)) ASC LIMIT 3");
+            while ($events = mysqli_fetch_array($query)) {
           ?>
             <div class="col">
               <div class="card">
-                <img src="/public/assets/img/LandingPage/event1.png" class="card-img-top" alt="Hollywood Sign on The Hill" />
+              <img src="/public/img/event<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" />
                 <div class="card-body">
                   <h5 class="card-title"><?php echo $events['nama_event']?></h5>
-                  <!-- <h5 class="card-title">FESTIVAL PULANG KAMPUNG</h5> -->
                   <p class="card-text">
                     Tanggal Pelaksanaan : <?php echo $events['tanggal_awal']?>
-                    <!-- Tanggal Pelaksanaan : 19 September 2023 -->
                     <br>
                     Tempat : <?php echo $events['tempat_event'] ?>
-                    <!-- Tempat : Alun - Alun Kota Nganjuk -->
                   </p>
                 </div>
               </div>

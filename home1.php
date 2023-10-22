@@ -1,6 +1,11 @@
+<?php 
+require_once('web/koneksi.php');
+require_once('web/authenticate.php');
+$database = koneksi::getInstance();
+$con = $database->getConnection();
+?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -63,7 +68,33 @@
 
                 <div class="row content">
                     <div class="row row-cols-1 row-cols-md-3 g-3">
+                        <?php 
+                            $query = mysqli_query($con, "SELECT events.id_detail, nama_event, deskripsi, tempat_event, DATE_FORMAT(tanggal_awal, '%d %M %Y')AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, poster_event FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' ORDER BY ABS(TIMESTAMPDIFF(SECOND, NOW(), tanggal_awal)) ASC");
+                            while ($events = mysqli_fetch_array($query)) {
+                        ?>
                         <div class="col">
+                            <div class="card">
+                                <img src="/public/img/event<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" />
+                                <div class="card-body">
+                                    <h5 class="card-title"><?php echo $events['nama_event']?></h5>
+                                    <p class="card-text">
+                                        Tanggal Pelaksanaan : <?php echo $events['tanggal_awal'] ?> 
+                                        <br><br>
+                                        Tempat : <?php echo $events['tempat_event']?>
+                                        <br><br>
+                                        <?php echo $events['deskripsi']?>
+                                        <!-- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi aliquet elementum
+                                        volutpat. Aliquam ultricies justo nulla, et feugiat ipsum sagittis ac. Nunc in
+                                        ante et odio pharetra dictum. Nunc et sapien a ante pretium molestie aliquet at
+                                        ex. Pellentesque venenatis gravida ipsum a molestie. Vestibulum ante ipsum
+                                        primis in faucibus orci luctus et ultrices posuere cubilia curae; -->
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <?php } ?>
+                    </div>
+                        <!-- <div class="col">
                             <div class="card">
                                 <img src="/public/assets/img/LandingPage/event1.png" class="card-img-top"
                                     alt="Hollywood Sign on The Hill" />
@@ -82,8 +113,8 @@
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col">
+                        </div> -->
+                        <!-- <div class="col">
                             <div class="card">
                                 <img src="/public/assets/img/LandingPage/event2.png" class="card-img-top"
                                     alt="Los Angeles Skyscrapers" />
@@ -102,8 +133,8 @@
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col">
+                        </div> -->
+                        <!-- <div class="col">
                             <div class="card">
                                 <img src="/public/assets/img/LandingPage/event3.png" class="card-img-top" alt="Skyscrapers" />
                                 <div class="card-body">
@@ -121,10 +152,8 @@
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="row row-cols-1 row-cols-md-3 g-3">
-                        <div class="col">
+                        </div> -->
+                        <!-- <div class="col">
                             <div class="card">
                                 <img src="/public/assets/img/LandingPage/event3.png" class="card-img-top" alt="Skyscrapers" />
                                 <div class="card-body">
@@ -142,8 +171,8 @@
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col">
+                        </div> -->
+                        <!-- <div class="col">
                             <div class="card">
                                 <img src="/public/assets/img/LandingPage/event1.png" class="card-img-top"
                                     alt="Hollywood Sign on The Hill" />
@@ -162,8 +191,8 @@
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col">
+                        </div> -->
+                        <!-- <div class="col">
                             <div class="card">
                                 <img src="/public/assets/img/LandingPage/event2.png" class="card-img-top"
                                     alt="Los Angeles Skyscrapers" />
@@ -182,9 +211,7 @@
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
+                        </div> -->
                 </div>
         </section>
 
