@@ -44,12 +44,12 @@
       <h1 class="logo me-auto"><a href="index.html">DISPORABUDPAR</a></h1>
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="home.html">Beranda</a></li>
-          <li><a class="nav-link scrollto" href="#event">Event</a></li>
-          <li><a class="nav-link scrollto" href="home.html">Informasi</a></li>
-          <li><a class="nav-link scrollto" href="home.html">Layanan</a></li>
-          <li><a class="nav-link   scrollto" href="home.html">Profil</a></li>
-          <li><a class="getstarted scrollto" href="">Masuk</a></li>
+          <li><a class="nav-link scrollto active" href="/home.php#hero">Beranda</a></li>
+          <li><a class="nav-link scrollto" href="/home.php#event">Event</a></li>
+          <li><a class="nav-link scrollto" href="/home.php#about">Informasi</a></li>
+          <li><a class="nav-link scrollto" href="/home.php#layanan">Layanan</a></li>
+          <li><a class="nav-link   scrollto" href="/home.php#profil">Profil</a></li>
+          <li><a class="getstarted scrollto" href="/login.php">Masuk</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav>

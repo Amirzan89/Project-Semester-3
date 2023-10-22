@@ -301,13 +301,10 @@ $userAuth = authenticate($_POST,[
     <!-- ======= Profil Section ======= -->
     <section id="profil" class="contact">
       <div class="container" data-aos="fade-up">
-
         <div class="section-title">
           <h2>LOKASI KANTOR DINAS</h2>
         </div>
-
         <div class="row">
-
           <div class="col-lg-12 d-flex align-items-stretch">
             <div class="info">
               <div class="address">
@@ -315,19 +312,13 @@ $userAuth = authenticate($_POST,[
                 <h4>Alamat</h4>
                 <p>Mangundikaran, Mangun Dikaran, Kec. Nganjuk, Kabupaten Nganjuk, Jawa Timur 64419</p>
               </div>
-              <iframe
-                src="https://www.google.com/maps/place/Gedung+Balai+Budaya+Mpu+Sendok/@-7.6010418,111.9027164,17.27z/data=!4m6!3m5!1s0x2e784ba9d9447a99:0x1e4f0169e2940678!8m2!3d-7.601066!4d111.9048658!16s%2Fg%2F11c0w2dh7n?entry=tts"
-                frameborder="0" style="border:0; width: 100%; height: 290px;" allowfullscreen></iframe>
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3950.270853382954!2d111.9027164!3d-7.601066!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e784ba9d9447a99:0x1e4f0169e2940678!2sGedung+Balai+Budaya+Mpu+Sendok!5e0!3m2!1sen!2sid!4v1666513915249" frameborder="0" style="border:0; width: 100%; height: 290px;" allowfullscreen></iframe>
             </div>
-
           </div>
-
         </div>
-
       </div>
     </section><!-- End Profil Section -->
   </main><!-- End #main -->
-
   <!-- ======= Footer ======= -->
   <footer id="footer">
     <div class="footer-top">
@@ -340,8 +331,6 @@ $userAuth = authenticate($_POST,[
               Kabupaten Nganjuk <br>
               Jawa Timur<br>
               64419 <br><br>
-              
-              
             </p>
           </div>
 
