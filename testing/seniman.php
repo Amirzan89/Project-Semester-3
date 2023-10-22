@@ -46,7 +46,7 @@ $tPath = '';
         <div id="divTambahSeniman" style="display:block">
             <div class="bg" onclick="closeForm('tambah')"></div>
             <div class="content">
-                <form id="" action="mobile/seniman/seniman.php" method="POST" enctype="multipart/form-data">
+                <form id="" action="/mobile/seniman/seniman.php" method="POST" enctype="multipart/form-data">
                     <div class="header">
                         <h1>registrasi seniman</h1>
                     </div>
@@ -66,7 +66,7 @@ $tPath = '';
                         <input type="text" name="no_telpon" id="nama_seniman">
                     </div>
                     <div class="row">
-                        <label>Alamat event</label>
+                        <label>Alamat seniman</label>
                         <textarea name="alamat" id="alamat"></textarea>
                     </div>
                     <div class="row">
@@ -111,13 +111,12 @@ $tPath = '';
         <div id="divEditSeniman" style="display:block">
             <div class="bg" onclick="closeForm('tambah')"></div>
             <div class="content">
-                <form id="" action="mobile/seniman/seniman.php" method="PUT" enctype="multipart/form-data">
+                <form id="" action="/mobile/seniman/seniman.php" method="POST" enctype="multipart/form-data">
                     <div class="header">
                         <h1>edit seniman</h1>
                     </div>
-                    <div>
+                    <input type="hidden" name="_method" value="PUT">
                         <input type="hidden" name="id_user" value="32">
-                    </div>
                     <div class="row">
                         <label>id seniman</label>
                         <input type="text" name="id_seniman" id="id_seniman">
@@ -135,7 +134,7 @@ $tPath = '';
                         <input type="text" name="no_telpon" id="nama_seniman">
                     </div>
                     <div class="row">
-                        <label>Alamat event</label>
+                        <label>Alamat seniman</label>
                         <textarea name="alamat" id="alamat"></textarea>
                     </div>
                     <div class="row">
@@ -177,14 +176,23 @@ $tPath = '';
                 </form>
             </div>
         </div>
-        <!-- <div id="divHapusEvent" style="display:none">
+        <div id="divHapusEvent" style="display:block">
             <div class="bg"></div>
             <div class="content">
-                <span>apakah anda mau menghapus</span>
-                <button id="btnHapusEvent" onclick="hapusEvent()">hapus</button>
-                <button onclick="closeForm('hapus')">batal</button>
+            <form id="" action="/mobile/seniman/seniman.php" method="POST" enctype="multipart/form-data">
+                    <div class="header">
+                        <h1>hapus seniman</h1>
+                    </div>
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="id_user" value="32">
+                    <div class="row">
+                        <label>ID seniman</label>
+                        <input type="text" name="id_seniman" id="id_seniman">
+                    </div>
+                    <input type="submit" value="hapus">
+                </form>
             </div>
-        </div> -->
+        </div>
         <button onclick="showForm('tambah')"> tambah event</button>
         <table class="tableEvent" id="tableEvent"> 
             <thead>

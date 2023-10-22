@@ -66,9 +66,15 @@ class SenimanMobile{
             if ($_FILES['surat_keterangan']['error'] !== UPLOAD_ERR_OK) {
                 throw new Exception('gagal upload pdf file');
             }
-            $tanggal_lahir = date('Y-m-d H:i:s',strtotime($data['tanggal_lahir']));
+            $tanggal_lahir = strtotime($data['tanggal_lahir']);
             if (!$tanggal_lahir) {
                 throw new Exception('Format tanggal lahir tidak valid');
+            }
+            date_default_timezone_set('Asia/Jakarta');
+            $tanggal_sekarang = date('Y-m-d');
+            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            if ($tanggal_lahir > $tanggal_sekarang){
+                throw new Exception('Tanggal tidak boleh lebih kurang dari sekarang !');
             }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -86,14 +92,12 @@ class SenimanMobile{
                 throw new Exception('invalid role');
             }
             //get last id seniman
-            $query = "SELECT id_seniman FROM seniman ORDER BY id_seniman DESC LIMIT 1";
+            $query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '".$_SERVER['DB_DATABASE']."' AND TABLE_NAME = 'seniman' ";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->execute();
             $idSeniman = 1;
             $stmt[1]->bind_result($idSeniman);
-            if($stmt[1]->fetch()){
-                $idSeniman += 1;
-            }
+            $stmt[1]->fetch();
             $stmt[1]->close();
             $folderKtp = '/ktp';
             $folderPassFoto = '/pass_foto';
@@ -169,7 +173,7 @@ class SenimanMobile{
             }
             $query = "INSERT INTO seniman (nomor_induk, nik, nama_seniman,jenis_kelamin, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi,jumlah_anggota,ktp_seniman,pass_foto, surat_keterangan, tgl_pembuatan,tgl_berlaku,status, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
-            $status = 'terkirim';
+            $status = 'diajukan';
             $data['kategori_event'] = strtoupper($data['kategori_event' ]);
             $nomerInduk = rand(1,9999);
             $now = date('Y-m-d');
@@ -177,14 +181,14 @@ class SenimanMobile{
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
-                echo json_encode(['status'=>'success','message'=>'event berhasil ditambahkan']);
+                echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil ditambahkan']);
                 exit();
             } else {
                 $stmt[2]->close();
                 unlink($fileKtpPath);
                 unlink($fileFotoPath);
                 unlink($fileSuratPath);
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'event gagal ditambahkan','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal ditambahkan','code'=>500]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -260,20 +264,33 @@ class SenimanMobile{
             if ($_FILES['surat_keterangan']['error'] !== UPLOAD_ERR_OK) {
                 throw new Exception('gagal upload pdf file');
             }
-            $tanggal_lahir = date('Y-m-d H:i:s',strtotime($data['tanggal_lahir']));
+            $tanggal_lahir = strtotime($data['tanggal_lahir']);
             if (!$tanggal_lahir) {
                 throw new Exception('Format tanggal lahir tidak valid');
             }
+            date_default_timezone_set('Asia/Jakarta');
+            $tanggal_sekarang = date('Y-m-d');
+            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            if ($tanggal_lahir > $tanggal_sekarang){
+                throw new Exception('Tanggal tidak boleh lebih kurang dari sekarang !');
+            }
             //check id seniman
-            $query = "SELECT id_seniman FROM seniman WHERE BINARY id_user = ? LIMIT 1";
+            $query = "SELECT status FROM seniman WHERE BINARY id_seniman = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['id_seniman']);
             $stmt[0]->execute();
+            $statusDB = '';
+            $stmt[0]->bind_result($statusDB);
             if(!$stmt[0]->fetch()){
                 $stmt[0]->close();
                 throw new Exception('Data seniman tidak ditemukan');
             }
             $stmt[0]->close();
+            if($statusDB == 'proses'){
+                throw new Exception('Data sedang diproses');
+            }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
+                throw new Exception('Data sudah diverifikasi');
+            }
             $folderKtp = '/ktp';
             $folderPassFoto = '/pass_foto';
             $folderSurat = '/surat_keterangan';
@@ -291,7 +308,6 @@ class SenimanMobile{
             //simpan file
             $nameFile = '/'.$data['id_seniman'].'.'.$extension;  
             $fileKtpPath = self::$folderPath.$folderKtp.$nameFile;
-            $fileKtpDB = $folderKtp.$nameFile;
             if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
@@ -310,7 +326,6 @@ class SenimanMobile{
             //simpan file
             $nameFile = '/'.$data['id_seniman'].'.'.$extension;
             $fileFotoPath = self::$folderPath.$folderPassFoto.$nameFile;
-            $fileFotoDB = $folderPassFoto.$nameFile;
             if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
                 unlink($fileKtpPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
@@ -330,25 +345,23 @@ class SenimanMobile{
             //simpan file
             $nameFile = '/'.$data['id_seniman'].'.'.$extension;
             $fileSuratPath = self::$folderPath.$folderSurat.$nameFile;
-            $fileSuratDB = $folderSurat.$nameFile;
             if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
                 unlink($fileKtpPath);
                 unlink($fileFotoPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
-            $query = "UPDATE seniman SET nama_seniman = ?, jenis_kelamin = ?, tempat_lahir = ?, tanggal_lahir = ?, alamat_seniman = ?, no_telpon = ?, nama_organisasi = ?, jumlah_anggota = ?, ktp_seniman = ?, pass_foto = ?, surat_keterangan = ?, tgl_pembuatan = ?, tgl_berlaku = ?, status = ? WHERE id_user = ? AND id_seniman = ?";
+            $query = "UPDATE seniman SET nik = ?, nama_seniman = ?, jenis_kelamin = ?, tempat_lahir = ?, tanggal_lahir = ?, alamat_seniman = ?, no_telpon = ?, nama_organisasi = ?, jumlah_anggota = ?, tgl_pembuatan = ?, tgl_berlaku = ? WHERE id_seniman = ?";
             $stmt[1] = self::$con->prepare($query);
-            $status = 'terkirim';
             $now = date('Y-m-d');
-            $stmt[1]->bind_param("ssssssssssssssss", $data['nama_seniman'], $data['jenis_kelamin_seniman'],$data['tempat_lahir'],$data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$fileKtpDB,$fileFotoDB, $fileSuratDB,$now,$now, $status, $data['id_user'],$data['id_seniman']);
+            $stmt[1]->bind_param("ssssssssssss", $data['nik_seniman'], $data['nama_seniman'], $data['jenis_kelamin_seniman'],$data['tempat_lahir'],$data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$now,$now,$data['id_seniman']);
             $stmt[1]->execute();
             if ($stmt[1]->affected_rows > 0) {
                 $stmt[1]->close();
-                echo json_encode(['status'=>'success','message'=>'seniman berhasil dubah']);
+                echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil dubah']);
                 exit();
             } else {
                 $stmt[1]->close();
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'seniman gagal diubah','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal diubah','code'=>500]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -389,23 +402,29 @@ class SenimanMobile{
                 throw new Exception('User tidak ditemukan');
             }
             $stmt[0]->close();
-            if(!in_array($role,['super admin','admin seniman'])){
-                throw new Exception('Anda bukan admin');
+            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+                throw new Exception('Harus masyarakat');
             }
             //check id_seniman
-            $query = "SELECT ktp_seniman, pass_foto, surat_keterangan FROM seniman WHERE id_seniman = ? LIMIT 1";
+            $query = "SELECT status, ktp_seniman, pass_foto, surat_keterangan FROM seniman WHERE id_seniman = ? LIMIT 1";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_seniman']);
             $stmt[1]->execute();
+            $statusDB = '';
             $pathKTP = '';
             $pathFoto = '';
             $pathSurat = '';
-            $stmt[1]->bind_result($pathKTP, $pathFoto,$pathSurat);
+            $stmt[1]->bind_result($statusDB, $pathKTP, $pathFoto,$pathSurat);
             if (!$stmt[1]->fetch()) {
                 $stmt[1]->close();
                 throw new Exception('Data seniman tidak ditemukan');
             }
             $stmt[1]->close();
+            if($statusDB == 'proses'){
+                throw new Exception('Data sedang diproses');
+            }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
+                throw new Exception('Data sudah diverifikasi');
+            }
             //delete file
             $fileKtpPath = self::$folderPath.$pathKTP;
             $fileFotoPath = self::$folderPath.$pathFoto;
@@ -416,15 +435,15 @@ class SenimanMobile{
             //delete data
             $query = "DELETE FROM seniman WHERE id_seniman = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param('ss', $data['id_seniman']);
+            $stmt[2]->bind_param('s', $data['id_seniman']);
             if ($stmt[2]->execute()) {
                 $stmt[2]->close();
                 header('Content-Type: application/json');
-                echo json_encode(['status'=>'success','message'=>'Data tempat berhasil dihapus']);
+                echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil dihapus']);
                 exit();
             } else {
                 $stmt[2]->close();
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data tempat gagal dihapus','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal dihapus','code'=>500]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -470,19 +489,32 @@ class SenimanMobile{
         }
     }
 }
-if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    echo 'ilang';
-}
+// if($_SERVER['REQUEST_METHOD'] == 'GET'){
+//     echo 'ilang';
+// }
+// if($_SERVER['REQUEST_METHOD'] == 'POST'){
+//     $SenimanMobile = new SenimanMobile();
+//     $SenimanMobile->regisrasiSeniman(SenimanMobile::handle());
+// }
+// if($_SERVER['REQUEST_METHOD'] == 'PUT'){
+//     $SenimanMobile = new SenimanMobile();
+//     $SenimanMobile->editSeniman(SenimanMobile::handle());
+// }
+// if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+//     $SenimanMobile = new SenimanMobile();
+//     $SenimanMobile->hapusSeniman(SenimanMobile::handle());
+// }
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $SenimanMobile = new SenimanMobile();
-    $SenimanMobile->regisrasiSeniman(SenimanMobile::handle());
-}
-if($_SERVER['REQUEST_METHOD'] == 'PUT'){
-    $SenimanMobile = new SenimanMobile();
-    $SenimanMobile->editSeniman(SenimanMobile::handle());
-}
-if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-    $SenimanMobile = new SenimanMobile();
-    $SenimanMobile->hapusSeniman(SenimanMobile::handle());
+    $data = SenimanMobile::handle();
+    if(isset($_POST['_method'])){
+        if($_POST['_method'] == 'PUT'){
+            $SenimanMobile->editSeniman($data);
+        }else if($_POST['_method'] == 'DELETE'){
+            $SenimanMobile->hapusSeniman($data);
+        }
+    }else{
+        $SenimanMobile->regisrasiSeniman($data);
+    }
 }
 ?>
