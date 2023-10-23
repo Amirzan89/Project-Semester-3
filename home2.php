@@ -57,7 +57,7 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
   <!-- ======= Header ======= -->
   <header id="header" class="fixed-top ">
     <div class="container d-flex align-items-center">
-      <h1 class="logo me-auto"><a href="index.html">DISPORABUDPAR</a></h1>
+    <h1 class="logo me-auto"><a href="/home.php">DISPORABUDPAR</a></h1>
       <nav id="navbar" class="navbar">
         <ul>
           <li><a class="nav-link scrollto active" href="/home.php#hero">Beranda</a></li>
