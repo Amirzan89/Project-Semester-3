@@ -5,18 +5,17 @@ $database = koneksi::getInstance();
 $conn = $database->getConnection();
 $userAuth = authenticate($_POST,[
   'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD'
-  ]
+  'method'=>$_SERVER['REQUEST_METHOD']
 ],$conn);
 if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
 }else{
 	$userAuth = $userAuth['data'];
-  if($userAuth['role'] != 'super admin'){
-    echo "<script>alert('Anda bukan super admin !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
+  // if($userAuth['role'] != 'super admin'){
+  //   echo "<script>alert('Anda bukan super admin !')</script>";
+  //   echo "<script>window.location.href = '/dashboard.php';</script>";
+  //   exit();
+  // }
 }
 $csrf = $GLOBALS['csrf'];
 ?>
@@ -31,29 +30,29 @@ $csrf = $GLOBALS['csrf'];
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/assets/img/landing-page/favicon.png" rel="icon">
-    <link href="/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="/public/assets/img/favicon.png" rel="icon">
+  <link href="/public/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
   <link
     href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
     rel="stylesheet">
   <!-- Vendor CSS Files -->
+  <!-- <link href="/public/assets/vendor/bootstrap/css/bootstrap.css" rel="stylesheet"> -->
+
   <link href="/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/tempat.css" rel="stylesheet">
+  <link href="/public/assets/css/nomor-induk.css" rel="stylesheet">
+
 </head>
 
 <body>
-  <script>
-		var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-    </script>
+
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../../header.php');
@@ -64,8 +63,8 @@ $csrf = $GLOBALS['csrf'];
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php 
-        $nav = 'tempat';
-        include('../../sidebar.php');
+      $nav = 'seniman';
+      include('../../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
@@ -73,13 +72,13 @@ $csrf = $GLOBALS['csrf'];
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Riwayat Pengajuan</h1>
+      <h1>Riwayat Nomer Induk Seniman</h1>
       <nav>
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-        <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-        <li class="breadcrumb-item active">Riwayat sewa tempat</li>
-      </ol>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
+          <li class="breadcrumb-item active">Riwayat Nomer Induk Seniman</li>
+        </ol>
       </nav>
     </div><!-- End Page Title -->
 
@@ -95,8 +94,7 @@ $csrf = $GLOBALS['csrf'];
                 <thead>
                   <tr>
                     <th scope="col">No</th>
-                    <th scope="col">Nama Peminjam</th>
-                    <th scope="col">Nama Tempat</th>
+                    <th scope="col">Nama Seniman</th>
                     <th scope="col">Tanggal Pengajuan</th>
                     <th scope="col">Status</th>
                     <th scope="col">Keterangan</th>
@@ -104,46 +102,50 @@ $csrf = $GLOBALS['csrf'];
                   </tr>
                 </thead>
                 <tbody>
-                <?php
-                    $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, tgl_akhir_peminjaman, status, catatan FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_sewa DESC");
-                    $no = 1;
-                    while ($sewa = mysqli_fetch_array($query)) {
-                    ?>
-                  <tr>
-                    <td><?php echo $no; ?></td>
-                    <td><?php echo $sewa['nama_peminjam']; ?></td>
-                    <td><?php echo $sewa['nama_tempat']; ?></td>
-                    <td><?php echo $sewa['tgl_awal_peminjaman']; ?></td>
-                    <td>
-                      <?php if($sewa['status'] == 'diterima'){ ?>
-                        <button type="button" class="btn btn-success">
-                          <i class="bi bi-check-circle">Setuju</i>
-                        </button>
-                      <?php }else if($sewa['status'] == 'ditolak'){ ?>
-                      <button type="button" class="btn btn-danger">
-                        <i class="bi bi-x-circle">Tolak</i>
-                      </button>
-                      <?php } ?>
-                    </td>
-                    <td><?php echo $sewa['catatan']?></td>
-                    <td>
-                      <a href="/halaman/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
-                    </td>
-                  </tr>
-                  <?php 
-                  $no++;
+                  <?php
+                      $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(tgl_pembuatan, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_seniman DESC");
+                      $no = 1;
+                      while ($seniman = mysqli_fetch_array($query)) {
+                  ?>
+                    <tr>
+                      <td><?php echo $no?></td>
+                      <td><?php echo $seniman['nama_seniman']?></td>
+                      <td><?php echo $seniman['tanggal']?></td>
+                      <td>
+                        <?php if($seniman['status'] == 'diterima'){ ?>
+                          <span class="badge bg-success"><i class="bi bi-check-circle"></i>  Disetujui</span>
+                        <?php }else if($seniman['status'] == 'ditolak'){ ?>
+                          <span class="badge bg-danger"><i class="bi bi-x-circle"></i>   Ditolak </span>
+                        <?php } ?>
+                      </td>
+                      <td><?php echo $seniman['catatan']?></td>
+                      <td>
+                        <a href="/halaman/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                      </td>
+                    </tr>
+                  <?php $no++;
                   } ?>
                   <!-- <tr>
-                    <th scope="row">2</th>
+                    <th scope="row">1</th>
+                    <td>3576447103910003</td>
                     <td>Puji Utami</td>
-                    <td>Siraman Sedudo</td>
                     <td>1 Oktober 2023</td>
-                    <td>
-                      <button type="button" class="btn btn-danger">
-                        <i class="bi bi-x-circle">Tolak</i>
+                    <td><span class="badge bg-success"><i class="bi bi-check-circle"></i>  Disetujui</span></td>
+                    <td></td>
+                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
                       </button>
                     </td>
-                    <td></td>
+                  </tr> -->
+                  <!-- <tr>
+                    <th scope="row">2</th>
+                    <td>3576441606910003</td>
+                    <td>Muhammad Lutfi Hakim</td>
+                    <td>31 Agustus 2023</td>
+                    <td><span class="badge bg-danger"><i class="bi bi-x-circle"></i>   Ditolak </span></td>
+                    <td>Data kurang lengkap</td>
+                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
+                      </button>
+                    </td>
                   </tr> -->
                 </tbody>
               </table>
@@ -157,12 +159,12 @@ $csrf = $GLOBALS['csrf'];
 
   </main><!-- End #main -->
 
-
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include('../../footer.php');
+    <?php include('footer.php');
     ?>
   </footer>
+  <!-- </footer> -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
       class="bi bi-arrow-up-short"></i></a>

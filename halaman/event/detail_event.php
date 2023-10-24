@@ -21,7 +21,7 @@ if($userAuth['status'] == 'error'){
     $sql = mysqli_query($conn, "SELECT id_event, nama_pengirim, status, catatan, events.id_detail, id_sewa, nama_event, deskripsi, kategori, tempat_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, link_pendaftaran FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = '$id'");
     $events = mysqli_fetch_assoc($sql);
   }else{
-    header('Location: /halaman/event.php');
+    header('Location: /event.php');
   }
 }
 $csrf = $GLOBALS['csrf'];
@@ -88,7 +88,7 @@ $csrf = $GLOBALS['csrf'];
       <nav>
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-        <li class="breadcrumb-item"><a href="/tempat.php">Kelola Event</a></li>
+        <li class="breadcrumb-item"><a href="/seniman.php">Kelola Event</a></li>
         <?php if($events['status'] == 'diajukan' || $events['status'] == 'proses'){ ?>
           <li class="breadcrumb-item"><a href="/halaman/event/pengajuan.php">Pengajuan event</a></li>
         <?php }else if($events['status'] == 'diterima' || $events['status'] == 'ditolak'){ ?>

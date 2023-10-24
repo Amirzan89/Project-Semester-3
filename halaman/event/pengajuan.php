@@ -106,7 +106,7 @@ $csrf = $GLOBALS['csrf'];
                   </thead>
                   <tbody>
                     <?php
-                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, tanggal_awal, tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses'");
+                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, tanggal_awal, tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC");
                       $no = 1;
                       while ($event = mysqli_fetch_array($query)) {
                     ?>
@@ -121,9 +121,9 @@ $csrf = $GLOBALS['csrf'];
                                 <i class="bi bi-check-circle">Diajukan</i>
                               </button>
                             <?php }else if($event['status'] == 'proses'){ ?>
-                            <button type="button" class="btn btn-danger">
-                              <i class="bi bi-x-circle">proses</i>
-                            </button>
+                              <button type="button" class="btn btn-danger">
+                                <i class="bi bi-x-circle">proses</i>
+                              </button>
                             <?php } ?>
                           </td>
                           <td>

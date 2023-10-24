@@ -21,7 +21,6 @@ $csrf = $GLOBALS['csrf'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -77,7 +76,7 @@ $csrf = $GLOBALS['csrf'];
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item active">Nomor Induk Seniman</li>
+          <li class="breadcrumb-item active">Kelola Seniman</li>
         </ol>
       </nav>
     </div>
@@ -90,30 +89,17 @@ $csrf = $GLOBALS['csrf'];
               <div class="col-xxl-4 col-md-4">
                   <div class="card success-card revenue-card">
                       <div class="card-body">
-                          <h5 class="card-title">Daftar Tempat</h5>
-                          <div class="d-flex align-items-center">
-                              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                  <i class="bi bi-file-earmark-text-fill"></i>
-                              </div>
-                              <div class="ps-3">
-                                  <h6>6</h6>
-                                  <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-xxl-4 col-md-4">
-                  <div class="card success-card revenue-card">
-                      <div class="card-body">
-                          <h5 class="card-title">Status Peminjaman Tempat</h5>
+                          <h5 class="card-title">Pengajuan</h5>
                           <div class="d-flex align-items-center">
                               <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                   <i class="bi bi-bell-fill"></i>
                               </div>
                               <div class="ps-3">
-                                  <h6>145</h6>
-                                  <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
+                                <?php 
+                                  $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diajukan' OR status = 'proses'");
+                                  $data = mysqli_fetch_assoc($sql);
+                                  echo "<h4>".$data['total']."</h4>";
+                                ?>
                               </div>
                           </div>
                       </div>
@@ -128,8 +114,11 @@ $csrf = $GLOBALS['csrf'];
                                   <i class="bi bi-clock-fill"></i>
                               </div>
                               <div class="ps-3">
-                                  <h6>145</h6>
-                                  <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
+                                <?php 
+                                  $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diterima' OR status = 'ditolak'");
+                                  $data = mysqli_fetch_assoc($sql);
+                                  echo "<h4>".$data['total']."</h4>";
+                                ?>
                               </div>
                           </div>
                       </div>
@@ -147,7 +136,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-file-earmark-text-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/formulir-baru.php">Formulir</a></h5>
+                      <h5 class="card-title"><a href="/halaman/seniman/formulir-baru.php">Formulir</a></h5>
                     </div>
                   </div>
                 </div>
@@ -161,7 +150,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/verif.php">Verifikasi Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/halaman/seniman/pengajuan.php">Verifikasi Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
@@ -175,7 +164,21 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/riwayat.php">Riwayat Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/halaman/seniman/riwayat.php">Riwayat Pengajuan</a></h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xxl-4 col-md-4">
+              <div class="card success-card revenue-card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded d-flex align-items-center justify-content-center">
+                      <i class="bi bi-clock-fill"></i>
+                    </div>
+                    <div class="ps-1">
+                      <h5 class="card-title"><a href="/halaman/seniman/riwayat.php">Perpanjang Nomer Induk Seniman</a></h5>
                     </div>
                   </div>
                 </div>
@@ -189,7 +192,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-folder-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/data-seniman.php">Data Seniman</a></h5>
+                      <h5 class="card-title"><a href="/halaman/seniman/data-seniman.php">Data Seniman</a></h5>
                     </div>
                   </div>
                 </div>
