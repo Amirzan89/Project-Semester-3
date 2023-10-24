@@ -119,9 +119,8 @@ $csrf = $GLOBALS['csrf'];
                 </thead>
                 <tbody>
                 <?php
-                    $query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin,
-                                      tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role != 'masyarakat'");
-                                      $no = 1;
+                    $query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin, tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role != 'masyarakat'"); 
+                    $no = 1;
                     while ($users = mysqli_fetch_array($query)) {
                     ?>
                       <tr>

@@ -88,6 +88,11 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
                     <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
+                    <?php if($sewa['status'] == 'diajukan' || $sewa['status'] == 'proses'){ ?>
+                        <li class="breadcrumb-item"><a href="/halaman/tempat/pengajuan.php">Pengajuan sewa tempat</a></li>
+                    <?php }else if($sewa['status'] == 'diterima' || $sewa['status'] == 'ditolak'){ ?>
+                        <li class="breadcrumb-item"><a href="/halaman/tempat/riwayat.php">Riwayat sewa tempat</a></li>
+                    <?php } ?>
                     <li class="breadcrumb-item"><a href="/halaman/tempat/data_tempat.php">Data tempat</a></li>
                     <li class="breadcrumb-item active">Detail Data Tempat</li>
                 </ol>

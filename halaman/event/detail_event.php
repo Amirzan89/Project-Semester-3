@@ -11,10 +11,17 @@ if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
 }else{
 	$userAuth = $userAuth['data'];
-  if($userAuth['role'] != 'super admin'){
-    echo "<script>alert('Anda bukan super admin !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
+  // if($userAuth['role'] != 'super admin'){
+  //   echo "<script>alert('Anda bukan super admin !')</script>";
+  //   echo "<script>window.location.href = '/dashboard.php';</script>";
+  //   exit();
+  // }
+  if (isset($_GET['id_event']) && !empty($_GET['id_event'])) {
+    $id  = $_GET['id_event'];
+    $sql = mysqli_query($conn, "SELECT id_event, nama_pengirim, status, catatan, events.id_detail, id_sewa, nama_event, deskripsi, kategori, tempat_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, link_pendaftaran FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = '$id'");
+    $events = mysqli_fetch_assoc($sql);
+  }else{
+    header('Location: /halaman/event.php');
   }
 }
 $csrf = $GLOBALS['csrf'];
@@ -79,58 +86,74 @@ $csrf = $GLOBALS['csrf'];
     <div class="pagetitle">
       <h1>Formulir Pengajuan</h1>
       <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="nis1.php">Kelola Event</a></li>
-          <li class="breadcrumb-item active">Formulir Pengajuan</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
-
-    <section class="section">
-      <div class="row">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+        <li class="breadcrumb-item"><a href="/tempat.php">Kelola Event</a></li>
+        <?php if($events['status'] == 'diajukan' || $events['status'] == 'proses'){ ?>
+          <li class="breadcrumb-item"><a href="/halaman/event/pengajuan.php">Pengajuan event</a></li>
+        <?php }else if($events['status'] == 'diterima' || $events['status'] == 'ditolak'){ ?>
+          <li class="breadcrumb-item"><a href="/halaman/event/riwayat.php">Riwayat Pengajuan event</a></li>
+        <?php } ?>
+        <li class="breadcrumb-item active">Detail event</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+  
+  <section class="section">
+    <div class="row">
         <div class="col-lg-12">
-
+          
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">FORMULIR UPLOAD EVENT</h5>
-
+              <?php if($events['status'] == 'diajukan' || $events['status'] == 'proses'){ ?>
+                <h5 class="card-title"> Pengajuan event</h5>
+                <?php }else if($events['status'] == 'diterima' || $events['status'] == 'ditolak'){ ?>
+                  <h5 class="card-title"> Riwayat event</h5>
+              <?php } ?>
               <form class="row g-3">
                 <div class="col-md-12">
                   <label for="inputText" class="form-label">Nama Pengirim :</label>
-                  <input type="text" class="form-control" id="inputText">
+                  <input type="text" class="form-control" id="inputText" readonly value="<?php echo $events['nama_pengirim']?>">
                 </div>
                 <div class="col-md-12">
                   <label for="inputText" class="form-label">Nama Event : </label>
-                  <input type="text" class="form-control" id="inputText">
+                  <input type="text" class="form-control" id="inputText" readonly value="<?php echo $events['nama_event']?>">
                 </div>
                 <div class="col-md-4">
-                    <label for="inputDate" class="form-label">Tanggal :</label>
-                    <input type="date" class="form-control" id="inputDate">
-                  </div>
+                    <label for="inputDate" class="form-label">Tanggal awal :</label>
+                    <input type="text" class="form-control" id="inputDate" readonly value="<?php echo $events['tanggal_awal']?>">
+                </div>
+                <div class="col-md-4">
+                    <label for="inputDate" class="form-label">Tanggal akhir :</label>
+                    <input type="text" class="form-control" id="inputDate" readonly value="<?php echo $events['tanggal_akhir']?>">
+                </div>
                 <div class="col-md-8">
                   <label for="inputText" class="form-label">Tempat :</label>
-                  <input type="text" class="form-control" id="inputText">
+                  <input type="text" class="form-control" id="inputText" readonly value="<?php echo $events['tempat_event']?>">
                 </div>
                 <div class="col-12">
                   <label for="inputText" class="form-label">Deskripsi Event :</label>
-                  <textarea class="form-control" id="inputTextarea" style="height: 100px;"></textarea>
+                  <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $events['deskripsi']?></textarea>
                 </div>
                 <div class="col-12">
                   <label for="inputLink" class="form-label">Link Pendaftaran :</label>
-                  <input type="link" class="form-control" id="inputLink">
+                  <input type="link" class="form-control" id="inputLink" readonly value="<?php echo $events['link_pendaftaran']?>">
                 </div>
                 <div class="col-12">
                   <label for="inputFile" class="form-label">Poster Event :</label>
-                  <input type="file" class="form-file-input form-control" id="inputFile">
+                  <input type="file" class="form-file-input form-control" id="inputFile" readonly>
                 </div>
-                <div class="text-center">
-                  <button type="kirim" class="btn btn-warning">Kirim</button>
-                </div>
+                <?php if(isset($events['catatan']) && !is_null($events['catatan']) && !empty($events['catatan'])){?>
+                  <div class="col-12">
+                    <label for="inputText" class="form-label">Catatan :</label>
+                    <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $events['catatan']?></textarea>
+                  </div>
+                  <?php } ?>
+                  <div class="text-center">
+                    <button type="kirim" class="btn btn-warning">proses</button>
+                  </div>
               </form>
-              
               <!-- End General Form Elements -->
-
             </div>
           </div>
 

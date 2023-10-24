@@ -291,13 +291,10 @@ $userAuth = authenticate($_POST,[
               </div>
             </div>
           </div>
-
         </div>
-
       </div>
     </section>
     <!-- End Layanan Section -->
-
     <!-- ======= Profil Section ======= -->
     <section id="profil" class="contact">
       <div class="container" data-aos="fade-up">

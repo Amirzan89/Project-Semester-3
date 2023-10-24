@@ -79,9 +79,9 @@ $csrf = $GLOBALS['csrf'];
       <h1>Pengajuan Event</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="nis1.php">Kelola Event</a></li>
-          <li class="breadcrumb-item active">Pengajuan Event</li>
+          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/event.php">Kelola event</a></li>
+          <li class="breadcrumb-item active">Pengajuan event</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -127,7 +127,7 @@ $csrf = $GLOBALS['csrf'];
                             <?php } ?>
                           </td>
                           <td>
-                            <a href="/halaman/event/detail_event.php?id_event=<?= $event['id_sewa'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                            <a href="/halaman/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
                           </td>
                       </tr>
                     <?php $no++;

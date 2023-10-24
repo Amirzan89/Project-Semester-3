@@ -77,7 +77,7 @@ $csrf = $GLOBALS['csrf'];
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item active">Nomor Induk Seniman</li>
+          <li class="breadcrumb-item active">Kelola Event</li>
         </ol>
       </nav>
     </div>
@@ -111,7 +111,11 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="ps-3">
-                      <h4>145</h4>
+                      <?php 
+                        $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM events WHERE status = 'diajukan' OR status = 'proses'");
+                        $data = mysqli_fetch_assoc($sql);
+                        echo "<h4>".$data['total']."</h4>";
+                      ?>
                     </div>
                   </div>
                 </div>
@@ -126,7 +130,11 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-3">
-                      <h4>145</h4>
+                      <?php 
+                        $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM events WHERE status = 'diterima' OR status = 'ditolak'");
+                        $data = mysqli_fetch_assoc($sql);
+                        echo "<h4>".$data['total']."</h4>";
+                      ?>
                     </div>
                   </div>
                 </div>
@@ -154,7 +162,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/event/pengajuan_event.php">Verifikasi Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/halaman/event/pengajuan.php">Verifikasi Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
@@ -168,21 +176,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/event/riwayat_event.php">Riwayat Pengajuan</a></h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xxl-4 col-md-4">
-              <div class="card success-card revenue-card">
-                <div class="card-body">
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded d-flex align-items-center justify-content-center">
-                      <i class="bi bi-folder-fill"></i>
-                    </div>
-                    <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/data-seniman.php">Data event</a></h5>
+                      <h5 class="card-title"><a href="/halaman/event/riwayat.php">Riwayat Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
@@ -198,7 +192,7 @@ $csrf = $GLOBALS['csrf'];
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <?php include('footer.php');
-        ?>
+    ?>
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
