@@ -1,7 +1,27 @@
+<?php
+require_once('../../web/koneksi.php');
+require_once('../../web/authenticate.php');
+$database = koneksi::getInstance();
+$conn = $database->getConnection();
+$userAuth = authenticate($_POST,[
+    'uri'=>$_SERVER['REQUEST_URI'],
+    'method'=>$_SERVER['REQUEST_METHOD'
+    ]
+],$conn);
+if($userAuth['status'] == 'error'){
+	header('Location: /login.php');
+}else{
+	$userAuth = $userAuth['data'];
+    if($userAuth['role'] != 'super admin'){
+        echo "<script>alert('Anda bukan super admin !')</script>";
+        echo "<script>window.location.href = '/dashboard.php';</script>";
+        exit();
+    }
+}
+$csrf = $GLOBALS['csrf'];
+?>
 <!DOCTYPE html>
 <html lang="en">
-
-
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -116,17 +136,17 @@
                                     </div>
                                 </div>
                                 <div class="row mb-3">
-                                    <label for="inputDate" class="col-sm-2 col-form-label">Tanggal</label>
+                                <label for="inputDate" class="col-sm-2 col-form-label">Tanggal awal sewa</label>
                                     <div class="col-sm-3">
-                                        <input type="date" class="form-control">
+                                        <input type="text" class="form-control" value="12 November 2020" readonly>
                                     </div>
-                                    <div class="col-sm-1 text-center">-</div>
+                                    <label for="inputDate" class="col-sm-2 col-form-label">Tanggal akhir sewa</label>
                                     <div class="col-sm-3">
-                                        <input type="date" class="form-control">
+                                        <input type="text" class="form-control" value="13 November 2020"readonly>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
-                                    <label for="inputNumber" class="col-sm-2 col-form-label">File Upload</label>
+                                    <label for="inputNumber" class="col-sm-2 col-form-label">Surat Keterangan</label>
                                     <div class="col-sm-10">
                                         <input class="form-control" type="file" id="formFile">
                                     </div>

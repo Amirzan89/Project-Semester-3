@@ -148,7 +148,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-file-earmark-text-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/formulir-baru.php">Formulir</a></h5>
+                      <h5 class="card-title"><a href="/halaman/event/formulir.php">Formulir</a></h5>
                     </div>
                   </div>
                 </div>

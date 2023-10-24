@@ -5,8 +5,7 @@ $database = koneksi::getInstance();
 $conn = $database->getConnection();
 $userAuth = authenticate($_POST,[
   'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD'
-  ]
+  'method'=>$_SERVER['REQUEST_METHOD']
 ],$conn);
 if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
@@ -33,6 +32,7 @@ $csrf = $GLOBALS['csrf'];
   <!-- Favicons -->
   <link href="/public/assets/img/landing-page/favicon.png" rel="icon">
     <link href="/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
+
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
   <link
@@ -42,8 +42,11 @@ $csrf = $GLOBALS['csrf'];
   <link href="/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/tempat.css" rel="stylesheet">
+  <link href="/public/assets/css/event.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -53,7 +56,7 @@ $csrf = $GLOBALS['csrf'];
     var idUser = "<?php echo $userAuth['id_user'] ?>";
     var number = "<?php echo $userAuth['number'] ?>";
     var role = "<?php echo $userAuth['role'] ?>";
-    </script>
+	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../../header.php');
@@ -63,23 +66,24 @@ $csrf = $GLOBALS['csrf'];
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php 
-        $nav = 'tempat';
-        include('../../sidebar.php');
+      <?php
+      $nav = 'event'; 
+      include('../../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
 
+
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Riwayat Pengajuan</h1>
+      <h1>Formulir Pengajuan</h1>
       <nav>
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-        <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-        <li class="breadcrumb-item active">Riwayat sewa tempat</li>
-      </ol>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="nis1.php">Kelola Event</a></li>
+          <li class="breadcrumb-item active">Formulir Pengajuan</li>
+        </ol>
       </nav>
     </div><!-- End Page Title -->
 
@@ -89,64 +93,43 @@ $csrf = $GLOBALS['csrf'];
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title"></h5>
+              <h5 class="card-title">FORMULIR UPLOAD EVENT</h5>
 
-              <table class="table datatable">
-                <thead>
-                  <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">Nama Peminjam</th>
-                    <th scope="col">Nama Tempat</th>
-                    <th scope="col">Tanggal Pengajuan</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Keterangan</th>
-                    <th scope="col">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                <?php
-                    $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, tgl_akhir_peminjaman, status, catatan FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak'");
-                    $no = 1;
-                    while ($sewa = mysqli_fetch_array($query)) {
-                    ?>
-                  <tr>
-                    <td><?php echo $no; ?></td>
-                    <td><?php echo $sewa['nama_peminjam']; ?></td>
-                    <td><?php echo $sewa['nama_tempat']; ?></td>
-                    <td><?php echo $sewa['tgl_awal_peminjaman']; ?></td>
-                    <td>
-                      <?php if($sewa['status'] == 'diterima'){ ?>
-                        <button type="button" class="btn btn-success">
-                          <i class="bi bi-check-circle">Setuju</i>
-                        </button>
-                      <?php }else if($sewa['status'] == 'ditolak'){ ?>
-                      <button type="button" class="btn btn-danger">
-                        <i class="bi bi-x-circle">Tolak</i>
-                      </button>
-                      <?php } ?>
-                    </td>
-                    <td><?php echo $sewa['catatan']?></td>
-                    <td>
-                      <a href="/halaman/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
-                    </td>
-                  </tr>
-                  <?php 
-                  $no++;
-                  } ?>
-                  <!-- <tr>
-                    <th scope="row">2</th>
-                    <td>Puji Utami</td>
-                    <td>Siraman Sedudo</td>
-                    <td>1 Oktober 2023</td>
-                    <td>
-                      <button type="button" class="btn btn-danger">
-                        <i class="bi bi-x-circle">Tolak</i>
-                      </button>
-                    </td>
-                    <td></td>
-                  </tr> -->
-                </tbody>
-              </table>
+              <form class="row g-3">
+                <div class="col-md-12">
+                  <label for="inputText" class="form-label">Nama Pengirim :</label>
+                  <input type="text" class="form-control" id="inputText">
+                </div>
+                <div class="col-md-12">
+                  <label for="inputText" class="form-label">Nama Event : </label>
+                  <input type="text" class="form-control" id="inputText">
+                </div>
+                <div class="col-md-4">
+                    <label for="inputDate" class="form-label">Tanggal :</label>
+                    <input type="date" class="form-control" id="inputDate">
+                  </div>
+                <div class="col-md-8">
+                  <label for="inputText" class="form-label">Tempat :</label>
+                  <input type="text" class="form-control" id="inputText">
+                </div>
+                <div class="col-12">
+                  <label for="inputText" class="form-label">Deskripsi Event :</label>
+                  <textarea class="form-control" id="inputTextarea" style="height: 100px;"></textarea>
+                </div>
+                <div class="col-12">
+                  <label for="inputLink" class="form-label">Link Pendaftaran :</label>
+                  <input type="link" class="form-control" id="inputLink">
+                </div>
+                <div class="col-12">
+                  <label for="inputFile" class="form-label">Poster Event :</label>
+                  <input type="file" class="form-file-input form-control" id="inputFile">
+                </div>
+                <div class="text-center">
+                  <button type="kirim" class="btn btn-warning">Kirim</button>
+                </div>
+              </form>
+              
+              <!-- End General Form Elements -->
 
             </div>
           </div>
@@ -156,7 +139,6 @@ $csrf = $GLOBALS['csrf'];
     </section>
 
   </main><!-- End #main -->
-
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">

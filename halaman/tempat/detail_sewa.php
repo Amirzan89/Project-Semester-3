@@ -21,10 +21,10 @@ if($userAuth['status'] == 'error'){
 $csrf = $GLOBALS['csrf'];
 if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
     $id  = $_GET['id_sewa'];
-    $sql  = mysqli_query($conn, "SELECT * FROM sewa_tempat WHERE `id_sewa` = '" . $id . "'");
+    $sql = mysqli_query($conn, "SELECT id_sewa, nik_sewa, nama_peminjam, nama_tempat, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, DATE_FORMAT(tgl_awal_peminjaman, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tgl_akhir_peminjaman, '%d %M %Y') AS tanggal_akhir, status, catatan FROM sewa_tempat WHERE id_sewa = '$id'");
     $sewa = mysqli_fetch_assoc($sql);
 }else{
-    header('Location: /halaman/tempat/status_pengajuan.php');
+    header('Location: /halaman/tempat.php');
 }
 ?>
 <!DOCTYPE html>
@@ -65,21 +65,21 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
         var number = "<?php echo $userAuth['number'] ?>";
         var role = "<?php echo $userAuth['role'] ?>";
     </script>
-  <!-- ======= Header ======= -->
-  <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include('../../header.php');
-    ?>
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <?php include('../../header.php');
+        ?>
     </header><!-- End Header -->
 
-  <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar">
-  <ul class="sidebar-nav" id="sidebar-nav">
-    <?php 
-    $nav = 'tempat';
-    include('../../sidebar.php');
-    ?>
-    </ul>
-  </aside><!-- End Sidebar-->
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+        <ul class="sidebar-nav" id="sidebar-nav">
+            <?php 
+            $nav = 'tempat';
+            include('../../sidebar.php');
+            ?>
+        </ul>
+    </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
         <div class="pagetitle">
@@ -93,7 +93,6 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
                     <?php }else if($sewa['status'] == 'diterima' || $sewa['status'] == 'ditolak'){ ?>
                         <li class="breadcrumb-item"><a href="/halaman/tempat/riwayat.php">Riwayat sewa tempat</a></li>
                     <?php } ?>
-                    <li class="breadcrumb-item"><a href="/halaman/tempat/data_tempat.php">Data tempat</a></li>
                     <li class="breadcrumb-item active">Detail Data Tempat</li>
                 </ol>
             </nav>
@@ -104,32 +103,67 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
                     <div class="card">
                         <div class="card-body">
                             <div class="card-body d-flex justify-content-center align-items-center">
-                                <h5 class="card-title text-center">Data Detail Tempat</h5>
+                                <h5 class="card-title text-center">Data Detail Sewa Tempat</h5>
                             </div>
                             <!-- General Form Elements -->
                             <form>
+                            <form>
                                 <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Nama Tempat</label>
+                                    <label for="inputText" class="col-sm-2 col-form-label">Nama Lengkap</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $sewa['nama_tempat']?>" readonly>
+                                        <input type="text" class="form-control" readonly value="<?php echo $sewa['nama_peminjam']?>">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Alamat Tempat</label>
+                                    <label for="inputText" class="col-sm-2 col-form-label">NIK</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $sewa['alamat_tempat']?>" readonly>
+                                        <input type="text" class="form-control" readonly value="<?php echo $sewa['nik_sewa']?>">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Instansi</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" readonly value="<?php echo $sewa['instansi']?>">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Nama Kegiatan</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" readonly value="<?php echo $sewa['nama_kegiatan_sewa']; ?>">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputNumber" class="col-sm-2 col-form-label">Jumlah Peserta</label>
+                                    <div class="col-sm-10">
+                                        <input type="number" class="form-control" readonly value="<?php echo $sewa['jumlah_peserta']?>">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Tempat</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" readonly value="<?php echo $sewa['nama_tempat']?>">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputDate" class="col-sm-2 col-form-label">Tanggal awal sewa</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" class="form-control" readonly value="<?php echo $sewa['tanggal_awal']?>">
+                                    </div>
+                                    <label for="inputDate" class="col-sm-2 col-form-label">Tanggal akhir sewa</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" class="form-control" readonly value="<?php echo $sewa['tanggal_akhir']?>">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputNumber" class="col-sm-2 col-form-label">Surat Keterangan</label>
+                                    <div class="col-sm-10">
+                                        <input class="form-control" type="file" id="formFile">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Deskripsi Kegiatan</label>
                                     <div class="col-sm-10">
-                                        <textarea class="form-control" style="height: 100px" readonly><?php echo $sewa['deskripsi_tempat']?></textarea>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputNumber" class="col-sm-2 col-form-label">Gambar tempat</label>
-                                    <div class="col-sm-10">
-                                        <input class="form-control" type="file" id="formFile" readonly>
+                                        <textarea class="form-control" style="height: 100px" readonly><?php echo $sewa['deskripsi_sewa_tempat'] ?></textarea>
                                     </div>
                                 </div>
                                 <div class="row mb-3 justify-content-end">
@@ -147,6 +181,12 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
                                         <?php }?>
                                     </div>
                                 </div>
+                                    <!-- <div class="row mb-3 justify-content-end">
+                                        <div class="col-sm-10 text-end">
+                                            <button type="submit" class="btn btn-primary">Terima</button>
+                                            <button type="button" class="btn btn-danger">Tolak</button>
+                                        </div>
+                                    </div> -->
                             </form>
                         </div>
                     </div>

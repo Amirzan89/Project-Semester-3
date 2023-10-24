@@ -79,7 +79,7 @@ class TempatMobile{
                 throw new Exception('Tanggal akhir sewa harus di isi !');
             }
             if (!isset($_FILES['surat_keterangan']) || empty($_FILES['surat_keterangan'])) {
-                throw new Exception('Surat keternangan harus di isi !');
+                throw new Exception('Surat keterangan harus di isi !');
             }
             if ($_FILES['surat_keterangan']['error'] !== UPLOAD_ERR_OK) {
                 throw new Exception('gagal upload file !');
