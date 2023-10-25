@@ -161,7 +161,7 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include('footer.php');
+    <?php include('../../footer.php');
     ?>
   </footer>
   <!-- </footer> -->

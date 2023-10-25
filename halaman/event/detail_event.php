@@ -86,18 +86,18 @@ $csrf = $GLOBALS['csrf'];
     <div class="pagetitle">
       <h1>Formulir Pengajuan</h1>
       <nav>
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-        <li class="breadcrumb-item"><a href="/seniman.php">Kelola Event</a></li>
-        <?php if($events['status'] == 'diajukan' || $events['status'] == 'proses'){ ?>
-          <li class="breadcrumb-item"><a href="/halaman/event/pengajuan.php">Pengajuan event</a></li>
-        <?php }else if($events['status'] == 'diterima' || $events['status'] == 'ditolak'){ ?>
-          <li class="breadcrumb-item"><a href="/halaman/event/riwayat.php">Riwayat Pengajuan event</a></li>
-        <?php } ?>
-        <li class="breadcrumb-item active">Detail event</li>
-      </ol>
-    </nav>
-  </div><!-- End Page Title -->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/event.php">Kelola Event</a></li>
+          <?php if($events['status'] == 'diajukan' || $events['status'] == 'proses'){ ?>
+            <li class="breadcrumb-item"><a href="/halaman/event/pengajuan.php">Pengajuan event</a></li>
+          <?php }else if($events['status'] == 'diterima' || $events['status'] == 'ditolak'){ ?>
+            <li class="breadcrumb-item"><a href="/halaman/event/riwayat.php">Riwayat Pengajuan event</a></li>
+          <?php } ?>
+          <li class="breadcrumb-item active">Detail event</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
   
   <section class="section">
     <div class="row">

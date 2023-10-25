@@ -1,5 +1,23 @@
 <?php
-include('../koneksi.php');
+require_once('../../web/koneksi.php');
+require_once('../../web/authenticate.php');
+$database = koneksi::getInstance();
+$conn = $database->getConnection();
+$userAuth = authenticate($_POST,[
+  'uri'=>$_SERVER['REQUEST_URI'],
+  'method'=>$_SERVER['REQUEST_METHOD']
+],$conn);
+if($userAuth['status'] == 'error'){
+	header('Location: /login.php');
+}else{
+	$userAuth = $userAuth['data'];
+  // if($userAuth['role'] != 'super admin'){
+  //   echo "<script>alert('Anda bukan super admin !')</script>";
+  //   echo "<script>window.location.href = '/dashboard.php';</script>";
+  //   exit();
+  // }
+}
+$csrf = $GLOBALS['csrf'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,8 +31,8 @@ include('../koneksi.php');
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="../assets/img/LandingPage/favicon.png" rel="icon">
-    <link href="../assets/img/LandingPage/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="/public/assets/img/LandingPage/favicon.png" rel="icon">
+    <link href="/public/assets/img/LandingPage/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -22,11 +40,11 @@ include('../koneksi.php');
     href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
     rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="../assets/css/style.css" rel="stylesheet">
+  <link href="/public/assets/css/style.css" rel="stylesheet">
 
 </head>
 
@@ -36,7 +54,7 @@ include('../koneksi.php');
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <?php
-    include('../header.php');
+    include('../../header.php');
     ?>
 
   </header><!-- End Header -->
@@ -46,7 +64,8 @@ include('../koneksi.php');
 
     <ul class="sidebar-nav" id="sidebar-nav">
         <?php
-        include('../sidebar.php');
+        $nav = "pentas";
+        include('../../sidebar.php');
         ?>
     </ul>
 
@@ -55,12 +74,12 @@ include('../koneksi.php');
   <main id="main" class="main">
 
   <div class="pagetitle">
-      <h1>Formulir</h1>
+      <h1>Formulir Pentas</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html"></a>Kelola Surat Advis</li>
-          <li class="breadcrumb-item">Formulir</li>
-          <!-- <li class="breadcrumb-item active">Data</li> -->
+          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/pentas.php">Kelola Pentas</a></li>
+          <li class="breadcrumb-item active">Formulir Pentas</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -140,11 +159,11 @@ include('../koneksi.php');
         class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
-    <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
-    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Template Main JS File -->
-    <script src="../assets/js/main.js"></script>
+    <script src="/public/assets/js/main.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         var currentPageURL = window.location.href;

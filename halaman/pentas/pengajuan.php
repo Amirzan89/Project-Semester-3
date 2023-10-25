@@ -16,7 +16,6 @@ if($userAuth['status'] == 'error'){
   //   echo "<script>window.location.href = '/dashboard.php';</script>";
   //   exit();
   // }
-  
 }
 $csrf = $GLOBALS['csrf'];
 ?>
@@ -36,12 +35,8 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
-  <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <!-- <link href="/public/assets/vendor/bootstrap/css/bootstrap.css" rel="stylesheet"> -->
-
   <link href="/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
@@ -53,13 +48,7 @@ $csrf = $GLOBALS['csrf'];
 </head>
 
 <body>
-  <script>
-		var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-	</script>
+
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../../header.php');
@@ -70,8 +59,8 @@ $csrf = $GLOBALS['csrf'];
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php 
-      $nav = 'event';
-      include('../../sidebar.php');
+        $nav = 'seniman';
+        include('../../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
@@ -79,15 +68,21 @@ $csrf = $GLOBALS['csrf'];
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Riwayat Pengajuan event</h1>
+      <h1>Pengajuan Pentas</h1>
       <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="/event.php">Kelola event</a></li>
-            <li class="breadcrumb-item active">Riwayat Pengajuan event</li>
+          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/pentas.php">Kelola Pentas</a></li>
+          <li class="breadcrumb-item active">Pengajuan Pentas</li>
         </ol>
+        <!-- <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
+          <li class="breadcrumb-item active">Pengajuan Nomer Induk Seniman</li>
+        </ol> -->
       </nav>
     </div><!-- End Page Title -->
+
     <section class="section">
       <div class="row">
         <div class="col-lg-12">
@@ -95,65 +90,53 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h5 class="card-title"></h5>
-
               <table class="table datatable">
-                <thead>
+              <thead>
                   <tr>
-                  <th scope="col">No</th>
-                    <th scope="col">Nama Pengirim</th>
-                    <th scope="col">Nama Event</th>
-                    <th scope="col">Tanggal Pengajuan</th>
+                    <th scope="col">No</th>
+                    <th scope="col">Nomor Induk Seniman</th>
+                    <th scope="col">Nama Seniman</th>
+                    <th scope="col">Tanggal</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Keterangan</th>
                     <th scope="col">Aksi</th>
                   </tr>
-                </thead>
-                <tbody>
-                  <?php
-                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_event DESC");
-                    $no = 1;
-                    while ($event = mysqli_fetch_array($query)) {
-                  ?>
+                  </thead>
+                  <tbody>
+                    <?php
+                      $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(tgl_advis, '%d %M %Y') AS tanggal, status, catatan FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
+                      $no = 1;
+                      while ($seniman = mysqli_fetch_array($query)) {
+                    ?>
                     <tr>
                       <td><?php echo $no?></td>
-                      <td><?php echo $event['nama_pengirim']?></td>
-                      <td><?php echo $event['nama_event']?></td>
-                      <td><?php echo $event['tanggal_awal']?></td>
+                      <td><?php echo $seniman['nomor_induk']?></td>
+                      <td><?php echo $seniman['nama_advis']?></td>
+                      <td><?php echo $seniman['tanggal']?></td>
                       <td>
-                        <?php if($event['status'] == 'diterima'){ ?>
-                          <span class="badge bg-success"><i class="bi bi-check-circle"></i>  Disetujui</span>
-                        <?php }else if($event['status'] == 'ditolak'){ ?>
-                          <span class="badge bg-danger"><i class="bi bi-x-circle"></i>   Ditolak </span>
+                        <?php if($seniman['status'] == 'diajukan'){ ?>
+                          <button type="button" class="btn btn-success">
+                            <i class="bi bi-check-circle">Diajukan</i>
+                          </button>
+                        <?php }else if($seniman['status'] == 'proses'){ ?>
+                          <button type="button" class="btn btn-danger">
+                            <i class="bi bi-x-circle">proses</i>
+                          </button>
                         <?php } ?>
                       </td>
-                      <td><?php echo $event['catatan']?></td>
                       <td>
-                        <a href="/halaman/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                        <a href="/halaman/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
                       </td>
                     </tr>
                   <?php $no++;
                   } ?>
-
                   <!-- <tr>
-                    <th scope="row">1</th>
-                    <td>3576447103910003</td>
-                    <td>Puji Utami</td>
-                    <td>1 Oktober 2023</td>
-                    <td><span class="badge bg-success"><i class="bi bi-check-circle"></i>  Disetujui</span></td>
-                    <td></td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
-                      </button>
+                    <td>1</td>
+                    <td>3576447103910003
                     </td>
-                  </tr> -->
-                  <!-- <tr>
-                    <th scope="row">1</th>
-                    <td>3576447103910003</td>
                     <td>Puji Utami</td>
                     <td>1 Oktober 2023</td>
-                    <td><span class="badge bg-success"><i class="bi bi-check-circle"></i>  Disetujui</span></td>
-                    <td></td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
-                      </button>
+                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i>  lihat
+                    </button>
                     </td>
                   </tr> -->
                   <!-- <tr>
@@ -161,21 +144,20 @@ $csrf = $GLOBALS['csrf'];
                     <td>3576441606910003</td>
                     <td>Muhammad Lutfi Hakim</td>
                     <td>31 Agustus 2023</td>
-                    <td><span class="badge bg-danger"><i class="bi bi-x-circle"></i>   Ditolak </span></td>
-                    <td>Data kurang lengkap</td>
                     <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
                       </button>
                     </td>
                   </tr> -->
-                </tbody>
+               </tbody>
               </table>
-
             </div>
           </div>
 
         </div>
       </div>
     </section>
+
+
 
   </main><!-- End #main -->
 
@@ -184,10 +166,8 @@ $csrf = $GLOBALS['csrf'];
     <?php include('../../footer.php');
     ?>
   </footer>
-  <!-- </footer> -->
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
   <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
