@@ -88,9 +88,6 @@ class SenimanMobile{
                 throw new Exception('user tidak ditemukan');
             }
             $stmt[0]->close();
-            if($role != 'masyarakat'){
-                throw new Exception('invalid role');
-            }
             //get last id seniman
             $query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '".$_SERVER['DB_DATABASE']."' AND TABLE_NAME = 'seniman' ";
             $stmt[1] = self::$con->prepare($query);
@@ -115,7 +112,7 @@ class SenimanMobile{
             //proses file
             $fileKtp = $_FILES['foto_ktp'];
             $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileKtp['name']);
+            $size = filesize($fileKtp['size']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= self::$sizeImg) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
@@ -134,7 +131,7 @@ class SenimanMobile{
             //proses file
             $fileFoto = $_FILES['pass_foto'];
             $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileFoto['name']);
+            $size = filesize($fileFoto['size']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= self::$sizeImg) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
@@ -154,7 +151,7 @@ class SenimanMobile{
             //proses file
             $fileSurat = $_FILES['surat_keterangan'];
             $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileSurat['name']);
+            $size = filesize($fileSurat['size']);
             if ($extension === 'pdf' || $extension === 'docx') {
                 if ($size >= self::$sizeFile) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
@@ -274,6 +271,16 @@ class SenimanMobile{
             if ($tanggal_lahir > $tanggal_sekarang){
                 throw new Exception('Tanggal tidak boleh lebih kurang dari sekarang !');
             }
+            //check user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'User tidak ditemukan','code'=>500]));
+            }
+            $stmt[0]->close();
             //check id seniman
             $query = "SELECT status FROM seniman WHERE BINARY id_seniman = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);

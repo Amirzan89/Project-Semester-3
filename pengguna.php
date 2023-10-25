@@ -80,12 +80,11 @@ $csrf = $GLOBALS['csrf'];
   <main id="main" class="main">
 
   <div class="pagetitle">
-      <h1>Kelola Admin</h1>
+      <h1>Kelola Pengguna</h1>
       <nav>
         <ol class="breadcrumb">
-          <!-- <li class="breadcrumb-item"><a href="/dashboard.php">Home</a></li> -->
-          <li class="breadcrumb-item">Tabel</li>
-          <li class="breadcrumb-item active">Admin</li>
+          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item active">Kelola Pengguna</li>
         </ol>
       </nav>
   </div><!-- End Page Title -->
@@ -96,12 +95,12 @@ $csrf = $GLOBALS['csrf'];
 
           <div class="card">
             <div class="card-body">
-              <h4 class="card-title">Data Admin</h4>
-              <a href="/halaman/users/form-tambah-user.php">
+              <h4 class="card-title">Data Pengguna</h4>
+              <!-- <a href="/halaman/users/form-tambah-user.php">
                 <button type="button" class="btn btn-success">
                     <i class="bi bi-person-plus-fill"></i> Tambah User
                 </button>
-              </a>
+              </a> -->
               <!-- <button type="button" class="btn btn-outline-secondary"><a href="../users/form-tambah-user.php"> Tambah User</a></button> -->
               <!-- Table with stripped rows -->
               <table class="table datatable">
@@ -113,16 +112,15 @@ $csrf = $GLOBALS['csrf'];
                     <th>Jenis Kelamin</th>
                     <th>Tanggal Lahir</th>
                     <th>Tempat Lahir</th>
-                    <th>Role User</th>
+                    <!-- <th>Role</th> -->
                     <th>Email</th>
                     <th>keterangan</th>
                   </tr>
                 </thead>
                 <tbody>
                 <?php
-                    $query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin,
-                                      tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role = 'masyarakat'");
-                                      $no = 1;
+                    $query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role = 'masyarakat'");
+                    $no = 1;
                     while ($users = mysqli_fetch_array($query)) {
                     ?>
                       <tr>
@@ -132,7 +130,7 @@ $csrf = $GLOBALS['csrf'];
                         <td><?php echo $users['jenis_kelamin'] ?></td>
                         <td><?php echo $users['tanggal_lahir'] ?></td>
                         <td><?php echo $users['tempat_lahir'] ?></td>
-                        <td><?php echo $users['role'] ?></td>
+                        <!-- <td><?php //echo $users['role'] ?></td> -->
                         <td><?php echo $users['email'] ?></td>
                         <td>
                           <a href="/halaman/users/form-edit-user.php?id_user=<?= $users['id_user'] ?>" class="btn btn-info"><i class="bi bi-pencil-square"></i></i></a>

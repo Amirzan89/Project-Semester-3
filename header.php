@@ -25,8 +25,9 @@
               <hr class="dropdown-divider">
             </li>
 
-            <li class="dropdown-item d-flex align-items-center">
-              <a href="users-profile.html">
+            <li >
+              <!-- <a class="dropdown-item d-flex align-items-center" href="/profile.php?id_user=<?php //$userAuth['id_user']?>"> -->
+              <a class="dropdown-item d-flex align-items-center" href="/profile.php<?php //$userAuth['id_user']?>">
                 <i class="bi bi-person"></i>
                 <span>Akun</span>
               </a>

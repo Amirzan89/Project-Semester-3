@@ -97,12 +97,32 @@ $csrf = $GLOBALS['csrf'];
                     <th>No</th>
                     <th>Nomor Induk Seniman</th>
                     <th>Nama Seniman</th>
-                    <th>Nomor Kontak</th>
+                    <th>Nomor Telepon</th>
                     <th>Aksi</th>
                   </tr>
                   </thead>
                   <tbody>
+                  <?php
+                      $query = mysqli_query($conn, "SELECT id_seniman, nomor_induk, nama_seniman, no_telpon FROM seniman WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_seniman DESC");
+                      $no = 1;
+                      while ($seniman = mysqli_fetch_array($query)) {
+                  ?>
                   <tr>
+                    <td><?php echo $no ?></td>
+                    <td><?php echo $sneiman['nomor_induk'] ?></td>
+                    <td><?php echo $sneiman['nama_seniman'] ?></td>
+                    <td><?php echo $sneiman[''] ?></td>
+                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye-fill"></i>  lihat
+                    </button>
+                    <button type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i>  edit
+                    </button>
+                    <button type="button" class="btn btn-danger"><i class="bi bi-trash-fill"></i>  hapus
+                    </button>
+                    </td>
+                  </tr>
+                  <?php $no++;
+                  } ?>
+                  <!-- <tr>
                     <td>1</td>
                     <td>3576447103910003
                     </td>
@@ -115,8 +135,8 @@ $csrf = $GLOBALS['csrf'];
                     <button type="button" class="btn btn-danger"><i class="bi bi-trash-fill"></i>  hapus
                     </button>
                     </td>
-                  </tr>
-                  <tr>
+                  </tr> -->
+                  <!-- <tr>
                     <td>2</td>
                     <td>3576441606910003
                     </td>
@@ -129,7 +149,7 @@ $csrf = $GLOBALS['csrf'];
                     <button type="button" class="btn btn-danger"><i class="bi bi-trash-fill"></i>  hapus
                     </button>
                     </td>
-                  </tr>
+                  </tr> -->
                </tbody>
               </table>
             </div>

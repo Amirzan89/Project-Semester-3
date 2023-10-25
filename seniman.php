@@ -192,7 +192,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-folder-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/seniman/data-seniman.php">Data Seniman</a></h5>
+                      <h5 class="card-title"><a href="/halaman/seniman/data_seniman.php">Data Seniman</a></h5>
                     </div>
                   </div>
                 </div>

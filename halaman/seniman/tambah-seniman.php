@@ -1,6 +1,6 @@
 <?php
 require_once('../../web/koneksi.php');
-require_once('../../ web/authenticate.php');
+require_once('../../web/authenticate.php');
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
 $userAuth = authenticate($_POST,[

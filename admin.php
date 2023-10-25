@@ -82,9 +82,8 @@ $csrf = $GLOBALS['csrf'];
       <h1>Kelola Admin</h1>
       <nav>
         <ol class="breadcrumb">
-          <!-- <li class="breadcrumb-item"><a href="/dashboard.php">Home</a></li> -->
-          <li class="breadcrumb-item">Tabel</li>
-          <li class="breadcrumb-item active">Admin</li>
+            <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+            <li class="breadcrumb-item active">Kelola Admin</li>
         </ol>
       </nav>
   </div><!-- End Page Title -->
@@ -96,7 +95,7 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h4 class="card-title">Data Admin</h4>
-              <a href="/halaman/users/form-tambah-user.php">
+              <a href="/halaman/admin/tambah.php">
                 <button type="button" class="btn btn-success">
                     <i class="bi bi-person-plus-fill"></i> Tambah User
                 </button>
@@ -112,14 +111,14 @@ $csrf = $GLOBALS['csrf'];
                     <th>Jenis Kelamin</th>
                     <th>Tanggal Lahir</th>
                     <th>Tempat Lahir</th>
-                    <th>Role User</th>
+                    <th>Role Admin</th>
                     <th>Email</th>
                     <th>keterangan</th>
                   </tr>
                 </thead>
                 <tbody>
                 <?php
-                    $query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin, tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role != 'masyarakat'"); 
+                    $query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role != 'masyarakat'"); 
                     $no = 1;
                     while ($users = mysqli_fetch_array($query)) {
                     ?>
@@ -133,8 +132,8 @@ $csrf = $GLOBALS['csrf'];
                         <td><?php echo $users['role'] ?></td>
                         <td><?php echo $users['email'] ?></td>
                         <td>
-                          <a href="/halaman/users/form-edit-user.php?id_user=<?= $users['id_user'] ?>" class="btn btn-info"><i class="bi bi-pencil-square"></i></i></a>
-                          <a href="/halaman/users/proses-hapus-user.php?id_user=<?= $users['id_user'] ?>" onclick="return confirm('Anda yakin ingin menghapus data <?php echo $users['nama_lengkap']; ?>?');" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+                          <a href="/halaman/admin/edit.php?id_user=<?= $users['id_user'] ?>" class="btn btn-info"><i class="bi bi-pencil-square"></i></i></a>
+                          <a href="/halaman/admin/proses-hapus-user.php?id_user=<?= $users['id_user'] ?>" onclick="return confirm('Anda yakin ingin menghapus data <?php echo $users['nama_lengkap']; ?>?');" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
                         </td>
                       </tr>
                     <?php $no++;

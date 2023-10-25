@@ -1,18 +1,23 @@
 <?php 
 require_once('koneksi.php');
 class User{
+    private static $sizeImg = 5 * 1024 * 1024;
     private static $database;
     private static $con;
     private static $folderPath;
     public function __construct(){
         self::$database = Koneksi::getInstance();
         self::$con = self::$database->getConnection();
-        self::$folderPath = __DIR__.'/public/img/event';
+        self::$folderPath = __DIR__.'/private/profile';
     }
     //khusus admin 
     public function tambahAdmin($data){
         try{
-            if (!isset($data['email']) || empty($data['email'])) {
+            if (!isset($data['id_user']) || empty($data['id_user'])) {
+                echo "<script>alert('ID User harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }else if (!isset($data['email']) || empty($data['email'])) {
                 echo "<script>alert('Email harus di isi !');</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
@@ -98,21 +103,6 @@ class User{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
-            $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
-            $stmt[0]->execute();
-            $role = '';
-            $stmt[0]->bind_result($role);
-            if(!$stmt[0]->fetch()){
-                $stmt[0]->close();
-                throw new Exception('user tidak ditemukan');
-            }
-            $stmt[0]->close();
-            if($role != 'masyarakat'){
-                throw new Exception('invalid role');
-            }
             //check tanggal
             date_default_timezone_set('Asia/Jakarta');
             $tanggal_lahir = strtotime($data['tanggalL']);
@@ -129,31 +119,87 @@ class User{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check email
-            $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
+            //check user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['email']);
+            $stmt[0]->bind_param('s', $data['id_user']);
             $stmt[0]->execute();
-            if ($stmt[0]->fetch()) {
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if(!$stmt[0]->fetch()){
                 $stmt[0]->close();
-                echo "<script>alert('Email sudah digunakan !')</script>";
+                echo "<script>alert('Pengguna tidak ditemukan !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             $stmt[0]->close();
+            if($role != 'super admin'){
+                echo "<script>alert('Anda bukan super admin !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check email input
+            $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['email']);
+            $stmt[1]->execute();
+            if ($stmt[1]->fetch()) {
+                $stmt[1]->close();
+                echo "<script>alert('Email sudah digunakan !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $stmt[1]->close();
+            //get last id user
+            $query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '".$_SERVER['DB_DATABASE']."' AND TABLE_NAME = 'users' ";
+            $stmt[2] = self::$con->prepare($query);
+            $stmt[2]->execute();
+            $idUser = 1;
+            $stmt[2]->bind_result($idUser);
+            $stmt[2]->fetch();
+            $stmt[2]->close();
+            $folderAdmin = '/admin';
+            //create folder
+            if (!is_dir(self::$folderPath.$folderAdmin)) {
+                mkdir(self::$folderPath.$folderAdmin, 0777, true);
+            }
+            //proses file
+            $fileFoto = $_FILES['foto'];
+            $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
+            $size = filesize($fileFoto['size']);
+            if (in_array($extension,['png','jpeg','jpg'])) {
+                if ($size >= self::$sizeImg) {
+                    echo "<script>alert('File terlalu besar !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
+            } else {
+                echo "<script>alert('File harus jpg, jpeg, png !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //simpan file
+            $nameFile = '/'.$idUser.'.'.$extension;  
+            $fileFotoPath = self::$folderPath.$folderAdmin.$nameFile;
+            if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
+                echo "<script>alert('Gagal menyimpan file')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //insert to database 
             $hashedPassword = password_hash($data['pass'], PASSWORD_DEFAULT);
-            $query = "INSERT INTO users (email,password, nama_lengkap, no_telpon, jenis_kelamin, tempat_lahir, tanggal_lahir, role, verifikasi) VALUES (?, ?, ?, ?, ? , ?, ?, ?, ?)";
+            $query = "INSERT INTO users (email,password, nama_lengkap, no_telpon, jenis_kelamin, tempat_lahir, tanggal_lahir, role, foto, verifikasi) VALUES (?, ?, ?, ?, ? , ?, ?, ?, ?, ?)";
             $verifikasi = 1;
-            $stmt = self::$con->prepare($query);
-            $stmt->bind_param("ssssssssi", $data['email'], $hashedPassword, $data['nama'], $data['phone'], $data['jenisK'],$data['tempatL'], $data['tanggalL'], $data['role'],$verifikasi);
-            $stmt->execute();
-            if ($stmt->affected_rows > 0) {
-                $stmt->close();
+            $stmt[3] = self::$con->prepare($query);
+            $stmt[3]->bind_param("sssssssssi", $data['email'], $hashedPassword, $data['nama'], $data['phone'], $data['jenisK'],$data['tempatL'], $data['tanggalL'], $data['role'], $nameFile, $verifikasi);
+            $stmt[3]->execute();
+            if ($stmt[3]->affected_rows > 0) {
+                $stmt[3]->close();
                 echo "<script>alert('akun berhasil dibuat');</script>";
                 echo "<script>window.location.href = '/admin.php';</script>";
                 exit();
             } else {
-                $stmt->close();
+                $stmt[3]->close();
                 echo "<script>alert('Akun gagal dibuat');</script>";
                 echo "<script>window.location.href = '/admin.php';</script>";
                 exit();
@@ -179,6 +225,16 @@ class User{
     }
     public function editAdmin($data){
         try{
+            if (!isset($data['id_admin']) || empty($data['id_admin'])) {
+                echo "<script>alert('ID Admin harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['id_user']) || empty($data['id_user'])) {
+                echo "<script>alert('ID User harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
             if (!isset($data['email']) || empty($data['email'])) {
                 echo "<script>alert('Email harus di isi !');</script>";
                 echo "<script>window.history.back();</script>";
@@ -265,21 +321,6 @@ class User{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
-            $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
-            $stmt[0]->execute();
-            $role = '';
-            $stmt[0]->bind_result($role);
-            if(!$stmt[0]->fetch()){
-                $stmt[0]->close();
-                throw new Exception('user tidak ditemukan');
-            }
-            $stmt[0]->close();
-            // if($role != 'masyarakat'){
-            //     throw new Exception('invalid role');
-            // }
             //check tanggal
             date_default_timezone_set('Asia/Jakarta');
             $tanggal_lahir = strtotime($data['tanggalL']);
@@ -293,6 +334,71 @@ class User{
             // Compare the dates
             if ($tanggal_lahir > $tanggal_sekarang){
                 echo "<script>alert('Tanggal lahir tidak boleh kurang dari tanggal sekarang !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check Admin
+            $query = "SELECT role FROM users WHERE id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_admin']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                echo "<script>alert('Pengguna tidak ditemukan')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            echo 'pengguna '. $data['id_user'];
+            $stmt[0]->close();
+            if($role != 'super admin'){
+                // echo 'duduk admin';
+                echo "<script>alert('Anda bukan super admin')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check email input
+            $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['email']);
+            $stmt[1]->execute();
+            if ($stmt[1]->fetch()) {
+                $stmt[1]->close();
+                echo "<script>alert('Email sudah digunakan !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $stmt[1]->close();
+            $query = "SELECT foto FROM users WHERE BINARY email = ? LIMIT 1";
+            //get data id user
+            $stmt[2] = self::$con->prepare($query);
+            $stmt[2]->execute();
+            $idUser = 1;
+            $stmt[2]->bind_result($idUser);
+            $stmt[2]->fetch();
+            $stmt[2]->close();
+            $folderAdmin = '/admin';
+            //proses file
+            $fileFoto = $_FILES['foto'];
+            $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
+            $size = filesize($fileFoto['name']);
+            if (in_array($extension,['png','jpeg','jpg'])) {
+                if ($size >= self::$sizeImg) {
+                    echo "<script>alert('File terlalu besar !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
+            } else {
+                echo "<script>alert('File harus jpg, jpeg, png !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //simpan file
+            $nameFile = '/'.$idUser.'.'.$extension;  
+            $fileFotoPath = self::$folderPath.$folderAdmin.$nameFile;
+            if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
+                echo "<script>alert('Gagal menyimpan File !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -356,9 +462,53 @@ class User{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if (!isset($data['nama']) || empty($data['nama'])) {
-                return ['status' => 'error', 'message' => 'Nama Wajib di isi', 'code' => 400];
+            if (!isset($data['id_user']) || empty($data['id_user'])) {
+                echo "<script>alert('ID admin harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
+            //check id_user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                echo "<script>alert('User tidak ditemukan');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $stmt[0]->close();
+            if($role != 'super admin'){
+                echo "<script>alert('Anda bukan super admin');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check id_user
+            $query = "SELECT role, foto FROM users WHERE id_user = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_user']);
+            $stmt[1]->execute();
+            $pathFoto = '';
+            $roleDB = '';
+            $stmt[1]->bind_result($roleDB, $pathFoto);
+            if (!$stmt[1]->fetch()) {
+                $stmt[1]->close();
+                echo "<script>alert('Data Admin tidak ditemukan');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $stmt[1]->close();
+            if($role == 'masyarakat'){
+                echo "<script>alert('Anda tidak boleh menghapus data masyarakat');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //delete file
+            $fileFotoPath = self::$folderPath.'/admin'.$pathFoto;
+            unlink($fileFotoPath);
             $query = "DELETE FROM users WHERE id_user = ? ";
             $stmt = self::$con->prepare($query);
             $stmt->bind_param('i', $data['id_user']);
@@ -384,7 +534,9 @@ class User{
                     'status' => 'error',
                     'message' => $errorJson['message'],
             );
-            return $responseData;
+            echo "<script>alert('$error')</script>";
+            echo "<script>window.history.back();</script>";
+            exit();
         }
     }
 }
