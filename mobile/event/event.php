@@ -368,7 +368,6 @@ class EventMobile{
             }
             //check id_event
             $query = "SELECT events.id_detail, status, poster_event FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = ? LIMIT 1";
-            // $query = "SELECT id_detail, poster_event FROM events WHERE BINARY id_event = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
             $stmt[0]->bind_param('s', $data['id_event']);
             $stmt[0]->execute();

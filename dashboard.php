@@ -106,7 +106,7 @@ $csrf = $GLOBALS['csrf'];
                 </div>
               </div>
             </div>
-            <!-- <div class="col-lg-6 col-md-4">
+            <div class="col-lg-6 col-md-4">
               <div class="card success-card revenue-card">
                 <div class="card-body">
                   <div class="d-flex align-items-center mt-3 mb-3">
@@ -120,7 +120,7 @@ $csrf = $GLOBALS['csrf'];
                   </div>
                 </div>
               </div>
-            </div> -->
+            </div>
           </div>
         </div>
 

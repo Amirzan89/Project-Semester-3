@@ -80,8 +80,8 @@ $csrf = $GLOBALS['csrf'];
       <h1>Formulir Pengajuan</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="nis1.php">Kelola Event</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/event.php">Kelola Event</a></li>
           <li class="breadcrumb-item active">Formulir Pengajuan</li>
         </ol>
       </nav>

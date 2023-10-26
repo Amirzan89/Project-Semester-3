@@ -8,7 +8,7 @@ class User{
     public function __construct(){
         self::$database = Koneksi::getInstance();
         self::$con = self::$database->getConnection();
-        self::$folderPath = __DIR__.'/private/profile';
+        self::$folderPath = __DIR__.'/../private/profile';
     }
     //khusus admin 
     public function tambahAdmin($data){

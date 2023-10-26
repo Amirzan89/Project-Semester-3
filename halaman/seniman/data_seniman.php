@@ -88,7 +88,6 @@ $csrf = $GLOBALS['csrf'];
               <a href="tambah-seniman.php" class="btn btn-primary">
   <i class="bi bi-person-plus-fill"></i> Tambahkan data seniman
 </a>
-
               <!-- <button type="button" class="btn btn-primary" href="formulir-baru.php"><i class="bi bi-person-plus-fill"></i> Tambahkan data seniman</button> -->
 
               <table class="table datatable">
@@ -103,21 +102,19 @@ $csrf = $GLOBALS['csrf'];
                   </thead>
                   <tbody>
                   <?php
-                      $query = mysqli_query($conn, "SELECT id_seniman, nomor_induk, nama_seniman, no_telpon FROM seniman WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_seniman DESC");
+                      $query = mysqli_query($conn, "SELECT id_seniman, nomor_induk, nama_seniman, no_telpon FROM seniman WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_seniman ASC");
                       $no = 1;
                       while ($seniman = mysqli_fetch_array($query)) {
                   ?>
                   <tr>
                     <td><?php echo $no ?></td>
-                    <td><?php echo $sneiman['nomor_induk'] ?></td>
-                    <td><?php echo $sneiman['nama_seniman'] ?></td>
-                    <td><?php echo $sneiman[''] ?></td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye-fill"></i>  lihat
-                    </button>
-                    <button type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i>  edit
-                    </button>
-                    <button type="button" class="btn btn-danger"><i class="bi bi-trash-fill"></i>  hapus
-                    </button>
+                    <td><?php echo $seniman['nomor_induk'] ?></td>
+                    <td><?php echo $seniman['nama_seniman'] ?></td>
+                    <td><?php echo $seniman['no_telpon'] ?></td>
+                    <td>
+                      <a href="/halaman/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-warning"><i class="bi bi-eye-fill">Lihat</i></a>
+                      <button type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i>  edit </button>
+                      <button type="button" class="btn btn-danger"><i class="bi bi-trash-fill"></i>  hapus</button>
                     </td>
                   </tr>
                   <?php $no++;

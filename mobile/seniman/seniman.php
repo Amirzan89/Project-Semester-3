@@ -123,7 +123,7 @@ class SenimanMobile{
             //simpan file
             $nameFile = '/'.$idSeniman.'.'.$extension;  
             $fileKtpPath = self::$folderPath.$folderKtp.$nameFile;
-            $fileKtpDB = $folderKtp.$nameFile;
+            $fileKtpDB = $nameFile;
             if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
@@ -142,7 +142,7 @@ class SenimanMobile{
             //simpan file
             $nameFile = '/'.$idSeniman.'.'.$extension;
             $fileFotoPath = self::$folderPath.$folderPassFoto.$nameFile;
-            $fileFotoDB = $folderPassFoto.$nameFile;
+            $fileFotoDB = $nameFile;
             if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
                 unlink($fileKtpPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
@@ -152,7 +152,7 @@ class SenimanMobile{
             $fileSurat = $_FILES['surat_keterangan'];
             $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
             $size = filesize($fileSurat['size']);
-            if ($extension === 'pdf' || $extension === 'docx') {
+            if ($extension === 'pdf') {
                 if ($size >= self::$sizeFile) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
@@ -162,7 +162,7 @@ class SenimanMobile{
             //simpan file
             $nameFile = '/'.$idSeniman.'.'.$extension;
             $fileSuratPath = self::$folderPath.$folderSurat.$nameFile;
-            $fileSuratDB = $folderSurat.$nameFile;
+            $fileSuratDB = $nameFile;
             if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
                 unlink($fileKtpPath);
                 unlink($fileFotoPath);
