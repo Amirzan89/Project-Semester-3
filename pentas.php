@@ -136,7 +136,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-file-earmark-text-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/pentas/formulir-advis.php">Formulir</a></h5>
+                      <h5 class="card-title"><a href="/pentas/formulir-advis.php">Formulir</a></h5>
                     </div>
                   </div>
                 </div>
@@ -150,7 +150,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/pentas/pengajuan.php">Verifikasi Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/pentas/pengajuan.php">Verifikasi Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
@@ -164,7 +164,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/pentas/riwayat.php">Riwayat Pengajuan pentas</a></h5>
+                      <h5 class="card-title"><a href="/pentas/riwayat.php">Riwayat Pengajuan pentas</a></h5>
                     </div>
                   </div>
                 </div>
@@ -178,7 +178,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-folder-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/data-seniman.php">Data Seniman</a></h5>
+                      <h5 class="card-title"><a href="/nis/data-seniman.php">Data Seniman</a></h5>
                     </div>
                   </div>
                 </div>

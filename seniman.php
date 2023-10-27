@@ -135,7 +135,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-file-earmark-text-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/seniman/formulir-baru.php">Formulir</a></h5>
+                      <h5 class="card-title"><a href="/seniman/formulir-baru.php">Formulir</a></h5>
                     </div>
                   </div>
                 </div>
@@ -149,7 +149,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/seniman/pengajuan.php">Verifikasi Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/seniman/pengajuan.php">Verifikasi Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
@@ -163,7 +163,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/seniman/riwayat.php">Riwayat Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/seniman/riwayat.php">Riwayat Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
@@ -177,7 +177,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/seniman/riwayat.php">Perpanjang Nomer Induk Seniman</a></h5>
+                      <h5 class="card-title"><a href="/seniman/riwayat.php">Perpanjang Nomer Induk Seniman</a></h5>
                     </div>
                   </div>
                 </div>
@@ -191,7 +191,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-folder-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/seniman/data_seniman.php">Data Seniman</a></h5>
+                      <h5 class="card-title"><a href="/seniman/data_seniman.php">Data Seniman</a></h5>
                     </div>
                   </div>
                 </div>

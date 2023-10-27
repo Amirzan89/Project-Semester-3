@@ -95,7 +95,7 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h4 class="card-title">Data Pengguna</h4>
-              <!-- <a href="/halaman/users/form-tambah-user.php">
+              <!-- <a href="/users/form-tambah-user.php">
                 <button type="button" class="btn btn-success">
                     <i class="bi bi-person-plus-fill"></i> Tambah User
                 </button>
@@ -132,8 +132,8 @@ $csrf = $GLOBALS['csrf'];
                         <!-- <td><?php //echo $users['role'] ?></td> -->
                         <td><?php echo $users['email'] ?></td>
                         <td>
-                          <a href="/halaman/users/form-edit-user.php?id_user=<?= $users['id_user'] ?>" class="btn btn-info"><i class="bi bi-pencil-square"></i></i></a>
-                          <a href="/halaman/users/proses-hapus-user.php?id_user=<?= $users['id_user'] ?>" onclick="return confirm('Anda yakin ingin menghapus data <?php echo $users['nama_lengkap']; ?>?');" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+                          <a href="/users/form-edit-user.php?id_user=<?= $users['id_user'] ?>" class="btn btn-info"><i class="bi bi-pencil-square"></i></i></a>
+                          <a href="/users/proses-hapus-user.php?id_user=<?= $users['id_user'] ?>" onclick="return confirm('Anda yakin ingin menghapus data <?php echo $users['nama_lengkap']; ?>?');" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
                         </td>
                       </tr>
                     <?php $no++;

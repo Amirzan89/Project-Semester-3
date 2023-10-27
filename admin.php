@@ -94,7 +94,7 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h4 class="card-title">Data Admin</h4>
-              <a href="/halaman/admin/tambah.php">
+              <a href="/admin/tambah.php">
                 <button type="button" class="btn btn-success">
                     <i class="bi bi-person-plus-fill"></i> Tambah User
                 </button>
@@ -131,8 +131,8 @@ $csrf = $GLOBALS['csrf'];
                         <td><?php echo $users['role'] ?></td>
                         <td><?php echo $users['email'] ?></td>
                         <td>
-                          <a href="/halaman/admin/edit.php?id_user=<?= $users['id_user'] ?>" class="btn btn-info"><i class="bi bi-pencil-square"></i></i></a>
-                          <a href="/halaman/admin/proses-hapus-user.php?id_user=<?= $users['id_user'] ?>" onclick="return confirm('Anda yakin ingin menghapus data <?php echo $users['nama_lengkap']; ?>?');" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+                          <a href="/admin/edit.php?id_user=<?= $users['id_user'] ?>" class="btn btn-info"><i class="bi bi-pencil-square"></i></i></a>
+                          <a href="/admin/proses-hapus-user.php?id_user=<?= $users['id_user'] ?>" onclick="return confirm('Anda yakin ingin menghapus data <?php echo $users['nama_lengkap']; ?>?');" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
                         </td>
                       </tr>
                     <?php $no++;

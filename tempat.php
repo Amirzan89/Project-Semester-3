@@ -156,7 +156,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-file-earmark-text-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/tempat/data_tempat.php">Data tempat</a></h5>
+                      <h5 class="card-title"><a href="/tempat/data_tempat.php">Data tempat</a></h5>
                     </div>
                   </div>
                 </div>
@@ -170,7 +170,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-file-earmark-text-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/tempat/formulir-sewa.php">Formulir</a></h5>
+                      <h5 class="card-title"><a href="/tempat/formulir-sewa.php">Formulir</a></h5>
                     </div>
                   </div>
                 </div>
@@ -184,7 +184,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/tempat/pengajuan.php">Verifikasi Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/tempat/pengajuan.php">Verifikasi Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
@@ -198,7 +198,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/tempat/riwayat.php">Riwayat Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/tempat/riwayat.php">Riwayat Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
@@ -212,7 +212,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-folder-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/nis/data-seniman.php">Data event</a></h5>
+                      <h5 class="card-title"><a href="/nis/data-seniman.php">Data event</a></h5>
                     </div>
                   </div>
                 </div>

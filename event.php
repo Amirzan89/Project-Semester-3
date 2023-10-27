@@ -151,7 +151,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-file-earmark-text-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/event/formulir.php">Formulir</a></h5>
+                      <h5 class="card-title"><a href="/event/formulir.php">Formulir</a></h5>
                     </div>
                   </div>
                 </div>
@@ -165,7 +165,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/event/pengajuan.php">Verifikasi Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/event/pengajuan.php">Verifikasi Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
@@ -179,7 +179,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="/halaman/event/riwayat.php">Riwayat Pengajuan</a></h5>
+                      <h5 class="card-title"><a href="/event/riwayat.php">Riwayat Pengajuan</a></h5>
                     </div>
                   </div>
                 </div>
