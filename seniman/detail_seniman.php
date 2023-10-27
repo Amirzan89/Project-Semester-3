@@ -52,7 +52,13 @@ $csrf = $GLOBALS['csrf'];
 </head>
 
 <body>
-
+    <script>
+	    var csrfToken = "<?php echo $csrf ?>";
+        var email = "<?php echo $userAuth['email'] ?>";
+        var idUser = "<?php echo $userAuth['id_user'] ?>";
+        var number = "<?php echo $userAuth['number'] ?>";
+        var role = "<?php echo $userAuth['role'] ?>";
+	</script>
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
         <?php include('../header.php');
@@ -186,6 +192,42 @@ $csrf = $GLOBALS['csrf'];
         ?>
     </footer>
 
+    <script>
+        //download data
+        function download(desc){
+            var xhr = new XMLHttpRequest();
+            var requestBody = {
+                email: email,
+                nama:namaDeviceInput.value,
+                token:tokenInput.value,
+                gps:gpsInput.value,
+            };
+            //open the request
+            xhr.open('POST',domain+"/device/create")
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            //send the form data
+            xhr.send(JSON.stringify(requestBody));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        // console.log('email  reload '+email);
+                        console.log(response)
+                        editDeviceForm.reset(); //reset form after AJAX success.
+                        // Handle the response data
+                        // ...
+                        getDevice();
+                    } else {
+                        var response = xhr.responseText;
+                        console.log('errorrr '+response);
+                        // Handle the error case
+                        // ...
+                    }
+                }
+            }
+        }
+    </script>
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
 

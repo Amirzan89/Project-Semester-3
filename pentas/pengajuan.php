@@ -47,7 +47,13 @@ $csrf = $GLOBALS['csrf'];
 </head>
 
 <body>
-
+  <script>
+	  var csrfToken = "<?php echo $csrf ?>";
+    var email = "<?php echo $userAuth['email'] ?>";
+    var idUser = "<?php echo $userAuth['id_user'] ?>";
+    var number = "<?php echo $userAuth['number'] ?>";
+    var role = "<?php echo $userAuth['role'] ?>";
+	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../header.php');
