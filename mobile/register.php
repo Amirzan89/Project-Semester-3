@@ -46,7 +46,6 @@ function Register($data,$con){
                 throw new Exception('Password harus sama');
             }else{
                 $user = new UserMobile();
-                // echo 'tambah database';
                 return $user->createUser($data,'register');
             }
         }else{

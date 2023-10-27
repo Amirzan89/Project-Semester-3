@@ -13,8 +13,7 @@ include('koneksi.php');
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/assets/img/landing-page/favicon.png" rel="icon">
-    <link href="/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="/public/img/icon/utama/logo.png" rel="icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
