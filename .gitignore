@@ -7,6 +7,10 @@
 /storage/*.key
 /vendor
 /private
+/event/preview
+/tempat/preview
+/pentas/preview
+/seniman/preview
 /web/.env
 .env.backup
 .env.production

@@ -141,34 +141,58 @@ $csrf = $GLOBALS['csrf'];
                   <div class="activity">
 
                     <div class="activity-item d-flex">
-                      <div class="activite-label">15 Oktober 2023</div>
+                      <div class="activite-label"><?php echo date('d M Y') ?></div>
                       <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
                       <div class="activity-content">
-                      <a href="event/verif-event.php" class="fw-bold text-dark"><h6><strong>Kelola Event</strong></h6>2 Notifikasi                        </a>
+                        <a href="/event.php" class="fw-bold text-dark"><h6><strong>Kelola Event</strong></h6>
+                          <?php 
+                            $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM events WHERE status = 'diajukan'");
+                            $data = mysqli_fetch_assoc($sql);
+                            echo $data['total']." notifikasi";
+                          ?>
+                        </a>
                       </div>
                     </div><!-- End activity item-->
 
                     <div class="activity-item d-flex">
-                      <div class="activite-label">15 Oktober 2023</div>
+                      <div class="activite-label"><?php echo date('d M Y') ?></div>
                       <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
                       <div class="activity-content">
-                      <a href="tempat/verif-tempat.php" class="fw-bold text-dark"><h6><strong>Peminjaman Tempat</strong></h6>2 Notifikasi                        </a>
+                        <a href="/tempat.php" class="fw-bold text-dark"><h6><strong>Peminjaman Tempat</strong></h6>
+                          <?php 
+                            $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM sewa_tempat WHERE status = 'diajukan'");
+                            $data = mysqli_fetch_assoc($sql);
+                            echo $data['total']." notifikasi";
+                          ?>
+                        </a>
                       </div>
                     </div><!-- End activity item-->
 
                     <div class="activity-item d-flex">
-                      <div class="activite-label">15 Oktober 2023</div>
+                      <div class="activite-label"><?php echo date('d M Y') ?></div>
                       <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
                       <div class="activity-content">
-                         <a href="nis/verif-nis.php" class="fw-bold text-dark"><h6><strong>Nomor Induk Seniman</strong></h6>2 Notifikasi                        </a>
+                        <a href="/seniman.php" class="fw-bold text-dark"><h6><strong>Nomor Induk Seniman</strong></h6>
+                          <?php 
+                            $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diajukan'");
+                            $data = mysqli_fetch_assoc($sql);
+                            echo $data['total']." notifikasi";
+                          ?>
+                        </a>
                       </div>
                     </div><!-- End activity item-->
 
                     <div class="activity-item d-flex">
-                      <div class="activite-label">15 Oktober 2023</div>
+                      <div class="activite-label"><?php echo date('d M Y') ?></div>
                       <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
                       <div class="activity-content">
-                      <a href="surat-advis/verif-advis.php" class="fw-bold text-dark"><h6><strong>Surat Advis</strong></h6>2 Notifikasi                        </a>
+                        <a href="/pentas.php" class="fw-bold text-dark"><h6><strong>Surat Advis</strong></h6>
+                          <?php 
+                            $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM surat_advis WHERE status = 'diajukan'");
+                            $data = mysqli_fetch_assoc($sql);
+                            echo $data['total']." notifikasi";
+                          ?>
+                        </a>
                       </div>
                     </div><!-- End activity item-->
                   </div>
