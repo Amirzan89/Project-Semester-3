@@ -53,11 +53,13 @@ $csrf = $GLOBALS['csrf'];
 
 <body>
     <script>
+        const domain = window.location.protocol + '//' + window.location.hostname +":"+window.location.port;
 	    var csrfToken = "<?php echo $csrf ?>";
         var email = "<?php echo $userAuth['email'] ?>";
         var idUser = "<?php echo $userAuth['id_user'] ?>";
         var number = "<?php echo $userAuth['number'] ?>";
         var role = "<?php echo $userAuth['role'] ?>";
+        var idSeniman = "<?php echo $id ?>";
 	</script>
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
@@ -154,15 +156,18 @@ $csrf = $GLOBALS['csrf'];
                                 </div>
                                 <div class="col-12">
                                     <label for="surat_keterangan" class="form-label">Surat Keterangan Desa</label>
-                                    <input type="file" class="form-file-input form-control" id="surat_keterangan">
+                                    <button class="btn btn-info" type="button" onclick="preview('surat') "> Lihat surat keterangan </button>
+                                    <button class="btn btn-info" type="button" onclick="download('surat') "> Download surat keterangan </button>
                                 </div>
                                 <div class=" col-12">
                                     <label for="ktp_seniman" class="form-label">Foto Kartu Tanda Penduduk</label>
-                                    <input type="file" class="form-file-input form-control" id="ktp_seniman">
+                                    <button class="btn btn-info" type="button" onclick="preview('ktp')"> Lihat Foto KTP</button>
+                                    <button class="btn btn-info" type="button" onclick="download('ktp')"> Download Foto KTP</button>
                                 </div>
                                 <div class="col-12">
                                     <label for="pass_foto" class="form-label">Pass Foto 3x4</label>
-                                    <input type="file" class="form-file-input form-control" id="pass_foto">
+                                    <button class="btn btn-info" type="button" onclick="preview('foto')"> Lihat pass foto </button>
+                                    <button class="btn btn-info" type="button" onclick="download('foto')"> Download pass foto </button>
                                 </div>
                                 <div class="row mb-3 justify-content-end">
                                     <div class="col-sm-10 text-end">
@@ -191,45 +196,71 @@ $csrf = $GLOBALS['csrf'];
         <?php include('footer.php');
         ?>
     </footer>
-
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
     <script>
-        //download data
-        function download(desc){
+        //preview data
+        function preview(desc){
+            if (desc != 'ktp' && desc != 'foto' && desc != 'surat'){
+                console.log('invalid description');
+                return;
+            }
             var xhr = new XMLHttpRequest();
             var requestBody = {
                 email: email,
-                nama:namaDeviceInput.value,
-                token:tokenInput.value,
-                gps:gpsInput.value,
+                id_seniman:idSeniman,
+                item:'seniman',
+                deskripsi:desc
             };
             //open the request
-            xhr.open('POST',domain+"/device/create")
+            xhr.open('POST',domain+"/preview.php")
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             //send the form data
             xhr.send(JSON.stringify(requestBody));
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
-                    if (xhr.status === 200) {
+                    if (xhr.status === 200 || xhr.status === 300 || xhr.status === 302) {
                         var response = JSON.parse(xhr.responseText);
-                        // console.log('email  reload '+email);
-                        console.log(response)
-                        editDeviceForm.reset(); //reset form after AJAX success.
-                        // Handle the response data
-                        // ...
-                        getDevice();
+                        window.location.href = response.data;
                     } else {
                         var response = xhr.responseText;
                         console.log('errorrr '+response);
-                        // Handle the error case
-                        // ...
+                    }
+                }
+            }
+        }
+        //download data
+        function download(desc){
+            if (desc != 'ktp' && desc != 'foto' && desc != 'surat'){
+                console.log('invalid description');
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            var requestBody = {
+                email: email,
+                id_seniman:idSeniman,
+                item:'seniman',
+                deskripsi:desc
+            };
+            //open the request
+            xhr.open('POST',domain+"/download.php")
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            //send the form data
+            xhr.send(JSON.stringify(requestBody));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status === 200 || xhr.status === 300 || xhr.status === 302) {
+                        // var response = JSON.parse(xhr.responseText);
+                        // window.location.href = response.data;
+                    } else {
+                        var response = xhr.responseText;
+                        console.log('errorrr '+response);
                     }
                 }
             }
         }
     </script>
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-            class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
     <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

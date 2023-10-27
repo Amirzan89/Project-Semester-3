@@ -58,11 +58,13 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
 
 <body>
     <script>
+        const domain = window.location.protocol + '//' + window.location.hostname +":"+window.location.port;
 		var csrfToken = "<?php echo $csrf ?>";
         var email = "<?php echo $userAuth['email'] ?>";
         var idUser = "<?php echo $userAuth['id_user'] ?>";
         var number = "<?php echo $userAuth['number'] ?>";
         var role = "<?php echo $userAuth['role'] ?>";
+        var idSewa = "<?php echo $id ?>";
     </script>
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
@@ -156,7 +158,8 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
                                 <div class="row mb-3">
                                     <label for="inputNumber" class="col-sm-2 col-form-label">Surat Keterangan</label>
                                     <div class="col-sm-10">
-                                        <input class="form-control" type="file" id="formFile">
+                                    <button class="btn btn-info" type="button" onclick="preview('surat')"> Lihat surat keterangan </button>
+                                    <button class="btn btn-info" type="button" onclick="download('surat')"> Download surat keterangan </button>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -199,6 +202,70 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
     <?php include('../footer.php');
     ?>
   </footer>
+    <script>
+        //preview data
+        function preview(desc){
+            if (desc != 'ktp' && desc != 'foto' && desc != 'surat'){
+                console.log('invalid description');
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            var requestBody = {
+                email: email,
+                id_sewa:idSewa,
+                item:'tempat',
+                deskripsi:desc
+            };
+            //open the request
+            xhr.open('POST',domain+"/preview.php")
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            //send the form data
+            xhr.send(JSON.stringify(requestBody));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status === 200 || xhr.status === 300 || xhr.status === 302) {
+                        var response = JSON.parse(xhr.responseText);
+                        window.location.href = response.data;
+                    } else {
+                        var response = xhr.responseText;
+                        console.log('errorrr '+response);
+                    }
+                }
+            }
+        }
+        //preview data
+        function download(desc){
+            if (desc != 'ktp' && desc != 'foto' && desc != 'surat'){
+                console.log('invalid description');
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            var requestBody = {
+                email: email,
+                id_sewa:idSewa,
+                item:'tempat',
+                deskripsi:desc
+            };
+            //open the request
+            xhr.open('POST',domain+"/download.php")
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            //send the form data
+            xhr.send(JSON.stringify(requestBody));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status === 200 || xhr.status === 300 || xhr.status === 302) {
+                        // var response = JSON.parse(xhr.responseText);
+                        // window.location.href = response.data;
+                    } else {
+                        var response = xhr.responseText;
+                        console.log('errorrr '+response);
+                    }
+                }
+            }
+        }
+    </script>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
       class="bi bi-arrow-up-short"></i></a>

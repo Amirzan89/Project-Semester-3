@@ -57,11 +57,13 @@ $csrf = $GLOBALS['csrf'];
 
 <body>
   <script>
+    const domain = window.location.protocol + '//' + window.location.hostname +":"+window.location.port;
 		var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
     var number = "<?php echo $userAuth['number'] ?>";
     var role = "<?php echo $userAuth['role'] ?>";
+    var idEvent = "<?php echo $id ?>";
 	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -140,7 +142,8 @@ $csrf = $GLOBALS['csrf'];
                 </div>
                 <div class="col-12">
                   <label for="inputFile" class="form-label">Poster Event :</label>
-                  <input type="file" class="form-file-input form-control" id="inputFile" readonly>
+                  <button class="btn btn-info" type="button" onclick="preview('foto')"> Lihat poster </button>
+                  <button class="btn btn-info" type="button" onclick="download('foto')"> Download poster </button>
                 </div>
                 <?php if(isset($events['catatan']) && !is_null($events['catatan']) && !empty($events['catatan'])){?>
                   <div class="col-12">
@@ -168,6 +171,70 @@ $csrf = $GLOBALS['csrf'];
     ?>
   </footer>
 
+  <script>
+        //preview data
+        function preview(desc){
+            if (desc != 'ktp' && desc != 'foto' && desc != 'surat'){
+                console.log('invalid description');
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            var requestBody = {
+                email: email,
+                id_event:idEvent,
+                item:'event',
+                deskripsi:desc
+            };
+            //open the request
+            xhr.open('POST',domain+"/preview.php")
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            //send the form data
+            xhr.send(JSON.stringify(requestBody));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status === 200 || xhr.status === 300 || xhr.status === 302) {
+                        var response = JSON.parse(xhr.responseText);
+                        window.location.href = response.data;
+                    } else {
+                        var response = xhr.responseText;
+                        console.log('errorrr '+response);
+                    }
+                }
+            }
+        }
+        //download data
+        function download(desc){
+            if (desc != 'ktp' && desc != 'foto' && desc != 'surat'){
+                console.log('invalid description');
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            var requestBody = {
+                email: email,
+                id_event:idEvent,
+                item:'event',
+                deskripsi:desc
+            };
+            //open the request
+            xhr.open('POST',domain+"/download.php")
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            //send the form data
+            xhr.send(JSON.stringify(requestBody));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status === 200 || xhr.status === 300 || xhr.status === 302) {
+                        var response = JSON.parse(xhr.responseText);
+                        window.location.href = response.data;
+                    } else {
+                        var response = xhr.responseText;
+                        console.log('errorrr '+response);
+                    }
+                }
+            }
+        }
+    </script>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
       class="bi bi-arrow-up-short"></i></a>
 

@@ -22,8 +22,8 @@ class Preview{
     //untuk admin
     public function previewEvent($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi !')</script>";
+            if(!isset($data['email']) || empty($data['email'])){
+                echo "<script>alert('Email harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -37,10 +37,10 @@ class Preview{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check id_user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['email']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
@@ -89,9 +89,12 @@ class Preview{
                 $des = __DIR__ . self::$folderEventDes .'/'. $randomString . '.'. $extension;
                 $previewURL = self::$folderEventDes .'/'. $randomString . '.'. $extension;
                 if (copy($file, $des)) {
-                    header("Location: $previewURL");
-                    flush();
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','data'=>"$previewURL"]);
                     exit();
+                    // header("Location: $previewURL");
+                    // flush();
+                    // exit();
                     // $startTime = time();
                     // $timeout = 5;
                     // while (true) {
@@ -133,8 +136,8 @@ class Preview{
     }
     public function previewSeniman($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi !')</script>";
+            if(!isset($data['email']) || empty($data['email'])){
+                echo "<script>alert('Email harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -148,10 +151,10 @@ class Preview{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check id_user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['email']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
@@ -206,15 +209,15 @@ class Preview{
                 $des = __DIR__ . self::$folderSenimanDes .'/'. $randomString . '.'. $extension;
                 $previewURL = self::$folderSenimanDes .'/'. $randomString . '.'. $extension;
                 if (copy($file, $des)) {
-                    header("Location: $previewURL");
-                    flush();
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','data'=>"$previewURL"]);
                     exit();
                     // $startTime = time();
                     // $timeout = 5;
                     // while (true) {
                     //     if (time() - $startTime >= $timeout) {
-                    //         unlink($des);
-                    //         exit();
+                            // unlink($des);
+                            // exit();
                     //     }
                     // }
                 } else {
@@ -250,8 +253,8 @@ class Preview{
     }
     public function previewPentas($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi !')</script>";
+            if(!isset($data['email']) || empty($data['email'])){
+                echo "<script>alert('Email harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -265,10 +268,10 @@ class Preview{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check id_user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['email']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
@@ -317,8 +320,8 @@ class Preview{
                 $des = __DIR__ . self::$folderPentasDes .'/'. $randomString . '.'. $extension;
                 $previewURL = self::$folderPentasDes .'/'. $randomString . '.'. $extension;
                 if (copy($file, $des)) {
-                    header("Location: $previewURL");
-                    flush();
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','data'=>"$previewURL"]);
                     exit();
                     // $startTime = time();
                     // $timeout = 5;
@@ -361,8 +364,8 @@ class Preview{
     }
     public function previewTempat($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi !')</script>";
+            if(!isset($data['email']) || empty($data['email'])){
+                echo "<script>alert('Email harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -376,10 +379,10 @@ class Preview{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check id_user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['email']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
@@ -428,8 +431,9 @@ class Preview{
                 $des = __DIR__ . self::$folderTempatDes .'/'. $randomString . '.'. $extension;
                 $previewURL = self::$folderTempatDes .'/'. $randomString . '.'. $extension;
                 if (copy($file, $des)) {
-                    header("Location: $previewURL");
-                    flush();
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','data'=>"$previewURL"]);
+                    exit();
                     // $startTime = time();
                     // $timeout = 5;
                     // while (true) {

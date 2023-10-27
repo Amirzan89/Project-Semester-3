@@ -48,7 +48,7 @@ $csrf = $GLOBALS['csrf'];
 </head>
 
 <body>
- <script>
+  <script>
 	  var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
