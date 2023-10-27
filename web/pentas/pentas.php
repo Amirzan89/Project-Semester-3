@@ -26,6 +26,12 @@ class PentasWebsite{
                 echo "<script>alert('Keterangan harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
+            }else{
+                if($data['keterangan'] == 'diajukan'){
+                    echo "<script>alert('Keterangan invalid !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
             }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";

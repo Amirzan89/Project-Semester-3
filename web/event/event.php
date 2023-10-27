@@ -1,5 +1,5 @@
 <?php
-require_once('koneksi.php');
+require_once(__DIR__ . '/../../web/koneksi.php');
 class EventWebsite{
     private static $database;
     private static $con;
@@ -62,6 +62,12 @@ class EventWebsite{
                 echo "<script>alert('Keterangan harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
+            }else{
+                if($data['keterangan'] == 'diajukan'){
+                    echo "<script>alert('Keterangan invalid !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
             }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -83,10 +89,12 @@ class EventWebsite{
                 exit();
             }
             //check id event
-            $query = "SELECT id_event FROM event WHERE id_event = ?";
+            $query = "SELECT status FROM events WHERE id_event = ?";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_event']);
             $stmt[1]->execute();
+            $statusDB = '';
+            $stmt[1]->bind_result($statusDB);
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
                 echo "<script>alert('Data event tidak ditemukan')</script>";
@@ -94,34 +102,56 @@ class EventWebsite{
                 exit();
             }
             $stmt[1]->close();
+            if($data['keterangan'] ==  'proses' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
+                echo "<script>alert('Data sudah diverifikasi')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if($data['keterangan'] ==  'ditolak' && $statusDB == 'diterima'){
+                echo "<script>alert('Data sudah diverifikasi')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if($data['keterangan'] ==  'diterima' && $statusDB == 'ditolak'){
+                echo "<script>alert('Data sudah diverifikasi')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
             //update data
-            $query = "UPDATE events SET status = ?, catatan = ?, WHERE id_event = ?";
+            $query = "UPDATE events SET status = ?, catatan = ? WHERE id_event = ?";
             $stmt[2] = self::$con->prepare($query);
             if($data['keterangan'] == 'proses'){
                 $status = 'proses';
+                $redirect = '/pengajuan.php';
+                if(isset($data['catatan']) || !empty($data['catatan'])){
+                    $data['catatan'] = '';
+                }
             }else if($data['keterangan'] == 'diterima'){
                 $status = 'diterima';
+                $redirect = '/riwayat.php';
+                if(isset($data['catatan']) || !empty($data['catatan'])){
+                    $data['catatan'] = '';
+                }
             }else if($data['keterangan'] == 'ditolak'){
                 if(!isset($data['catatan']) || empty($data['catatan'])){
                     echo "<script>alert('Catatan harus di isi !')</script>";
                     echo "<script>window.history.back();</script>";
                     exit();
-                }else{
-                    $data['catatan'] = '';
                 }
+                $redirect = '/riwayat.php';
                 $status = 'ditolak';
             }
-            $stmt[2]->bind_param("si", $status, $data['catatan'], $data['id_tempat']);
+            $stmt[2]->bind_param("ssi", $status, $data['catatan'], $data['id_event']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
                 echo "<script>alert('Status berhasil diubah')</script>";
-                echo "<script>window.location.href = '/halaman/event/data_event.php';</script>";
+                echo "<script>window.location.href = '/event". $redirect . "'; </script>";
                 exit();
             } else {
                 $stmt[2]->close();
                 echo "<script>alert('Status gagal diubah')</script>";
-                echo "<script>window.location.href = '/halaman/event/data_event.php';</script>";
+                echo "<script>window.location.href = '/event". $redirect . "'; </script>";
                 exit();
             }
         }catch(Exception $e){
