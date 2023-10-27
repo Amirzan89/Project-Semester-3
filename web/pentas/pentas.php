@@ -17,7 +17,7 @@ class PentasWebsite{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if(!isset($data['id_sewa']) || empty($data['id_sewa'])){
+            if(!isset($data['id_advis']) || empty($data['id_advis'])){
                 echo "<script>alert('ID sewa harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
@@ -41,54 +41,79 @@ class PentasWebsite{
                 exit();
             }
             $stmt[0]->close();
-            if(($role != 'admin tempat' && $role != 'super admin') || $role == 'masyarakat'){
+            if(($role != 'admin pentas' && $role != 'super admin') || $role == 'masyarakat'){
                 echo "<script>alert('Invalid role !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check id sewa
-            $query = "SELECT id_sewa FROM sewa_tempat WHERE id_sewa = ?";
+            //check id advis
+            $query = "SELECT status FROM surat_advis WHERE id_advis = ?";
             $stmt[1] = self::$con->prepare($query);
-            $stmt[1]->bind_param('s', $data['id_event']);
+            $stmt[1]->bind_param('s', $data['id_advis']);
             $stmt[1]->execute();
+            $statusDB = '';
+            $stmt[1]->bind_result($statusDB);
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
-                echo "<script>alert('Data sewa tempat tidak ditemukan')</script>";
+                echo "<script>alert('Data Pentas tidak ditemukan')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             $stmt[1]->close();
+            if($data['keterangan'] ==  'proses' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
+                echo "<script>alert('Data sudah diverifikasi')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if($data['keterangan'] ==  'ditolak' && $statusDB == 'diterima'){
+                echo "<script>alert('Data sudah diverifikasi')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if($data['keterangan'] ==  'diterima' && $statusDB == 'ditolak'){
+                echo "<script>alert('Data sudah diverifikasi')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
             //update data
-            $query = "UPDATE sewa_tempat SET status = ?, catatan = ?, WHERE id_sewa = ?";
+            $query = "UPDATE surat_advis SET status = ?, catatan = ? WHERE id_advis = ?";
             $stmt[2] = self::$con->prepare($query);
             if($data['keterangan'] == 'proses'){
                 $status = 'proses';
+                $redirect = '/pengajuan.php';
+                if(isset($data['catatan']) || !empty($data['catatan'])){
+                    $data['catatan'] = '';
+                }
             }else if($data['keterangan'] == 'diterima'){
                 $status = 'diterima';
+                $redirect = '/riwayat.php';
+                if(isset($data['catatan']) || !empty($data['catatan'])){
+                    $data['catatan'] = '';
+                }
             }else if($data['keterangan'] == 'ditolak'){
                 if(!isset($data['catatan']) || empty($data['catatan'])){
                     echo "<script>alert('Catatan harus di isi !')</script>";
                     echo "<script>window.history.back();</script>";
                     exit();
-                }else{
-                    $data['catatan'] = '';
                 }
+                $redirect = '/riwayat.php';
                 $status = 'ditolak';
             }
-            $stmt[2]->bind_param("si", $status, $data['catatan'], $data['id_sewa']);
+            $stmt[2]->bind_param("ssi", $status, $data['catatan'], $data['id_advis']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
                 echo "<script>alert('Status berhasil diubah')</script>";
-                echo "<script>window.location.href = '/halaman/event/data_event.php';</script>";
+                echo "<script>window.location.href = '/pentas". $redirect . "'; </script>";
                 exit();
             } else {
                 $stmt[2]->close();
                 echo "<script>alert('Status gagal diubah')</script>";
-                echo "<script>window.location.href = '/halaman/event/data_event.php';</script>";
+                echo "<script>window.location.href = '/pentas". $redirect . "'; </script>";
                 exit();
             }
         }catch(Exception $e){
+            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -140,14 +165,5 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($data['keterangan'])){
         $pentasWeb->prosesPentas($data);
     }
-    // if(isset($_POST['_method'])){
-    //     if($_POST['_method'] == 'PUT'){
-    //         $pentasWeb->editTempat($data);
-    //     }else if($_POST['_method'] == 'DELETE'){
-    //         $pentasWeb->editTempat($data);
-    //     }
-    // }else{
-    //     $pentasWeb->tambahTempat($data);
-    // }
 }
 ?>
