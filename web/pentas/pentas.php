@@ -66,8 +66,14 @@ class PentasWebsite{
                 exit();
             }
             $stmt[1]->close();
+            //check status
             if($data['keterangan'] ==  'proses' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
                 echo "<script>alert('Data sudah diverifikasi')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if($statusDB ==  'diajukan' && ($data['keterangan'] == 'diterima' || $data['keterangan'] == 'ditolak')){
+                echo "<script>alert('Data harus di proses')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
