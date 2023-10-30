@@ -96,7 +96,7 @@ $csrf = $GLOBALS['csrf'];
                     <div class="ps-1">
                       <h5 class="card-title"><a href="/admin.php"><b>Daftar Admin</b></a></h5>
                       <?php 
-                        $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role != 'super admin'");
+                        $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role != 'super admin' AND role != 'masyarakat'");
                         $data = mysqli_fetch_assoc($sql);
                         echo "<h6 class= 'notif'>".$data['total']."</h6>";
                       ?>
@@ -114,7 +114,11 @@ $csrf = $GLOBALS['csrf'];
                     </div>
                     <div class="ps-1">
                       <h5 class="card-title"><a href="/pengguna.php"><b>Daftar Pengguna</b></a></h5>
-                      <h6 class="notif" >8</h6>
+                      <?php 
+                        $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role = 'masyarakat'");
+                        $data = mysqli_fetch_assoc($sql);
+                        echo "<h6 class= 'notif'>".$data['total']."</h6>";
+                      ?>
                     </div>
                   </div>
                 </div>
