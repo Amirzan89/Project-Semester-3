@@ -170,25 +170,28 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
                                 </div>
                                 <div class="row mb-3 justify-content-end">
                                     <div class="col-sm-10 text-end">
-                                        <a href="/tempat/status_peminjaman.php" class="btn btn-info"><i>kembali</i></a>
-                                        <?php if($sewa['status'] == 'diajukan'){?>
-                                            <a href="/tempat/edit_detail_tempat.php?id_tempat=<?= $id ?>" class="btn btn-info"><i>Proses</i></a>
-                                        <?php }else if($sewa['status'] == 'proses'){?>
-                                            <button type="button" class="btn btn-success">
+                                    <?php if ($sewa['status'] == 'diajukan' || $sewa['status'] == 'proses') { ?>
+                                            <a href="/tempat/pengajuan.php" class="btn btn-info"><i>kembali</i></a>
+                                        <?php } else if ($sewa['status'] == 'diterima' || $sewa['status'] == 'ditolak') { ?>
+                                                <a href="/tempat/riwayat.php" class="btn btn-info"><i>kembali</i></a>
+                                        <?php } ?>
+                                        <?php if ($sewa['status'] == 'diajukan') { ?>
+                                            <button type="button" class="btn btn-success"
+                                                onclick="openProses(<?php echo $sewa['id_sewa'] ?>)">
+                                                <i class="bi bi-edit-fill">Proses</i>
+                                            </button>
+                                        <?php } else if ($sewa['status'] == 'proses') { ?>
+                                            <button type="button" class="btn btn-success"
+                                                onclick="openSetuju(<?php echo $sewa['id_sewa'] ?>)">
                                                 <i class="bi bi-check-circle">Setuju</i>
                                             </button>
-                                            <button type="button" class="btn btn-danger">
+                                            <button type="button" class="btn btn-danger"
+                                                onclick="openTolak(<?php echo $sewa['id_sewa'] ?>)">
                                                 <i class="bi bi-x-circle">Tolak</i>
                                             </button>
-                                        <?php }?>
+                                        <?php } ?>
                                     </div>
                                 </div>
-                                    <!-- <div class="row mb-3 justify-content-end">
-                                        <div class="col-sm-10 text-end">
-                                            <button type="submit" class="btn btn-primary">Terima</button>
-                                            <button type="button" class="btn btn-danger">Tolak</button>
-                                        </div>
-                                    </div> -->
                             </form>
                         </div>
                     </div>
@@ -197,12 +200,111 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
         </section>
 
     </main><!-- End #main -->
+    <!-- start modal proses -->
+    <div class="modal fade" id="modalProses" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi proses sewa tempat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin memproses data sewa tempat ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/tempat/tempat.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_sewa" id="inpSewaP">
+                        <input type="hidden" name="keterangan" value="proses">
+                        <button type="submit" class="btn btn-success">Proses</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal proses -->
+
+    <!-- start modal setuju -->
+    <div class="modal fade" id="modalSetuju" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi setuju sewa tempat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menyetujui sewa tempat ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/tempat/tempat.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_sewa" id="inpSewaS">
+                        <input type="hidden" name="keterangan" value="diterima">
+                        <button type="submit" class="btn btn-success">Setuju</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal setuju -->
+
+    <!-- start modal tolak -->
+    <div class="modal fade" id="modalTolak" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi tolak sewa tempat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menolak sewa tempat ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/tempat/tempat.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_sewa" id="inpSewaT">
+                        <input type="hidden" name="catatan" value="terserah">
+                        <input type="hidden" name="keterangan" value="ditolak">
+                        <button type="submit" class="btn btn-success">Tolak</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal tolak -->
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <?php include('../footer.php');
     ?>
   </footer>
     <script>
+        var modalProses = document.getElementById('modalProses');
+        var modalSetuju = document.getElementById('modalSetuju');
+        var modalTolak = document.getElementById('modalTolak');
+        var inpSewaP = document.getElementById('inpSewaP');
+        var inpSewaS = document.getElementById('inpSewaS');
+        var inpSewaT = document.getElementById('inpSewaT');
+        function openProses(dataU,) {
+            inpSewaP.value = dataU;
+            var myModal = new bootstrap.Modal(modalProses);
+            myModal.show();
+        }
+        function openSetuju(dataU) {
+            inpSewaS.value = dataU;
+            var myModal = new bootstrap.Modal(modalSetuju);
+            myModal.show();
+        }
+        function openTolak(dataU) {
+            inpSewaT.value = dataU;
+            var myModal = new bootstrap.Modal(modalTolak);
+            myModal.show();
+        }
         //preview data
         function preview(desc){
             if (desc != 'ktp' && desc != 'foto' && desc != 'surat'){

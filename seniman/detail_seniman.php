@@ -292,7 +292,7 @@ $csrf = $GLOBALS['csrf'];
             </div>
         </div>
     </div>
-    <!-- end modal proses -->
+    <!-- end modal tolak -->
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
         <?php include('footer.php');
