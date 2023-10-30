@@ -16,9 +16,9 @@ if($userAuth['status'] == 'error'){
   //   echo "<script>window.location.href = '/dashboard.php';</script>";
   //   exit();
   // }
-  if (isset($_GET['id_advis']) && !empty($_GET['id_advis'])) {
-    $id  = $_GET['id_advis'];
-    $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, DATE_FORMAT(tgl_advis, '%d %M %Y') AS tanggal, tempat_advis, status, catatan, FROM surat_advis WHERE id_advis = '$id'");
+  if (isset($_GET['id_pentas']) && !empty($_GET['id_pentas'])) {
+    $id  = $_GET['id_pentas'];
+    $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, DATE_FORMAT(tgl_advis, '%d %M %Y') AS tanggal, tempat_advis, status, catatan FROM surat_advis WHERE id_advis = '$id' LIMIT 1");
     $pentas = mysqli_fetch_assoc($sql);
   }else{
     header('Location: /pentas.php');
@@ -96,12 +96,8 @@ $csrf = $GLOBALS['csrf'];
           <?php }else if($pentas['status'] == 'diterima' || $pentas['status'] == 'ditolak'){ ?>
             <li class="breadcrumb-item"><a href="/pentas/riwayat.php">Riwayat Pengajuan Pentas</a></li>
           <?php } ?>
-          <li class="breadcrumb-item active">Detail event</li>
+          <li class="breadcrumb-item active">Detail pentas</li>
         </ol>
-        <!-- <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html"></a>Kelola Surat Advis</li>
-          <li class="breadcrumb-item">Formulir</li>
-        </ol> -->
       </nav>
     </div><!-- End Page Title -->
 
@@ -153,7 +149,30 @@ $csrf = $GLOBALS['csrf'];
                     <input type="text" class="form-control" name="tempatL" readonly value="<?php echo $pentas['tempat_advis'] ?>">
                   </div>
                 </div>
-
+                <div class="row mb-3 justify-content-end">
+                  <div class="col-sm-10 text-end">
+                    <?php if ($pentas['status'] == 'diajukan' || $pentas['status'] == 'proses') { ?>
+                        <a href="/pentas/pengajuan.php" class="btn btn-info"><i>kembali</i></a>
+                    <?php } else if ($pentas['status'] == 'diterima' || $pentas['status'] == 'ditolak') { ?>
+                            <a href="/pentas/riwayat.php" class="btn btn-info"><i>kembali</i></a>
+                    <?php } ?>
+                    <?php if ($pentas['status'] == 'diajukan') { ?>
+                        <button type="button" class="btn btn-success"
+                            onclick="openProses(<?php echo $pentas['id_advis'] ?>)">
+                            <i class="bi bi-edit-fill">Proses</i>
+                        </button>
+                    <?php } else if ($pentas['status'] == 'proses') { ?>
+                        <button type="button" class="btn btn-success"
+                            onclick="openSetuju(<?php echo $pentas['id_advis'] ?>)">
+                            <i class="bi bi-check-circle">Setuju</i>
+                        </button>
+                        <button type="button" class="btn btn-danger"
+                            onclick="openTolak(<?php echo $pentas['id_advis'] ?>)">
+                            <i class="bi bi-x-circle">Tolak</i>
+                        </button>
+                    <?php } ?>
+                  </div>
+                </div>
               </form><!-- End General Form Elements -->
 
               <p>
@@ -168,7 +187,84 @@ $csrf = $GLOBALS['csrf'];
 
   </main>
   <!-- End #main -->
+  <!-- start modal proses -->
+  <div class="modal fade" id="modalProses" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi proses pentas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin memproses data pentas ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/pentas/pentas.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_pentas" id="inpPentasP">
+                        <input type="hidden" name="keterangan" value="proses">
+                        <button type="submit" class="btn btn-success">Proses</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal proses -->
 
+    <!-- start modal setuju -->
+    <div class="modal fade" id="modalSetuju" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi setuju pentas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menyetujui pentas ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/pentas/pentas.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_pentas" id="inpPentasS">
+                        <input type="hidden" name="keterangan" value="diterima">
+                        <button type="submit" class="btn btn-success">Setuju</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal setuju -->
+
+    <!-- start modal tolak -->
+    <div class="modal fade" id="modalTolak" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi tolak pentas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menolak pentas ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/pentas/pentas.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_pentas" id="inpPentasT">
+                        <input type="hidden" name="catatan" value="terserah">
+                        <input type="hidden" name="keterangan" value="ditolak">
+                        <button type="submit" class="btn btn-success">Tolak</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal tolak -->
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <div class="copyright">
@@ -186,6 +282,27 @@ $csrf = $GLOBALS['csrf'];
     <!-- Template Main JS File -->
     <script src="/public/assets/js/main.js"></script>
     <script>
+      var modalProses = document.getElementById('modalProses');
+      var modalSetuju = document.getElementById('modalSetuju');
+      var modalTolak = document.getElementById('modalTolak');
+      var inpPentasP = document.getElementById('inpPentasP');
+      var inpPentasS = document.getElementById('inpPentasS');
+      var inpPentasT = document.getElementById('inpPentasT');
+      function openProses(dataU,) {
+          inpPentasP.value = dataU;
+          var myModal = new bootstrap.Modal(modalProses);
+          myModal.show();
+      }
+      function openSetuju(dataU) {
+          inpPentasS.value = dataU;
+          var myModal = new bootstrap.Modal(modalSetuju);
+          myModal.show();
+      }
+      function openTolak(dataU) {
+          inpPentasT.value = dataU;
+          var myModal = new bootstrap.Modal(modalTolak);
+          myModal.show();
+      }
       document.addEventListener('DOMContentLoaded', function () {
         var currentPageURL = window.location.href;
         var menuLinks = document.querySelectorAll('.nav-link');

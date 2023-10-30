@@ -184,9 +184,6 @@ $csrf = $GLOBALS['csrf'];
                     <?php } ?>
                   </div>
                 </div>
-                <!-- <div class="text-center">
-                  <button type="kirim" class="btn btn-warning">proses</button>
-                </div> -->
               </form>
               <!-- End General Form Elements -->
             </div>

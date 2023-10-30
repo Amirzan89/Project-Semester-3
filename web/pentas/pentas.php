@@ -17,8 +17,8 @@ class PentasWebsite{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if(!isset($data['id_advis']) || empty($data['id_advis'])){
-                echo "<script>alert('ID sewa harus di isi !')</script>";
+            if(!isset($data['id_pentas']) || empty($data['id_pentas'])){
+                echo "<script>alert('ID pentas harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -55,7 +55,7 @@ class PentasWebsite{
             //check id advis
             $query = "SELECT status FROM surat_advis WHERE id_advis = ?";
             $stmt[1] = self::$con->prepare($query);
-            $stmt[1]->bind_param('s', $data['id_advis']);
+            $stmt[1]->bind_param('s', $data['id_pentas']);
             $stmt[1]->execute();
             $statusDB = '';
             $stmt[1]->bind_result($statusDB);
@@ -111,7 +111,7 @@ class PentasWebsite{
                 $redirect = '/pengajuan.php';
                 $status = 'ditolak';
             }
-            $stmt[2]->bind_param("ssi", $status, $data['catatan'], $data['id_advis']);
+            $stmt[2]->bind_param("ssi", $status, $data['catatan'], $data['id_pentas']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();

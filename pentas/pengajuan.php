@@ -80,11 +80,6 @@ $csrf = $GLOBALS['csrf'];
           <li class="breadcrumb-item"><a href="/pentas.php">Kelola Pentas</a></li>
           <li class="breadcrumb-item active">Pengajuan Pentas</li>
         </ol>
-        <!-- <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
-          <li class="breadcrumb-item active">Pengajuan Nomer Induk Seniman</li>
-        </ol> -->
       </nav>
     </div><!-- End Page Title -->
 
@@ -98,9 +93,9 @@ $csrf = $GLOBALS['csrf'];
               <table class="table datatable">
               <thead>
                   <tr>
-                    <th scope="col">No</th>
+                  <th scope="col">No</th>
                     <th scope="col">Nomor Induk Seniman</th>
-                    <th scope="col">Nama Seniman</th>
+                    <th scope="col">Nama Pemohon</th>
                     <th scope="col">Tanggal</th>
                     <th scope="col">Status</th>
                     <th scope="col">Aksi</th>
@@ -108,51 +103,32 @@ $csrf = $GLOBALS['csrf'];
                   </thead>
                   <tbody>
                     <?php
-                      $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(tgl_advis, '%d %M %Y') AS tanggal, status, catatan FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
+                      $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(tgl_advis, '%d %M %Y') AS tanggal, status, catatan FROM surat_advis WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_advis DESC");
                       $no = 1;
-                      while ($seniman = mysqli_fetch_array($query)) {
+                      while ($advis = mysqli_fetch_array($query)) {
                     ?>
                     <tr>
                       <td><?php echo $no?></td>
-                      <td><?php echo $seniman['nomor_induk']?></td>
-                      <td><?php echo $seniman['nama_advis']?></td>
-                      <td><?php echo $seniman['tanggal']?></td>
+                      <td><?php echo $advis['nomor_induk']?></td>
+                      <td><?php echo $advis['nama_advis']?></td>
+                      <td><?php echo $advis['tanggal']?></td>
                       <td>
-                        <?php if($seniman['status'] == 'diajukan'){ ?>
+                        <?php if($advis['status'] == 'diajukan'){ ?>
                           <button type="button" class="btn btn-success">
                             <i class="bi bi-check-circle">Diajukan</i>
                           </button>
-                        <?php }else if($seniman['status'] == 'proses'){ ?>
+                        <?php }else if($advis['status'] == 'proses'){ ?>
                           <button type="button" class="btn btn-danger">
                             <i class="bi bi-x-circle">proses</i>
                           </button>
                         <?php } ?>
                       </td>
                       <td>
-                        <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                        <a href="/pentas/detail_pentas.php?id_pentas=<?= $advis['id_advis'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
                       </td>
                     </tr>
                   <?php $no++;
                   } ?>
-                  <!-- <tr>
-                    <td>1</td>
-                    <td>3576447103910003
-                    </td>
-                    <td>Puji Utami</td>
-                    <td>1 Oktober 2023</td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i>  lihat
-                    </button>
-                    </td>
-                  </tr> -->
-                  <!-- <tr>
-                    <th scope="row">2</th>
-                    <td>3576441606910003</td>
-                    <td>Muhammad Lutfi Hakim</td>
-                    <td>31 Agustus 2023</td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
-                      </button>
-                    </td>
-                  </tr> -->
                </tbody>
               </table>
             </div>

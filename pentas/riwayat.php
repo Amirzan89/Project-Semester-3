@@ -130,7 +130,7 @@ $csrf = $GLOBALS['csrf'];
                       </td>
                       <td><?php echo $pentas['catatan']?></td>
                       <td>
-                        <a href="/pentas/detail_seniman.php?id_seniman=<?= $pentas['id_seniman'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                        <a href="/pentas/detail_pentas.php?id_pentas=<?= $pentas['id_advis'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
                       </td>
                     </tr>
                   <?php $no++;
