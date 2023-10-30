@@ -467,16 +467,16 @@ class User{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check id_user
+            //check Admin
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['id_admin']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                echo "<script>alert('User tidak ditemukan');</script>";
+                echo "<script>alert('Admin tidak ditemukan');</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -496,7 +496,7 @@ class User{
             $stmt[1]->bind_result($roleDB, $pathFoto);
             if (!$stmt[1]->fetch()) {
                 $stmt[1]->close();
-                echo "<script>alert('Data Admin tidak ditemukan');</script>";
+                echo "<script>alert('Data Pengguna tidak ditemukan');</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
