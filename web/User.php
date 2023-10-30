@@ -169,7 +169,7 @@ class User{
             $size = filesize($fileFoto['size']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= self::$sizeImg) {
-                    echo "<script>alert('File terlalu besar !')</script>";
+                    echo "<script>alert('Ukuran File maksimal '".(self::$sizeImg/1000000)."MB' !')</script>";
                     echo "<script>window.history.back();</script>";
                     exit();
                 }
@@ -350,57 +350,67 @@ class User{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            echo 'pengguna '. $data['id_user'];
             $stmt[0]->close();
             if($role != 'super admin'){
-                // echo 'duduk admin';
                 echo "<script>alert('Anda bukan super admin')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check email input
-            $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
+            //check data user
+            $query = "SELECT foto FROM users WHERE BINARY id_user = ? LIMIT 1";
             $stmt[1] = self::$con->prepare($query);
-            $stmt[1]->bind_param('s', $data['email']);
+            $stmt[1]->bind_param('s', $data['id_user']);
             $stmt[1]->execute();
-            if ($stmt[1]->fetch()) {
+            $idUser = 1;
+            $stmt[1]->bind_result($idUser);
+            if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
-                echo "<script>alert('Email sudah digunakan !')</script>";
+                echo "<script>alert('Data Admin tidak ditemukan')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             $stmt[1]->close();
-            $query = "SELECT foto FROM users WHERE BINARY email = ? LIMIT 1";
-            //get data id user
+            //check email input
+            $query = "SELECT id_user FROM users WHERE BINARY email = ? AND id_user != ? LIMIT 1";
             $stmt[2] = self::$con->prepare($query);
+            $stmt[2]->bind_param('si', $data['email'],$data['id_user']);
             $stmt[2]->execute();
-            $idUser = 1;
-            $stmt[2]->bind_result($idUser);
-            $stmt[2]->fetch();
-            $stmt[2]->close();
-            $folderAdmin = '/admin';
-            //proses file
-            $fileFoto = $_FILES['foto'];
-            $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileFoto['name']);
-            if (in_array($extension,['png','jpeg','jpg'])) {
-                if ($size >= self::$sizeImg) {
-                    echo "<script>alert('File terlalu besar !')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
-                }
-            } else {
-                echo "<script>alert('File harus jpg, jpeg, png !')</script>";
+            if ($stmt[2]->fetch()) {
+                $stmt[2]->close();
+                echo "<script>alert('Email sudah digunakan !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //simpan file
-            $nameFile = '/'.$idUser.'.'.$extension;  
-            $fileFotoPath = self::$folderPath.$folderAdmin.$nameFile;
-            if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
-                echo "<script>alert('Gagal menyimpan File !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+            $stmt[2]->close();
+            //if upload file then update file
+            if (isset($_FILES['foto']) & !empty($_FILES['foto']) && !is_null($_FILES['foto']) && $_FILES['foto']['error'] !== 4) {
+                // echo 'file  ';
+                // echo json_encode($_FILES['foto']);
+                // exit();
+                $folderAdmin = '/admin';
+                //proses file
+                $fileFoto = $_FILES['foto'];
+                $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
+                $size = filesize($fileFoto['name']);
+                if (in_array($extension,['png','jpeg','jpg'])) {
+                    if ($size >= self::$sizeImg) {
+                        echo "<script>alert('Ukuran File maksimal '".(self::$sizeImg/1000000)."MB' !')</script>";
+                        echo "<script>window.history.back();</script>";
+                        exit();
+                    }
+                } else {
+                    echo "<script>alert('File harus jpg, jpeg, png !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
+                //simpan file
+                $nameFile = '/'.$idUser.'.'.$extension;  
+                $fileFotoPath = self::$folderPath.$folderAdmin.$nameFile;
+                if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
+                    echo "<script>alert('Gagal menyimpan File !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
             }
             //jika admin mengubah password
             if(isset($data['pass']) && !empty($data['pass'])){
