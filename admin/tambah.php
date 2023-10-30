@@ -147,11 +147,9 @@ $csrf = $GLOBALS['csrf'];
                   <div class="col-sm-10">
                     <select class="form-select" name="role" aria-label="Default select example">
                       <option value="" disabled selected>Pilih Role</option>
-                      <option value="super admin">Super Admin</option>
                       <option value="admin event">Admin Event</option>
                       <option value="admin tempat">Admin Tempat</option>
                       <option value="admin seniman">Admin Seniman</option>
-                      <option value="admin pentas">Admin Pentas</option>
                     </select>
                   </div>
                 </div>

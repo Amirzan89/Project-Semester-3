@@ -11,11 +11,11 @@ if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
 }else{
 	$userAuth = $userAuth['data'];
-  // if($userAuth['role'] != 'super admin'){
-  //   echo "<script>alert('Anda bukan super admin !')</script>";
-  //   echo "<script>window.location.href = '/dashboard.php';</script>";
-  //   exit();
-  // }
+  if($userAuth['role'] != 'super admin'){
+    echo "<script>alert('Anda bukan super admin !')</script>";
+    echo "<script>window.location.href = '/dashboard.php';</script>";
+    exit();
+  }
 }
 $csrf = $GLOBALS['csrf'];
 ?>

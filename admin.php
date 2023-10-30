@@ -96,7 +96,7 @@ $csrf = $GLOBALS['csrf'];
               <h4 class="card-title">Data Admin</h4>
               <a href="/admin/tambah.php">
                 <button type="button" class="btn btn-success">
-                    <i class="bi bi-person-plus-fill"></i> Tambah User
+                    <i class="bi bi-person-plus-fill"></i> Tambah Admin
                 </button>
               </a>
               <!-- <button type="button" class="btn btn-outline-secondary"><a href="../users/form-tambah-user.php"> Tambah User</a></button> -->

@@ -34,8 +34,8 @@
 </li>
 <?php }?>
 
-<?php if($userAuth['role'] == 'super admin' || $userAuth['role'] == 'admin pentas'){ ?>
-<li class="nav-item <?php echo $nav == 'pentas' ? 'active' : ''; ?>">
+<?php if($userAuth['role'] == 'super admin' || $userAuth['role'] == 'admin seniman'){ ?>
+<li class="nav-item <?php echo $nav == 'seniman' ? 'active' : ''; ?>">
   <a class="nav-link " href="/pentas.php">
     <i class="bi bi-megaphone"></i>
     <span>Kelola Izin Pentas</span>
@@ -43,7 +43,7 @@
 </li>
 <?php }?>
 
-<?php if(in_array($userAuth['role'],['super admin','admin event','admin pentas','admin seniman','admin tempat'])){ ?>
+<?php if(in_array($userAuth['role'],['super admin','admin event','admin seniman','admin tempat'])){ ?>
 <li class="nav-item <?php echo $nav == 'pengguna' ? 'active' :  ''?>">
   <a class="nav-link " href="/pengguna.php">
     <i class="bi bi-people"></i>

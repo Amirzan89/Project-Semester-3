@@ -152,12 +152,9 @@ $csrf = $GLOBALS['csrf'];
                   <label class="col-sm-2 col-form-label">Role</label>
                   <div class="col-sm-10">
                   <select class="form-select" name="role" aria-label="Default select example">
-                      <!-- <option value="" disabled>Pilih Role</option> -->
-                      <option value="super admin" <?php echo ($users['role'] == 'super admin') ? 'selected' : ''; ?>>Super Admin</option>
                       <option value="admin event" <?php echo ($users['role'] == 'admin event') ? 'selected' : ''; ?>>Admin Event</option>
                       <option value="admin tempat" <?php echo ($users['role'] == 'admin tempat') ? 'selected' : ''; ?>>Admin Tempat</option>
                       <option value="admin seniman" <?php echo ($users['role'] == 'admin seniman') ? 'selected' : ''; ?>>Admin Seniman</option>
-                      <option value="admin pentas" <?php echo ($users['role'] == 'admin pentas') ? 'selected' : ''; ?>>Admin Pentas</option>
                   </select>
                   </div>
                 </div>

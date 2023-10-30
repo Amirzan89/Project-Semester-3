@@ -47,7 +47,7 @@ class PentasWebsite{
                 exit();
             }
             $stmt[0]->close();
-            if(($role != 'admin pentas' && $role != 'super admin') || $role == 'masyarakat'){
+            if(($role != 'admin seniman' && $role != 'super admin') || $role == 'masyarakat'){
                 echo "<script>alert('Invalid role !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
