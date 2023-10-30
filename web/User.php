@@ -473,7 +473,7 @@ class User{
                 exit();
             }
             if (!isset($data['id_user']) || empty($data['id_user'])) {
-                echo "<script>alert('ID admin harus di isi !');</script>";
+                echo "<script>alert('ID user harus di isi !');</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -516,23 +516,25 @@ class User{
                 exit();
             }
             $stmt[1]->close();
-            if($role == 'masyarakat'){
+            if($roleDB == 'masyarakat'){
                 echo "<script>alert('Anda tidak boleh menghapus data masyarakat');</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             //delete file
-            $fileFotoPath = self::$folderPath.'/admin'.$pathFoto;
-            unlink($fileFotoPath);
+            if(!empty($pathFoto) && !is_null($pathFoto)){
+                $fileFotoPath = self::$folderPath.'/admin'.$pathFoto;
+                unlink($fileFotoPath);
+            }
             $query = "DELETE FROM users WHERE id_user = ? ";
             $stmt = self::$con->prepare($query);
             $stmt->bind_param('i', $data['id_user']);
             if ($stmt->execute()) {
-                echo "<script>alert('akun berhasil dihapus')</script>";
+                echo "<script>alert('Akun admin berhasil dihapus')</script>";
                 echo "<script>window.location.href = '/admin.php';</script>";
                 exit();
             }else{
-                echo "<script>alert('akun gagal dihapus')</script>";
+                echo "<script>alert('Akun admin gagal dihapus')</script>";
                 echo "<script>window.location.href = '/admin.php';</script>";
                 exit();
             }
@@ -548,13 +550,112 @@ class User{
                 $responseData = array(
                     'status' => 'error',
                     'message' => $errorJson['message'],
-            );
+                );
+                echo "<script>alert('$error')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+        }
+    }
+    public function hapusUser($data){
+        try{
+            // echo 'hapus user';
+            // exit();
+            if (!isset($data['id_admin']) || empty($data['id_admin'])) {
+                echo "<script>alert('ID admin harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['id_user']) || empty($data['id_user'])) {
+                echo "<script>alert('ID user harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if($data['id_admin'] === $data['id_user']){
+                echo "<script>alert('Anda tidak boleh menghapus anda sendiri !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check Admin
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_admin']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                echo "<script>alert('Admin tidak ditemukan');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $stmt[0]->close();
+            if($role != 'super admin'){
+                echo "<script>alert('Anda bukan super admin');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check id_user
+            $query = "SELECT role, foto FROM users WHERE id_user = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_user']);
+            $stmt[1]->execute();
+            $roleDB = '';
+            $pathFoto = '';
+            $stmt[1]->bind_result($roleDB, $pathFoto);
+            if (!$stmt[1]->fetch()) {
+                $stmt[1]->close();
+                echo "<script>alert('Data Pengguna tidak ditemukan');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $stmt[1]->close();
+            if($roleDB != 'masyarakat'){
+                echo "<script>alert('Anda tidak boleh menghapus data Admin');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //delete file
+            if(!empty($pathFoto) && !is_null($pathFoto)){
+                $fileFotoPath = self::$folderPath.'/masyarakat'.$pathFoto;
+                unlink($fileFotoPath);
+            }
+            // echo 'delete usevaovoa';
+            // exit();
+            $query = "DELETE FROM users WHERE id_user = ?";
+            $stmt[2] = self::$con->prepare($query);
+            $stmt[2]->bind_param('i', $data['id_user']);
+            if ($stmt[2]->execute()) {
+                $stmt[2]->close();
+                echo "<script>alert('Akun pengguna berhasil dihapus')</script>";
+                echo "<script>window.location.href = '/pengguna.php';</script>";
+                exit();
+            }else{
+                $stmt[2]->close();
+                echo "<script>alert('Akun pengguna gagal dihapus')</script>";
+                echo "<script>window.location.href = '/pengguna.php';</script>";
+                exit();
+            }
+        }catch(Exception $e){
+            echo $e->getTraceAsString();
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
             echo "<script>alert('$error')</script>";
             echo "<script>window.history.back();</script>";
             exit();
         }
     }
-}
     public function isExistUser($email){
         if(empty($email) || is_null($email)){
             return ['status'=>'error','message'=>'email empty'];
@@ -1351,6 +1452,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if($_POST['_method'] == 'DELETE'){
             if(isset($_POST['hapusAdmin'])){
                 $user->hapusAdmin($_POST);
+            }
+            if(isset($_POST['hapusUser'])){
+                $user->hapusUser($_POST);
             }
         }
     }

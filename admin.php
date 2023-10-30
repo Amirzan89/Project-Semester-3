@@ -117,7 +117,7 @@ $csrf = $GLOBALS['csrf'];
                 </thead>
                 <tbody>
                 <?php
-                    $query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role != 'masyarakat'"); 
+                    $query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role != 'masyarakat' AND role != 'super admin'"); 
                     $no = 1;
                     while ($users = mysqli_fetch_array($query)) {
                     ?>

@@ -122,8 +122,6 @@ $csrf = $GLOBALS['csrf'];
               <h2><center><?php echo $userAuth['nama_lengkap']?></center></h2>
               <h3><?php echo $userAuth['role']?></h3>
             </div>
-          
-
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Nama Lengkap</div>
                     <div class="col-lg-9 col-md-8"><?php echo $userAuth['nama_lengkap'] ?></div>
