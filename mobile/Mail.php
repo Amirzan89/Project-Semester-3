@@ -1,20 +1,53 @@
 <?php
 require(__DIR__.'/../web/koneksi.php');
-// namespace Controllers\Mail;
-// require_once 'vendor/autoload.php';
+require(__DIR__.'/../vendor/autoload.php');
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use Database\Database;
 use Carbon\Carbon;
 class MailMobile{ 
     protected $mail;
     private static $database;
     private static $con;
     private static $timeZone;
+    private static function loadEnv($path = null){
+        if($path == null){
+            $path = __DIR__."/../web/.env";
+        }
+        if (file_exists($path)) {
+            $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+                    list($key, $value) = explode('=', $line, 2);
+                    $_ENV[trim($key)] = trim($value);
+                    $_SERVER[trim($key)] = trim($value);
+                }
+            }
+        }
+    }
+    // public function testing(){
+    //     $mail = new PHPMailer(true);
+    //     $mail->Host = 'smtp.gmail.com';
+    //     $mail->isSMTP();
+    //     $mail->SMTPAuth = true;
+    //     $mail->Username = 'amirzanfikri5@gmail.com';
+    //     $mail->Password = 'vamvwrdfyewbhkca';
+    //     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    //     $mail->Port = 587;
+    //     try {
+    //         $mail->setFrom($_SERVER['MAIL_FROM_ADDRESS'], 'gabutt');
+    //         $mail->Body = 'This is the email body content.';
+    //         $mail->addAddress('amirzanfikri5@gmail.com','Amirzan');
+    //         $mail->send();
+    //         echo 'Email sent successfully';
+    //     } catch (Exception $e) {
+    //         echo 'Email could not be sent. Mailer Error: ' . $mail->ErrorInfo;
+    //     }
+    // }
     public function __construct(){
         try {
+            self::loadEnv();
             self::$timeZone = 'Asia/Jakarta';
-            self::$database = Koneksi::getInstance();
+            self::$database = koneksi::getInstance();
             self::$con = self::$database->getConnection();
             $this->mail = new PHPMailer(true);
             $this->mail->Host = $_SERVER['MAIL_HOST'];
@@ -25,19 +58,35 @@ class MailMobile{
             $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $this->mail->Port = $_SERVER['MAIL_PORT'];
         } catch (Exception $e) {
-            echo "Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
+            // echo $e->getTraceAsString();
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+            // echo "Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
         }
     }
-
     public function send($data){
         try {
-            // exit();
             $this->mail->setFrom($_SERVER['MAIL_FROM_ADDRESS'], 'gabutt');
             $this->mail->addAddress($data['email'], $data['name']);
             $this->mail->isHTML(true);
             $this->mail->Subject = $data['deskripsi'];
             if($data['deskripsi'] == 'email'){
-                $filePath = __DIR__ . '/../../view/mail/verifyEmail.php';
+                $filePath = __DIR__ . '/../mobile/Mail/verifikasiEmail.php';
                 $emailBody = file_get_contents($filePath);
                 $emailData = [
                     'EMAIL' => $data['email'],
@@ -51,7 +100,7 @@ class MailMobile{
                 }
                 $this->mail->Body = $emailTemplate;
             }else if($data['deskripsi'] == 'password'){
-                $filePath = __DIR__ . '/../../view/mail/forgotPassword.php';
+                $filePath = __DIR__ . '/../mobile/mail/lupaPassword.php';
                 $emailBody = file_get_contents($filePath);
                 $emailData = [
                     'EMAIL' => $data['email'],
@@ -72,49 +121,71 @@ class MailMobile{
         }
     }
     public function getVerifyEmail($data){
-        $email = $data['email'];
-        if(empty($email) || is_null($email)){
-            return ['status'=>'error','message'=>'email kosong'];
-        }else{
-            //check email exist in table user
-            $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ? LIMIT 1";
-            $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $email);
-            $result = '';
-            $stmt[0]->bind_result($result);
-            $stmt[0]->execute();
-            if ($stmt[0]->fetch()) {
-                $stmt[0]->close();
-                //checking if email exist in table verifikasi
-                $query = "SELECT kode_otp,link FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? LIMIT 1";
-                $stmt[1] = self::$con->prepare($query);
-                $deskripsi = 'email';
-                $stmt[1]->bind_param('ss', $email, $deskripsi);
-                $kode_otp = ''; $link = '';
-                $stmt[1]->bind_result($kode_otp, $link);
-                $stmt[1]->execute();
-                if ($stmt[1]->fetch()) {
-                    $stmt[1]->close();
-                    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-                    $host = $_SERVER['HTTP_HOST'];
-                    $baseURL = $protocol . '://' . $host;
-                    $verificationLink = $baseURL . '/verifikasi/email/' . $link;
-                    return ['status'=>'success','data'=>['kode_otp'=>$kode_otp,'link'=>$verificationLink]];
-                }else{
-                    $stmt[1]->close();
-                    return ['status'=>'error','message'=>'email invalid'];
-                }
+        try{
+            $email = $data['email'];
+            if(empty($email) || empty($email)){
+                throw new Exception('Email harus di isi !');
             }else{
-                $stmt[0]->close();
-                return ['status'=>'error','message'=>'email invalid'];
+                //check email exist in table user
+                $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ? LIMIT 1";
+                $stmt[0] = self::$con->prepare($query);
+                $stmt[0]->bind_param('s', $email);
+                $result = '';
+                $stmt[0]->bind_result($result);
+                $stmt[0]->execute();
+                if ($stmt[0]->fetch()) {
+                    $stmt[0]->close();
+                    //checking if email exist in table verifikasi
+                    $query = "SELECT kode_otp,link FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? LIMIT 1";
+                    $stmt[1] = self::$con->prepare($query);
+                    $deskripsi = 'email';
+                    $stmt[1]->bind_param('ss', $email, $deskripsi);
+                    $kode_otp = ''; $link = '';
+                    $stmt[1]->bind_result($kode_otp, $link);
+                    $stmt[1]->execute();
+                    if ($stmt[1]->fetch()) {
+                        $stmt[1]->close();
+                        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+                        $host = $_SERVER['HTTP_HOST'];
+                        $baseURL = $protocol . '://' . $host;
+                        $verificationLink = $baseURL . '/verifikasi/email/' . $link;
+                        header('Content-Type: application/json');
+                        echo json_encode(['status'=>'success','data'=>['kode_otp'=>$kode_otp,'link'=>$verificationLink]]);
+                    }else{
+                        $stmt[1]->close();
+                        throw new Exception('Email tidak ditemukan');
+                    }
+                }else{
+                    $stmt[0]->close();
+                    throw new Exception('Email tidak ditemukan');
+                }
             }
+        }catch(Exception $e){
+            echo $e->getTraceAsString();
+                $error = $e->getMessage();
+                $errorJson = json_decode($error, true);
+                if ($errorJson === null) {
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $error,
+                    );
+                }else{
+                    $responseData = array(
+                        'status' => 'error',
+                        'message' => $errorJson['message'],
+                    );
+                }
+                header('Content-Type: application/json');
+                isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+                echo json_encode($responseData);
+                exit();
         }
     }
     public function createVerifyEmail($data,$uri = null){
         try{
             $email = $data['email'];
             if(empty($email) || is_null($email)){
-                return ['status'=>'error','message'=>'Email wajib di isi'];
+                throw new Exception('Email harus di isi !');
             }else{
                 $currentDateTime = Carbon::now(self::$timeZone);
                 $now = $currentDateTime->format('Y-m-d H:i:s');
@@ -163,17 +234,18 @@ class MailMobile{
                                 //resend email
                                 $result = $this->send($data);
                                 if($result['status'] == 'error'){
-                                    return ['status'=>'error','message'=>$result['message']];
+                                    throw new Exception($result['message']);
                                 }else{
-                                    return ['status'=>'success','message'=>'success send verifikasi email','data'=>['waktu'=>$subminute]];
+                                    header('Content-Type: application/json');
+                                    echo json_encode(['status'=>'success','message'=>'success send verifikasi email','data'=>['waktu'=>$subminute]]);
                                 }
                             }else{
                                 $stmt[3]->close();
-                                return ['status'=>'error','message'=>'fail create verifikasi email'];
+                                throw new Exception(json_encode(['status' => 'error', 'message' => 'verifikasi gagal dibuat','code'=>500]));
                             }
                         }else{
                             $stmt[2]->close();
-                            return ['status'=>'error','message'=>'we have send verifikasi email'];
+                            throw new Exception('Kami sudah kirim verifikasi email !');
                         }
                     //if user not create verifikasi email
                     }else{
@@ -203,26 +275,41 @@ class MailMobile{
                             $data = ['name'=>$result,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'email'];
                             $result = $this->send($data);
                             if($result['status'] == 'error'){
-                                return ['status'=>'error','message'=>$result['message'],'kode_otp'=> isset($result['kode_otp']) ? $result['kode_otp'] : 400 ,'data'=>['waktu'=>$subminute]];
+                                throw new Exception(json_encode(['status'=>'error','message'=>$result['message'],'kode_otp'=> isset($result['kode_otp']) ? $result['kode_otp'] : 400 ,'data'=>['waktu'=>$subminute]]));
                             }else{
-                                return ['status'=>'success','message'=>'Akun Berhasil Dibuat Silahkan verifikasi email','kode_otp'=>200,'data'=>['waktu'=>$subminute]];
+                                header('Content-Type: application/json');
+                                echo json_encode(['status'=>'success','message'=>'Akun Berhasil Dibuat Silahkan verifikasi email','kode_otp'=>200,'data'=>['waktu'=>$subminute]]);
                             }
                         }else{
                             $stmt[3]->close();
-                            return ['status'=>'error','message'=>'fail create verifikasi email','kode_otp'=>500];
                         }
                     }
                 }else{
                     $stmt[0]->close();
                     if($_SERVER['REQUEST_URI']->path() === 'verifikasi/create/email' && $_SERVER['REQUEST_METHOD'] === 'get'){
-                        return ['status'=>'error','message'=>'email invalid'];
                     }else{
-                        return ['status'=>'error','message'=>'email invalid','kode_otp'=>400];
                     }
                 }    
             }
         }catch(Exception $e){
-            return ['status'=>'error','message'=>$e->getMessage()];
+            echo $e->getTraceAsString();
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
         }
     }
     //send email forgot password
@@ -230,7 +317,7 @@ class MailMobile{
         try{
             $email = $data['email'];
             if(empty($email) || is_null($email)){
-                return ['status'=>'error','message'=>'Email empty'];
+                throw new Exception('Email harus di isi !');
             }else{
                 //checking if email exist in table user
                 $currentDateTime = Carbon::now(self::$timeZone);
@@ -279,19 +366,21 @@ class MailMobile{
                                 $stmt[3]->close();
                                 $data = ['name'=>$result,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'password'];
                                 //resend email
+                                echo 'kirim ulang';
                                 $result = $this->send($data);
-                                if($result['status' == 'error']){
-                                    return ['status'=>'error','message'=>$result['message'],'kode_otp'=>isset($result['kode_otp']) ? $result['kode_otp'] : 400,'data'=>['waktu'=>$subminute]];
+                                if($result['status'] == 'error'){
+                                    throw new Exception(json_encode(['status'=>'error','message'=>$result['message'],'kode_otp'=>isset($result['kode_otp']) ? $result['kode_otp'] : 400,'data'=>['waktu'=>$subminute]]));
                                 }else{
-                                    return ['status'=>'success','message'=>'success send reset Password','data'=>['waktu'=>$subminute]];
+                                    header('Content-Type: application/json');
+                                    echo json_encode(['status'=>'success','message'=>'success send reset Password','data'=>['waktu'=>$subminute]]);
                                 }
                             }else{
                                 $stmt[3]->close();
-                                return ['status'=>'error','message'=>'fail create verifikasi email','kode_otp'=>500];
+                                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal buat lupa password','code'=>500]));
                             }
                         }else{
                             $stmt[2]->close();
-                            return ['status'=>'error','message'=>'Kami sudah mengirimkan otp lupa password silahkan cek mail anda'];
+                            throw new Exception('Kami sudah mengirimkan otp lupa password silahkan cek mail anda');
                         }
                     //if user haven't create email forgot password
                     }else{
@@ -321,70 +410,163 @@ class MailMobile{
                             $data = ['name'=>$result,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'password'];
                             $result = $this->send($data);
                             if($result['status'] == 'error'){
-                                return ['status'=>'error','message'=>$result['message'],'kode_otp'=>isset($result['kode_otp']) ? $result['kode_otp'] : 400,'data'=>['waktu'=>$subminute]];
+                                throw new Exception(json_encode(['status'=>'error','message'=>$result['message'],'kode_otp'=>isset($result['kode_otp']) ? $result['kode_otp'] : 400,'data'=>['waktu'=>$subminute]]));
                             }else{
-                                return ['status'=>'success','message'=>'Reset password sudah dikirim ','kode_otp'=>200,'data'=>['waktu'=>$subminute]];
+                                header('Content-Type: application/json');
+                                echo json_encode(['status'=>'success','message'=>'Reset password sudah dikirim','data'=>['waktu'=>$subminute]]);
                             }
                         }else{
                             $stmt[3]->close();
-                            return ['status'=>'error','message'=>'fail create verifikasi email','kode_otp'=>500];
+                            throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal buat lupa password','code'=>500]));
                         }
                     }
                 }else{
                     $stmt[0]->close();
-                    return ['status'=>'error','message'=>'email invalid'];
+                    throw new Exception('Email tidak ditemukan');
                 }
             }
-        }catch(\Exception $e){
+        }catch(Exception $e){
             echo $e->getTraceAsString();
-            return ['status'=>'error','message'=>$e->getMessage()];
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
         }
     }
     public function email($data, $uri,$method){
-        $email = $data['email'];
-        if(empty($email) || is_null($email)){
-            return ['status'=>'error','message'=>'Email empty','kode_otp'=>400];
-        }else{
-            $prefix = "/verifikasi/email/";
-            if(($uri === $prefix) && $method === "post"){
-                $linkPath = substr($uri, strlen($prefix));
-                $query = "SELECT email FROM verifikasi WHERE BINARY link = ? LIMIT 1";
-                $stmt[0] = self::$con->prepare($query);
-                $stmt[0]->bind_param('s', $linkPath);
-                $email1 = '';
-                $stmt[0]->bind_result($email1);
-                $stmt[0]->execute();
-                //checking if email exist in table verifikasi
-                if ($stmt[0]->fetch()) {
-                    $stmt[0]->close();
-                    //check email is same
-                    if($email === $email1){
-                        $query = "UPDATE users SET email_verified = ? FROM users WHERE BINARY email = ? LIMIT 1";
-                        $stmt[1] = self::$con->prepare($query);
-                        $verified = true;
-                        $stmt[1]->bind_param('bs',$verified, $email);
-                        $stmt[1]->execute();
-                        $affectedRows = $stmt[1]->affected_rows;
-                        //update link
-                        if ($affectedRows > 0) {
-                            $stmt[1]->close();
-                            return ['status'=>'success','message'=>'email verifikasi success'];
+        try{
+            $email = $data['email'];
+            if(empty($email) || is_null($email)){
+                throw new Exception('Email harus di isi !');
+            }else{
+                $prefix = "/verifikasi/email/";
+                if(($uri === $prefix) && $method === "post"){
+                    $linkPath = substr($uri, strlen($prefix));
+                    $query = "SELECT email FROM verifikasi WHERE BINARY link = ? LIMIT 1";
+                    $stmt[0] = self::$con->prepare($query);
+                    $stmt[0]->bind_param('s', $linkPath);
+                    $email1 = '';
+                    $stmt[0]->bind_result($email1);
+                    $stmt[0]->execute();
+                    //checking if email exist in table verifikasi
+                    if ($stmt[0]->fetch()) {
+                        $stmt[0]->close();
+                        //check email is same
+                        if($email === $email1){
+                            $query = "UPDATE users SET email_verified = ? FROM users WHERE BINARY email = ? LIMIT 1";
+                            $stmt[1] = self::$con->prepare($query);
+                            $verified = true;
+                            $stmt[1]->bind_param('bs',$verified, $email);
+                            $stmt[1]->execute();
+                            $affectedRows = $stmt[1]->affected_rows;
+                            //update link
+                            if ($affectedRows > 0) {
+                                $stmt[1]->close();
+                                header('Content-Type: application/json');
+                                echo json_encode(['status'=>'success','message'=>'email verifikasi success']);
+                            }else{
+                                $stmt[1]->close();
+                                throw new Exception(json_encode(['status' => 'error', 'message' => 'kode otp gagal diupdate','code'=>500]));
+                            }
                         }else{
-                            $stmt[1]->close();
-                            // return redirect('/login');
-                            return ['status'=>'error','message'=>'Email invalid','kode_otp'=>500];
+                            throw new Exception('Email invalid');
                         }
                     }else{
-                        return ['status'=>'error','message'=>'email invalid','kode_otp'=>400];
+                        $stmt[0]->close();
+                        throw new Exception('Link invalid');
                     }
                 }else{
-                    $stmt[0]->close();
-                    return ['status'=>'error','message'=>'link invalid','kode_otp'=>400];
+                    include(__DIR__.'/../notfound.php');
+                    exit();
                 }
-            }else{
-                return ['status'=>'error','message'=>'not found'];
             }
+        }catch(Exception $e){
+            echo $e->getTraceAsString();
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
         }
     }
+    public static function handle(){
+        $contentType = $_SERVER["CONTENT_TYPE"];
+        if ($contentType === "application/json") {
+            $rawData = file_get_contents("php://input");
+            $requestData = json_decode($rawData, true);
+            if ($requestData === null && json_last_error() !== JSON_ERROR_NONE) {
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
+                exit();
+            }
+            return $requestData;
+        } else if ($contentType === "application/x-www-form-urlencoded") {
+            $requestData = $_POST;
+            return $requestData;
+        } else if (strpos($contentType, 'multipart/form-data') !== false) {
+            $requestData = $_POST;
+            return $requestData;
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
+            exit();
+        }
+    }
+}
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    $mailMobile = new MailMobile();
+    $data = MailMobile::handle();
+    if(isset($data['desc']) && !is_null($data['desc']) && !empty($data['desc'])){
+        if($data['desc'] == 'email'){
+            $mailMobile->createVerifyEmail($data);
+        }else if($data['desc'] == 'password'){
+            $mailMobile->createForgotPassword($data);
+        }else if($data['desc'] == 'random'){
+            $mailMobile->testing();
+        }
+    }
+    // if(isset($data['_method'])){
+    //     if($data['_method'] == 'PUT'){
+    //         $mailMobile->editSewaTempat($data);
+    //     }
+    //     if($data['_method'] == 'DELETE'){
+    //         $mailMobile->hapusSewaTempat($data);
+    //     }
+    // }else{
+    //     $mailMobile->sewaTempat($data);
+    // }
+}
+if($_SERVER['REQUEST_METHOD'] == 'PUT'){
+    // $mailMobile = new MailMobile();
+    // $mailMobile->editSewaTempat(MailMobile::handle());
+}
+if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+    // $mailMobile = new MailMobile();
+    // $mailMobile->hapusSewaTempat(MailMobile::handle());
 }
 ?>

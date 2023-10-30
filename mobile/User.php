@@ -1,5 +1,5 @@
 <?php 
-require_once('koneksi.php');
+require_once(__DIR__ . '/../web/koneksi.php');
 class UserMobile{
     private static $database;
     private static $con;
