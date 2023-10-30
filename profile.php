@@ -238,9 +238,7 @@ $csrf = $GLOBALS['csrf'];
                   <!-- <form> -->
                   <form method="POST" action="/web/User.php" enctype="multipart/form-data">
                     <input type="hidden" name="_method" value="PUT">
-                    <input type="hidden" name="id_admin" value="<?php echo $userAuth['id_user'] ?>">
                     <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
-                    <input type="hidden" name="keterangan" value="<?php echo 'update password' ?>">
                     <div class="row mb-3">
                       <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Password Lama</label>
                       <div class="col-md-8 col-lg-9">
@@ -263,7 +261,7 @@ $csrf = $GLOBALS['csrf'];
                     </div>
 
                     <div class="text-center">
-                      <button type="submit" class="btn btn-primary">Ubah Password</button>
+                      <button type="submit" class="btn btn-primary" name="changePass">Ubah Password</button>
                     </div>
                   </form><!-- End Change Password Form -->
 

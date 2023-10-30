@@ -53,32 +53,31 @@ if(isset($_POST['login'])){
                     echo "<script>alert('Password salah')</script>";
                     echo "<script>window.history.back();</script>";
                     exit();
+                }
+                $stmt[0]->close();
+                $result = Jwt::createToken($_POST,$con,$loadEnv);
+                if(is_null($result)){
+                    echo "<script>alert('Create token error')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
                 }else{
-                    $stmt[0]->close();
-                    $result = Jwt::createToken($_POST,$con,$loadEnv);
-                    if(is_null($result)){
-                        echo "<script>alert('Create token error')</script>";
-                        echo "<script>window.history.back();</script>";
+                    if($result['status'] == 'error'){
+                        echo json_encode($result);
                         exit();
                     }else{
-                        if($result['status'] == 'error'){
-                            echo json_encode($result);
-                            exit();
-                        }else{
-                            $loadEnv();
-                            $data1 = ['email'=>$email,'number'=>$result['number'],'expire'=>time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED'])];
-                            $encoded = base64_encode(json_encode($data1));
-                            header('Content-Type: application/json');
-                            setcookie('token1', $encoded, time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
-                            setcookie('token2', $result['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
-                            setcookie('token3', $result['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
-                            header('Location: /dashboard.php');
-                        }
+                        $loadEnv();
+                        $data1 = ['email'=>$email,'number'=>$result['number'],'expire'=>time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED'])];
+                        $encoded = base64_encode(json_encode($data1));
+                        header('Content-Type: application/json');
+                        setcookie('token1', $encoded, time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
+                        setcookie('token2', $result['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
+                        setcookie('token3', $result['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
+                        header('Location: /dashboard.php');
                     }
                 }
             }else{
                 $stmt[0]->close();
-                echo "<script>alert('Email tidak ditemukan')</script>";
+                echo "<script>alert('Pengguna tidak ditemukan')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }

@@ -656,6 +656,125 @@ class User{
             exit();
         }
     }
+    public function changePass($data){
+        try{
+            echo json_encode($data);
+            // exit();
+            if (!isset($data['id_user']) || empty($data['id_user'])) {
+                echo "<script>alert('ID User harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['pass_old']) && empty($data['pass_old'])){
+                echo "<script>alert('Password lama harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['pass_new']) && empty($data['pass_new'])){
+                echo "<script>alert('Password baru harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (strlen($data['pass_new']) < 8) {
+                echo "<script>alert('Password baru minimal 8 karakter !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (strlen($data['pass_new']) > 25) {
+                echo "<script>alert('Password baru maksimal 25 karakter !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass_new'])) {
+                echo "<script>alert('Password baru harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['password_new']) && empty($data['password_new'])){
+                echo "<script>alert('Password baru harus di isi !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (strlen($data['password_new']) < 8) {
+                echo "<script>alert('Password baru minimal 8 karakter !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (strlen($data['password_new']) > 25) {
+                echo "<script>alert('Password baru maksimal 25 karakter !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['password_new'])) {
+                echo "<script>alert('Password baru harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if($data['pass_new'] !== $data['password_new']){
+                echo "<script>alert('Password baru maksimal harus sama !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check user
+            $query = "SELECT role, password FROM users WHERE id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $passDb = '';
+            $stmt[0]->bind_result($role, $passDb);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                echo "<script>alert('Pengguna tidak ditemukan')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $stmt[0]->close();
+            if($role == 'masyarakat'){
+                echo "<script>alert('Anda bukan admin')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check password lama
+            if(!password_verify($data['pass_old'],$passDb)){
+                echo "<script>alert('Password salah')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $hashedPassword = password_hash($data['password_new'], PASSWORD_DEFAULT);
+            $query = "UPDATE users SET password = ? WHERE id_user = ?";
+            $stmt = self::$con->prepare($query);
+            $stmt->bind_param("si", $hashedPassword, $data['id_user']);
+            $stmt->execute();
+            if ($stmt->affected_rows > 0) {
+                $stmt->close();
+                echo "<script>alert('akun berhasil diubah')</script>";
+                echo "<script>window.location.href = '/profile.php';</script>";
+                exit();
+            } else {
+                $stmt->close();
+                echo "<script>alert('akun gagal diubah')</script>";
+                echo "<script>window.location.href = '/profile.php';</script>";
+                exit();
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            echo "<script> alert('$responseData')</script>";
+            exit();
+        }
+    }
     public function isExistUser($email){
         if(empty($email) || is_null($email)){
             return ['status'=>'error','message'=>'email empty'];
@@ -1435,26 +1554,51 @@ class User{
             return $responseData;
         }
     }
-    public function updateUser(){
+    public static function handle(){
+        $contentType = $_SERVER["CONTENT_TYPE"];
+        if ($contentType === "application/json") {
+            $rawData = file_get_contents("php://input");
+            $requestData = json_decode($rawData, true);
+            if ($requestData === null && json_last_error() !== JSON_ERROR_NONE) {
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
+                exit();
+            }
+            return $requestData;
+        } elseif ($contentType === "application/x-www-form-urlencoded") {
+            $requestData = $_POST;
+            return $requestData;
+        } elseif (strpos($contentType, 'multipart/form-data') !== false) {
+            $requestData = $_POST;
+            return $requestData;
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
+            exit();
+        }
     }
 }
-$user = new User;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if(isset($_POST['tambahAdmin'])){
-        $user->tambahAdmin($_POST);
+    $user = new User();
+    $data = User::handle();
+    if(isset($data['tambahAdmin'])){
+        $user->tambahAdmin($data);
     }
-    if(isset($_POST['_method'])){
-        if($_POST['_method'] == 'PUT'){
-            if(isset($_POST['editAdmin'])){
-                $user->editAdmin($_POST);
+    if(isset($data['_method'])){
+        if($data['_method'] == 'PUT'){
+            if(isset($data['editAdmin'])){
+                $user->editAdmin($data);
+            }
+            if(isset($data['changePass'])){
+                $user->changePass($data);
             }
         }
-        if($_POST['_method'] == 'DELETE'){
-            if(isset($_POST['hapusAdmin'])){
-                $user->hapusAdmin($_POST);
+        if($data['_method'] == 'DELETE'){
+            if(isset($data['hapusAdmin'])){
+                $user->hapusAdmin($data);
             }
-            if(isset($_POST['hapusUser'])){
-                $user->hapusUser($_POST);
+            if(isset($data['hapusUser'])){
+                $user->hapusUser($data);
             }
         }
     }
