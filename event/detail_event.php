@@ -18,7 +18,7 @@ if ($userAuth['status'] == 'error') {
   // }
   if (isset($_GET['id_event']) && !empty($_GET['id_event'])) {
     $id = $_GET['id_event'];
-    $sql = mysqli_query($conn, "SELECT id_event, nama_pengirim, status, catatan, events.id_detail, id_sewa, nama_event, deskripsi, kategori, tempat_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, link_pendaftaran FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = '$id'");
+    $sql = mysqli_query($conn, "SELECT id_event, nama_pengirim, status, catatan, events.id_detail, id_event, nama_event, deskripsi, kategori, tempat_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, link_pendaftaran FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = '$id'");
     $events = mysqli_fetch_assoc($sql);
   } else {
     header('Location: /event.php');
@@ -160,9 +160,33 @@ $csrf = $GLOBALS['csrf'];
                       readonly><?php echo $events['catatan'] ?></textarea>
                   </div>
                 <?php } ?>
-                <div class="text-center">
-                  <button type="kirim" class="btn btn-warning">proses</button>
+                <div class="row mb-3 justify-content-end">
+                  <div class="col-sm-10 text-end">
+                    <?php if ($events['status'] == 'diajukan' || $events['status'] == 'proses') { ?>
+                        <a href="/tempat/pengajuan.php" class="btn btn-info"><i>kembali</i></a>
+                    <?php } else if ($events['status'] == 'diterima' || $events['status'] == 'ditolak') { ?>
+                            <a href="/tempat/riwayat.php" class="btn btn-info"><i>kembali</i></a>
+                    <?php } ?>
+                    <?php if ($events['status'] == 'diajukan') { ?>
+                        <button type="button" class="btn btn-success"
+                            onclick="openProses(<?php echo $events['id_event'] ?>)">
+                            <i class="bi bi-edit-fill">Proses</i>
+                        </button>
+                    <?php } else if ($events['status'] == 'proses') { ?>
+                        <button type="button" class="btn btn-success"
+                            onclick="openSetuju(<?php echo $events['id_event'] ?>)">
+                            <i class="bi bi-check-circle">Setuju</i>
+                        </button>
+                        <button type="button" class="btn btn-danger"
+                            onclick="openTolak(<?php echo $events['id_event'] ?>)">
+                            <i class="bi bi-x-circle">Tolak</i>
+                        </button>
+                    <?php } ?>
+                  </div>
                 </div>
+                <!-- <div class="text-center">
+                  <button type="kirim" class="btn btn-warning">proses</button>
+                </div> -->
               </form>
               <!-- End General Form Elements -->
             </div>
@@ -173,7 +197,84 @@ $csrf = $GLOBALS['csrf'];
     </section>
 
   </main><!-- End #main -->
+  <!-- start modal proses -->
+  <div class="modal fade" id="modalProses" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi proses event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin memproses data event ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/event/event.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_event" id="inpEventP">
+                        <input type="hidden" name="keterangan" value="proses">
+                        <button type="submit" class="btn btn-success">Proses</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal proses -->
 
+    <!-- start modal setuju -->
+    <div class="modal fade" id="modalSetuju" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi setuju event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menyetujui event ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/event/event.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_event" id="inpEventS">
+                        <input type="hidden" name="keterangan" value="diterima">
+                        <button type="submit" class="btn btn-success">Setuju</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal setuju -->
+
+    <!-- start modal tolak -->
+    <div class="modal fade" id="modalTolak" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi tolak event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menolak event ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/event/event.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_event" id="inpEventT">
+                        <input type="hidden" name="catatan" value="terserah">
+                        <input type="hidden" name="keterangan" value="ditolak">
+                        <button type="submit" class="btn btn-success">Tolak</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal tolak -->
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <?php include('../footer.php');
@@ -181,6 +282,27 @@ $csrf = $GLOBALS['csrf'];
   </footer>
 
   <script>
+    var modalProses = document.getElementById('modalProses');
+    var modalSetuju = document.getElementById('modalSetuju');
+    var modalTolak = document.getElementById('modalTolak');
+    var inpEventP = document.getElementById('inpEventP');
+    var inpEventS = document.getElementById('inpEventS');
+    var inpEventT = document.getElementById('inpEventT');
+    function openProses(dataU,) {
+        inpEventP.value = dataU;
+        var myModal = new bootstrap.Modal(modalProses);
+        myModal.show();
+    }
+    function openSetuju(dataU) {
+        inpEventS.value = dataU;
+        var myModal = new bootstrap.Modal(modalSetuju);
+        myModal.show();
+    }
+    function openTolak(dataU) {
+        inpEventT.value = dataU;
+        var myModal = new bootstrap.Modal(modalTolak);
+        myModal.show();
+    }
     //preview data
     function preview(desc) {
       if (desc != 'ktp' && desc != 'foto' && desc != 'surat') {

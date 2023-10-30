@@ -134,7 +134,7 @@ class EventWebsite{
                 }
             }else if($data['keterangan'] == 'diterima'){
                 $status = 'diterima';
-                $redirect = '/riwayat.php';
+                $redirect = '/pengajuan.php';
                 if(isset($data['catatan']) || !empty($data['catatan'])){
                     $data['catatan'] = '';
                 }
@@ -144,7 +144,7 @@ class EventWebsite{
                     echo "<script>window.history.back();</script>";
                     exit();
                 }
-                $redirect = '/riwayat.php';
+                $redirect = '/pengajuan.php';
                 $status = 'ditolak';
             }
             $stmt[2]->bind_param("ssi", $status, $data['catatan'], $data['id_event']);
