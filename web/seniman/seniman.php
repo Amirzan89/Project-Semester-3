@@ -218,17 +218,12 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $senimanWeb = new SenimanWebsite();
     $data = SenimanWebsite::handle();
-    if(isset($data['keterangan'])){
-        $senimanWeb->prosesSeniman($data);
+    if(isset($_POST['_method'])){
+        if($_POST['_method'] == 'PUT'){
+            if(isset($data['keterangan'])){
+                $senimanWeb->prosesSeniman($data);
+            }
+        }
     }
-    // if(isset($_POST['_method'])){
-    //     if($_POST['_method'] == 'PUT'){
-    //         $senimanWeb->editTempat($data);
-    //     }else if($_POST['_method'] == 'DELETE'){
-    //         $senimanWeb->editTempat($data);
-    //     }
-    // }else{
-    //     $senimanWeb->tambahTempat($data);
-    // }
 }
 ?>

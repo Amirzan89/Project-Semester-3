@@ -128,25 +128,6 @@ $csrf = $GLOBALS['csrf'];
                     </tr>
                   <?php $no++;
                   } ?>
-                  <!-- <tr>
-                    <td>1</td>
-                    <td>3576447103910003
-                    </td>
-                    <td>Puji Utami</td>
-                    <td>1 Oktober 2023</td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i>  lihat
-                    </button>
-                    </td>
-                  </tr> -->
-                  <!-- <tr>
-                    <th scope="row">2</th>
-                    <td>3576441606910003</td>
-                    <td>Muhammad Lutfi Hakim</td>
-                    <td>31 Agustus 2023</td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
-                      </button>
-                    </td>
-                  </tr> -->
                </tbody>
               </table>
             </div>

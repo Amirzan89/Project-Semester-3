@@ -53,14 +53,14 @@ $csrf = $GLOBALS['csrf'];
 
 <body>
     <script>
-        const domain = window.location.protocol + '//' + window.location.hostname +":"+window.location.port;
-	    var csrfToken = "<?php echo $csrf ?>";
+        const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
+        var csrfToken = "<?php echo $csrf ?>";
         var email = "<?php echo $userAuth['email'] ?>";
         var idUser = "<?php echo $userAuth['id_user'] ?>";
         var number = "<?php echo $userAuth['number'] ?>";
         var role = "<?php echo $userAuth['role'] ?>";
         var idSeniman = "<?php echo $id ?>";
-	</script>
+    </script>
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
         <?php include('../header.php');
@@ -106,82 +106,106 @@ $csrf = $GLOBALS['csrf'];
                             <form class="row g-3">
                                 <div class="col-md-12">
                                     <label for="nik" class="form-label">Nomor Induk Seniman</label>
-                                    <input type="text" class="form-control" id="nik" readonly value="<?php echo $seniman['nomor_induk']?>">
+                                    <input type="text" class="form-control" id="nik" readonly
+                                        value="<?php echo $seniman['nomor_induk'] ?>">
                                 </div>
                                 <div class="col-md-12">
                                     <label for="nik" class="form-label">Nomor Induk Kependudukan</label>
-                                    <input type="text" class="form-control" id="nik" readonly value="<?php echo $seniman['nik']?>">
+                                    <input type="text" class="form-control" id="nik" readonly
+                                        value="<?php echo $seniman['nik'] ?>">
                                 </div>
                                 <div class="col-md-12">
                                     <label for="nama_seniman" class="form-label">Nama Lengkap</label>
-                                    <input type="text" class="form-control" id="nama_seniman" readonly value="<?php echo $seniman['nama_seniman']?>">
+                                    <input type="text" class="form-control" id="nama_seniman" readonly
+                                        value="<?php echo $seniman['nama_seniman'] ?>">
                                 </div>
                                 <div class="col-mb-3 mt-0">
                                     <label for="jenis_kelamin" class="col-md-12 pt-3 col-form-label">Jenis
                                         Kelamin</label>
                                     <div class="col-md-6">
                                         <select class="form-select" aria-label="Default select example" disabled>
-                                            <?php if($seniman['jenis_kelamin'] == 'laki-laki'){ ?>
+                                            <?php if ($seniman['jenis_kelamin'] == 'laki-laki') { ?>
                                                 <option value="laki-laki" selected="selected">Laki-laki</option>
-                                            <?php }else if($seniman['jenis_kelamin'] === 'perempuan'){ ?>
-                                                <option value="perempuan" selected="selected">Perempuan</option>
+                                            <?php } else if ($seniman['jenis_kelamin'] === 'perempuan') { ?>
+                                                    <option value="perempuan" selected="selected">Perempuan</option>
                                             <?php } ?>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
                                     <label for="tempat_lahir" class="form-label">Tempat lahir</label>
-                                    <input type="text" class="form-control" id="tempat_lahir" readonly value="<?php echo $seniman['tempat_lahir']?>">
+                                    <input type="text" class="form-control" id="tempat_lahir" readonly
+                                        value="<?php echo $seniman['tempat_lahir'] ?>">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="tanggal_lahir" class="form-label">Tanggal lahir</label>
-                                    <input type="text" class="form-control" id="tanggal_lahir" readonly value="<?php echo $seniman['tanggal_lahir']?>">
+                                    <input type="text" class="form-control" id="tanggal_lahir" readonly
+                                        value="<?php echo $seniman['tanggal_lahir'] ?>">
                                 </div>
                                 <div class="col-md-12 ">
                                     <label for="alamat_seniman" class="form-label">Alamat</label>
                                     <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat"
-                                        style="height: 100px;" readonly><?php echo $seniman['alamat_seniman']?></textarea>
+                                        style="height: 100px;"
+                                        readonly><?php echo $seniman['alamat_seniman'] ?></textarea>
                                 </div>
                                 <div class="col-md-12">
                                     <label for="no_telpon" class="form-label">Nomor Telepon</label>
-                                    <input type="text" class="form-control" id="no_telpon" readonly value="<?php echo $seniman['no_telpon']?>">
+                                    <input type="text" class="form-control" id="no_telpon" readonly
+                                        value="<?php echo $seniman['no_telpon'] ?>">
                                 </div>
                                 <div class="col-md-8">
                                     <label for="nama_organisasi" class="form-label">Nama Organisasi</label>
-                                    <input type="text" class="form-control" id="nama_organisasi" readonly value="<?php echo $seniman['nama_organisasi']?>" >
+                                    <input type="text" class="form-control" id="nama_organisasi" readonly
+                                        value="<?php echo $seniman['nama_organisasi'] ?>">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="jumlah_anggota" class="form-label">Jumlah Anggota</label>
-                                    <input type="number" class="form-control" id="jumlah_anggota" readonly value="<?php echo $seniman['jumlah_anggota']?>" >
+                                    <input type="number" class="form-control" id="jumlah_anggota" readonly
+                                        value="<?php echo $seniman['jumlah_anggota'] ?>">
                                 </div>
                                 <div class="col-12">
                                     <label for="surat_keterangan" class="form-label">Surat Keterangan Desa</label>
-                                    <button class="btn btn-info" type="button" onclick="preview('surat') "> Lihat surat keterangan </button>
-                                    <button class="btn btn-info" type="button" onclick="download('surat') "> Download surat keterangan </button>
+                                    <button class="btn btn-info" type="button" onclick="preview('surat') "> Lihat surat
+                                        keterangan </button>
+                                    <button class="btn btn-info" type="button" onclick="download('surat') "> Download
+                                        surat keterangan </button>
                                 </div>
                                 <div class=" col-12">
                                     <label for="ktp_seniman" class="form-label">Foto Kartu Tanda Penduduk</label>
-                                    <button class="btn btn-info" type="button" onclick="preview('ktp')"> Lihat Foto KTP</button>
-                                    <button class="btn btn-info" type="button" onclick="download('ktp')"> Download Foto KTP</button>
+                                    <button class="btn btn-info" type="button" onclick="preview('ktp')"> Lihat Foto
+                                        KTP</button>
+                                    <button class="btn btn-info" type="button" onclick="download('ktp')"> Download Foto
+                                        KTP</button>
                                 </div>
                                 <div class="col-12">
                                     <label for="pass_foto" class="form-label">Pass Foto 3x4</label>
-                                    <button class="btn btn-info" type="button" onclick="preview('foto')"> Lihat pass foto </button>
-                                    <button class="btn btn-info" type="button" onclick="download('foto')"> Download pass foto </button>
+                                    <button class="btn btn-info" type="button" onclick="preview('foto')"> Lihat pass
+                                        foto </button>
+                                    <button class="btn btn-info" type="button" onclick="download('foto')"> Download pass
+                                        foto </button>
                                 </div>
                                 <div class="row mb-3 justify-content-end">
                                     <div class="col-sm-10 text-end">
-                                        <a href="/tempat/status_peminjaman.php" class="btn btn-info"><i>kembali</i></a>
-                                        <?php if($seniman['status'] == 'diajukan'){?>
-                                            <a href="/tempat/edit_detail_tempat.php?id_tempat=<?= $id ?>" class="btn btn-info"><i>Proses</i></a>
-                                        <?php }else if($seniman['status'] == 'proses'){?>
-                                            <button type="button" class="btn btn-success">
-                                                <i class="bi bi-check-circle">Setuju</i>
+                                        <?php if ($seniman['status'] == 'diajukan' || $seniman['status'] == 'proses') { ?>
+                                            <a href="/seniman/pengajuan.php" class="btn btn-info"><i>kembali</i></a>
+                                        <?php } else if ($seniman['status'] == 'diterima' || $seniman['status'] == 'ditolak') { ?>
+                                                <a href="/seniman/riwayat.php" class="btn btn-info"><i>kembali</i></a>
+                                        <?php } ?>
+                                        <?php if ($seniman['status'] == 'diajukan') { ?>
+                                            <button type="button" class="btn btn-success"
+                                                onclick="openProses(<?php echo $seniman['id_seniman'] ?>)">
+                                                <i class="bi bi-edit-fill">Proses</i>
                                             </button>
-                                            <button type="button" class="btn btn-danger">
-                                                <i class="bi bi-x-circle">Tolak</i>
-                                            </button>
-                                        <?php }?>
+                                        <?php } else if ($seniman['status'] == 'proses') { ?>
+                                                <button type="button" class="btn btn-success"
+                                                    onclick="openSetuju(<?php echo $seniman['id_seniman'] ?>)">
+                                                    <i class="bi bi-check-circle">Setuju</i>
+                                                </button>
+                                                <button type="button" class="btn btn-danger"
+                                                    onclick="openTolak(<?php echo $seniman['id_seniman'] ?>)">
+                                                    <i class="bi bi-x-circle">Tolak</i>
+                                                </button>
+                                        <?php } ?>
                                     </div>
                                 </div>
                             </form>
@@ -191,59 +215,159 @@ $csrf = $GLOBALS['csrf'];
             </div>
         </section>
     </main><!-- End #main -->
+    <!-- start modal proses -->
+    <div class="modal fade" id="modalProses" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi proses seniman</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin memproses data seniman ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_seniman" id="inpSenimanP">
+                        <input type="hidden" name="keterangan" value="proses">
+                        <button type="submit" class="btn btn-success">Proses</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal proses -->
+
+    <!-- start modal setuju -->
+    <div class="modal fade" id="modalSetuju" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi setuju seniman</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menyetujui seniman ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_seniman" id="inpSenimanS">
+                        <input type="hidden" name="keterangan" value="diterima">
+                        <button type="submit" class="btn btn-success">Setuju</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal setuju -->
+
+    <!-- start modal tolak -->
+    <div class="modal fade" id="modalTolak" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi tolak seniman</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menolak seniman ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_seniman" id="inpSenimanT">
+                        <input type="hidden" name="catatan" value="terserah">
+                        <input type="hidden" name="keterangan" value="ditolak">
+                        <button type="submit" class="btn btn-success">Tolak</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal proses -->
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
         <?php include('footer.php');
         ?>
     </footer>
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
     <script>
+        var modalProses = document.getElementById('modalProses');
+        var modalSetuju = document.getElementById('modalSetuju');
+        var modalTolak = document.getElementById('modalTolak');
+        var inpSenimanP = document.getElementById('inpSenimanP');
+        var inpSenimanS = document.getElementById('inpSenimanS');
+        var inpSenimanT = document.getElementById('inpSenimanT');
+        function openProses(dataU,) {
+            inpSenimanP.value = dataU;
+            var myModal = new bootstrap.Modal(modalProses);
+            myModal.show();
+        }
+        function openSetuju(dataU) {
+            inpSenimanS.value = dataU;
+            var myModal = new bootstrap.Modal(modalSetuju);
+            myModal.show();
+        }
+        function openTolak(dataU) {
+            inpSenimanT.value = dataU;
+            var myModal = new bootstrap.Modal(modalTolak);
+            myModal.show();
+        }
         //preview data
-        function preview(desc){
-            if (desc != 'ktp' && desc != 'foto' && desc != 'surat'){
+        function preview(desc) {
+            if (desc != 'ktp' && desc != 'foto' && desc != 'surat') {
                 console.log('invalid description');
                 return;
             }
             var xhr = new XMLHttpRequest();
             var requestBody = {
                 email: email,
-                id_seniman:idSeniman,
-                item:'seniman',
-                deskripsi:desc
+                id_seniman: idSeniman,
+                item: 'seniman',
+                deskripsi: desc
             };
             //open the request
-            xhr.open('POST',domain+"/preview.php")
+            xhr.open('POST', domain + "/preview.php")
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             //send the form data
             xhr.send(JSON.stringify(requestBody));
-            xhr.onreadystatechange = function() {
+            xhr.onreadystatechange = function () {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
                     if (xhr.status === 200 || xhr.status === 300 || xhr.status === 302) {
                         var response = JSON.parse(xhr.responseText);
                         window.location.href = response.data;
                     } else {
                         var response = xhr.responseText;
-                        console.log('errorrr '+response);
+                        console.log('errorrr ' + response);
                     }
                 }
             }
         }
         //download data
-        function download(desc){
-            if (desc != 'ktp' && desc != 'foto' && desc != 'surat'){
+        function download(desc) {
+            if (desc != 'ktp' && desc != 'foto' && desc != 'surat') {
                 console.log('invalid description');
                 return;
             }
             var xhr = new XMLHttpRequest();
             var requestBody = {
                 email: email,
-                id_seniman:idSeniman,
-                item:'seniman',
-                deskripsi:desc
+                id_seniman: idSeniman,
+                item: 'seniman',
+                deskripsi: desc
             };
             //open the request
-            xhr.open('POST',domain+"/download.php")
+            xhr.open('POST', domain + "/download.php")
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.responseType = 'blob';

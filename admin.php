@@ -183,7 +183,6 @@ $csrf = $GLOBALS['csrf'];
     </a>
     <script>
         var modal = document.getElementById('modalDelete');
-        var deleteForm = document.getElementById('deleteForm');
         var inpUser = document.getElementById('inpUser');
         function openDelete(dataU){
           inpUser.value = dataU;

@@ -94,7 +94,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-person-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="kelola-admin.php"><b>Daftar Admin</b></a></h5>
+                      <h5 class="card-title"><a href="/admin.php"><b>Daftar Admin</b></a></h5>
                       <?php 
                         $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role != 'super admin'");
                         $data = mysqli_fetch_assoc($sql);
@@ -113,7 +113,7 @@ $csrf = $GLOBALS['csrf'];
                       <i class="bi bi-person-fill"></i>
                     </div>
                     <div class="ps-1">
-                      <h5 class="card-title"><a href="daftar-pengguna.php"><b>Daftar Pengguna</b></a></h5>
+                      <h5 class="card-title"><a href="/pengguna.php"><b>Daftar Pengguna</b></a></h5>
                       <h6 class="notif" >8</h6>
                     </div>
                   </div>

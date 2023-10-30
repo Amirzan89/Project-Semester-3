@@ -366,7 +366,6 @@ class TempatWebsite{
                 echo "<script>alert('Data tempat gagal dihapus ')</script>";
                 echo "<script>window.location.href = '/tempat/data_tempat.php'; </script>";
                 exit();
-                // throw new Exception(json_encode(['status' => 'error', 'message' => 'Data tempat gagal dihapus','code'=>500]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
