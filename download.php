@@ -18,8 +18,8 @@ class Download{
     //untuk admin
     public function downloadEvent($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi !')</script>";
+            if(!isset($data['email']) || empty($data['email'])){
+                echo "<script>alert('Email harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -33,10 +33,10 @@ class Download{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check id_user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['email']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
@@ -116,8 +116,8 @@ class Download{
     }
     public function downloadSeniman($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi !')</script>";
+            if(!isset($data['email']) || empty($data['email'])){
+                echo "<script>alert('Email harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -131,10 +131,10 @@ class Download{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check id_user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['email']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
@@ -220,8 +220,8 @@ class Download{
     }
     public function downloadPentas($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi !')</script>";
+            if(!isset($data['email']) || empty($data['email'])){
+                echo "<script>alert('Email harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -235,10 +235,10 @@ class Download{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check id_user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['email']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
@@ -286,15 +286,14 @@ class Download{
                 header('Cache-Control: must-revalidate');
                 header('Pragma: public');
                 header('Content-Length: ' . filesize($file));
-                ob_clean();
-                flush();
+                // Output the file contents
                 readfile($file);
                 exit();
             } else {
                 echo "<script>alert('File tidak ditemukan !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
-            }
+            }            
         }catch(Exception $e){
             echo $e->getTraceAsString();
             $error = $e->getMessage();
@@ -318,8 +317,8 @@ class Download{
     }
     public function downloadTempat($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi !')</script>";
+            if(!isset($data['email']) || empty($data['email'])){
+                echo "<script>alert('Email harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -333,10 +332,10 @@ class Download{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check id_user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['email']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);

@@ -251,19 +251,30 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
             xhr.open('POST',domain+"/download.php")
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
-            //send the form data
+            xhr.responseType = 'blob';
+            // send the form data
             xhr.send(JSON.stringify(requestBody));
-            xhr.onreadystatechange = function() {
+            xhr.onreadystatechange = function () {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
-                    if (xhr.status === 200 || xhr.status === 300 || xhr.status === 302) {
-                        // var response = JSON.parse(xhr.responseText);
-                        // window.location.href = response.data;
+                    if (xhr.status === 200) {
+                        var blob = xhr.response;
+                        var contentDisposition = xhr.getResponseHeader('Content-Disposition');
+                        var match = contentDisposition.match(/filename="(.+\..+?)"/);
+                        if (match) {
+                            var filename = match[1];
+                            var link = document.createElement('a');
+                            link.href = window.URL.createObjectURL(blob);
+                            link.download = filename;
+                            link.click();
+                        } else {
+                            console.log('Invalid content-disposition header');
+                        }
                     } else {
                         var response = xhr.responseText;
-                        console.log('errorrr '+response);
+                        console.log('errorrr ' + response);
                     }
                 }
-            }
+            };
         }
     </script>
 

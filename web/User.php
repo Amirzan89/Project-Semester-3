@@ -451,7 +451,7 @@ class User{
                     'message' => $errorJson['message'],
                 );
             }
-            echo "<script> alert('$error')</script>";
+            echo "<script> alert('$responseData')</script>";
             exit();
         }
     }
