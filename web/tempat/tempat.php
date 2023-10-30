@@ -148,13 +148,13 @@ class TempatWebsite{
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
                 echo "<script>alert('Data tempat berhasil ditambahkan')</script>";
-                echo "<script>window.location.href = '/halaman/tempat/data_tempat.php';</script>";
+                echo "<script>window.location.href = '/tempat/data_tempat.php';</script>";
                 exit();
             } else {
                 $stmt[2]->close();
                 unlink($fileFotoPath);
                 echo "<script>alert('Data tempat gagal ditambahkan')</script>";
-                echo "<script>window.location.href = '/halaman/tempat/data_tempat.php';</script>";
+                echo "<script>window.location.href = '/tempat/data_tempat.php';</script>";
                 exit();
             }
         }catch(Exception $e){
@@ -277,12 +277,12 @@ class TempatWebsite{
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
                 echo "<script>alert('Data Tempat berhasil diubah')</script>";
-                echo "<script>window.location.href = '/halaman/tempat/data_tempat.php';</script>";
+                echo "<script>window.location.href = '/tempat/data_tempat.php';</script>";
                 exit();
             } else {
                 $stmt[2]->close();
                 echo "<script>alert('Data Tempat gagal diubah')</script>";
-                echo "<script>window.location.href = '/halaman/tempat/data_tempat.php';</script>";
+                echo "<script>window.location.href = '/tempat/data_tempat.php';</script>";
                 exit();
             }
         }catch(Exception $e){
@@ -307,10 +307,14 @@ class TempatWebsite{
     public function hapusTempat($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                throw new Exception('ID User harus di isi !');
+                echo "<script>alert('ID User harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
             if(!isset($data['id_tempat']) || empty($data['id_tempat'])){
-                throw new Exception('ID tempat harus di isi !');
+                echo "<script>alert('ID Tempat harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
             //check id_user
             $query = "SELECT role FROM users WHERE id_user = ? LIMIT 1";
@@ -321,11 +325,15 @@ class TempatWebsite{
             $stmt[0]->bind_result($role);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                throw new Exception('User tidak ditemukan');
+                echo "<script>alert('User tidak ditemukan ')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
             $stmt[0]->close();
             if(!in_array($role,['super admin','admin tempat'])){
-                throw new Exception('Anda bukan admin');
+                echo "<script>alert('Anda bukan admin ')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
             //check id_tempat
             $query = "SELECT foto_tempat FROM list_tempat WHERE id_tempat = ? LIMIT 1";
@@ -336,7 +344,9 @@ class TempatWebsite{
             $stmt[0]->bind_result($path);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                throw new Exception('Data tempat tidak ditemukan');
+                echo "<script>alert('Data tempat tidak ditemukan ')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
             }
             $stmt[0]->close();
             //delete file
@@ -345,15 +355,18 @@ class TempatWebsite{
             //delete data
             $query = "DELETE FROM list_tempat WHERE id_tempat = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param('ss', $data['id_tempat']);
+            $stmt[2]->bind_param('s', $data['id_tempat']);
             if ($stmt[2]->execute()) {
                 $stmt[2]->close();
-                header('Content-Type: application/json');
-                echo json_encode(['status'=>'success','message'=>'Data tempat berhasil dihapus']);
+                echo "<script>alert('Data tempat berhasil dihapus')</script>";
+                echo "<script>window.location.href = '/tempat/data_tempat.php'; </script>";
                 exit();
             } else {
                 $stmt[2]->close();
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data tempat gagal dihapus','code'=>500]));
+                echo "<script>alert('Data tempat gagal dihapus ')</script>";
+                echo "<script>window.location.href = '/tempat/data_tempat.php'; </script>";
+                exit();
+                // throw new Exception(json_encode(['status' => 'error', 'message' => 'Data tempat gagal dihapus','code'=>500]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -370,6 +383,7 @@ class TempatWebsite{
                 );
             }
             echo "<script>alert('$error')</script>";
+            echo "<script>window.history.back();</script>";
             exit();
         }
     }
@@ -955,7 +969,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if($_POST['_method'] == 'PUT'){
             $tempatWeb->editTempat($data);
         }else if($_POST['_method'] == 'DELETE'){
-            $tempatWeb->editTempat($data);
+            $tempatWeb->hapusTempat($data);
         }
     }else{
         $tempatWeb->tambahTempat($data);

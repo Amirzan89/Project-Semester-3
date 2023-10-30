@@ -116,6 +116,7 @@ $csrf = $GLOBALS['csrf'];
                                         <td><?php echo $tempat['alamat_tempat'] ?></td>
                                         <td>
                                           <a href="/tempat/detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                                          <button type="button" class="btn btn-danger" onclick="openDelete(<?php echo $tempat['id_tempat']?>)"> <i class="bi bi-trash-fill">Hapus</i></button>
                                         </td>
                                       </tr>
                                     <?php $no++;
@@ -130,16 +131,47 @@ $csrf = $GLOBALS['csrf'];
         </section>
 
     </main><!-- End #main -->
-
+    <!-- start modal delete -->
+  <div class="modal fade" id="modalDelete" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Konfirmasi hapus tempat</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Apakah Anda yakin ingin menghapus tempat ?  
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <form action="/web/tempat/tempat.php" id="deleteForm" method="POST">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+            <input type="hidden" name="id_tempat" id="inpTempat">
+            <button type="submit" class="btn btn-success" name="hapusAdmin">Hapus</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end modal delete -->
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <?php include('../footer.php');
     ?>
   </footer>
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
-
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script>
+    var modal = document.getElementById('modalDelete');
+    var deleteForm = document.getElementById('deleteForm');
+    var inpTempat = document.getElementById('inpTempat');
+    function openDelete(dataU){
+      inpTempat.value = dataU;
+      var myModal = new bootstrap.Modal(modal);
+      myModal.show();
+    }
+  </script>
   <!-- Vendor JS Files -->
   <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="/public/assets/vendor/simple-datatables/simple-datatables.js"></script>

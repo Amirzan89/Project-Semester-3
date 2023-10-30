@@ -95,12 +95,6 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h4 class="card-title">Data Pengguna</h4>
-              <!-- <a href="/users/form-tambah-user.php">
-                <button type="button" class="btn btn-success">
-                    <i class="bi bi-person-plus-fill"></i> Tambah User
-                </button>
-              </a> -->
-              <!-- <button type="button" class="btn btn-outline-secondary"><a href="../users/form-tambah-user.php"> Tambah User</a></button> -->
               <!-- Table with stripped rows -->
               <table class="table datatable">
                 <thead>

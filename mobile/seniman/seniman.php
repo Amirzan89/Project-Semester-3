@@ -496,21 +496,21 @@ class SenimanMobile{
         }
     }
 }
-// if($_SERVER['REQUEST_METHOD'] == 'GET'){
-//     echo 'ilang';
-// }
-// if($_SERVER['REQUEST_METHOD'] == 'POST'){
-//     $SenimanMobile = new SenimanMobile();
-//     $SenimanMobile->regisrasiSeniman(SenimanMobile::handle());
-// }
-// if($_SERVER['REQUEST_METHOD'] == 'PUT'){
-//     $SenimanMobile = new SenimanMobile();
-//     $SenimanMobile->editSeniman(SenimanMobile::handle());
-// }
-// if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-//     $SenimanMobile = new SenimanMobile();
-//     $SenimanMobile->hapusSeniman(SenimanMobile::handle());
-// }
+if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    echo 'ilang';
+}
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    $SenimanMobile = new SenimanMobile();
+    $SenimanMobile->regisrasiSeniman(SenimanMobile::handle());
+}
+if($_SERVER['REQUEST_METHOD'] == 'PUT'){
+    $SenimanMobile = new SenimanMobile();
+    $SenimanMobile->editSeniman(SenimanMobile::handle());
+}
+if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+    $SenimanMobile = new SenimanMobile();
+    $SenimanMobile->hapusSeniman(SenimanMobile::handle());
+}
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $SenimanMobile = new SenimanMobile();
     $data = SenimanMobile::handle();
