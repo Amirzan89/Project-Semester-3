@@ -467,6 +467,11 @@ class User{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
+            if($data['id_admin'] === $data['id_user']){
+                echo "<script>alert('Anda tidak boleh menghapus anda sendiri !');</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
             //check Admin
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
