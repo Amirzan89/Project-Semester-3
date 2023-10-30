@@ -213,7 +213,7 @@ class Jwt{
                 return ['status'=>'error','message'=>'email empty'];
             }else{
                 //check email is exist on database
-                $userColumns = ['id_user','nama_lengkap','no_telpon','jenis_kelamin','tanggal_lahir','tempat_lahir','email','role'];
+                $userColumns = ['id_user','nama_lengkap','no_telpon','jenis_kelamin','tanggal_lahir','tempat_lahir','email','role', 'foto'];
                 $columns = implode(',', $userColumns);
                 $query = "SELECT $columns FROM users WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = $con->prepare($query);

@@ -18,13 +18,6 @@ if($userAuth['status'] == 'error'){
     exit();
   }
 $csrf = $GLOBALS['csrf'];
-  // if (isset($_GET['id_user']) && !empty($_GET['id_user'])) {
-  //   $id  = $_GET['id_user'];
-  //   $sql  = mysqli_query($conn, "SELECT * FROM users WHERE id_user = '$id'");
-  //   $users = mysqli_fetch_assoc($sql);
-  // }else{
-  //   header('Location: /dashboard.php');
-  // }
 }
 ?>
 <!DOCTYPE html>
@@ -125,9 +118,9 @@ $csrf = $GLOBALS['csrf'];
                   
             <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
 
-              <img src="/private/profile/admin/1.jpeg" alt="Profile" class="rounded-circle">
-              <h2><center>Kevin Anderson</center></h2>
-              <h3>Admin</h3>
+              <img src="/private/profile/admin<?php echo $userAuth['foto']?>" alt="Profile" class="rounded-circle">
+              <h2><center><?php echo $userAuth['nama_lengkap']?></center></h2>
+              <h3><?php echo $userAuth['role']?></h3>
             </div>
           
 
@@ -179,7 +172,7 @@ $csrf = $GLOBALS['csrf'];
                     <div class="row mb-3">
                       <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Foto Profil</label>
                       <div class="col-md-8 col-lg-9">
-                        <img src="/private/profile/admin/1.jpeg" alt="Profile">
+                        <img src="/private/profile/admin<?php echo $userAuth['foto']?>" alt="Profile">
                         <div class="pt-2">
                           <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image"><i class="bi bi-upload"></i></a>
                           <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>

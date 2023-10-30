@@ -12,22 +12,25 @@
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="/public/assets/img/ava.jpg" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">Huffle Puff</span>
+            <?php if(isset($userAuth['foto']) && !empty($userAuth['foto']) && !is_null($userAuth['foto'])){?>
+              <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" class="rounded-circle">
+              <?php }else{?>
+                <img src="/private/profile/admin/default.jpg" alt="Profile" class="rounded-circle">
+            <?php }?>
+            <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $userAuth['nama_lengkap']?></span>
           </a><!-- End Profile Iamge Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Huffle Puff</h6>
-              <span>Super Admin</span>
+              <h6><?php echo $userAuth['nama_lengkap'] ?></h6>
+              <span><?php echo $userAuth['role'] ?></span>
             </li>
             <li>
               <hr class="dropdown-divider">
             </li>
 
             <li >
-              <!-- <a class="dropdown-item d-flex align-items-center" href="/profile.php?id_user=<?php //$userAuth['id_user']?>"> -->
-              <a class="dropdown-item d-flex align-items-center" href="/profile.php<?php //$userAuth['id_user']?>">
+              <a class="dropdown-item d-flex align-items-center" href="/profile.php">
                 <i class="bi bi-person"></i>
                 <span>Akun</span>
               </a>
