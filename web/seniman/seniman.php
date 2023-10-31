@@ -218,8 +218,8 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $senimanWeb = new SenimanWebsite();
     $data = SenimanWebsite::handle();
-    if(isset($_POST['_method'])){
-        if($_POST['_method'] == 'PUT'){
+    if(isset($data['_method'])){
+        if($data['_method'] == 'PUT'){
             if(isset($data['keterangan'])){
                 $senimanWeb->prosesSeniman($data);
             }
