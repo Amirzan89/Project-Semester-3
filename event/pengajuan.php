@@ -116,13 +116,9 @@ $csrf = $GLOBALS['csrf'];
                           <td><?php echo $event['tanggal_awal']?></td>
                           <td>
                             <?php if($event['status'] == 'diajukan'){ ?>
-                              <button type="button" class="btn btn-success">
-                                <i class="bi bi-check-circle">Diajukan</i>
-                              </button>
+                              <span class="badge bg-proses">Diajukan</span>
                             <?php }else if($event['status'] == 'proses'){ ?>
-                              <button type="button" class="btn btn-danger">
-                                <i class="bi bi-x-circle">proses</i>
-                              </button>
+                              <span class="badge bg-terima">Diproses</span>
                             <?php } ?>
                           </td>
                           <td>

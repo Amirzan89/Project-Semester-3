@@ -114,13 +114,9 @@ $csrf = $GLOBALS['csrf'];
                                         <td><?php echo $sewa['tgl_awal_peminjaman']?></td>
                                         <td>
                                           <?php if($sewa['status'] == 'diajukan'){ ?>
-                                            <button type="button" class="btn btn-success">
-                                              <i class="bi bi-check-circle">Diajukan</i>
-                                            </button>
+                                            <span class="badge bg-proses">Diajukan</span>
                                           <?php }else if($sewa['status'] == 'proses'){ ?>
-                                          <button type="button" class="btn btn-danger">
-                                            <i class="bi bi-x-circle">proses</i>
-                                          </button>
+                                            <span class="badge bg-terima">Diproses</span>
                                           <?php } ?>
                                         </td>
                                         <td>

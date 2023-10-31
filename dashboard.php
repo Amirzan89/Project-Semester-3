@@ -86,44 +86,46 @@ $csrf = $GLOBALS['csrf'];
       <div class="row">
         <div class="col-lg-12">
           <div class="row">
-            <div class="col-lg-6 col-md-4">
-              <div class="card success-card revenue-card">
-                <div class="card-body">
-                  <div class="d-flex align-items-center mt-3 mb-3">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-person-fill"></i>
-                    </div>
-                    <div class="ps-1">
-                      <h5 class="card-title"><a href="/admin.php"><b>Daftar Admin</b></a></h5>
-                      <?php 
-                        $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role != 'super admin' AND role != 'masyarakat'");
+          <div class="col-lg-6 col-md-4">
+              <div class="card success-card revenue-card"><a href="/admin.php">
+                  <div class="card-body">
+                    <h5 class="card-title">Daftar Admin</h5>
+                    <div class="d-flex align-items-center">
+                      <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-people-fill"></i>
+                      </div>
+                      <div class="ps-3">
+                        <?php
+                        $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role != 'super admin'");
                         $data = mysqli_fetch_assoc($sql);
-                        echo "<h6 class= 'notif'>".$data['total']."</h6>";
-                      ?>
+                        echo "<h4>" . $data['total'] . "</46>";
+                        ?>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </a>
               </div>
             </div>
             <div class="col-lg-6 col-md-4">
-              <div class="card success-card revenue-card">
-                <div class="card-body">
-                  <div class="d-flex align-items-center mt-3 mb-3">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-person-fill"></i>
-                    </div>
-                    <div class="ps-1">
-                      <h5 class="card-title"><a href="/pengguna.php"><b>Daftar Pengguna</b></a></h5>
-                      <?php 
-                        $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role = 'masyarakat'");
+              <div class="card success-card revenue-card"><a href="/pengguna.php">
+                  <div class="card-body">
+                    <h5 class="card-title">Daftar Pengguna</h5>
+                    <div class="d-flex align-items-center">
+                      <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-people-fill"></i>
+                      </div>
+                      <div class="ps-3">
+                        <?php
+                        $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM list_tempat");
                         $data = mysqli_fetch_assoc($sql);
-                        echo "<h6 class= 'notif'>".$data['total']."</h6>";
-                      ?>
+                        echo "<h4>" . $data['total'] . "</h4>";
+                        ?>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                </a>
               </div>
             </div>
+
           </div>
         </div>
 

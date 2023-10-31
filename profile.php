@@ -119,9 +119,12 @@ if ($userAuth['status'] == 'error') {
                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
 
                   <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-
-                    <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile"
-                      class="rounded-circle">
+                  <?php if(isset($userAuth['foto']) && !empty($userAuth['foto']) && !is_null($userAuth['foto'])){?>
+                    <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" class="rounded-circle">
+                    <?php }else{?>
+                    <img src="/private/profile/admin/default.jpg" alt="Profile" class="rounded-circle">
+                  <?php }?>
+                    <!-- <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" class="rounded-circle"> -->
                     <h2>
                       <center>
                         <?php echo $userAuth['nama_lengkap'] ?>
@@ -191,7 +194,12 @@ if ($userAuth['status'] == 'error') {
                     <div class="row mb-3">
                       <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Foto Profil</label>
                       <div class="col-md-8 col-lg-9">
-                        <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile">
+                      <?php if(isset($userAuth['foto']) && !empty($userAuth['foto']) && !is_null($userAuth['foto'])){?>
+                        <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" class="rounded-circle">
+                        <?php }else{?>
+                        <img src="/private/profile/admin/default.jpg" alt="Profile" class="rounded-circle">
+                      <?php }?>
+                        <!-- <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile"> -->
                         <div class="pt-2">
                           <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image"><i
                               class="bi bi-upload"></i></a>

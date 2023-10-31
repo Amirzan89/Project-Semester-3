@@ -99,7 +99,33 @@ h6 {
   visibility: visible;
   opacity: 1;
 }
-
+.badge.bg-proses {
+  background-color: #cf570a ;
+  color: #fff; 
+  border-radius: 5px;
+  font-size: 15px; 
+  text-align: center;
+  padding: 10px;
+  width: 110px;
+}  
+.badge.bg-terima {
+  background-color: #61BB63;
+  color: #fff; 
+  border-radius: 5px;
+  font-size: 15px; 
+  text-align: center;
+  padding: 10px;
+  width: 110px;
+}
+.badge.bg-tolak {
+  background-color: #DC3545;
+  color: #fff; 
+  border-radius: 5px;
+  font-size: 15px; 
+  text-align: center;
+  padding: 10px;
+  width: 110px;
+}
 /*--------------------------------------------------------------
 # Override some default Bootstrap stylings
 --------------------------------------------------------------*/

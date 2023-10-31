@@ -15,7 +15,7 @@
             <?php if(isset($userAuth['foto']) && !empty($userAuth['foto']) && !is_null($userAuth['foto'])){?>
               <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" class="rounded-circle">
               <?php }else{?>
-                <img src="/private/profile/admin/default.jpg" alt="Profile" class="rounded-circle">
+              <img src="/private/profile/admin/default.jpg" alt="Profile" class="rounded-circle">
             <?php }?>
             <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $userAuth['nama_lengkap']?></span>
           </a><!-- End Profile Iamge Icon -->
