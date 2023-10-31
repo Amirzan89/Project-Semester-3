@@ -50,6 +50,7 @@ $csrf = $GLOBALS['csrf'];
 
 <body>
   <script>
+    const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
 	  var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
@@ -120,7 +121,11 @@ $csrf = $GLOBALS['csrf'];
                                           <?php } ?>
                                         </td>
                                         <td>
-                                          <a href="/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                                          <?php if($sewa['status'] == 'diajukan'){ ?>
+                                            <button class="btn btn-info" onclick="proses(<?php echo $sewa['id_sewa'] ?>)"><i class="bi bi-pencil-square">Lihat</i></button>
+                                          <?php }else if($sewa['status'] == 'proses'){ ?>
+                                            <a href="/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                                          <?php } ?>
                                         </td>
                                     </tr>
                                   <?php $no++;
@@ -142,9 +147,37 @@ $csrf = $GLOBALS['csrf'];
     ?>
   </footer>
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
-
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script>
+    function proses(Id) {
+      var xhr = new XMLHttpRequest();
+      var requestBody = {
+        _method: 'PUT',
+        id_user: idUser,
+        id_sewa: Id,
+        keterangan: 'proses'
+      };
+      //open the request
+      xhr.open('POST', domain + "/web/tempat/tempat.php")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      //send the form data
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            window.location.href = "/tempat/detail_sewa.php?id_sewa="+Id;
+          } else {
+            try {
+                eval(xhr.responseText);
+            } catch (error) {
+                console.error('Error evaluating JavaScript:', error);
+            }
+          }
+        }
+      }
+    }
+  </script>
   <!-- Vendor JS Files -->
   <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="/public/assets/vendor/simple-datatables/simple-datatables.js"></script>

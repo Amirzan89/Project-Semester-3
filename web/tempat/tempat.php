@@ -961,13 +961,14 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $tempatWeb = new TempatWebsite();
     $data = TempatWebsite::handle();
-    if(isset($data['keterangan'])){
-        $tempatWeb->prosesSewaTempat($data);
-    }
-    if(isset($_POST['_method'])){
-        if($_POST['_method'] == 'PUT'){
-            $tempatWeb->editTempat($data);
-        }else if($_POST['_method'] == 'DELETE'){
+    if(isset($data['_method'])){
+        if($data['_method'] == 'PUT'){
+            if(isset($data['keterangan'])){
+                $tempatWeb->prosesSewaTempat($data);
+            }else{
+                $tempatWeb->editTempat($data);
+            }
+        }else if($data['_method'] == 'DELETE'){
             $tempatWeb->hapusTempat($data);
         }
     }else{
