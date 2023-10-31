@@ -174,8 +174,12 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $pentasWeb = new PentasWebsite();
     $data = PentasWebsite::handle();
-    if(isset($data['keterangan'])){
-        $pentasWeb->prosesPentas($data);
+    if(isset($data['_method'])){
+        if($data['_method'] == 'PUT'){
+            if(isset($data['keterangan'])){
+                $pentasWeb->prosesPentas($data);
+            }
+        }
     }
 }
 ?>

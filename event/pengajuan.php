@@ -169,11 +169,7 @@ $csrf = $GLOBALS['csrf'];
       xhr.onreadystatechange = function () {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
-            try {
-              window.location.href = "/event/detail_event.php?id_event="+Id;
-            } catch (error) {
-                console.error('Error evaluating JavaScript:', error);
-            }
+            window.location.href = "/event/detail_event.php?id_event="+Id;
           } else {
             try {
                 eval(xhr.responseText);
