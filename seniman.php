@@ -82,7 +82,76 @@ $csrf = $GLOBALS['csrf'];
     <!-- End Page Title -->
 
     <section class="section dashboard">
-      <div class="row">
+    <div class="row">
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-xxl-4 col-md-4">
+              <div class="card success-card revenue-card"><a href="/seniman/formulir-baru.php">
+                  <div class="card-body">
+                    <h5 class="card-title">Formulir</h5>
+                    <div class="d-flex align-items-center">
+                      <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-file-earmark-text-fill"></i>
+                      </div>
+                    </div>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-4 col-md-4">
+            <div class="card success-card revenue-card"><a href="/seniman/pengajuan.php">
+                <div class="card-body">
+                  <h5 class="card-title">Verifikasi Pengajuan</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-bell-fill"></i>
+                    </div>
+                    <div class="ps-3">
+                      <?php
+                      $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diajukan' OR status = 'proses'");
+                      $data = mysqli_fetch_assoc($sql);
+                      echo "<h4>" . $data['total'] . "</h4>";
+                      ?>
+                    </div>
+                  </div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-xxl-4 col-md-4">
+          <div class="card success-card revenue-card"><a href="/seniman/riwayat.php">
+              <div class="card-body">
+                <h5 class="card-title">Riwayat</h5>
+                <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="bi bi-clock-fill"></i>
+                  </div>
+                  <div class="ps-3">
+                    <?php
+                    $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diterima' OR status = 'ditolak'");
+                    $data = mysqli_fetch_assoc($sql);
+                    echo "<h4>" . $data['total'] . "</h4>";
+                    ?>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-xxl-4 col-md-4">
+        <div class="card success-card revenue-card"><a href="/seniman/data_seniman.php">
+            <div class="card-body">
+              <h5 class="card-title">Data Seniman</h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="bi bi-folder-fill"></i>
+                </div>
+              </div>
+          </a>
+        </div>
+      </div>
+      <!-- <div class="row">
       <div class="col-lg-12">
             <div class="row">
               <div class="col-xxl-4 col-md-4">
@@ -95,9 +164,9 @@ $csrf = $GLOBALS['csrf'];
                               </div>
                               <div class="ps-3">
                                 <?php 
-                                  $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diajukan' OR status = 'proses'");
-                                  $data = mysqli_fetch_assoc($sql);
-                                  echo "<h4>".$data['total']."</h4>";
+                                  // $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diajukan' OR status = 'proses'");
+                                  // $data = mysqli_fetch_assoc($sql);
+                                  // echo "<h4>".$data['total']."</h4>";
                                 ?>
                               </div>
                           </div>
@@ -114,9 +183,9 @@ $csrf = $GLOBALS['csrf'];
                               </div>
                               <div class="ps-3">
                                 <?php 
-                                  $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diterima' OR status = 'ditolak'");
-                                  $data = mysqli_fetch_assoc($sql);
-                                  echo "<h4>".$data['total']."</h4>";
+                                  // $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diterima' OR status = 'ditolak'");
+                                  // $data = mysqli_fetch_assoc($sql);
+                                  // echo "<h4>".$data['total']."</h4>";
                                 ?>
                               </div>
                           </div>
@@ -199,7 +268,7 @@ $csrf = $GLOBALS['csrf'];
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </section>
   </main>
   <!-- End #main -->

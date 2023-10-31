@@ -131,6 +131,7 @@ $csrf = $GLOBALS['csrf'];
                         <td><?php echo $users['role'] ?></td>
                         <td><?php echo $users['email'] ?></td>
                         <td>
+                          <a href="/admin/edit.php?id_user=<?= $users['id_user'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
                           <a href="/admin/edit.php?id_user=<?= $users['id_user'] ?>" class="btn btn-info"><i class="bi bi-pencil-square"></i>Edit</a>
                           <button type="button" class="btn btn-danger" onclick="openDelete(<?php echo $users['id_user']?>)"> <i class="bi bi-trash-fill">Hapus</i></button>
                         </td>

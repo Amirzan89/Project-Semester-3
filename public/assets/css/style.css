@@ -37,6 +37,19 @@ h5,
 h6 {
   font-family: "Nunito", sans-serif;
 }
+.btn.btn-lihat {
+  background-color: #FFC107 ;
+  color: #fff; 
+  border: 2px solid #FFC107 ; 
+  border-radius: 5px;
+  text-align: center;
+}
+
+.btn.btn-lihat:hover {
+  background-color: #dba604; 
+  border-color: #dba604;
+  color: #fff;
+}
 .btn-hijau {
   background-color: #0c3924;
 }
