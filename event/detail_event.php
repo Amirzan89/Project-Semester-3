@@ -163,9 +163,9 @@ $csrf = $GLOBALS['csrf'];
                 <div class="row mb-3 justify-content-end">
                   <div class="col-sm-10 text-end">
                     <?php if ($events['status'] == 'diajukan' || $events['status'] == 'proses') { ?>
-                        <a href="/tempat/pengajuan.php" class="btn btn-info"><i>kembali</i></a>
+                        <a href="/event/pengajuan.php" class="btn btn-info"><i>kembali</i></a>
                     <?php } else if ($events['status'] == 'diterima' || $events['status'] == 'ditolak') { ?>
-                            <a href="/tempat/riwayat.php" class="btn btn-info"><i>kembali</i></a>
+                            <a href="/event/riwayat.php" class="btn btn-info"><i>kembali</i></a>
                     <?php } ?>
                     <?php if ($events['status'] == 'diajukan') { ?>
                         <button type="button" class="btn btn-success"

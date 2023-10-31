@@ -192,7 +192,7 @@ $csrf = $GLOBALS['csrf'];
         <!-- Vendor JS Files -->
     <script src="../public/assets/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="../public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-        
+    <script src="/public/assets/vendor/tinymce/tinymce.min.js"></script>
     <!-- Template Main JS File -->
         <script src="/public/assets/js/admin/main.js"></script>
     <script>

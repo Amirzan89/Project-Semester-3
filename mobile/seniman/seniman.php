@@ -208,6 +208,9 @@ class SenimanMobile{
     }
     public function editSeniman($data){
         try{
+            if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
+                throw new Exception('ID Seniman harus di isi');
+            }
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('ID User harus di isi');
             }

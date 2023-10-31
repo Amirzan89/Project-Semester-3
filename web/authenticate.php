@@ -153,7 +153,7 @@ function authenticate($request,$data,$con = null){
         }
     //if cookie gone
     }else{
-        $page = ['/dashboard.php','/event.php','/seniman.php','/pentas.php','/pengguna.php','/admin.php','/event/dashboard','/testing/seniman/dashboard','/testing/event/dashboard','/testing/tempat/dashboard'];
+        $page = ['/dashboard.php','/event.php','/event/detail_event.php' ,'/event/formulir.php' ,'/event/pengajuan.php' ,'/event/riwayat.php','/seniman.php', '/seniman/data_seniman.php', '/seniman/detail_seniman.php', '/seniman/formulir.php', '/seniman/pengajuan.php', '/seniman/riwayat.php', '/seniman/tambah.php', '/pentas.php', '/pentas/detail_pentas.php', '/pentas/formulir.php', '/pentas/pengajuan.php', '/pentas/riwayat.php', '/pentas/tambah.php', '/tempat.php', '/tempat/data_sewa_tempat.php', '/tempat/data_tempat.php', '/tempat/detail_sewa.php', '/tempat/detail_tempat.php', '/tempat/edit_detail_tempat.php', '/tempat/formulir-sewa.php', '/tempat/pengajuan.php', '/tempat/riwayat.php', '/tempat/tambah_tempat.php', '/pengguna.php','/admin.php', '/admin/edit.php' ,'/admin/tambah.php','/testing/seniman/dashboard','/testing/event/dashboard','/testing/tempat/dashboard'];
         if(in_array($data['uri'],$page)){
             if(isset($_COOKIE["token1"])){
                 $token1 = $_COOKIE['token1'];

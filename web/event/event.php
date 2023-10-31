@@ -49,21 +49,25 @@ class EventWebsite{
     public function prosesEvent($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
+                http_response_code(400);
                 echo "<script>alert('ID User harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             if(!isset($data['id_event']) || empty($data['id_event'])){
+                http_response_code(400);
                 echo "<script>alert('ID Event harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             if(!isset($data['keterangan']) || empty($data['keterangan'])){
+                http_response_code(400);
                 echo "<script>alert('Keterangan harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }else{
                 if($data['keterangan'] == 'diajukan'){
+                    http_response_code(400);
                     echo "<script>alert('Keterangan invalid !')</script>";
                     echo "<script>window.history.back();</script>";
                     exit();
@@ -78,12 +82,14 @@ class EventWebsite{
             $stmt[0]->bind_result($role);
             if(!$stmt[0]->fetch()){
                 $stmt[0]->close();
+                http_response_code(400);
                 echo "<script>alert('User tidak ditemukan')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             $stmt[0]->close();
             if(($role != 'admin event' && $role != 'super admin') || $role == 'masyarakat'){
+                http_response_code(400);
                 echo "<script>alert('Invalid role !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
@@ -97,6 +103,7 @@ class EventWebsite{
             $stmt[1]->bind_result($statusDB);
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
+                http_response_code(400);
                 echo "<script>alert('Data event tidak ditemukan')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
@@ -104,21 +111,25 @@ class EventWebsite{
             $stmt[1]->close();
             //check status
             if($data['keterangan'] ==  'proses' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
+                http_response_code(400);
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             if($statusDB ==  'diajukan' && ($data['keterangan'] == 'diterima' || $data['keterangan'] == 'ditolak')){
+                http_response_code(400);
                 echo "<script>alert('Data harus di proses')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             if($data['keterangan'] ==  'ditolak' && $statusDB == 'diterima'){
+                http_response_code(400);
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             if($data['keterangan'] ==  'diterima' && $statusDB == 'ditolak'){
+                http_response_code(400);
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
@@ -140,6 +151,7 @@ class EventWebsite{
                 }
             }else if($data['keterangan'] == 'ditolak'){
                 if(!isset($data['catatan']) || empty($data['catatan'])){
+                    http_response_code(400);
                     echo "<script>alert('Catatan harus di isi !')</script>";
                     echo "<script>window.history.back();</script>";
                     exit();
@@ -152,12 +164,11 @@ class EventWebsite{
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
                 echo "<script>alert('Status berhasil diubah')</script>";
-                echo "<script>window.location.href = '/event". $redirect . "'; </script>";
                 exit();
             } else {
                 $stmt[2]->close();
+                http_response_code(500);
                 echo "<script>alert('Status gagal diubah')</script>";
-                echo "<script>window.location.href = '/event". $redirect . "'; </script>";
                 exit();
             }
         }catch(Exception $e){
@@ -174,8 +185,8 @@ class EventWebsite{
                     'message' => $errorJson->message,
                 );
             }
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
             echo "<script>alert('$error')</script>";
-            echo "<script>window.history.back();</script>";
             exit();
         }
     }
@@ -206,17 +217,12 @@ class EventWebsite{
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $eventWeb = new EventWebsite();
     $data = EventWebsite::handle();
-    if(isset($data['keterangan'])){
-        $eventWeb->prosesEvent($data);
+    if(isset($data['_method'])){
+        if($data['_method'] == 'PUT'){
+            if(isset($data['keterangan'])){
+                $eventWeb->prosesEvent($data);
+            }
+        }
     }
-    // if(isset($_POST['_method'])){
-    //     if($_POST['_method'] == 'PUT'){
-    //         $eventWeb->editTempat($data);
-    //     }else if($_POST['_method'] == 'DELETE'){
-    //         $eventWeb->editTempat($data);
-    //     }
-    // }else{
-    //     $eventWeb->tambahTempat($data);
-    // }
 }
 ?>

@@ -90,7 +90,7 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h5 class="card-title"></h5>
-              <a href="tambah-seniman.php" class="btn btn-primary">
+              <a href="tambah.php" class="btn btn-primary">
   <i class="bi bi-person-plus-fill"></i> Tambahkan data seniman
 </a>
               <!-- <button type="button" class="btn btn-primary" href="formulir-baru.php"><i class="bi bi-person-plus-fill"></i> Tambahkan data seniman</button> -->

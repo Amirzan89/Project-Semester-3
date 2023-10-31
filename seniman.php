@@ -86,7 +86,7 @@ $csrf = $GLOBALS['csrf'];
         <div class="col-lg-12">
           <div class="row">
             <div class="col-xxl-4 col-md-4">
-              <div class="card success-card revenue-card"><a href="/seniman/formulir-baru.php">
+              <div class="card success-card revenue-card"><a href="/seniman/formulir.php">
                   <div class="card-body">
                     <h5 class="card-title">Formulir</h5>
                     <div class="d-flex align-items-center">

@@ -50,6 +50,7 @@ $csrf = $GLOBALS['csrf'];
 
 <body>
   <script>
+    const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
 		var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
@@ -92,15 +93,14 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h5 class="card-title"></h5>
-
-              <table class="table datatable">
-              <thead>
+              <table class="table">
+                <thead>
                   <tr>
-                    <th>No</th>
-                    <th>Nama Pengirim</th>
-                    <th>Nama Event</th>
-                    <th>Tanggal Pengajuan</th>
-                    <th>Aksi</th>
+                    <th scope="col">No</th>
+                    <th scope="col">Nama Pengirim</th>
+                    <th scope="col">Nama Event</th>
+                    <th scope="col">Tanggal Pengajuan</th>
+                    <th scope="col">Aksi</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -122,21 +122,17 @@ $csrf = $GLOBALS['csrf'];
                             <?php } ?>
                           </td>
                           <td>
-                            <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                            <?php if($event['status'] == 'diajukan'){ ?>
+                              <button class="btn btn-info" onclick="proses(<?php echo $event['id_event'] ?>)"><i class="bi bi-pencil-square">Lihat</i></button>
+                            <?php }else if($event['status'] == 'proses'){ ?>
+                              <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                            <?php } ?>
                           </td>
                       </tr>
                     <?php $no++;
                     } ?>
-                  <!-- <tr>
-                    <td>1</td>
-                    <td>Puji Utami</td>
-                    <td>Siraman Sedudo</td>
-                    <td>1 Oktober 2023</td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i>  lihat
-                    </button>
-                    </td> -->
                   </tr>
-               </tbody>
+                </tbody>
               </table>
             </div>
           </div>
@@ -144,8 +140,6 @@ $csrf = $GLOBALS['csrf'];
         </div>
       </div>
     </section>
-
-
 
   </main><!-- End #main -->
 
@@ -156,9 +150,41 @@ $csrf = $GLOBALS['csrf'];
     ?>
   </footer>
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
-
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script>
+    function proses(Id) {
+      var xhr = new XMLHttpRequest();
+      var requestBody = {
+        _method: 'PUT',
+        id_user: idUser,
+        id_event: Id,
+        keterangan: 'proses'
+      };
+      //open the request
+      xhr.open('POST', domain + "/web/event/event.php")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      //send the form data
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            try {
+              window.location.href = "/event/detail_event.php?id_event="+Id;
+            } catch (error) {
+                console.error('Error evaluating JavaScript:', error);
+            }
+          } else {
+            try {
+                eval(xhr.responseText);
+            } catch (error) {
+                console.error('Error evaluating JavaScript:', error);
+            }
+          }
+        }
+      }
+    }
+  </script>
   <!-- Vendor JS Files -->
   <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="/public/assets/vendor/simple-datatables/simple-datatables.js"></script>

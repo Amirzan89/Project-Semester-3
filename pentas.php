@@ -88,7 +88,7 @@ $csrf = $GLOBALS['csrf'];
           <div class="row">
             <div class="row">
               <div class="col-xxl-4 col-md-4">
-                <div class="card success-card revenue-card"><a href="/pentas/formulir-advis.php">
+                <div class="card success-card revenue-card"><a href="/pentas/formulir.php">
                     <div class="card-body">
                       <h5 class="card-title">Formulir</h5>
                       <div class="d-flex align-items-center">
