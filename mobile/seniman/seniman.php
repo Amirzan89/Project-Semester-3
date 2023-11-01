@@ -27,32 +27,44 @@ class SenimanMobile{
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/../../private/seniman';
     }
-    private function generateNIS($data){
+    public function getSeniman($data){
         try{
-            if(!isset($data['kategori']) || empty($data['kategori'])){
-                throw new Exception('Kategori harus di isi');
+            if(!isset($data['id_user']) || empty($data['id_user'])){
+                throw new Exception('ID User harus di isi !');
             }
-            if (array_key_exists($data['kategori'], self::$kategori)) {
-                $kategori = self::$kategori[$data['kategori']];
-            } else {
-                throw new Exception('Kategori invalid');
+            if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
+                throw new Exception('ID seniman harus di isi !');
             }
-            //get last kategori
-            $query = "SELECT COUNT(*) AS total FROM seniman WHERE KATEGORI = '$kategori'";
+            //check id_user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
             $stmt[0]->execute();
-            $total = 0;
-            $stmt[0]->bind_result($total);
-            if(!$stmt[0]->fetch()){
-                $total = 1;
-            }else{
-                $total++;
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
             }
             $stmt[0]->close();
-            date_default_timezone_set('Asia/Jakarta');
-            $total = str_pad($total, 3, '0', STR_PAD_LEFT);
-            $nis = $kategori.'/'.$total.'/'.self::$constID.'/'.date('Y');
-            return ['nis'=>$nis,'kategori'=>$kategori];
+            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+                throw new Exception('Harus masyarakat');
+            }
+            //check id_seniman and get data
+            $query = "SELECT id_seniman, nik, nomor_induk, nama_seniman, jenis_kelamin, kategori, kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota FROM seniman WHERE id_seniman = ?";
+            $stmt[2] = self::$con->prepare($query);
+            $stmt[2]->bind_param('s', $data['id_seniman']);
+            if ($stmt[2]->execute()) {
+                $result = $stmt[2]->get_result();
+                $senimanData = $result->fetch_assoc();
+                $stmt[2]->close();
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'success', 'message' => 'Data Seniman berhasil didapatkan', 'data' => $senimanData]);
+                exit();
+            } else {
+                $stmt[2]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman tidak ditemukan', 'code' => 400]));
+            }
         }catch(Exception $e){
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
@@ -67,6 +79,7 @@ class SenimanMobile{
                     'message' => $errorJson['message'],
                 );
             }
+            header('Content-Type: application/json');
             isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
             echo json_encode($responseData);
             exit();
@@ -97,7 +110,12 @@ class SenimanMobile{
             }else if(!in_array($data['jenis_kelamin_seniman'],['laki-laki','perempuan'])){
                 throw new Exception('Jenis kelamin salah');
             }
-            $nomerInduk = $this->generateNIS($data);
+            if(!isset($data['kategori']) || empty($data['kategori'])){
+                throw new Exception('Kategori harus di isi');
+            }
+            if (!array_key_exists($data['kategori'], self::$kategori)) {
+                throw new Exception('Kategori invalid');
+            }
             if (!isset($data['kecamatan']) || empty($data['kecamatan'])) {
                 throw new Exception('Kecamatan harus di isi');
             }else if(!in_array($data['kecamatan'],['bagor','baron','berbek','gondang','jatikalen','kertosono','lengkong','loceret','nganjuk','ngetos','ngluyu','ngronggot','pace','patianrowo','prambon','rejoso','sawahan','sukomoro','tanjunganom','wilangan'])){
@@ -235,12 +253,12 @@ class SenimanMobile{
                 unlink($fileFotoPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
-            $query = "INSERT INTO seniman (nomor_induk, nik, nama_seniman,jenis_kelamin, kategori,kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi,jumlah_anggota,ktp_seniman,pass_foto, surat_keterangan, tgl_pembuatan,tgl_berlaku,status, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO seniman (nik, nama_seniman,jenis_kelamin, kategori,kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi,jumlah_anggota,ktp_seniman,pass_foto, surat_keterangan, tgl_pembuatan,tgl_berlaku,status, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
             $status = 'diajukan';
-            $data['kategori_event'] = strtoupper($data['kategori_event' ]);
             $now = date('Y-m-d');
-            $stmt[2]->bind_param("sssssssssssssssssss", $nomerInduk['nis'], $data['nik_seniman'], $data['nama_seniman'], $data['jenis_kelamin_seniman'], $nomerInduk['kategori'], $data['kecamatan'], $data['tempat_lahir'], $data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$fileKtpDB,$fileFotoDB, $fileSuratDB,$now,$now, $status, $data['id_user']);
+            $end = date('Y-m-d',strtotime('12/31/' . date('Y')));
+            $stmt[2]->bind_param("ssssssssssssssssss", $data['nik_seniman'], $data['nama_seniman'], $data['jenis_kelamin_seniman'], $data['kategori'], $data['kecamatan'], $data['tempat_lahir'], $data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$fileKtpDB,$fileFotoDB, $fileSuratDB, $now, $end, $status, $data['id_user']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -300,7 +318,12 @@ class SenimanMobile{
             }else if(!in_array($data['jenis_kelamin_seniman'],['laki-laki','perempuan'])){
                 throw new Exception('Jenis kelamin salah');
             }
-            $nomorInduk = $this->generateNIS($data);
+            if(!isset($data['kategori']) || empty($data['kategori'])){
+                throw new Exception('Kategori harus di isi');
+            }
+            if (!array_key_exists($data['kategori'], self::$kategori)) {
+                throw new Exception('Kategori invalid');
+            }
             if (!isset($data['kecamatan']) || empty($data['kecamatan'])) {
                 throw new Exception('Kecamatan harus di isi');
             }else if(!in_array($data['kecamatan'],['bagor','baron','berbek','gondang','jatikalen','kertosono','lengkong','loceret','nganjuk','ngetos','ngluyu','ngronggot','pace','patianrowo','prambon','rejoso','sawahan','sukomoro','tanjunganom','wilangan'])){
@@ -432,10 +455,9 @@ class SenimanMobile{
                 unlink($fileFotoPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
-            $query = "UPDATE seniman SET nik = ?, nomor_induk = ?, nama_seniman = ?, jenis_kelamin = ?, kategori = ?, kecamatan = ?, tempat_lahir = ?, tanggal_lahir = ?, alamat_seniman = ?, no_telpon = ?, nama_organisasi = ?, jumlah_anggota = ?, tgl_pembuatan = ?, tgl_berlaku = ? WHERE id_seniman = ?";
+            $query = "UPDATE seniman SET nik = ?, nama_seniman = ?, jenis_kelamin = ?, kategori = ?, kecamatan = ?, tempat_lahir = ?, tanggal_lahir = ?, alamat_seniman = ?, no_telpon = ?, nama_organisasi = ?, jumlah_anggota = ? WHERE id_seniman = ?";
             $stmt[1] = self::$con->prepare($query);
-            $now = date('Y-m-d');
-            $stmt[1]->bind_param("sssssssssssssss", $data['nik_seniman'], $nomorInduk['nis'], $data['nama_seniman'], $data['jenis_kelamin_seniman'], $nomorInduk['kategori'], $data['kecamatan'], $data['tempat_lahir'],$data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$now,$now,$data['id_seniman']);
+            $stmt[1]->bind_param("ssssssssssss", $data['nik_seniman'], $data['nama_seniman'], $data['jenis_kelamin_seniman'], $data['kategori'], $data['kecamatan'], $data['tempat_lahir'],$data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$data['id_seniman']);
             $stmt[1]->execute();
             if ($stmt[1]->affected_rows > 0) {
                 $stmt[1]->close();
@@ -547,6 +569,321 @@ class SenimanMobile{
             exit();
         }
     }
+    public function buatPerpanjangan($data){
+        try{
+            if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
+                throw new Exception('ID Seniman harus di isi');
+            }
+            if(!isset($data['id_user']) || empty($data['id_user'])){
+                throw new Exception('ID User harus di isi');
+            }
+            if (!isset($_FILES['foto_ktp']) || empty($_FILES['foto_ktp'])) {
+                throw new Exception('foto ktp harus di isi');
+            }
+            if (!isset($_FILES['pass_foto']) || empty($_FILES['pass_foto'])) {
+                throw new Exception('pass foto harus di isi');
+            }
+            if (!isset($_FILES['surat_keterangan']) || empty($_FILES['surat_keterangan'])) {
+                throw new Exception('Surat keternangan harus di isi');
+            }
+            if ($_FILES['foto_ktp']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception('gagal upload ktp file');
+            }
+            if ($_FILES['pass_foto']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception('gagal upload foto file');
+            }
+            if ($_FILES['surat_keterangan']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception('gagal upload pdf file');
+            }
+            //check user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                throw new Exception('user tidak ditemukan');
+            }
+            $stmt[0]->close();
+            //check seniman
+            $query = "SELECT status, tgl_berlaku FROM seniman WHERE seniman = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['seniman']);
+            $stmt[0]->execute();
+            $statusDB = '';
+            $berlaku = '';
+            $stmt[0]->bind_result($statusDB, $berlaku);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                throw new Exception('Data seniman tidak ditemukan');
+            }
+            $stmt[0]->close();
+            //check tanggal berlaku
+            $berlaku = strtotime($berlaku);
+            date_default_timezone_set('Asia/Jakarta');
+            $tanggal_sekarang = date('Y-m-d');
+            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            if ($tanggal_sekarang < $berlaku){
+                throw new Exception('Anda tidak bisa update data seniman !');
+            }
+            //file
+            $folderKtp = '/ktp';
+            $folderPassFoto = '/pass_foto';
+            $folderSurat = '/surat_keterangan';
+            //proses file
+            $fileKtp = $_FILES['foto_ktp'];
+            $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
+            $size = filesize($fileKtp['size']);
+            if (in_array($extension,['png','jpeg','jpg'])) {
+                if ($size >= self::$sizeImg) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                }
+            } else {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+            }
+            //simpan file
+            $nameFile = '/'.$data['id_seniman'].'.'.$extension;  
+            $fileKtpPath = self::$folderPath.$folderKtp.$nameFile;
+            $fileKtpDB = $nameFile;
+            //replace file
+            unlink($fileKtpPath);
+            if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+            }
+
+            //proses file
+            $fileFoto = $_FILES['pass_foto'];
+            $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
+            $size = filesize($fileFoto['size']);
+            if (in_array($extension,['png','jpeg','jpg'])) {
+                if ($size >= self::$sizeImg) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                }
+            } else {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+            }
+            //simpan file
+            $nameFile = '/'.$data['id_seniman'].'.'.$extension;
+            $fileFotoPath = self::$folderPath.$folderPassFoto.$nameFile;
+            $fileFotoDB = $nameFile;
+            //replace file
+            unlink($fileFotoPath);
+            if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
+                unlink($fileKtpPath);
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+            }
+
+            //proses file
+            $fileSurat = $_FILES['surat_keterangan'];
+            $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
+            $size = filesize($fileSurat['size']);
+            if ($extension === 'pdf') {
+                if ($size >= self::$sizeFile) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                }
+            } else {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+            }
+            //simpan file
+            $nameFile = '/'.$data['id_seniman'].'.'.$extension;
+            $fileSuratPath = self::$folderPath.$folderSurat.$nameFile;
+            $fileSuratDB = $nameFile;
+            //replace file
+            unlink($fileSuratPath);
+            if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
+                unlink($fileKtpPath);
+                unlink($fileFotoPath);
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+            }
+            $query = "INSERT INTO perpanjangan (nik, ktp_seniman, pass_foto, surat_keterangan, status, id_seniman) VALUES (?, ?, ?, ?, ?, ?)";
+            $stmt[2] = self::$con->prepare($query);
+            $status = 'diajukan';
+            $stmt[2]->bind_param("ssssss", $data['nik_seniman'], $fileKtpDB, $fileFotoDB, $fileSuratDB, $status, $data['id_seniman']);
+            $stmt[2]->execute();
+            if ($stmt[2]->affected_rows > 0) {
+                $stmt[2]->close();
+                echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil ditambahkan']);
+                exit();
+            } else {
+                $stmt[2]->close();
+                unlink($fileKtpPath);
+                unlink($fileFotoPath);
+                unlink($fileSuratPath);
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal ditambahkan','code'=>500]));
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
+    }
+    public function editPerpanjangan($data){
+        try{
+            if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
+                throw new Exception('ID Seniman harus di isi');
+            }
+            if(!isset($data['id_user']) || empty($data['id_user'])){
+                throw new Exception('ID User harus di isi');
+            }
+            if (!isset($_FILES['foto_ktp']) || empty($_FILES['foto_ktp'])) {
+                throw new Exception('foto ktp harus di isi');
+            }
+            if (!isset($_FILES['pass_foto']) || empty($_FILES['pass_foto'])) {
+                throw new Exception('pass foto harus di isi');
+            }
+            if (!isset($_FILES['surat_keterangan']) || empty($_FILES['surat_keterangan'])) {
+                throw new Exception('Surat keternangan harus di isi');
+            }
+            if ($_FILES['foto_ktp']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception('gagal upload ktp file');
+            }
+            if ($_FILES['pass_foto']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception('gagal upload foto file');
+            }
+            if ($_FILES['surat_keterangan']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception('gagal upload pdf file');
+            }
+            //check user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'User tidak ditemukan','code'=>500]));
+            }
+            $stmt[0]->close();
+            //check id seniman
+            $query = "SELECT status FROM seniman WHERE BINARY id_seniman = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_seniman']);
+            $stmt[0]->execute();
+            $statusDB = '';
+            $berlaku = '';
+            $stmt[0]->bind_result($statusDB, $berlaku);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                throw new Exception('Data seniman tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if($statusDB == 'proses'){
+                throw new Exception('Data sedang diproses');
+            }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
+                throw new Exception('Data sudah diverifikasi');
+            }
+            //check tanggal berlaku
+            $berlaku = strtotime($berlaku);
+            date_default_timezone_set('Asia/Jakarta');
+            $tanggal_sekarang = date('Y-m-d');
+            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            if ($tanggal_sekarang < $berlaku){
+                throw new Exception('Anda tidak bisa update data seniman !');
+            }
+            $folderKtp = '/ktp';
+            $folderPassFoto = '/pass_foto';
+            $folderSurat = '/surat_keterangan';
+            //proses file
+            $fileKtp = $_FILES['foto_ktp'];
+            $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
+            $size = filesize($fileKtp['name']);
+            if (in_array($extension,['png','jpeg','jpg'])) {
+                if ($size >= self::$sizeImg) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                }
+            } else {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+            }
+            //simpan file
+            $nameFile = '/'.$data['id_seniman'].'.'.$extension;  
+            $fileKtpPath = self::$folderPath.$folderKtp.$nameFile;
+            if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+            }
+
+            //proses file
+            $fileFoto = $_FILES['pass_foto'];
+            $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
+            $size = filesize($fileFoto['name']);
+            if (in_array($extension,['png','jpeg','jpg'])) {
+                if ($size >= self::$sizeImg) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                }
+            } else {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+            }
+            //simpan file
+            $nameFile = '/'.$data['id_seniman'].'.'.$extension;
+            $fileFotoPath = self::$folderPath.$folderPassFoto.$nameFile;
+            if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
+                unlink($fileKtpPath);
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+            }
+
+            //proses file
+            $fileSurat = $_FILES['surat_keterangan'];
+            $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
+            $size = filesize($fileSurat['name']);
+            if ($extension === 'pdf' || $extension === 'docx') {
+                if ($size >= self::$sizeFile) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                }
+            } else {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+            }
+            //simpan file
+            $nameFile = '/'.$data['id_seniman'].'.'.$extension;
+            $fileSuratPath = self::$folderPath.$folderSurat.$nameFile;
+            if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
+                unlink($fileKtpPath);
+                unlink($fileFotoPath);
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+            }
+            $query = "UPDATE perpanjangan SET nik = ? WHERE id_seniman = ?";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param("ss", $data['nik_seniman'],$data['id_seniman']);
+            $stmt[1]->execute();
+            if ($stmt[1]->affected_rows > 0) {
+                $stmt[1]->close();
+                echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil dubah']);
+                exit();
+            } else {
+                $stmt[1]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal diubah','code'=>500]));
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
+    }
     public static function handle(){
         $contentType = $_SERVER["CONTENT_TYPE"];
         if ($contentType === "application/json") {
@@ -576,7 +913,12 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 }
 if($_SERVER['REQUEST_METHOD'] == 'PUT'){
     $SenimanMobile = new SenimanMobile();
-    $SenimanMobile->editSeniman(SenimanMobile::handle());
+    $data = SenimanMobile::handle();
+    if($data['keterangan'] == 'perpanjang'){
+        $senimanMobile->editPerpanjangan($data);
+    }else{
+        $SenimanMobile->editSeniman(SenimanMobile::handle());
+    }
 }
 if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
     $SenimanMobile = new SenimanMobile();
@@ -587,12 +929,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $data = SenimanMobile::handle();
     if(isset($_POST['_method'])){
         if($_POST['_method'] == 'PUT'){
-            $SenimanMobile->editSeniman($data);
+            if($data['keterangan'] == 'perpanjang'){
+                $senimanMobile->editPerpanjangan($data);
+            }else{
+                $SenimanMobile->editSeniman($data);
+            }
         }else if($_POST['_method'] == 'DELETE'){
             $SenimanMobile->hapusSeniman($data);
         }
     }else{
-        $SenimanMobile->regisrasiSeniman($data);
+        if($data['keterangan'] == 'perpanjang'){
+            $senimanMobile->buatPerpanjangan($data);
+        }else{
+            $SenimanMobile->regisrasiSeniman($data);
+        }
     }
 }
 ?>

@@ -29,8 +29,7 @@ class MailWebsite{
     }
 
     public function send($data){
-        try {
-            // exit();
+        try { 
             $this->mail->setFrom($_SERVER['MAIL_FROM_ADDRESS'], 'gabutt');
             $this->mail->addAddress($data['email'], $data['name']);
             $this->mail->isHTML(true);

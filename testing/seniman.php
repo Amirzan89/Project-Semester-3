@@ -279,6 +279,66 @@ $tPath = '';
                 </form>
             </div>
         </div>
+        <div id="divTambahperpanjangan" style="display:block">
+            <div class="bg"></div>
+            <div class="content">
+            <form id="" action="/mobile/seniman/seniman.php" method="POST" enctype="multipart/form-data">
+                    <div class="header">
+                        <h1>Perpanjangan seniman</h1>
+                    </div>
+                    <!-- <input type="hidden" name="_method" value="DELETE"> -->
+                    <input type="hidden" name="id_user" value="32">
+                    <input type="hidden" name="keterangan" value="perpanjang">
+                    <div class="row">
+                        <label>ID seniman</label>
+                        <input type="text" name="id_seniman" id="id_seniman">
+                    </div>
+                    <div class="row">
+                        <label>foto ktp</label>
+                        <input type="file" name="foto_ktp" id="foto_ktp">
+                    </div>
+                    <div class="row">
+                        <label>pass foto</label>
+                        <input type="file" name="pass_foto" id="pass_foto">
+                    </div>
+                    <div class="row">
+                        <label>surat keterangan</label>
+                        <input type="file" name="surat_keterangan" id="surat_keterangan">
+                    </div>
+                    <input type="submit" value="hapus">
+                </form>
+            </div>
+        </div>
+        <div id="divTambahperpanjangan" style="display:block">
+            <div class="bg"></div>
+            <div class="content">
+            <form id="" action="/mobile/seniman/seniman.php" method="POST" enctype="multipart/form-data">
+                    <div class="header">
+                        <h1>edit Perpanjangan seniman</h1>
+                    </div>
+                    <input type="hidden" name="_method" value="PUT">
+                    <input type="hidden" name="id_user" value="32">
+                    <input type="hidden" name="keterangan" value="perpanjang">
+                    <div class="row">
+                        <label>ID seniman</label>
+                        <input type="text" name="id_seniman" id="id_seniman">
+                    </div>
+                    <div class="row">
+                        <label>foto ktp</label>
+                        <input type="file" name="foto_ktp" id="foto_ktp">
+                    </div>
+                    <div class="row">
+                        <label>pass foto</label>
+                        <input type="file" name="pass_foto" id="pass_foto">
+                    </div>
+                    <div class="row">
+                        <label>surat keterangan</label>
+                        <input type="file" name="surat_keterangan" id="surat_keterangan">
+                    </div>
+                    <input type="submit" value="hapus">
+                </form>
+            </div>
+        </div>
         <button onclick="showForm('tambah')"> tambah event</button>
         <table class="tableEvent" id="tableEvent"> 
             <thead>
