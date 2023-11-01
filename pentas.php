@@ -130,7 +130,7 @@ $csrf = $GLOBALS['csrf'];
                     </div>
                     <div class="ps-3">
                       <?php
-                      $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM surat_advis WHERE status = 'diajukan' OR status = 'proses'");
+                      $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak'");
                       $data = mysqli_fetch_assoc($sql);
                       echo "<h4>" . $data['total'] . "</h4>";
                       ?>

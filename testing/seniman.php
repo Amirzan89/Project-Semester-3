@@ -77,6 +77,49 @@ $tPath = '';
                         </select>
                     </div>
                     <div class="row">
+                        <label>Kategori</label>
+                        <select name="kategori" id="kategori" multiple>
+                            <option value="campursari">campursari</option>  
+                            <option value="dalang">dalang</option>  
+                            <option value="jaranan">jaranan</option>  
+                            <option value="karawitan">karawitan</option>  
+                            <option value="mc">MC</option>  
+                            <option value="ludruk">ludruk</option>  
+                            <option value="organisasi kesenian musik">organisasi kesenian musik</option>  
+                            <option value="organisasi">organisasi</option>  
+                            <option value="pramugari tayup">pramugari tayup</option>  
+                            <option value="sanggar">sanggar</option>  
+                            <option value="sinden">sinden</option>  
+                            <option value="vocalis">vocalis</option>  
+                            <option value="waranggono">waranggono</option>  
+                        </select>
+                    </div>
+                    <div class="row">
+                        <label>kecamatan</label>
+                        <select name="kecamatan" id="kecamatan" multiple>
+                            <option $formattedTotal = str_pad($total, 3, '0', STR_PAD_LEFT);value="bagor">bagor</option>
+                            <option value="baron">baron</option>
+                            <option value="berbek">berbek</option>
+                            <option value="gondang">gondang</option>
+                            <option value="jatikalen">jatikalen</option>
+                            <option value="kertosono">kertosono</option>
+                            <option value="lengkong">lengkong</option>
+                            <option value="loceret">loceret</option>
+                            <option value="nganjuk">nganjuk</option>
+                            <option value="ngetos">ngetos</option>
+                            <option value="ngluyu">ngluyu</option>
+                            <option value="ngronggot">ngronggot</option>
+                            <option value="pace">pace</option>
+                            <option value="patianrowo">patianrowo</option>
+                            <option value="prambon">prambon</option>
+                            <option value="rejoso">rejoso</option>
+                            <option value="sawahan">sawahan</option>
+                            <option value="sukomoro">sukomoro</option>
+                            <option value="tanjunganom">tanjonganom</option>
+                            <option value="wilangan">wilangan</option>
+                        </select>
+                    </div>
+                    <div class="row">
                         <label>tempat lahir seniman</label>
                         <input type="text" name="tempat_lahir" id="tempat_lahir">
                     </div>
@@ -142,6 +185,49 @@ $tPath = '';
                         <select name="jenis_kelamin_seniman" id="jenis_kelamin" multiple>
                             <option value="laki-laki">Laki-laki</option>  
                             <option value="perempuan">perempuan</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <label>Kategori</label>
+                        <select name="kategori" id="kategori" multiple>
+                            <option value="campursari">campursari</option>  
+                            <option value="dalang">dalang</option>  
+                            <option value="jaranan">jaranan</option>  
+                            <option value="karawitan">karawitan</option>  
+                            <option value="mc">MC</option>  
+                            <option value="ludruk">ludruk</option>  
+                            <option value="organisasi kesenian musik">organisasi kesenian musik</option>  
+                            <option value="organisasi">organisasi</option>  
+                            <option value="pramugari tayup">pramugari tayup</option>  
+                            <option value="sanggar">sanggar</option>  
+                            <option value="sinden">sinden</option>  
+                            <option value="vocalis">vocalis</option>  
+                            <option value="waranggono">waranggono</option>  
+                        </select>
+                    </div>
+                    <div class="row">
+                        <label>kecamatan</label>
+                        <select name="kecamatan" id="kecamatan" multiple>
+                            <option value="bagor">bagor</option>
+                            <option value="baron">baron</option>
+                            <option value="berbek">berbek</option>
+                            <option value="gondang">gondang</option>
+                            <option value="jatikalen">jatikalen</option>
+                            <option value="kertosono">kertosono</option>
+                            <option value="lengkong">lengkong</option>
+                            <option value="loceret">loceret</option>
+                            <option value="nganjuk">nganjuk</option>
+                            <option value="ngetos">ngetos</option>
+                            <option value="ngluyu">ngluyu</option>
+                            <option value="ngronggot">ngronggot</option>
+                            <option value="pace">pace</option>
+                            <option value="patianrowo">patianrowo</option>
+                            <option value="prambon">prambon</option>
+                            <option value="rejoso">rejoso</option>
+                            <option value="sawahan">sawahan</option>
+                            <option value="sukomoro">sukomoro</option>
+                            <option value="tanjunganom">tanjonganom</option>
+                            <option value="wilangan">wilangan</option>
                         </select>
                     </div>
                     <div class="row">

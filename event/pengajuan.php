@@ -123,7 +123,7 @@ $csrf = $GLOBALS['csrf'];
                           </td>
                           <td>
                             <?php if($event['status'] == 'diajukan'){ ?>
-                              <button class="btn btn-info" onclick="proses(<?php echo $event['id_event'] ?>)"><i class="bi bi-pencil-square">Lihat</i></button>
+                              <button class="btn btn-lihat" onclick="proses(<?php echo $event['id_event'] ?>)"><i class="bi bi-eye-fill">Lihat</i></button>
                             <?php }else if($event['status'] == 'proses'){ ?>
                               <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
                             <?php } ?>

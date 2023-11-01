@@ -68,7 +68,7 @@ $csrf = $GLOBALS['csrf'];
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php 
-      $nav = 'seniman';
+      $nav = 'pentas';
       include('../sidebar.php');
       ?>
     </ul>

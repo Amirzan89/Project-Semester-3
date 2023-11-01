@@ -164,11 +164,13 @@ class EventWebsite{
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
                 echo "<script>alert('Status berhasil diubah')</script>";
+                echo "<script>window.location.href = '/event". $redirect . "'; </script>";
                 exit();
             } else {
                 $stmt[2]->close();
                 http_response_code(500);
                 echo "<script>alert('Status gagal diubah')</script>";
+                echo "<script>window.location.href = '/event". $redirect . "'; </script>";
                 exit();
             }
         }catch(Exception $e){
