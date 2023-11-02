@@ -115,6 +115,12 @@ $csrf = $GLOBALS['csrf'];
                           <input type="text" name="alamat" class="form-control" placeholder="Masukkan Alamat Tempat">
                         </div>
                       </div>
+                      <label for="inputText"><strong>Contact Person</strong></label>
+                      <div class="row mb-3">
+                        <div class="col-sm-12">
+                          <input type="text" name="phone" class="form-control" placeholder="Masukkan Contact Person">
+                        </div>
+                      </div>
                       <label for="inputText"><strong>Deskripsi Tempat</strong></label>
                       <div class="col-sm-12">
                         <textarea class="form-control" name="deskripsi" style="height: 80px" placeholder="Masukkan Deskripsi Tempat"></textarea>

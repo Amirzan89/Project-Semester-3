@@ -75,6 +75,31 @@ class TempatWebsite{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
+            if (!isset($data['phone']) || empty($data['phone'])) {
+                echo "<script>alert('nomer telepon harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!is_numeric($data['phone'])) {
+                echo "<script>alert('Nomer telepon harus berisi hanya angka.')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (strlen($data['phone']) < 8) {
+                echo "<script>alert('Nomer telpon minimal 8 karakter !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (strlen($data['phone']) > 15) {
+                echo "<script>alert('Nomer telpon maksimal 15 karakter !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (substr($data['phone'], 0, 2) !== '08') {
+                echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
             if (!isset($_FILES['foto']) || empty($_FILES['foto'])) {
                 echo "<script>alert('Foto tempat harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
@@ -141,9 +166,9 @@ class TempatWebsite{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            $query = "INSERT INTO list_tempat (nama_tempat, alamat_tempat, deskripsi_tempat, foto_tempat) VALUES (?, ?, ?, ?)";
+            $query = "INSERT INTO list_tempat (nama_tempat, alamat_tempat, deskripsi_tempat, contact_person,foto_tempat) VALUES (?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param("ssss", $data['nama_tempat'],$data['alamat'],$data['deskripsi'],$nameFile);
+            $stmt[2]->bind_param("sssss", $data['nama_tempat'],$data['alamat'],$data['deskripsi'], $data['phone'], $nameFile);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -196,6 +221,31 @@ class TempatWebsite{
             }
             if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
                 echo "<script>alert('Deskripsi tempat harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!isset($data['phone']) || empty($data['phone'])) {
+                echo "<script>alert('nomer telepon harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (!is_numeric($data['phone'])) {
+                echo "<script>alert('Nomer telepon harus berisi hanya angka.')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (strlen($data['phone']) < 8) {
+                echo "<script>alert('Nomer telpon minimal 8 karakter !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (strlen($data['phone']) > 15) {
+                echo "<script>alert('Nomer telpon maksimal 15 karakter !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if (substr($data['phone'], 0, 2) !== '08') {
+                echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -269,10 +319,10 @@ class TempatWebsite{
                 exit();
             }
             //update data
-            $query = "UPDATE list_tempat SET nama_tempat = ?, alamat_tempat = ?, deskripsi_tempat = ?, foto_tempat = ? WHERE id_tempat = ?
+            $query = "UPDATE list_tempat SET nama_tempat = ?, alamat_tempat = ?, deskripsi_tempat = ?, contact_person = ?, foto_tempat = ? WHERE id_tempat = ?
             ";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param("sssss", $data['nama_tempat'],$data['alamat'],$data['deskripsi'],$nameFile, $data['id_tempat']);
+            $stmt[2]->bind_param("ssssss", $data['nama_tempat'],$data['alamat'],$data['deskripsi'], $data['phone'], $nameFile, $data['id_tempat']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();

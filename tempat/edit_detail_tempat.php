@@ -120,6 +120,12 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
                                     </div>
                                 </div>
                                 <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Contact person</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="phone" value="<?php echo $tempat['contact_person']?>">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Deskripsi Kegiatan</label>
                                     <div class="col-sm-10">
                                         <textarea class="form-control" name="deskripsi" style="height: 100px"><?php echo $tempat['deskripsi_tempat']?></textarea>

@@ -315,7 +315,7 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
             var requestBody = {
                 email: email,
                 id_sewa:idSewa,
-                item:'tempat',
+                item:'sewa',
                 deskripsi:desc
             };
             //open the request
@@ -346,7 +346,7 @@ if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
             var requestBody = {
                 email: email,
                 id_sewa:idSewa,
-                item:'tempat',
+                item:'sewa',
                 deskripsi:desc
             };
             //open the request
