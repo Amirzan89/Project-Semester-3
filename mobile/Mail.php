@@ -8,7 +8,8 @@ class MailMobile{
     protected $mail;
     private static $database;
     private static $con;
-    private static $timeZone;
+    private static $timeZone = 'Asia/Jakarta';
+    private static $sendTime = [5, 15, 30, 60, 6*60, 12*60, 24*60];
     private static function loadEnv($path = null){
         if($path == null){
             $path = __DIR__."/../web/.env";
@@ -24,29 +25,28 @@ class MailMobile{
             }
         }
     }
-    // public function testing(){
-    //     $mail = new PHPMailer(true);
-    //     $mail->Host = 'smtp.gmail.com';
-    //     $mail->isSMTP();
-    //     $mail->SMTPAuth = true;
-    //     $mail->Username = 'amirzanfikri5@gmail.com';
-    //     $mail->Password = 'vamvwrdfyewbhkca';
-    //     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    //     $mail->Port = 587;
-    //     try {
-    //         $mail->setFrom($_SERVER['MAIL_FROM_ADDRESS'], 'gabutt');
-    //         $mail->Body = 'This is the email body content.';
-    //         $mail->addAddress('amirzanfikri5@gmail.com','Amirzan');
-    //         $mail->send();
-    //         echo 'Email sent successfully';
-    //     } catch (Exception $e) {
-    //         echo 'Email could not be sent. Mailer Error: ' . $mail->ErrorInfo;
-    //     }
-    // }
+    public function testing(){
+        $mail = new PHPMailer(true);
+        $mail->Host = 'smtp.gmail.com';
+        $mail->isSMTP();
+        $mail->SMTPAuth = true;
+        $mail->Username = 'amirzanfikri5@gmail.com';
+        $mail->Password = 'vamvwrdfyewbhkca';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+        try {
+            $mail->setFrom($_SERVER['MAIL_FROM_ADDRESS'], 'gabutt');
+            $mail->Body = 'This is the email body content.';
+            $mail->addAddress('amirzanfikri5@gmail.com','Amirzan');
+            $mail->send();
+            echo 'Email sent successfully';
+        } catch (Exception $e) {
+            echo 'Email could not be sent. Mailer Error: ' . $mail->ErrorInfo;
+        }
+    }
     public function __construct(){
         try {
             self::loadEnv();
-            self::$timeZone = 'Asia/Jakarta';
             self::$database = koneksi::getInstance();
             self::$con = self::$database->getConnection();
             $this->mail = new PHPMailer(true);
@@ -184,31 +184,40 @@ class MailMobile{
     public function createVerifyEmail($data,$uri = null){
         try{
             $email = $data['email'];
-            if(empty($email) || is_null($email)){
+            if(!isset($email) || empty($email) || is_null($email)){
                 throw new Exception('Email harus di isi !');
             }else{
+                //check email exist in table user
                 $currentDateTime = Carbon::now(self::$timeZone);
                 $now = $currentDateTime->format('Y-m-d H:i:s');
                 $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $email);
-                $result = '';
-                $stmt[0]->bind_result($result);
+                $namaLengkap = '';
+                $stmt[0]->bind_result($namaLengkap);
                 $stmt[0]->execute();
-                //check email exist in table user
                 if ($stmt[0]->fetch()) {
                     $stmt[0]->close();
-                    //create timeout
-                    $subminute = $currentDateTime->subMinutes(15);
-                    $query = "SELECT updated_at FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? LIMIT 1";
+                    //checking if email exist in table verifikasi
+                    $query = "SELECT updated_at, send FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
                     $deskripsi = 'email';
                     $stmt[1]->bind_param('ss', $email, $deskripsi);
+                    $timeUpdate = '';
+                    $sendd = '';
+                    $stmt[1]->bind_result($timeUpdate,$sendd);
                     $stmt[1]->execute();
-                    //checking if email exist in table verifikasi
+                    $subminute = $currentDateTime->subMinutes(15);
                     if ($stmt[1]->fetch()) {
                         $stmt[1]->close();
-                        $query = "SELECT updated_at FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? AND updated_at >= ? LIMIT 1";
+                         // If $now is after 15 minutes from $timeUpdate, then resend is expired.
+                        $databaseTime = Carbon::parse($timeUpdate);
+                        $remaining = $currentDateTime->diffInMinutes($databaseTime);
+                        if ($remaining < 15) {
+                            throw new Exception(json_encode(['status'=>'error','message'=>'Kami sudah kirim kode otp','data'=>$remaining]));
+                        }
+                        $subminute = $currentDateTime->subMinutes(self::$sendTime[$sendd]);
+                        $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? AND updated_at >= ? LIMIT 1";
                         $stmt[2] = self::$con->prepare($query);
                         $stmt[2]->bind_param('sss', $email, $deskripsi, $subminute);
                         $stmt[2]->execute();
@@ -222,15 +231,18 @@ class MailMobile{
                             $host = $_SERVER['HTTP_HOST'];
                             $baseURL = $protocol . '://' . $host;
                             $verificationLink = $baseURL . '/verifikasi/email/' . $linkPath;
-                            $query = "UPDATE verifikasi SET link = ?, kode_otp = ? updated_at = ? FROM verifikasi WHERE BINARY email = ? LIMIT 1";
+                            $query = "UPDATE verifikasi SET link = ?, kode_otp = ?, send = ?, updated_at = ? FROM verifikasi WHERE BINARY email = ? LIMIT 1";
                             $stmt[3] = self::$con->prepare($query);
-                            $stmt[3]->bind_param('ssss',$verificationLink, $verificationCode, $email, $now, $email);
+                            if($sendd < (count(self::$sendTime) - 1)){
+                                $sendd++;
+                            }
+                            $stmt[3]->bind_param('sssss',$verificationLink, $verificationCode, $sendd, $now, $email);
                             $stmt[3]->execute();
                             $affectedRows = $stmt[3]->affected_rows;
                             //update link
                             if ($affectedRows > 0) {
                                 $stmt[3]->close();
-                                $data = ['name'=>$result,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'email'];
+                                $data = ['name'=>$namaLengkap,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'email'];
                                 //resend email
                                 $result = $this->send($data);
                                 if($result['status'] == 'error'){
@@ -266,13 +278,14 @@ class MailMobile{
                         $stmt[2]->fetch();
                         $stmt[2]->close();
                         //insert data
-                        $query = "INSERT INTO verifikasi (email, kode_otp, link, deskripsi, created_at, updated_at,id_user) VALUES(?,?,?,?,?,?,?)";
+                        $query = "INSERT INTO verifikasi (email, kode_otp, link, deskripsi, send, created_at, updated_at,id_user) VALUES(?,?,?,?,?,?,?,?)";
                         $stmt[3] = self::$con->prepare($query);
                         $deskripsi = 'email';
-                        $stmt[3]->bind_param("sssssss", $data['email'], $verificationCode, $linkPath, $deskripsi, $now, $now, $idUser);
+                        $send = 0;
+                        $stmt[3]->bind_param("ssssssss", $data['email'], $verificationCode, $linkPath, $deskripsi, $send, $now, $now, $idUser);
                         $stmt[3]->execute();
                         if ($stmt[3]->affected_rows > 0) {
-                            $data = ['name'=>$result,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'email'];
+                            $data = ['name'=>$namaLengkap,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'email'];
                             $result = $this->send($data);
                             if($result['status'] == 'error'){
                                 throw new Exception(json_encode(['status'=>'error','message'=>$result['message'],'kode_otp'=> isset($result['kode_otp']) ? $result['kode_otp'] : 400 ,'data'=>['waktu'=>$subminute]]));
@@ -292,7 +305,6 @@ class MailMobile{
                 }    
             }
         }catch(Exception $e){
-            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -316,7 +328,7 @@ class MailMobile{
     public function createForgotPassword($data, $uri = null){
         try{
             $email = $data['email'];
-            if(empty($email) || is_null($email)){
+            if(!isset($email) || empty($email) || is_null($email)){
                 throw new Exception('Email harus di isi !');
             }else{
                 //checking if email exist in table user
@@ -325,24 +337,32 @@ class MailMobile{
                 $query = "SELECT nama_lengkap FROM users WHERE BINARY email = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $email);
-                $result = '';
-                $stmt[0]->bind_result($result);
+                $namaLengkap = '';
+                $stmt[0]->bind_result($namaLengkap);
                 $stmt[0]->execute();
                 //check email exist in table user
                 if ($stmt[0]->fetch()) {
-                    //checking if email exist in table verifikasi
                     $stmt[0]->close();
-                    //create timeout
-                    $subminute = $currentDateTime->subMinutes(15);
-                    $query = "SELECT updated_at FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? LIMIT 1";
+                    //checking if email exist in table verifikasi
+                    $query = "SELECT updated_at, send FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? LIMIT 1";
                     $stmt[1] = self::$con->prepare($query);
                     $deskripsi = 'password';  
                     $stmt[1]->bind_param('ss', $email, $deskripsi);
+                    $timeUpdate = '';
+                    $sendd = '';
+                    $stmt[1]->bind_result($timeUpdate,$sendd);
                     $stmt[1]->execute();
-                    //checking if email exist in table verifikasi
+                    $subminute = $currentDateTime->subMinutes(15);
                     if ($stmt[1]->fetch()) {
                         $stmt[1]->close();
-                        $query = "SELECT updated_at FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? AND updated_at >= ? LIMIT 1";
+                        // If $now is after 15 minutes from $timeUpdate, then resend is expired.
+                        $databaseTime = Carbon::parse($timeUpdate);
+                        $remaining = $currentDateTime->diffInMinutes($databaseTime);
+                        if ($remaining > 15) {
+                            throw new Exception(json_encode(['status'=>'error','message'=>'Kami sudah kirim kode otp','data'=>$remaining]));
+                        }
+                        $subminute = $currentDateTime->subMinutes(self::$sendTime[$sendd]);
+                        $query = "SELECT id_verifikasi FROM verifikasi WHERE BINARY email = ? AND deskripsi = ? AND updated_at >= ? LIMIT 1";
                         $stmt[2] = self::$con->prepare($query);
                         $stmt[2]->bind_param('sss', $email, $deskripsi, $subminute);
                         $stmt[2]->execute();
@@ -356,17 +376,19 @@ class MailMobile{
                             $host = $_SERVER['HTTP_HOST'];
                             $baseURL = $protocol . '://' . $host;
                             $verificationLink = $baseURL . '/verifikasi/password/' . $linkPath;
-                            $query = "UPDATE verifikasi SET link = ?, kode_otp = ?, updated_at = ? WHERE BINARY email = ? AND deskripsi = 'password' LIMIT 1";
+                            $query = "UPDATE verifikasi SET link = ?, kode_otp = ?, send = ?, updated_at = ? WHERE BINARY email = ? AND deskripsi = 'password' LIMIT 1";
                             $stmt[3] = self::$con->prepare($query);
-                            $stmt[3]->bind_param('ssss',$linkPath, $verificationCode, $now, $email);
+                            if($sendd < (count(self::$sendTime) - 1)){
+                                $sendd++;
+                            }
+                            $stmt[3]->bind_param('sssss',$linkPath, $verificationCode, $sendd, $now, $email);
                             $stmt[3]->execute();
                             $affectedRows = $stmt[3]->affected_rows;
                             //update link
                             if ($affectedRows > 0) {
                                 $stmt[3]->close();
-                                $data = ['name'=>$result,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'password'];
+                                $data = ['name'=>$namaLengkap,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'password'];
                                 //resend email
-                                echo 'kirim ulang';
                                 $result = $this->send($data);
                                 if($result['status'] == 'error'){
                                     throw new Exception(json_encode(['status'=>'error','message'=>$result['message'],'kode_otp'=>isset($result['kode_otp']) ? $result['kode_otp'] : 400,'data'=>['waktu'=>$subminute]]));
@@ -401,13 +423,14 @@ class MailMobile{
                         $stmt[2]->fetch();
                         $stmt[2]->close();
                         //insert data
-                        $query = "INSERT INTO verifikasi (email, kode_otp, link, deskripsi, created_at, updated_at,id_user) VALUES(?,?,?,?,?,?,?)";
+                        $query = "INSERT INTO verifikasi (email, kode_otp, link, deskripsi, send, created_at, updated_at,id_user) VALUES(?,?,?,?,?,?,?,?)";
                         $stmt[3] = self::$con->prepare($query);
                         $deskripsi = 'password';
-                        $stmt[3]->bind_param("sssssss", $data['email'], $verificationCode, $linkPath, $deskripsi, $now, $now, $idUser);
+                        $send = 0;
+                        $stmt[3]->bind_param("ssssssss", $data['email'], $verificationCode, $linkPath, $deskripsi, $send, $now, $now, $idUser);
                         $stmt[3]->execute();
                         if ($stmt[3]->affected_rows > 0) {
-                            $data = ['name'=>$result,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'password'];
+                            $data = ['name'=>$namaLengkap,'email'=>$email,'kode_otp'=>$verificationCode,'link'=>urldecode($verificationLink),'deskripsi'=>'password'];
                             $result = $this->send($data);
                             if($result['status'] == 'error'){
                                 throw new Exception(json_encode(['status'=>'error','message'=>$result['message'],'kode_otp'=>isset($result['kode_otp']) ? $result['kode_otp'] : 400,'data'=>['waktu'=>$subminute]]));
@@ -426,7 +449,6 @@ class MailMobile{
                 }
             }
         }catch(Exception $e){
-            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {

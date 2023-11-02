@@ -255,7 +255,7 @@ class TempatMobile{
             if (!isset($data['tanggal_awal_sewa']) || empty($data['tanggal_awal_sewa'])) {
                 throw new Exception('Tanggal awal sewa harus di isi !');
             }
-            if (!isset($data['tanggal_akhir_sewa']) || empty($data['tanggal_akhir_sewa'])) {
+            if (!isset($data['tanggal_akhir_sewa']) || empty($data['tanggal_akhir_sewa'])) { 
                 throw new Exception('Tanggal akhir sewa harus di isi !');
             }
             if (!isset($_FILES['surat_keterangan']) || empty($_FILES['surat_keterangan'])) {
