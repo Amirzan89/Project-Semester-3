@@ -97,52 +97,52 @@ class SenimanWebsite{
     public function updateKategori(){
         //
     }
-    private function generateInpNIS($data){
-        try{
-            if(!isset($data['kategori']) || empty($data['kategori'])){
-                throw new Exception('Kategori harus di isi');
-            }
-            if (array_key_exists($data['kategori'], self::$kategoriInp)) {
-                $kategori = self::$kategoriInp[$data['kategori']];
-            } else {
-                throw new Exception('Kategori invalid');
-            }
-            //get last kategori
-            $query = "SELECT COUNT(*) AS total FROM seniman WHERE KATEGORI = '$kategori'";
-            $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->execute();
-            $total = 0;
-            $stmt[0]->bind_result($total);
-            if(!$stmt[0]->fetch()){
-                $total = 1;
-            }else{
-                $total++;
-            }
-            $stmt[0]->close();
-            date_default_timezone_set('Asia/Jakarta');
-            $total = str_pad($total, 3, '0', STR_PAD_LEFT);
-            $nis = $kategori.'/'.$total.'/'.self::$constID.'/'.date('Y');
-            return ['nis'=>$nis,'kategori'=>$kategori];
-        }catch(Exception $e){
-            $error = $e->getMessage();
-            $errorJson = json_decode($error, true);
-            if ($errorJson === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $errorJson['message'],
-                );
-            }
-            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
-            echo json_encode($responseData);
-            exit();
-        }
-    }
-    private function generateNIS($data){
+    // private function generateInpNIS($data){
+    //     try{
+    //         if(!isset($data['kategori']) || empty($data['kategori'])){
+    //             throw new Exception('Kategori harus di isi');
+    //         }
+    //         if (array_key_exists($data['kategori'], self::$kategoriInp)) {
+    //             $kategori = self::$kategoriInp[$data['kategori']];
+    //         } else {
+    //             throw new Exception('Kategori invalid');
+    //         }
+    //         //get last kategori
+    //         $query = "SELECT COUNT(*) AS total FROM seniman WHERE KATEGORI = '$kategori'";
+    //         $stmt[0] = self::$con->prepare($query);
+    //         $stmt[0]->execute();
+    //         $total = 0;
+    //         $stmt[0]->bind_result($total);
+    //         if(!$stmt[0]->fetch()){
+    //             $total = 1;
+    //         }else{
+    //             $total++;
+    //         }
+    //         $stmt[0]->close();
+    //         date_default_timezone_set('Asia/Jakarta');
+    //         $total = str_pad($total, 3, '0', STR_PAD_LEFT);
+    //         $nis = $kategori.'/'.$total.'/'.self::$constID.'/'.date('Y');
+    //         return ['nis'=>$nis,'kategori'=>$kategori];
+    //     }catch(Exception $e){
+    //         $error = $e->getMessage();
+    //         $errorJson = json_decode($error, true);
+    //         if ($errorJson === null) {
+    //             $responseData = array(
+    //                 'status' => 'error',
+    //                 'message' => $error,
+    //             );
+    //         }else{
+    //             $responseData = array(
+    //                 'status' => 'error',
+    //                 'message' => $errorJson['message'],
+    //             );
+    //         }
+    //         isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+    //         echo json_encode($responseData);
+    //         exit();
+    //     }
+    // }
+    private function generateNIS($data,$desc){
         try{
             if(!isset($data['kategori']) || empty($data['kategori'])){
                 throw new Exception('Kategori harus di isi');
@@ -150,8 +150,15 @@ class SenimanWebsite{
             if (!in_array($data['kategori'], self::$kategori)) {
                 throw new Exception('Kategori invalid');
             }
-            //get last kategori
-            $query = "SELECT COUNT(*) AS total FROM seniman WHERE KATEGORI = '".$data['kategori']."' ";
+            //get last NIS
+            date_default_timezone_set('Asia/Jakarta');
+            if($desc == 'tambah'){
+                $query = "SELECT COUNT(*) AS total FROM seniman WHERE nomor_induk LIKE '%/".date('Y')."' AND kategori = '".$data['kategori']."'";
+            }else if($desc == 'perpanjangan'){
+                $query = "SELECT COUNT(*) AS total FROM seniman WHERE nomor_induk LIKE '%/".(date('Y')+1)."' AND kategori = '".$data['kategori']."'";
+            }else{
+                throw new Exception('Description invalid');
+            }
             $stmt[0] = self::$con->prepare($query);
             $stmt[0]->execute();
             $total = 0;
@@ -162,9 +169,12 @@ class SenimanWebsite{
                 $total++;
             }
             $stmt[0]->close();
-            date_default_timezone_set('Asia/Jakarta');
             $total = str_pad($total, 3, '0', STR_PAD_LEFT);
-            $nis = $data['kategori'].'/'.$total.'/'.self::$constID.'/'.date('Y');
+            if($desc == 'tambah'){
+                $nis = $data['kategori'].'/'.$total.'/'.self::$constID.'/'.date('Y');
+            }else if($desc == 'perpanjangan'){
+                $nis = $data['kategori'].'/'.$total.'/'.self::$constID.'/'.(date('Y')+1);
+            }
             return ['nis'=>$nis,'kategori'=>$data['kategori']];
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -281,7 +291,7 @@ class SenimanWebsite{
                 $redirect = '/pengajuan.php';
                 $status = 'diterima';
                 $query = "UPDATE seniman SET nomor_induk = ?, status = ? WHERE id_seniman = ?";
-                $nomorInduk = $this->generateNIS(['kategori'=>$kategori]);
+                $nomorInduk = $this->generateNIS(['kategori'=>$kategori],'tambah');
                 $stmt[2] = self::$con->prepare($query);
                 $stmt[2]->bind_param("ssi", $nomorInduk['nis'], $status, $data['id_seniman']);
             }else if($data['keterangan'] == 'ditolak'){
@@ -459,7 +469,7 @@ class SenimanWebsite{
                 $redirect = '/perpanjangan.php';
                 $status = 'diterima';
                 $query = "UPDATE perpanjangan SET nomor_induk = ?, status = ? WHERE id_seniman = ?";
-                $nomorInduk = $this->generateNIS(['kategori'=>$kategori]);
+                $nomorInduk = $this->generateNIS(['kategori'=>$kategori],'perpanjangan');
                 $stmt[2] = self::$con->prepare($query);
                 $stmt[2]->bind_param("ssi", $nomorInduk, $status, $data['id_seniman']);
                 $stmt[2]->execute();
