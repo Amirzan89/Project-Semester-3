@@ -5,10 +5,31 @@ class AdvisMobile{
     private static $database;
     private static $con;
     private static $folderPath;
+    private static $kategoriInp = [
+        'CAMP'=>'campursari',
+        'DLG'=>'dalang',
+        'JKP'=>'jaranan',
+        'KRW'=>'karawitan',
+        'MC'=>'mc',
+        'LDR'=>'ludruk',
+        'OKM'=>'organisasi kesenian musik',
+        'ORG'=>'organisasi',
+        'PRAM'=>'pramugari tayup',
+        'SGR'=>'sanggar',
+        'SIND'=>'sinden',
+        'VOC'=>'vocalis',
+        'WAR'=>'waranggono',
+        'BAR'=>'barongsai',
+        'KTR'=>'ketoprak',
+        'PTJ'=>'pataji',
+        'REOG'=>'reog',
+        'THR'=>'taman hiburan rakyat',
+        'PLWK'=>'pelawak'
+    ];
     public function __construct(){
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();
-        self::$folderPath = __DIR__.'/../../private/tempat';
+        self::$folderPath = __DIR__.'/../../private/pentas';
     }
     public function tambahPentas($data){
         try{
@@ -18,17 +39,14 @@ class AdvisMobile{
             if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
                 throw new Exception('ID Seniman harus di isi !');
             }
-            if(!isset($data['nis']) || empty($data['nis'])){
-                throw new Exception('Nomer induk seniman harus di isi !');
-            }
             if(!isset($data['nama']) || empty($data['nama'])){
                 throw new Exception('Nama harus di isi !');
             }
             if (!isset($data['alamat']) || empty($data['alamat'])) {
                 throw new Exception(' Alamat harus di isi !');
             }
-            if (strlen($data['alamat']) > 25) {
-                throw new Exception(' Alamat maksimal 25 angka !');
+            if (strlen($data['alamat']) > 100) {
+                throw new Exception(' Alamat maksimal 100 karakter !');
             }
             if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
                 throw new Exception(' Deskripsi harus di isi !');
@@ -39,23 +57,34 @@ class AdvisMobile{
             if(!isset($data['nama_pentas']) || empty($data['nama_pentas'])){
                 throw new Exception('Nama pentas harus di isi !');
             }
-            if (!isset($data['tanggal']) || empty($data['tanggal'])) {
-                throw new Exception('Tanggal harus di isi !');
+            if (!isset($data['tanggal_awal']) || empty($data['tanggal_awal'])) {
+                throw new Exception('Tanggal awal harus di isi !');
+            }
+            if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
+                throw new Exception('Tanggal akhir harus di isi !');
             }
             if (!isset($data['tempat_pentas']) || empty($data['tempat_pentas'])) {
                 throw new Exception(' Tempat pentas harus di isi !');
             }
             date_default_timezone_set('Asia/Jakarta');
-            $tanggal = strtotime($data['tanggal']);
-            $tanggalDB = date('Y-m-d H:i:s', $tanggal);
+            $tanggal_awal = strtotime($data['tanggal_awal']);
+            $tanggal_akhir = strtotime($data['tanggal_akhir']);
+            $tanggalAwalDB = date('Y-m-d H:i:s', $tanggal_awal);
+            $tanggalAkhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
             $tanggal_sekarang = date('Y-m-d H:i:s');
             $tanggal_sekarang = strtotime($tanggal_sekarang);
             // Check if the date formats are valid
-            if (!$tanggal) {
+            if (!$tanggal_awal) {
                 throw new Exception('Format tanggal awal tidak valid !');
             }
-            if ($tanggal < $tanggal_sekarang){
-                throw new Exception('Tanggal tidak boleh kurang dari sekarang !');
+            if (!$tanggal_akhir) {
+                throw new Exception('Format tanggal selesai tidak valid !');
+            }
+            if ($tanggal_awal > $tanggal_akhir) {
+                throw new Exception('Tanggal akhir tidak boleh lebih awal dari tanggal awal !');
+            }
+            if ($tanggal_awal < $tanggal_sekarang){
+                throw new Exception('Tanggal tidak boleh lebih kurang dari sekarang !');
             }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -72,26 +101,64 @@ class AdvisMobile{
             if($role != 'masyarakat'){
                 throw new Exception('invalid role');
             }
-            //check nomor induk seniman
-            $query = "SELECT nomor_induk FROM seniman WHERE id_seniman = ? LIMIT 1";
+            //check seniman
+            $query = "SELECT nomor_induk, kategori FROM seniman WHERE id_seniman = ? LIMIT 1";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_seniman']);
             $stmt[1]->execute();
             $nisDB = '';
-            $stmt[1]->bind_result($nisDB);
+            $kategori = '';
+            $stmt[1]->bind_result($nisDB, $kategori);
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
                 throw new Exception('Data seniman tidak ditemukan');
             }
             $stmt[1]->close();
-            if($nisDB != $data['nis']){
-                throw new Exception('NIS invalid');
+            $currentHour = date('G'); //format 0-23
+            if($kategori == 'DLG'){
+                if ($currentHour >= 21) {
+                    throw new Exception('Permintaan anda tidak boleh lebih dari jam 9 malam');
+                }
+            }else{
+                if ($currentHour >= 17) {
+                    throw new Exception('Permintaan anda tidak boleh lebih dari jam 5 sore');
+                }
+            }
+            //get last id advis
+            $query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '".$_SERVER['DB_DATABASE']."' AND TABLE_NAME = 'surat_advis' ";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->execute();
+            $idAdvis = 1;
+            $stmt[1]->bind_result($idAdvis);
+            $stmt[1]->fetch();
+            $stmt[1]->close();
+            //create folder
+            if (!is_dir(self::$folderPath)) {
+                mkdir(self::$folderPath, 0777, true);
+            }
+            //proses file
+            $fileSurat = $_FILES['surat_keterangan'];
+            $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
+            $size = filesize($fileSurat['size']);
+            if ($extension === 'pdf') {
+                if ($size >= self::$sizeFile) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                }
+            } else {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus pdf','code'=>500]));
+            }
+            //simpan file
+            $nameFile = '/'.$idAdvis.'.'.$extension;
+            $fileSuratPath = self::$folderPath.$nameFile;
+            $fileSuratDB = $nameFile;
+            if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
             //save data
-            $query = "INSERT INTO surat_advis (nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_advis, tempat_advis, status, id_user, id_seniman) VALUES (?, ?, ?, ?, ?, ?, ? ,?, ?)";
+            $query = "INSERT INTO surat_advis (nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_awal, tgl_selesai, tempat_advis, surat_keterangan, status, id_user, id_seniman) VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
             $status = 'diajukan';
-            $stmt[2]->bind_param("sssssssii", $data['nis'], $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalDB, $data['tempat_pentas'],$status, $data['id_user'], $data['id_seniman']);
+            $stmt[2]->bind_param("sssssssssii", $nisDB, $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalAwalDB, $tanggalAkhirDB, $data['tempat_pentas'], $fileSuratDB, $status, $data['id_user'], $data['id_seniman']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -130,12 +197,6 @@ class AdvisMobile{
             if(!isset($data['id_advis']) || empty($data['id_advis'])){
                 throw new Exception('ID Advis harus di isi !');
             }
-            // if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
-            //     throw new Exception('ID Seniman harus di isi !');
-            // }
-            // if(!isset($data['nis']) || empty($data['nis'])){
-            //     throw new Exception('Nomer induk seniman harus di isi !');
-            // }
             if(!isset($data['nama']) || empty($data['nama'])){
                 throw new Exception('Nama pengirim harus di isi !');
             }
@@ -205,21 +266,6 @@ class AdvisMobile{
             }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
                 throw new Exception('Data sudah diverifikasi');
             }
-            // //check nomor induk seniman
-            // $query = "SELECT nomor_induk FROM seniman WHERE id_seniman = ? LIMIT 1";
-            // $stmt[1] = self::$con->prepare($query);
-            // $stmt[1]->bind_param('s', $data['id_seniman']);
-            // $stmt[1]->execute();
-            // $nisDB = '';
-            // $stmt[1]->bind_result($nisDB);
-            // if(!$stmt[1]->fetch()){
-            //     $stmt[1]->close();
-            //     throw new Exception('Data seniman tidak ditemukan');
-            // }
-            // $stmt[1]->close();
-            // if($nisDB != $data['nis']){
-            //     throw new Exception('NIS invalid');
-            // }
             //update data
             $query = "UPDATE surat_advis SET nama_advis = ?, alamat_advis = ?, deskripsi_advis = ?, tgl_advis = ?, tempat_advis = ? WHERE id_advis = ?";
             $stmt[2] = self::$con->prepare($query);
@@ -340,9 +386,9 @@ class AdvisMobile{
         // } elseif ($contentType === "application/x-www-form-urlencoded") {
         //     $requestData = $_POST;
         //     return $requestData;
-        // } elseif (strpos($contentType, 'multipart/form-data') !== false) {
-        //     $requestData = $_POST;
-        //     return $requestData;
+        } elseif (strpos($contentType, 'multipart/form-data') !== false) {
+            $requestData = $_POST;
+            return $requestData;
         } else {
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);

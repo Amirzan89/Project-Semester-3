@@ -46,7 +46,7 @@ $tPath = '';
         <div id="divTambahSeniman" style="display:block">
             <div class="bg" onclick="closeForm('tambah')"></div>
             <div class="content">
-                <form id="" action="/mobile/seniman/seniman.php" method="POST" enctype="multipart/form-data">
+                <form id="" action="/mobile/pentas/pentas.php" method="POST" enctype="multipart/form-data">
                     <div class="header">
                         <h1>pengajuan pentas</h1>
                     </div>
@@ -54,51 +54,36 @@ $tPath = '';
                         <input type="hidden" name="id_user" value="32">
                     </div>
                     <div class="row">
-                        <label>NIK seniman</label>
-                        <input type="text" name="nik_seniman" id="nama_seniman">
+                        <label>id seniman</label>
+                        <input type="text" name="id_seniman" id="id_seniman">
                     </div>
                     <div class="row">
-                        <label>Nama seniman</label>
-                        <input type="text" name="nama_seniman" id="nama_seniman">
+                        <label>Nama advis</label>
+                        <input type="text" name="nama" id="nama_seniman">
                     </div>
                     <div class="row">
-                        <label>no telpon seniman</label>
-                        <input type="text" name="no_telpon" id="nama_seniman">
-                    </div>
-                    <div class="row">
-                        <label>Alamat seniman</label>
+                        <label>Alamat advis</label>
                         <textarea name="alamat" id="alamat"></textarea>
                     </div>
                     <div class="row">
-                        <label>Jenis kelamin</label>
-                        <select name="jenis_kelamin_seniman" id="jenis_kelamin" multiple>
-                            <option value="laki-laki">Laki-laki</option>  
-                            <option value="perempuan">perempuan</option>
-                        </select>
+                        <label>Deskripsi advis</label>
+                        <textarea name="deskripsi" id="deskripsi"></textarea>
                     </div>
                     <div class="row">
-                        <label>tempat lahir seniman</label>
-                        <input type="text" name="tempat_lahir" id="tempat_lahir">
+                        <label>Nama pentas</label>
+                        <input type="text" name="nama_pentas" id="tempat_lahir">
                     </div>
                     <div class="row">
-                        <label>Tanggal lahir seniman</label>
-                        <input type="date" name="tanggal_lahir" id="tanggal_lahir">
+                        <label>Tanggal awal pentas</label>
+                        <input type="date" name="tanggal_awal" id="tanggal_awal">
                     </div>
                     <div class="row">
-                        <label>nama organisasi</label>
-                        <input type="text" name="nama_organisasi" id="nama_organisasi">
+                        <label>Tanggal akhir pentas</label>
+                        <input type="date" name="tanggal_akhir" id="tanggal_akhir">
                     </div>
                     <div class="row">
-                        <label>jumlah anggota organisasi</label>
-                        <input type="text" name="anggota_organisasi" id="anggota_organisasi">
-                    </div>
-                    <div class="row">
-                        <label>foto ktp</label>
-                        <input type="file" name="foto_ktp" id="foto_ktp">
-                    </div>
-                    <div class="row">
-                        <label>pass foto</label>
-                        <input type="file" name="pass_foto" id="pass_foto">
+                        <label>Nama tempat</label>
+                        <input type="text" name="tempat_pentas" id="tempat_pentas">
                     </div>
                     <div class="row">
                         <label>surat keterangan</label>

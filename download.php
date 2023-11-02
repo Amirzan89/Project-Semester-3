@@ -8,7 +8,7 @@ class Download{
     private static $folderSeniman = __DIR__.'/private/seniman';
     private static $folderSewa = __DIR__.'/private/tempat';
     private static $folderTempat = __DIR__.'/public/img/tempat';
-    private static $folderPentas = __DIR__.'/private/img/event';
+    private static $folderPentas = __DIR__.'/private/pentas';
     public function __construct(){
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();
@@ -226,7 +226,7 @@ class Download{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if(!isset($data['id_advis']) || empty($data['id_advis'])){
+            if(!isset($data['id_pentas']) || empty($data['id_pentas'])){
                 echo "<script>alert('ID Pentas harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
@@ -255,7 +255,7 @@ class Download{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            //check id_advis
+            //check id_pentas
             if($data['deskripsi'] == 'surat'){
                 $query = "SELECT surat_keterangan FROM surat_advis WHERE id_advis = ? LIMIT 1";
                 $file = self::$folderPentas;
@@ -265,7 +265,7 @@ class Download{
                 exit();
             }
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_advis']);
+            $stmt[0]->bind_param('s', $data['id_pentas']);
             $stmt[0]->execute();
             $path = '';
             $stmt[0]->bind_result($path);

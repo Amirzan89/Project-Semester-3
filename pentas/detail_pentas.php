@@ -18,7 +18,7 @@ if($userAuth['status'] == 'error'){
   // }
   if (isset($_GET['id_pentas']) && !empty($_GET['id_pentas'])) {
     $id  = $_GET['id_pentas'];
-    $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, DATE_FORMAT(tgl_advis, '%d %M %Y') AS tanggal, tempat_advis, status, catatan FROM surat_advis WHERE id_advis = '$id' LIMIT 1");
+    $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, DATE_FORMAT(tgl_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_selesai, tempat_advis, status, catatan FROM surat_advis WHERE id_advis = '$id' LIMIT 1");
     $pentas = mysqli_fetch_assoc($sql);
   }else{
     header('Location: /pentas.php');
@@ -56,11 +56,13 @@ $csrf = $GLOBALS['csrf'];
 
 <body>
   <script>
+    const domain = window.location.protocol + '//' + window.location.hostname +":"+window.location.port;
 	  var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
     var number = "<?php echo $userAuth['number'] ?>";
     var role = "<?php echo $userAuth['role'] ?>";
+    var idPentas = "<?php echo $id ?>";
 	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -138,9 +140,15 @@ $csrf = $GLOBALS['csrf'];
                   </div>
                 </div>
                 <div class="row mb-3">
-                  <label for="inputDate" class="col-sm-2 col-form-label">Tanggal Lahir</label>
+                  <label for="inputDate" class="col-sm-2 col-form-label">Tanggal mulai</label>
                   <div class="col-sm-10">
-                    <input type="text" class="form-control" name="tanggalL" readonly value="<?php echo $pentas['tanggal'] ?>">
+                    <input type="text" class="form-control" name="tanggalL" readonly value="<?php echo $pentas['tanggal_awal'] ?>">
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="inputDate" class="col-sm-2 col-form-label">Tanggal selesai</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" name="tanggalL" readonly value="<?php echo $pentas['tanggal_selesai'] ?>">
                   </div>
                 </div>
                 <div class="row mb-3">
@@ -148,6 +156,13 @@ $csrf = $GLOBALS['csrf'];
                   <div class="col-sm-10">
                     <input type="text" class="form-control" name="tempatL" readonly value="<?php echo $pentas['tempat_advis'] ?>">
                   </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="inputNumber" class="col-sm-2 col-form-label">Surat Keterangan</label>
+                    <div class="col-sm-10">
+                    <button class="btn btn-info" type="button" onclick="preview('surat')"> Lihat surat keterangan </button>
+                    <button class="btn btn-info" type="button" onclick="download('surat')"> Download surat keterangan </button>
+                    </div>
                 </div>
                 <div class="row mb-3 justify-content-end">
                   <div class="col-sm-10 text-end">
@@ -313,7 +328,79 @@ $csrf = $GLOBALS['csrf'];
           }
         });
       });
-
+      //preview data
+      function preview(desc){
+            if (desc != 'surat'){
+                console.log('invalid description');
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            var requestBody = {
+                email: email,
+                id_pentas:idPentas,
+                item:'pentas',
+                deskripsi:desc
+            };
+            //open the request
+            xhr.open('POST',domain+"/preview.php")
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            //send the form data
+            xhr.send(JSON.stringify(requestBody));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status === 200 || xhr.status === 300 || xhr.status === 302) {
+                        var response = JSON.parse(xhr.responseText);
+                        window.location.href = response.data;
+                    } else {
+                        var response = xhr.responseText;
+                        console.log('errorrr '+response);
+                    }
+                }
+            }
+        }
+        //preview data
+        function download(desc){
+            if (desc != 'surat'){
+                console.log('invalid description');
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            var requestBody = {
+                email: email,
+                id_pentas:idPentas,
+                item:'pentas',
+                deskripsi:desc
+            };
+            //open the request
+            xhr.open('POST',domain+"/download.php")
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.responseType = 'blob';
+            // send the form data
+            xhr.send(JSON.stringify(requestBody));
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        var blob = xhr.response;
+                        var contentDisposition = xhr.getResponseHeader('Content-Disposition');
+                        var match = contentDisposition.match(/filename="(.+\..+?)"/);
+                        if (match) {
+                            var filename = match[1];
+                            var link = document.createElement('a');
+                            link.href = window.URL.createObjectURL(blob);
+                            link.download = filename;
+                            link.click();
+                        } else {
+                            console.log('Invalid content-disposition header');
+                        }
+                    } else {
+                        var response = xhr.responseText;
+                        console.log('errorrr ' + response);
+                    }
+                }
+            };
+        }
     </script>
 </body>
 

@@ -259,7 +259,7 @@ class Preview{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if(!isset($data['id_advis']) || empty($data['id_advis'])){
+            if(!isset($data['id_pentas']) || empty($data['id_pentas'])){
                 echo "<script>alert('ID Pentas harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
@@ -298,7 +298,7 @@ class Preview{
                 exit();
             }
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_advis']);
+            $stmt[0]->bind_param('s', $data['id_pentas']);
             $stmt[0]->execute();
             $path = '';
             $stmt[0]->bind_result($path);

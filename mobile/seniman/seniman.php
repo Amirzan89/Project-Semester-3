@@ -203,7 +203,7 @@ class SenimanMobile{
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
             } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus jpg, png, jpeg','code'=>500]));
             }
             //simpan file
             $nameFile = '/'.$idSeniman.'.'.$extension;  
@@ -222,7 +222,7 @@ class SenimanMobile{
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
             } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus png, jpeg, jpg','code'=>500]));
             }
             //simpan file
             $nameFile = '/'.$idSeniman.'.'.$extension;
@@ -242,7 +242,7 @@ class SenimanMobile{
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
             } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus pdf','code'=>500]));
             }
             //simpan file
             $nameFile = '/'.$idSeniman.'.'.$extension;

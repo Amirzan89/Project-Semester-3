@@ -97,14 +97,15 @@ $csrf = $GLOBALS['csrf'];
                   <th scope="col">No</th>
                     <th scope="col">Nomor Induk Seniman</th>
                     <th scope="col">Nama Pemohon</th>
-                    <th scope="col">Tanggal</th>
+                    <th scope="col">Tanggal awal</th>
+                    <th scope="col">Tanggal akhir</th>
                     <th scope="col">Status</th>
                     <th scope="col">Aksi</th>
                   </tr>
                   </thead>
                   <tbody>
                     <?php
-                      $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(tgl_advis, '%d %M %Y') AS tanggal, status, catatan FROM surat_advis WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_advis DESC");
+                      $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(tgl_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_akhir, status, catatan FROM surat_advis WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_advis DESC");
                       $no = 1;
                       while ($advis = mysqli_fetch_array($query)) {
                     ?>
@@ -112,7 +113,8 @@ $csrf = $GLOBALS['csrf'];
                       <td><?php echo $no?></td>
                       <td><?php echo $advis['nomor_induk']?></td>
                       <td><?php echo $advis['nama_advis']?></td>
-                      <td><?php echo $advis['tanggal']?></td>
+                      <td><?php echo $advis['tanggal_awal']?></td>
+                      <td><?php echo $advis['tanggal_akhir']?></td>
                       <td>
                         <?php if($advis['status'] == 'diajukan'){ ?>
                           <span class="badge bg-proses">Diajukan</span>

@@ -80,7 +80,7 @@ $csrf = $GLOBALS['csrf'];
     <main id="main" class="main">
 
         <div class="pagetitle">
-            <h1>Formulir Pendaftaran</h1>
+            <h1>Detail data seniman</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
@@ -92,7 +92,7 @@ $csrf = $GLOBALS['csrf'];
                             <li class="breadcrumb-item"><a href="/seniman/riwayat.php">Riwayat Nomer Induk Seniman</a>
                             </li>
                     <?php } ?>
-                    <li class="breadcrumb-item active">Detail event</li>
+                    <li class="breadcrumb-item active">Detail Data Seniman</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
