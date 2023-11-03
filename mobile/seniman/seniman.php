@@ -7,25 +7,71 @@ class SenimanMobile{
     private static $con;
     private static $folderPath;
     private static $constID = '411.302';
-    private static $kategori = [
-        'campursari'=>'CAMP',
-        'dalang'=>'DLG',
-        'jaranan'=>'JKP',
-        'karawitan'=>'KRW',
-        'mc'=>'MC',
-        'ludruk'=>'LDR',
-        'organisasi kesenian musik'=>'OKM',
-        'organisasi'=>'ORG',
-        'pramugari tayup'=>'PRAM',
-        'sanggar'=>'SGR',
-        'sinden'=>'SIND',
-        'vocalis'=>'VOC',
-        'waranggono'=>'WAR'
-    ];
+    // private static $kategori = [
+    //     'campursari'=>'CAMP',
+    //     'dalang'=>'DLG',
+    //     'jaranan'=>'JKP',
+    //     'karawitan'=>'KRW',
+    //     'mc'=>'MC',
+    //     'ludruk'=>'LDR',
+    //     'organisasi kesenian musik'=>'OKM',
+    //     'organisasi'=>'ORG',
+    //     'pramugari tayup'=>'PRAM',
+    //     'sanggar'=>'SGR',
+    //     'sinden'=>'SIND',
+    //     'vocalis'=>'VOC',
+    //     'waranggono'=>'WAR'
+    // ];
     public function __construct(){
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/../../private/seniman';
+    }
+    private function kategori($data, $desc){
+        try{
+            if($desc == 'check'){
+                if(!isset($data['kategori']) || empty($data['kategori'])){
+                    throw new Exception('Kategori harus di isi');
+                }
+                //check kategori
+                $query = "SELECT id_kategori_seniman FROM kategori_seniman WHERE nama_kategori = ? LIMIT 1";
+                $stmt[0] = self::$con->prepare($query);
+                $stmt[0]->bind_param('s', $data['kategori']);
+            }else if($desc == 'get'){
+                if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
+                    throw new Exception('Kategori harus di isi');
+                }
+                $query = "SELECT nama_kategori FROM kategori_seniman WHERE id_kategori_seniman = ? LIMIT 1";
+                $stmt[0] = self::$con->prepare($query);
+                $stmt[0]->bind_param('s', $data['id_kategori']);
+            }
+            $stmt[0]->execute();
+            $kategoriDB = '';
+            $stmt[0]->bind_result($kategoriDB);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                throw new Exception('Kategori seniman tidak ditemukan');
+            }
+            return $kategoriDB;
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
     }
     public function getSeniman($data){
         try{
@@ -50,20 +96,28 @@ class SenimanMobile{
             if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
                 throw new Exception('Harus masyarakat');
             }
+            $query = "SELECT id_kategori_seniman FROM seniman WHERE id_seniman = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_seniman']);
+            $stmt[1]->execute();
+            $idKategori = '';
+            $stmt[1]->bind_result($idKategori);
+            if(!$stmt[1]->fetch()){
+                $stmt[1]->close();
+                throw new Exception('Data Seniman tidak ditemukan');
+            }
             //check id_seniman and get data
-            $query = "SELECT id_seniman, nik, nomor_induk, nama_seniman, jenis_kelamin, kategori, kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota FROM seniman WHERE id_seniman = ?";
+            $query = "SELECT id_seniman, nik, nomor_induk, nama_seniman, jenis_kelamin, kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota FROM seniman WHERE id_seniman = ?";
             $stmt[2] = self::$con->prepare($query);
             $stmt[2]->bind_param('s', $data['id_seniman']);
             if ($stmt[2]->execute()) {
                 $result = $stmt[2]->get_result();
                 $senimanData = $result->fetch_assoc();
+                $senimanData['kategori'] = $this->kategori(['id_kategori'=>$idKategori],'get');
                 $stmt[2]->close();
                 header('Content-Type: application/json');
                 echo json_encode(['status' => 'success', 'message' => 'Data Seniman berhasil didapatkan', 'data' => $senimanData]);
                 exit();
-            } else {
-                $stmt[2]->close();
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman tidak ditemukan', 'code' => 400]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -110,12 +164,7 @@ class SenimanMobile{
             }else if(!in_array($data['jenis_kelamin_seniman'],['laki-laki','perempuan'])){
                 throw new Exception('Jenis kelamin salah');
             }
-            if(!isset($data['kategori']) || empty($data['kategori'])){
-                throw new Exception('Kategori harus di isi');
-            }
-            if (!array_key_exists($data['kategori'], self::$kategori)) {
-                throw new Exception('Kategori invalid');
-            }
+            $kategori = $this->kategori(['kategori'=>$data['kategori']],'check');
             if (!isset($data['kecamatan']) || empty($data['kecamatan'])) {
                 throw new Exception('Kecamatan harus di isi');
             }else if(!in_array($data['kecamatan'],['bagor','baron','berbek','gondang','jatikalen','kertosono','lengkong','loceret','nganjuk','ngetos','ngluyu','ngronggot','pace','patianrowo','prambon','rejoso','sawahan','sukomoro','tanjunganom','wilangan'])){
@@ -253,12 +302,12 @@ class SenimanMobile{
                 unlink($fileFotoPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
-            $query = "INSERT INTO seniman (nik, nama_seniman,jenis_kelamin, kategori,kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi,jumlah_anggota,ktp_seniman,pass_foto, surat_keterangan, tgl_pembuatan,tgl_berlaku,status, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO seniman (nik, nama_seniman,jenis_kelamin,kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi,jumlah_anggota,ktp_seniman,pass_foto, surat_keterangan, tgl_pembuatan, tgl_berlaku, status, id_kategori_seniman, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
             $status = 'diajukan';
             $now = date('Y-m-d');
             $end = date('Y-m-d',strtotime('12/31/' . date('Y')));
-            $stmt[2]->bind_param("ssssssssssssssssss", $data['nik_seniman'], $data['nama_seniman'], $data['jenis_kelamin_seniman'], $data['kategori'], $data['kecamatan'], $data['tempat_lahir'], $data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$fileKtpDB,$fileFotoDB, $fileSuratDB, $now, $end, $status, $data['id_user']);
+            $stmt[2]->bind_param("ssssssssssssssssss", $data['nik_seniman'], $data['nama_seniman'], $data['jenis_kelamin_seniman'], $data['kecamatan'], $data['tempat_lahir'], $data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$fileKtpDB,$fileFotoDB, $fileSuratDB, $now, $end, $status, $kategori, $data['id_user']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -318,12 +367,7 @@ class SenimanMobile{
             }else if(!in_array($data['jenis_kelamin_seniman'],['laki-laki','perempuan'])){
                 throw new Exception('Jenis kelamin salah');
             }
-            if(!isset($data['kategori']) || empty($data['kategori'])){
-                throw new Exception('Kategori harus di isi');
-            }
-            if (!array_key_exists($data['kategori'], self::$kategori)) {
-                throw new Exception('Kategori invalid');
-            }
+            $kategori = $this->kategori(['kategori'=>$data['kategori']],'check');
             if (!isset($data['kecamatan']) || empty($data['kecamatan'])) {
                 throw new Exception('Kecamatan harus di isi');
             }else if(!in_array($data['kecamatan'],['bagor','baron','berbek','gondang','jatikalen','kertosono','lengkong','loceret','nganjuk','ngetos','ngluyu','ngronggot','pace','patianrowo','prambon','rejoso','sawahan','sukomoro','tanjunganom','wilangan'])){
@@ -455,9 +499,9 @@ class SenimanMobile{
                 unlink($fileFotoPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
-            $query = "UPDATE seniman SET nik = ?, nama_seniman = ?, jenis_kelamin = ?, kategori = ?, kecamatan = ?, tempat_lahir = ?, tanggal_lahir = ?, alamat_seniman = ?, no_telpon = ?, nama_organisasi = ?, jumlah_anggota = ? WHERE id_seniman = ?";
+            $query = "UPDATE seniman SET nik = ?, nama_seniman = ?, jenis_kelamin = ?, kecamatan = ?, tempat_lahir = ?, tanggal_lahir = ?, alamat_seniman = ?, no_telpon = ?, nama_organisasi = ?, jumlah_anggota = ?, id_kategori_seniman = ?, WHERE id_seniman = ?";
             $stmt[1] = self::$con->prepare($query);
-            $stmt[1]->bind_param("ssssssssssss", $data['nik_seniman'], $data['nama_seniman'], $data['jenis_kelamin_seniman'], $data['kategori'], $data['kecamatan'], $data['tempat_lahir'],$data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'],$data['id_seniman']);
+            $stmt[1]->bind_param("ssssssssssss", $data['nik_seniman'], $data['nama_seniman'], $data['jenis_kelamin_seniman'], $data['kecamatan'], $data['tempat_lahir'],$data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'], $kategori, $data['id_seniman']);
             $stmt[1]->execute();
             if ($stmt[1]->affected_rows > 0) {
                 $stmt[1]->close();
@@ -894,6 +938,7 @@ class SenimanMobile{
                 echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
                 exit();
             }
+            htmlspecialchars($_POST);
             return $requestData;
         } elseif ($contentType === "application/x-www-form-urlencoded") {
             $requestData = $_POST;

@@ -245,7 +245,11 @@ class Jwt{
                         $key = $_SERVER['JWT_SECRET'];
                         $Rkey = $_SERVER['JWT_SECRET_REFRESH_TOKEN'];
                         $exp = (time()+intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']));
-                        $Rexp = (time()+intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']));
+                        $times = explode('*', $_SERVER['JWT_REFRESH_TOKEN_EXPIRED']);
+                        $Rexp = 1;
+                        foreach($times as $n){
+                            $Rexp *= $n;
+                        }
                         //get id_user
                         $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
                         $stmt[0] = $con->prepare($query);
