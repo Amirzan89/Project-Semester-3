@@ -66,7 +66,7 @@ $tPath = '';
             <div class="content">
             <form id="" action="/mobile/tempat/tempat.php" method="POST" enctype="multipart/form-data">
                     <div class="header">
-                        <h1>tambah tempat</h1>
+                        <h1>buat sewa tempat</h1>
                     </div>
                     <input type="hidden" name="id_user" value="32">
                     <div class="row">
@@ -122,7 +122,7 @@ $tPath = '';
             <div class="content">
             <form id="" action="/mobile/tempat/tempat.php" method="POST" enctype="multipart/form-data">
                     <div class="header">
-                        <h1>edit tempat</h1>
+                        <h1>edit sewa tempat</h1>
                     </div>
                     <input type="hidden" name="_method" value="PUT">
                     <input type="hidden" name="id_user" value="32">
@@ -184,7 +184,7 @@ $tPath = '';
             <div class="content">
             <form id="" action="/mobile/tempat/tempat.php" method="POST" enctype="multipart/form-data">
                     <div class="header">
-                        <h1>hapus tempat</h1>
+                        <h1>hapus sewa tempat</h1>
                     </div>
                     <input type="hidden" name="_method" value="DELETE">
                     <input type="hidden" name="id_user" value="32">

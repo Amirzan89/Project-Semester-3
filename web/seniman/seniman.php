@@ -746,9 +746,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $data = SenimanWebsite::handle();
     if(isset($data['_method'])){
         if($data['_method'] == 'PUT'){
-            // echo json_encode($data);
-            // exit();
-            if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc']) && $data['desc'] == 'ubah kategori'){
+            if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc']) && $data['desc'] == 'kategori'){
                 $senimanWeb->ubahKategori($data);
             }
             if(isset($data['keterangan'])){
@@ -756,9 +754,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
     }
-
-    // if(isset($data['desc']) && $data['desc'] == 'tambah kategori' && !empty($data['desc']) && !is_null($data['desc'])){
-    //     $senimanWeb->tambahKategori($data);
-    // }
+    if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc']) &&  $data['desc'] == 'kategori'){
+        $senimanWeb->tambahKategori($data);
+    }
 }
 ?>
