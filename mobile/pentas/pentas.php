@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
+require_once(__DIR__ . '/../pentas/pentas.php');
 class AdvisMobile{
     private static $sizeFile = 5 * 1024 * 1024;
     private static $database;
@@ -30,6 +31,61 @@ class AdvisMobile{
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/../../private/pentas';
+    }
+    public function getPentas($data){
+        try{
+            if(!isset($data['email']) || empty($data['email'])){
+                throw new Exception('Email harus di isi !');
+            }
+            if(!isset($data['id_pentas']) || empty($data['id_pentas'])){
+                throw new Exception('ID Pentas harus di isi !');
+            }
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['email']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+                throw new Exception('Harus masyarakat');
+            }
+            //check id_pentas and get data
+            $query = "SELECT nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_awal, tgl_selesai, tempat_advis FROM surat_advis WHERE id_advis = ?";
+            $stmt[2] = self::$con->prepare($query);
+            $stmt[2]->bind_param('s', $data['id_pentas']);
+            if ($stmt[2]->execute()) {
+                $result = $stmt[2]->get_result();
+                $pentasData = $result->fetch_assoc();
+                $stmt[2]->close();
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'success', 'message' => 'Data Seniman berhasil didapatkan', 'data' => $pentasData]);
+                exit();
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
     }
     public function tambahPentas($data){
         try{
@@ -102,7 +158,7 @@ class AdvisMobile{
                 throw new Exception('invalid role');
             }
             //check seniman
-            $query = "SELECT nomor_induk, kategori FROM seniman WHERE id_seniman = ? LIMIT 1";
+            $query = "SELECT nomor_induk, id_kategori_seniman FROM seniman WHERE id_seniman = ? LIMIT 1";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_seniman']);
             $stmt[1]->execute();
@@ -115,6 +171,8 @@ class AdvisMobile{
             }
             $stmt[1]->close();
             $currentHour = date('G'); //format 0-23
+            $seniman = new SenimanMobile();
+            $kategori = $seniman->kategori(['id_kategori'=>$kategori],'getINI');
             if($kategori == 'DLG'){
                 if ($currentHour >= 21) {
                     throw new Exception('Permintaan anda tidak boleh lebih dari jam 9 malam');
@@ -170,6 +228,7 @@ class AdvisMobile{
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Pentas gagal ditambahkan','code'=>500]));
             }
         }catch(Exception $e){
+            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {

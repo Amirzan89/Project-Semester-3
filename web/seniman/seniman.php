@@ -94,7 +94,7 @@ class SenimanWebsite{
             exit();
         }
     }
-    private function tambahKategori($data){
+    public function tambahKategori($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('ID User harus di isi !');
@@ -103,13 +103,13 @@ class SenimanWebsite{
                 throw new Exception('Kategori seniman harus di isi !');
             }
             if (strlen($data['nama_kategori']) > 50) {
-                throw new Exception('Nama event maksimal 50 huruf');
+                throw new Exception('Kategori seniman maksimal 50 huruf');
             }
             if(!isset($data['singkatan']) || empty($data['singkatan'])){
                 throw new Exception('Singkatan kategori harus di isi !');
             }
-            if (strlen($data['no_telpon']) > 10) {
-                throw new Exception('Nama event maksimal 10 huruf');
+            if (strlen($data['singkatan']) > 10) {
+                throw new Exception('Singkatan kategori maksimal 10 huruf');
             }
             //check id_user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -123,10 +123,10 @@ class SenimanWebsite{
                 throw new Exception('User tidak ditemukan');
             }
             $stmt[0]->close();
-            if($role != 'super admin' || $role != 'admin seniman'){
+            if($role != 'super admin' && $role != 'admin seniman'){
                 throw new Exception('Anda bukan admin');
             }
-            $query = "INSERT INTO kategori_seniman (nama_kategori, singkatan) VALUES ()";
+            $query = "INSERT INTO kategori_seniman (nama_kategori, singkatan) VALUES (?, ?)";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param("ss",$data['nama_kategori'], $data['singkatan']);
             $stmt[1]->execute();
@@ -158,25 +158,25 @@ class SenimanWebsite{
             exit();
         }
     }
-    private function ubahKategori($data){
+    public function ubahKategori($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('ID User harus di isi !');
             }
             if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
-                throw new Exception('Kategori seniman harus di isi !');
+                throw new Exception('ID Kategori seniman harus di isi !');
             }
             if(!isset($data['nama_kategori']) || empty($data['nama_kategori'])){
                 throw new Exception('Kategori seniman harus di isi !');
             }
             if (strlen($data['nama_kategori']) > 50) {
-                throw new Exception('Nama event maksimal 50 huruf');
+                throw new Exception('Kategori seniman maksimal 50 huruf');
             }
             if(!isset($data['singkatan']) || empty($data['singkatan'])){
                 throw new Exception('Singkatan kategori harus di isi !');
             }
-            if (strlen($data['no_telpon']) > 10) {
-                throw new Exception('Nama event maksimal 10 huruf');
+            if (strlen($data['singkatan']) > 10) {
+                throw new Exception('Singkatan kategori maksimal 10 huruf');
             }
             //check id_user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -190,7 +190,7 @@ class SenimanWebsite{
                 throw new Exception('User tidak ditemukan');
             }
             $stmt[0]->close();
-            if($role != 'super admin' || $role != 'admin seniman'){
+            if($role != 'super admin' && $role != 'admin seniman'){
                 throw new Exception('Anda bukan admin');
             }
             $query = "UPDATE seniman SET nama_kategori = ?, singkatan = ? WHERE id_kategori_seniman = ?";
@@ -225,7 +225,7 @@ class SenimanWebsite{
             exit();
         }
     }
-    private function hapusKategori($data){
+    public function hapusKategori($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('ID User harus di isi !');
@@ -245,7 +245,7 @@ class SenimanWebsite{
                 throw new Exception('User tidak ditemukan');
             }
             $stmt[0]->close();
-            if($role != 'super admin' || $role != 'admin seniman'){
+            if($role != 'super admin' && $role != 'admin seniman'){
                 throw new Exception('Anda bukan admin');
             }
             //delete data
@@ -743,8 +743,14 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $senimanWeb = new SenimanWebsite();
     $data = SenimanWebsite::handle();
+    if(isset($data['desc']) && $data['desc'] == 'kategori' && !empty($data['desc']) && !is_null($data['desc'])){
+        $senimanWeb->tambahKategori($data);
+    }
     if(isset($data['_method'])){
         if($data['_method'] == 'PUT'){
+            if(isset($data['desc']) && $data['desc'] == 'kategori' && !empty($data['kategori']) && !is_null($data['kategori'])){
+                $senimanWeb->ubahKategori($data);
+            }
             if(isset($data['keterangan'])){
                 $senimanWeb->prosesSeniman($data);
             }
