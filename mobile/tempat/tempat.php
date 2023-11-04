@@ -57,6 +57,9 @@ class TempatMobile{
                 $result = $stmt[1]->get_result();
                 $sewaTempatData = $result->fetch_assoc();
                 $stmt[1]->close();
+                if ($sewaTempatData === null) {
+                    throw new Exception('Data sewa tempat tidak ditemukan');
+                }
                 header('Content-Type: application/json');
                 echo json_encode(['status' => 'success', 'message' => 'Data Sewa tempat berhasil didapatkan', 'data' => $sewaTempatData]);
                 exit();
@@ -114,14 +117,17 @@ class TempatMobile{
             $stmt[1]->execute();
             if ($stmt[1]->execute()) {
                 $result = $stmt[1]->get_result();
-                $sewaTempatData = $result->fetch_assoc();
+                $tempatData = $result->fetch_assoc();
                 $stmt[1]->close();
+                if ($tempatData === null) {
+                    throw new Exception('Data tempat tidak ditemukan');
+                }
                 header('Content-Type: application/json');
-                echo json_encode(['status' => 'success', 'message' => 'Data Sewa tempat berhasil didapatkan', 'data' => $sewaTempatData]);
+                echo json_encode(['status' => 'success', 'message' => 'Data Sewa tempat berhasil didapatkan', 'data' => $tempatData]);
                 exit();
             }else{
                 $stmt[1]->close();
-                throw new Exception('Data sewa tempat tidak ditemukan');
+                throw new Exception('Data tempat tidak ditemukan');
             }
         }catch(Exception $e){
             $error = $e->getMessage();

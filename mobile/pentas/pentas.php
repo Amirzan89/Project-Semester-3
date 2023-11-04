@@ -1,6 +1,5 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
-require_once(__DIR__ . '/../pentas/pentas.php');
 class AdvisMobile{
     private static $sizeFile = 5 * 1024 * 1024;
     private static $database;
@@ -57,16 +56,75 @@ class AdvisMobile{
             }
             //check id_pentas and get data
             $query = "SELECT nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_awal, tgl_selesai, tempat_advis FROM surat_advis WHERE id_advis = ?";
-            $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param('s', $data['id_pentas']);
-            if ($stmt[2]->execute()) {
-                $result = $stmt[2]->get_result();
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_pentas']);
+            if ($stmt[1]->execute()) {
+                $result = $stmt[1]->get_result();
                 $pentasData = $result->fetch_assoc();
-                $stmt[2]->close();
+                $stmt[1]->close();
+                if ($pentasData === null) {
+                    throw new Exception('Data pentas tidak ditemukan');
+                }
                 header('Content-Type: application/json');
-                echo json_encode(['status' => 'success', 'message' => 'Data Seniman berhasil didapatkan', 'data' => $pentasData]);
+                echo json_encode(['status' => 'success', 'message' => 'Data pentas berhasil didapatkan', 'data' => $pentasData]);
                 exit();
+            }else{
+                $stmt[1]->close();
+                throw new Exception('Data pentas tidak ditemukan');
             }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
+    }
+    public function kategori($data, $desc){
+        try{
+            if($desc == 'check'){
+                if(!isset($data['kategori']) || empty($data['kategori'])){
+                    throw new Exception('Kategori harus di isi');
+                }
+                //check kategori
+                $query = "SELECT id_kategori_seniman FROM kategori_seniman WHERE nama_kategori = ? LIMIT 1";
+                $stmt[0] = self::$con->prepare($query);
+                $stmt[0]->bind_param('s', $data['kategori']);
+            }else if($desc == 'get'){
+                if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
+                    throw new Exception('Kategori harus di isi');
+                }
+                $query = "SELECT nama_kategori FROM kategori_seniman WHERE id_kategori_seniman = ? LIMIT 1";
+                $stmt[0] = self::$con->prepare($query);
+                $stmt[0]->bind_param('s', $data['id_kategori']);
+            }else if($desc == 'getINI'){
+                if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
+                    throw new Exception('Kategori harus di isi');
+                }
+                $query = "SELECT singkatan FROM kategori_seniman WHERE id_kategori_seniman = ? LIMIT 1";
+                $stmt[0] = self::$con->prepare($query);
+                $stmt[0]->bind_param('s', $data['id_kategori']);
+            }
+            $stmt[0]->execute();
+            $kategoriDB = '';
+            $stmt[0]->bind_result($kategoriDB);
+            if(!$stmt[0]->fetch()){
+                $stmt[0]->close();
+                throw new Exception('Kategori seniman tidak ditemukan');
+            }
+            return $kategoriDB;
         }catch(Exception $e){
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
@@ -96,7 +154,7 @@ class AdvisMobile{
                 throw new Exception('ID Seniman harus di isi !');
             }
             if(!isset($data['nama']) || empty($data['nama'])){
-                throw new Exception('Nama harus di isi !');
+                throw new Exception('Nama advis harus di isi !');
             }
             if (!isset($data['alamat']) || empty($data['alamat'])) {
                 throw new Exception(' Alamat harus di isi !');
@@ -158,30 +216,38 @@ class AdvisMobile{
                 throw new Exception('invalid role');
             }
             //check seniman
-            $query = "SELECT nomor_induk, id_kategori_seniman FROM seniman WHERE id_seniman = ? LIMIT 1";
+            $query = "SELECT nomor_induk, id_kategori_seniman, status FROM seniman WHERE id_seniman = ? LIMIT 1";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_seniman']);
             $stmt[1]->execute();
             $nisDB = '';
             $kategori = '';
-            $stmt[1]->bind_result($nisDB, $kategori);
+            $statusDB = '';
+            $stmt[1]->bind_result($nisDB, $kategori, $statusDB);
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
                 throw new Exception('Data seniman tidak ditemukan');
             }
             $stmt[1]->close();
-            $currentHour = date('G'); //format 0-23
-            $seniman = new SenimanMobile();
-            $kategori = $seniman->kategori(['id_kategori'=>$kategori],'getINI');
-            if($kategori == 'DLG'){
-                if ($currentHour >= 21) {
-                    throw new Exception('Permintaan anda tidak boleh lebih dari jam 9 malam');
-                }
-            }else{
-                if ($currentHour >= 17) {
-                    throw new Exception('Permintaan anda tidak boleh lebih dari jam 5 sore');
-                }
+            if($statusDB == 'diajukan'){
+                throw new Exception('Data seniman sedang diajukan');
+            }else if($statusDB == 'proses'){
+                throw new Exception('Data seniman sedang diproses');
+            }else if($statusDB == 'ditolak'){
+                throw new Exception('Data seniman ditolak mohon cek kembali');
             }
+            //check time
+            // $currentHour = date('G'); //format 0-23
+            // $kategori = $this->kategori(['id_kategori'=>$kategori],'getINI');
+            // if($kategori == 'DLG'){
+            //     if ($currentHour >= 21) {
+            //         throw new Exception('Permintaan anda tidak boleh lebih dari jam 9 malam');
+            //     }
+            // }else{
+            //     if ($currentHour >= 17) {
+            //         throw new Exception('Permintaan anda tidak boleh lebih dari jam 5 sore');
+            //     }
+            // }
             //get last id advis
             $query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '".$_SERVER['DB_DATABASE']."' AND TABLE_NAME = 'surat_advis' ";
             $stmt[1] = self::$con->prepare($query);
@@ -228,7 +294,6 @@ class AdvisMobile{
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Pentas gagal ditambahkan','code'=>500]));
             }
         }catch(Exception $e){
-            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -308,13 +373,28 @@ class AdvisMobile{
             if($role != 'masyarakat'){
                 throw new Exception('invalid role');
             }
+            //check seniman
+            $query = "SELECT nomor_induk, id_kategori_seniman FROM seniman WHERE id_seniman = ? AND status = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $status = 'diterima';
+            $stmt[1]->bind_param('ss', $data['id_seniman'],$status);
+            $stmt[1]->execute();
+            $nisDB = '';
+            $kategori = '';
+            $stmt[1]->bind_result($nisDB, $kategori);
+            if(!$stmt[1]->fetch()){
+                $stmt[1]->close();
+                throw new Exception('Data seniman tidak ditemukan');
+            }
+            $stmt[1]->close();
             //check id advis
-            $query = "SELECT status FROM surat_advis WHERE BINARY id_advis = ? LIMIT 1";
+            $query = "SELECT status, surat_keterangan FROM surat_advis WHERE BINARY id_advis = ? LIMIT 1";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_advis']);
             $stmt[1]->execute();
             $statusDB = '';
-            $stmt[1]->bind_result($statusDB);
+            $suratDB = '';
+            $stmt[1]->bind_result($statusDB, $suratDB);
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
                 throw new Exception('Data Pentas tidak ditemukan');
@@ -325,10 +405,29 @@ class AdvisMobile{
             }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
                 throw new Exception('Data sudah diverifikasi');
             }
+            //proses file
+            $fileSurat = $_FILES['surat_keterangan'];
+            $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
+            $size = filesize($fileSurat['size']);
+            if ($extension === 'pdf') {
+                if ($size >= self::$sizeFile) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                }
+            } else {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus pdf','code'=>500]));
+            }
+            //replace file
+            $nameFile = '/'.$data['id_advis'].'.'.$extension;
+            $fileSuratPath = self::$folderPath.$nameFile;
+            $fileSuratDB = $nameFile;
+            unlink(self::$folderPath.$suratDB);
+            if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+            }
             //update data
-            $query = "UPDATE surat_advis SET nama_advis = ?, alamat_advis = ?, deskripsi_advis = ?, tgl_advis = ?, tempat_advis = ? WHERE id_advis = ?";
+            $query = "UPDATE surat_advis SET nama_advis = ?, alamat_advis = ?, deskripsi_advis = ?, tgl_advis = ?, tempat_advis = ?, surat_keterangan = ? WHERE id_advis = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param("sssssi", $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalDB, $data['tempat_pentas'], $data['id_advis']);
+            $stmt[2]->bind_param("ssssssi", $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalDB, $data['tempat_pentas'], $fileSuratDB, $data['id_advis']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -461,6 +560,9 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $pentasMobile = new AdvisMobile();
     $data = AdvisMobile::handle();
+    if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan']) && $data['keterangan'] == 'get'){
+        $pentasMobile->getPentas($data);
+    }
     if(isset($data['_method'])){
         if($data['_method'] == 'PUT'){
             $pentasMobile->editPentas($data);

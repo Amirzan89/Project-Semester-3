@@ -384,21 +384,25 @@ class SenimanWebsite{
     public function prosesSeniman($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
+                http_response_code(400);
                 echo "<script>alert('ID User harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
+                http_response_code(400);
                 echo "<script>alert('ID Seniman harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             if(!isset($data['keterangan']) || empty($data['keterangan'])){
+                http_response_code(400);
                 echo "<script>alert('Keterangan harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }else{
                 if($data['keterangan'] == 'diajukan'){
+                    http_response_code(400);
                     echo "<script>alert('Keterangan invalid !')</script>";
                     echo "<script>window.history.back();</script>";
                     exit();
@@ -419,10 +423,14 @@ class SenimanWebsite{
             }
             $stmt[0]->close();
             if(($role != 'admin seniman' && $role != 'super admin') || $role == 'masyarakat'){
+                http_response_code(400);
                 echo "<script>alert('Invalid role !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
+            // http_response_code(400);
+            // echo json_encode($data);
+            // exit();
             //check id seniman
             $query = "SELECT status, kategori FROM seniman WHERE id_seniman = ?";
             $stmt[1] = self::$con->prepare($query);
@@ -433,11 +441,17 @@ class SenimanWebsite{
             $stmt[1]->bind_result($statusDB, $kategori);
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
+                http_response_code(400);
+                echo 'errororrr data ilang';
+                exit();
                 echo "<script>alert('Data Seniman tidak ditemukan')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             $stmt[1]->close();
+            http_response_code(400);
+            echo 'status '.$data['keterangan'];
+            exit();
             //check status
             if($data['keterangan'] ==  'proses' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
                 echo "<script>alert('Data sudah diverifikasi')</script>";

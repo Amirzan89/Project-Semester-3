@@ -169,6 +169,7 @@ $csrf = $GLOBALS['csrf'];
           if (xhr.status === 200) {
             window.location.href = "/seniman/detail_seniman.php?id_seniman="+Id;
           } else {
+            console.log(xhr.responseText);
             try {
                 eval(xhr.responseText);
             } catch (error) {
