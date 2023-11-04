@@ -25,7 +25,125 @@ class TempatMobile{
             }
         }
     }
-    public function sewaTempat($data){
+    public function getSewa($data){
+        try{
+            if(!isset($data['email']) || empty($data['email'])){
+                throw new Exception('Email harus di isi !');
+            }
+            if(!isset($data['id_sewa']) || empty($data['id_sewa'])){
+                throw new Exception('ID sewa tempat harus di isi !');
+            }
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['email']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+                throw new Exception('Harus masyarakat');
+            }
+            //check id_sewa
+            $query = "SELECT id_sewa, nik_sewa, nama_peminjam, nama_tempat, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, tgl_awal_peminjaman, tgl_akhir_peminjaman, id_tempat, id_user FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_sewa']);
+            $stmt[1]->execute();
+            if ($stmt[1]->execute()) {
+                $result = $stmt[1]->get_result();
+                $sewaTempatData = $result->fetch_assoc();
+                $stmt[1]->close();
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'success', 'message' => 'Data Sewa tempat berhasil didapatkan', 'data' => $sewaTempatData]);
+                exit();
+            }else{
+                $stmt[1]->close();
+                throw new Exception('Data sewa tempat tidak ditemukan');
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
+    }
+    public function getTempat($data){
+        try{
+            if(!isset($data['email']) || empty($data['email'])){
+                throw new Exception('Email harus di isi !');
+            }
+            if(!isset($data['id_tempat']) || empty($data['id_tempat'])){
+                throw new Exception('ID sewa tempat harus di isi !');
+            }
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['email']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+                throw new Exception('Harus masyarakat');
+            }
+            //check id_tempat
+            $query = "SELECT id_tempat, nama_tempat, alamat_tempat, deskripsi_tempat, pengelola, contact_person FROM list_tempat WHERE id_tempat = ? LIMIT 1";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_tempat']);
+            $stmt[1]->execute();
+            if ($stmt[1]->execute()) {
+                $result = $stmt[1]->get_result();
+                $sewaTempatData = $result->fetch_assoc();
+                $stmt[1]->close();
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'success', 'message' => 'Data Sewa tempat berhasil didapatkan', 'data' => $sewaTempatData]);
+                exit();
+            }else{
+                $stmt[1]->close();
+                throw new Exception('Data sewa tempat tidak ditemukan');
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
+    }
+    public function buatSewaTempat($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('ID User harus di isi !');
@@ -152,12 +270,12 @@ class TempatMobile{
             $fileSurat = $_FILES['surat_keterangan'];
             $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
             $size = filesize($fileSurat['name']);
-            if (in_array($extension,['jpg','jpeg','png','pdf','docx'])) {
+            if (in_array($extension,['pdf'])) {
                 if ($size >= self::$sizeFile) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
             } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
             }
             //simpan file
             $nameFile = '/'.$idSewa.'.'.$extension;
@@ -302,7 +420,7 @@ class TempatMobile{
                 throw new Exception('invalid role');
             }
             //check id tempat
-            $query = "SELECT id_tempat FROM list_tempat WHERE id_tempat = ? LIMIT 1";
+            $query = "SELECT id_tempat, surat_ket_sewa FROM list_tempat WHERE id_tempat = ? LIMIT 1";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_tempat']);
             $stmt[1]->execute();
@@ -312,12 +430,13 @@ class TempatMobile{
             }
             $stmt[1]->close();
             //check id sewa
-            $query = "SELECT status FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
+            $query = "SELECT status,  FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
             $stmt[2] = self::$con->prepare($query);
             $stmt[2]->bind_param('s', $data['id_sewa']);
             $stmt[2]->execute();
             $statusDB = '';
-            $stmt[2]->bind_result($statusDB);
+            $suratDB = '';
+            $stmt[2]->bind_result($statusDB, $suratDB);
             if(!$stmt[2]->fetch()){
                 $stmt[2]->close();
                 throw new Exception('Data tempat tidak ditemukan');
@@ -336,17 +455,18 @@ class TempatMobile{
             $fileSurat = $_FILES['surat_keterangan'];
             $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
             $size = filesize($fileSurat['tmp_name']);
-            if (in_array($extension,['jpg','jpeg','png','pdf','docx'])) {
+            if (in_array($extension,['pdf'])) {
                 if ($size >= self::$sizeFile) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
             } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
             }
-            //simpan file
+            //replace file
             $nameFile = '/'.$data['id_sewa'].'.'.$extension;
             $fileSuratPath = self::$folderPath.$folderSurat.$fileTime.$nameFile;
             $fileSuratDB = $folderSurat.$fileTime.$nameFile;
+            unlink(self::$folderPath.$folderSurat.$suratDB);
             if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
@@ -490,6 +610,13 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $tempatMobile = new TempatMobile();
     $data = TempatMobile::handle();
+    if(isset($data['keterangan']) && !empty($data['kategori']) && !is_null($data['kategori'])){
+        if($data['keterangan'] == 'get sewa'){
+            $tempatMobile->getSewa($data);
+        }else if($data['keterangan'] == 'get tempat'){
+            $tempatMobile->getTempat($data);
+        }
+    }
     if(isset($data['_method'])){
         if($data['_method'] == 'PUT'){
             $tempatMobile->editSewaTempat($data);
@@ -498,7 +625,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $tempatMobile->hapusSewaTempat($data);
         }
     }else{
-        $tempatMobile->sewaTempat($data);
+        $tempatMobile->buatSewaTempat($data);
     }
 }
 if($_SERVER['REQUEST_METHOD'] == 'PUT'){

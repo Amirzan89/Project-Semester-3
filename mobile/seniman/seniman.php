@@ -499,7 +499,7 @@ class SenimanMobile{
             $fileSurat = $_FILES['surat_keterangan'];
             $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
             $size = filesize($fileSurat['tmp_name']);
-            if ($extension === 'pdf' || $extension === 'docx') {
+            if ($extension === 'pdf') {
                 if ($size >= self::$sizeFile) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
@@ -873,7 +873,7 @@ class SenimanMobile{
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
             } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format foto ktp harus png, jpeg, jpg','code'=>500]));
             }
             //replace file
             $nameFile = '/'.$data['id_seniman'].'.'.$extension;  
@@ -893,7 +893,7 @@ class SenimanMobile{
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
             } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format pass foto harus png, jpeg, jpg','code'=>500]));
             }
             //replace file
             $nameFile = '/'.$data['id_seniman'].'.'.$extension;
@@ -909,12 +909,12 @@ class SenimanMobile{
             $fileSurat = $_FILES['surat_keterangan'];
             $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
             $size = filesize($fileSurat['name']);
-            if ($extension === 'pdf' || $extension === 'docx') {
+            if ($extension === 'pdf') {
                 if ($size >= self::$sizeFile) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
                 }
             } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'file aneh','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
             }
             //replace file
             $nameFile = '/'.$data['id_seniman'].'.'.$extension;
@@ -1001,7 +1001,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $SenimanMobile = new SenimanMobile();
     $data = SenimanMobile::handle();
     if(isset($data['keterangan']) && !empty($data['kategori']) && !is_null($data['kategori']) && $data['keterangan'] == 'get'){
-        $senimanMobile->getData($data);
+        $senimanMobile->getSeniman($data);
     }
     if(isset($_POST['_method'])){
         if($_POST['_method'] == 'PUT'){

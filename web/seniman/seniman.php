@@ -132,11 +132,11 @@ class SenimanWebsite{
             $stmt[1]->execute();
             if ($stmt[1]->affected_rows > 0) {
                 $stmt[1]->close();
-                echo json_encode(['status'=>'success','message'=>'Data kategori seniman berhasil ditambahkan']);
+                echo json_encode(['status'=>'success','message'=>'Data Kategori Seniman berhasil ditambahkan']);
                 exit();
             } else {
                 $stmt[1]->close();
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data kategori seniman gagal ditambahkan','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Kategori Seniman gagal ditambahkan','code'=>500]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -193,19 +193,20 @@ class SenimanWebsite{
             if($role != 'super admin' && $role != 'admin seniman'){
                 throw new Exception('Anda bukan admin');
             }
-            $query = "UPDATE seniman SET nama_kategori = ?, singkatan = ? WHERE id_kategori_seniman = ?";
+            $query = "UPDATE kategori_seniman SET nama_kategori = ?, singkatan = ? WHERE id_kategori_seniman = ?";
             $stmt[1] = self::$con->prepare($query);
-            $stmt[1]->bind_param("sss", $data['nama_kategori'],$data['id_seniman']);
+            $stmt[1]->bind_param("sss", $data['nama_kategori'], $data['singkatan'], $data['id_kategori']);
             $stmt[1]->execute();
             if ($stmt[1]->affected_rows > 0) {
                 $stmt[1]->close();
-                echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil dubah']);
+                echo json_encode(['status'=>'success','message'=>'Data Kategori Seniman berhasil dubah']);
                 exit();
             } else {
                 $stmt[1]->close();
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal diubah','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Kategori Seniman gagal diubah','code'=>500]));
             }
         }catch(Exception $e){
+            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -255,11 +256,11 @@ class SenimanWebsite{
             if ($stmt[2]->execute()) {
                 $stmt[2]->close();
                 header('Content-Type: application/json');
-                echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil dihapus']);
+                echo json_encode(['status'=>'success','message'=>'Data Kategori Seniman berhasil dihapus']);
                 exit();
             } else {
                 $stmt[2]->close();
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal dihapus','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Kategori Seniman gagal dihapus','code'=>500]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -743,12 +744,11 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $senimanWeb = new SenimanWebsite();
     $data = SenimanWebsite::handle();
-    if(isset($data['desc']) && $data['desc'] == 'kategori' && !empty($data['desc']) && !is_null($data['desc'])){
-        $senimanWeb->tambahKategori($data);
-    }
     if(isset($data['_method'])){
         if($data['_method'] == 'PUT'){
-            if(isset($data['desc']) && $data['desc'] == 'kategori' && !empty($data['kategori']) && !is_null($data['kategori'])){
+            // echo json_encode($data);
+            // exit();
+            if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc']) && $data['desc'] == 'ubah kategori'){
                 $senimanWeb->ubahKategori($data);
             }
             if(isset($data['keterangan'])){
@@ -756,5 +756,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
     }
+
+    // if(isset($data['desc']) && $data['desc'] == 'tambah kategori' && !empty($data['desc']) && !is_null($data['desc'])){
+    //     $senimanWeb->tambahKategori($data);
+    // }
 }
 ?>
