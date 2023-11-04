@@ -250,6 +250,7 @@ class Jwt{
                         foreach($times as $n){
                             $Rexp *= $n;
                         }
+                        $Rexp = time()+$Rexp;
                         //get id_user
                         $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
                         $stmt[0] = $con->prepare($query);

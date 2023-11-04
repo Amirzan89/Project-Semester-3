@@ -94,8 +94,192 @@ class SenimanWebsite{
             exit();
         }
     }
-    public function updateKategori(){
-        //
+    private function tambahKategori($data){
+        try{
+            if(!isset($data['id_user']) || empty($data['id_user'])){
+                throw new Exception('ID User harus di isi !');
+            }
+            if(!isset($data['nama_kategori']) || empty($data['nama_kategori'])){
+                throw new Exception('Kategori seniman harus di isi !');
+            }
+            if (strlen($data['nama_kategori']) > 50) {
+                throw new Exception('Nama event maksimal 50 huruf');
+            }
+            if(!isset($data['singkatan']) || empty($data['singkatan'])){
+                throw new Exception('Singkatan kategori harus di isi !');
+            }
+            if (strlen($data['no_telpon']) > 10) {
+                throw new Exception('Nama event maksimal 10 huruf');
+            }
+            //check id_user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if($role != 'super admin' || $role != 'admin seniman'){
+                throw new Exception('Anda bukan admin');
+            }
+            $query = "INSERT INTO kategori_seniman (nama_kategori, singkatan) VALUES ()";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param("ss",$data['nama_kategori'], $data['singkatan']);
+            $stmt[1]->execute();
+            if ($stmt[1]->affected_rows > 0) {
+                $stmt[1]->close();
+                echo json_encode(['status'=>'success','message'=>'Data kategori seniman berhasil ditambahkan']);
+                exit();
+            } else {
+                $stmt[1]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data kategori seniman gagal ditambahkan','code'=>500]));
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
+    }
+    private function ubahKategori($data){
+        try{
+            if(!isset($data['id_user']) || empty($data['id_user'])){
+                throw new Exception('ID User harus di isi !');
+            }
+            if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
+                throw new Exception('Kategori seniman harus di isi !');
+            }
+            if(!isset($data['nama_kategori']) || empty($data['nama_kategori'])){
+                throw new Exception('Kategori seniman harus di isi !');
+            }
+            if (strlen($data['nama_kategori']) > 50) {
+                throw new Exception('Nama event maksimal 50 huruf');
+            }
+            if(!isset($data['singkatan']) || empty($data['singkatan'])){
+                throw new Exception('Singkatan kategori harus di isi !');
+            }
+            if (strlen($data['no_telpon']) > 10) {
+                throw new Exception('Nama event maksimal 10 huruf');
+            }
+            //check id_user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if($role != 'super admin' || $role != 'admin seniman'){
+                throw new Exception('Anda bukan admin');
+            }
+            $query = "UPDATE seniman SET nama_kategori = ?, singkatan = ? WHERE id_kategori_seniman = ?";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param("sss", $data['nama_kategori'],$data['id_seniman']);
+            $stmt[1]->execute();
+            if ($stmt[1]->affected_rows > 0) {
+                $stmt[1]->close();
+                echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil dubah']);
+                exit();
+            } else {
+                $stmt[1]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal diubah','code'=>500]));
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
+    }
+    private function hapusKategori($data){
+        try{
+            if(!isset($data['id_user']) || empty($data['id_user'])){
+                throw new Exception('ID User harus di isi !');
+            }
+            if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
+                throw new Exception('Kategori seniman harus di isi !');
+            }
+            //check id_user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if($role != 'super admin' || $role != 'admin seniman'){
+                throw new Exception('Anda bukan admin');
+            }
+            //delete data
+            $query = "DELETE FROM kategori_seniman WHERE id_kategori = ?";
+            $stmt[2] = self::$con->prepare($query);
+            $stmt[2]->bind_param('s', $data['id_kategori']);
+            if ($stmt[2]->execute()) {
+                $stmt[2]->close();
+                header('Content-Type: application/json');
+                echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil dihapus']);
+                exit();
+            } else {
+                $stmt[2]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal dihapus','code'=>500]));
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
     }
     // private function generateInpNIS($data){
     //     try{

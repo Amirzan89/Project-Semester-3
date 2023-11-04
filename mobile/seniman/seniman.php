@@ -36,7 +36,7 @@ class SenimanMobile{
                 //check kategori
                 $query = "SELECT id_kategori_seniman FROM kategori_seniman WHERE nama_kategori = ? LIMIT 1";
                 $stmt[0] = self::$con->prepare($query);
-                $stmt[0]->bind_param('s', $data['kategori']);
+                $stmt[0]->bind_param('s', $data['k  ategori']);
             }else if($desc == 'get'){
                 if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                     throw new Exception('Kategori harus di isi');
