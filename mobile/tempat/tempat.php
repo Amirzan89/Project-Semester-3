@@ -49,7 +49,7 @@ class TempatMobile{
                 throw new Exception('Harus masyarakat');
             }
             //check id_sewa
-            $query = "SELECT id_sewa, nik_sewa, nama_peminjam, nama_tempat, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, tgl_awal_peminjaman, tgl_akhir_peminjaman, id_tempat, id_user FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
+            $query = "SELECT id_sewa, nik_sewa, nama_peminjam, nama_tempat, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, tgl_awal_peminjaman, tgl_akhir_peminjaman, status, catatan, id_tempat, id_user FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_sewa']);
             $stmt[1]->execute();

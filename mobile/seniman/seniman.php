@@ -114,8 +114,9 @@ class SenimanMobile{
                 $stmt[1]->close();
                 throw new Exception('Data Seniman tidak ditemukan');
             }
+            $stmt[1]->close();
             //get data
-            $query = "SELECT id_seniman, nik, nomor_induk, nama_seniman, jenis_kelamin, kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota FROM seniman WHERE id_seniman = ?";
+            $query = "SELECT id_seniman, nik, nomor_induk, nama_seniman, jenis_kelamin, kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota, status, catatan FROM seniman WHERE id_seniman = ?";
             $stmt[2] = self::$con->prepare($query);
             $stmt[2]->bind_param('s', $data['id_seniman']);
             if ($stmt[2]->execute()) {
@@ -985,22 +986,22 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
     echo 'ilang';
 }
 if($_SERVER['REQUEST_METHOD'] == 'PUT'){
-    $SenimanMobile = new SenimanMobile();
+    $senimanMobile = new SenimanMobile();
     $data = SenimanMobile::handle();
     if($data['keterangan'] == 'perpanjang'){
         $senimanMobile->editPerpanjangan($data);
     }else{
-        $SenimanMobile->editSeniman(SenimanMobile::handle());
+        $senimanMobile->editSeniman(SenimanMobile::handle());
     }
 }
 if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-    $SenimanMobile = new SenimanMobile();
-    $SenimanMobile->hapusSeniman(SenimanMobile::handle());
+    $senimanMobile = new SenimanMobile();
+    $senimanMobile->hapusSeniman(SenimanMobile::handle());
 }
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $SenimanMobile = new SenimanMobile();
+    $senimanMobile = new SenimanMobile();
     $data = SenimanMobile::handle();
-    if(isset($data['keterangan']) && !empty($data['kategori']) && !is_null($data['kategori']) && $data['keterangan'] == 'get'){
+    if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan']) && $data['keterangan'] == 'get'){
         $senimanMobile->getSeniman($data);
     }
     if(isset($_POST['_method'])){
@@ -1008,16 +1009,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             if(isset($data['keterangan']) && !empty($data['kategori']) && !is_null($data['kategori']) && $data['keterangan'] == 'perpanjang'){
                 $senimanMobile->editPerpanjangan($data);
             }else{
-                $SenimanMobile->editSeniman($data);
+                $senimanMobile->editSeniman($data);
             }
         }else if($_POST['_method'] == 'DELETE'){
-            $SenimanMobile->hapusSeniman($data);
+            $senimanMobile->hapusSeniman($data);
         }
     }else{
         if(isset($data['keterangan']) && !empty($data['kategori']) && !is_null($data['kategori']) && $data['keterangan'] == 'perpanjang'){
             $senimanMobile->buatPerpanjangan($data);
         }else{
-            $SenimanMobile->regisrasiSeniman($data);
+            $senimanMobile->regisrasiSeniman($data);
         }
     }
 }

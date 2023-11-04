@@ -10,16 +10,186 @@ class EventMobile{
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/../../public/img/event';
     }
-    private static function isExistUser($data){
-        $idUser = $data['id_user'];
-        $query = "SELECT email FROM users WHERE BINARY id_user = ? LIMIT 1";
-        $stmt = self::$con->prepare($query);
-        $stmt->bind_param('s', $idUser);
-        $stmt->execute();
-        return $stmt->fetch();
+    public function getFullEvent($data){
+        try{
+            if(!isset($data['email']) || empty($data['email'])){
+                throw new Exception('Email harus di isi !');
+            }
+            if(!isset($data['id_event']) || empty($data['id_event'])){
+                throw new Exception('ID event harus di isi !');
+            }
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['email']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+                throw new Exception('Harus masyarakat');
+            }
+            //check id_event and get data
+            $query = "SELECT * FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail
+            WHERE events.id_event = ?";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_event']);
+            if (!$stmt[1]->execute()) {
+                $stmt[1]->close();
+                throw new Exception('Data event tidak ditemukan');
+            }
+            $result = $stmt[1]->get_result();
+            $eventsData = $result->fetch_assoc();
+            $stmt[1]->close();
+            if ($eventsData === null) {
+                throw new Exception('Data event tidak ditemukan');
+            }
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'message' => 'Data event berhasil didapatkan', 'data' => $eventsData]);
+            exit();
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
     }
-    public static function getEvent($data){
-        //
+    public function getEvent($data){
+        try{
+            if(!isset($data['email']) || empty($data['email'])){
+                throw new Exception('Email harus di isi !');
+            }
+            if(!isset($data['id_event']) || empty($data['id_event'])){
+                throw new Exception('ID event harus di isi !');
+            }
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['email']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+                throw new Exception('Harus masyarakat');
+            }
+            //check id_event and get data
+            $query = "SELECT * FROM events WHERE id_event = ?";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_event']);
+            if (!$stmt[1]->execute()) {
+                $stmt[1]->close();
+                throw new Exception('Data event tidak ditemukan');
+            }
+            $result = $stmt[1]->get_result();
+            $eventsData = $result->fetch_assoc();
+            $stmt[1]->close();
+            if ($eventsData === null) {
+                throw new Exception('Data event tidak ditemukan');
+            }
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'message' => 'Data event berhasil didapatkan', 'data' => $eventsData]);
+            exit();
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
+    }
+    public function getDetailEvent($data){
+        try{
+            if(!isset($data['email']) || empty($data['email'])){
+                throw new Exception('Email harus di isi !');
+            }
+            if(!isset($data['id_event']) || empty($data['id_event'])){
+                throw new Exception('ID event harus di isi !');
+            }
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['email']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+                throw new Exception('Harus masyarakat');
+            }
+            //check id_event and get data
+            $query = "SELECT events.id_detail, nama_event, deskripsi, kategori, tempat_event, tanggal_awal, tanggal_akhir, link_pendaftaran FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = ?";
+            $stmt[1] = self::$con->prepare($query);
+            $stmt[1]->bind_param('s', $data['id_event']);
+            if (!$stmt[1]->execute()) {
+                $stmt[1]->close();
+                throw new Exception('Data event tidak ditemukan');
+            }
+            $result = $stmt[1]->get_result();
+            $eventsData = $result->fetch_assoc();
+            $stmt[1]->close();
+            if ($eventsData === null) {
+                throw new Exception('Data event tidak ditemukan');
+            }
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'message' => 'Data event berhasil didapatkan', 'data' => $eventsData]);
+            exit();
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
     }
     //untuk masyarakat
     public function tambahEventMasyarakat($data){
@@ -456,6 +626,16 @@ class EventMobile{
 }
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $EventMobile = new EventMobile();
+    $data = EventMobile::handle();
+    if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan'])){
+        if($data['keterangan'] == 'get full event'){
+            $EventMobile->getFullEvent($data);
+        }else if($data['keterangan'] == 'get event'){
+            $EventMobile->getEvent($data);
+        }else if($data['keterangan'] == 'get detail'){
+            $EventMobile->getDetailEvent($data);
+        }
+    } 
     $EventMobile->tambahEventMasyarakat(EventMobile::handle());
 }
 if($_SERVER['REQUEST_METHOD'] == 'PUT'){
