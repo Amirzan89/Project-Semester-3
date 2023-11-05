@@ -31,7 +31,8 @@ $csrf = $GLOBALS['csrf'];
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="/public/assets/img/favicon.png" rel="icon">
+  <link href="/public/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -48,7 +49,25 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- Template Main CSS File -->
   <link href="/public/assets/css/nomor-induk.css" rel="stylesheet">
+  <style>
+    .ui-datepicker-calendar {
+      display: none;
+    }
+    
+    .srcDate {
+      float: right;
+      padding: 10px;
+    }
 
+    .inp {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+    }
+
+  </style>
 </head>
 
 <body>
@@ -78,12 +97,12 @@ $csrf = $GLOBALS['csrf'];
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Riwayat Pengajuan event</h1>
+      <h1>Riwayat Pengajuan</h1>
       <nav>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="/event.php">Kelola event</a></li>
-            <li class="breadcrumb-item active">Riwayat Pengajuan event</li>
+            <li class="breadcrumb-item"><a href="/event.php">Kelola Event</a></li>
+            <li class="breadcrumb-item active">Riwayat Pengajuan</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -94,7 +113,31 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h5 class="card-title"></h5>
-
+              <div class="srcDate">
+                  <div class="col-lg-12">
+                    <div class="row">
+                      <div class="col-lg-3">
+                        <input type="text" name="" id="" placeholder="Tahun" class="inp">
+                      </div>
+                      <div class="col-lg-5">
+                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
+                          <option value="01">Januari</option>
+                          <option value="02">Februari</option>
+                          <option value="03">Maret</option>
+                          <option value="04">April</option>
+                          <option value="05">Mei</option>
+                          <option value="06">Juni</option>
+                          <option value="07">Juli</option>
+                          <option value="08">Agustus</option>
+                          <option value="09">September</option>
+                          <option value="10">Oktober</option>
+                          <option value="11">November</option>
+                          <option value="12">Desember</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+              </div>
               <table class="table datatable">
                 <thead>
                   <tr>
@@ -120,52 +163,18 @@ $csrf = $GLOBALS['csrf'];
                       <td><?php echo $event['tanggal_awal']?></td>
                       <td>
                         <?php if($event['status'] == 'diterima'){ ?>
-                          <span class="badge bg-success"><i class="bi bi-check-circle"></i>  Disetujui</span>
+                          <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i>  Disetujui</span>
                         <?php }else if($event['status'] == 'ditolak'){ ?>
-                          <span class="badge bg-danger"><i class="bi bi-x-circle"></i>   Ditolak </span>
+                          <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i>   Ditolak </span>
                         <?php } ?>
                       </td>
                       <td><?php echo $event['catatan']?></td>
                       <td>
-                        <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                        <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                       </td>
                     </tr>
                   <?php $no++;
                   } ?>
-
-                  <!-- <tr>
-                    <th scope="row">1</th>
-                    <td>3576447103910003</td>
-                    <td>Puji Utami</td>
-                    <td>1 Oktober 2023</td>
-                    <td><span class="badge bg-success"><i class="bi bi-check-circle"></i>  Disetujui</span></td>
-                    <td></td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
-                      </button>
-                    </td>
-                  </tr> -->
-                  <!-- <tr>
-                    <th scope="row">1</th>
-                    <td>3576447103910003</td>
-                    <td>Puji Utami</td>
-                    <td>1 Oktober 2023</td>
-                    <td><span class="badge bg-success"><i class="bi bi-check-circle"></i>  Disetujui</span></td>
-                    <td></td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
-                      </button>
-                    </td>
-                  </tr> -->
-                  <!-- <tr>
-                    <th scope="row">2</th>
-                    <td>3576441606910003</td>
-                    <td>Muhammad Lutfi Hakim</td>
-                    <td>31 Agustus 2023</td>
-                    <td><span class="badge bg-danger"><i class="bi bi-x-circle"></i>   Ditolak </span></td>
-                    <td>Data kurang lengkap</td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
-                      </button>
-                    </td>
-                  </tr> -->
                 </tbody>
               </table>
 

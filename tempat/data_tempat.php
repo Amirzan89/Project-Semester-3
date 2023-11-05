@@ -115,7 +115,8 @@ $csrf = $GLOBALS['csrf'];
                                         <td><?php echo $tempat['nama_tempat'] ?></td>
                                         <td><?php echo $tempat['alamat_tempat'] ?></td>
                                         <td>
-                                          <a href="/tempat/detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                                          <a href="/tempat/detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill">Lihat</i></a>
+                                          <a href="/tempat/edit_detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
                                           <button type="button" class="btn btn-danger" onclick="openDelete(<?php echo $tempat['id_tempat']?>)"> <i class="bi bi-trash-fill">Hapus</i></button>
                                         </td>
                                       </tr>

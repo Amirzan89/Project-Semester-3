@@ -44,7 +44,7 @@ $csrf = $GLOBALS['csrf'];
 
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/admin.css" rel="stylesheet">
+  <link href="/public/assets/css/event.css" rel="stylesheet">
 
 </head>
 

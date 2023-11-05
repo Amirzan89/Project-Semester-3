@@ -30,7 +30,8 @@ $csrf = $GLOBALS['csrf'];
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="/public/assets/img/landing-page/favicon.png" rel="icon">
+    <link href="/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -45,7 +46,25 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- Template Main CSS File -->
   <link href="/public/assets/css/event.css" rel="stylesheet">
+  <style>
+    .ui-datepicker-calendar {
+      display: none;
+    }
+    
+    .srcDate {
+      float: right;
+      padding: 10px;
+    }
 
+    .inp {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+    }
+
+  </style>
 </head>
 
 <body>
@@ -76,12 +95,12 @@ $csrf = $GLOBALS['csrf'];
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Pengajuan Event</h1>
+      <h1>Verifikasi Pengajuan</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/event.php">Kelola event</a></li>
-          <li class="breadcrumb-item active">Pengajuan event</li>
+          <li class="breadcrumb-item"><a href="/event.php">Kelola Event</a></li>
+          <li class="breadcrumb-item active">Verifikasi Pengajuan</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -93,18 +112,44 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h5 class="card-title"></h5>
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">Nama Pengirim</th>
-                    <th scope="col">Nama Event</th>
-                    <th scope="col">Tanggal Pengajuan</th>
-                    <th scope="col">Aksi</th>
+              <div class="srcDate">
+                  <div class="col-lg-12">
+                    <div class="row">
+                      <div class="col-lg-3">
+                        <input type="text" name="" id="" placeholder="Tahun" class="inp">
+                      </div>
+                      <div class="col-lg-5">
+                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
+                          <option value="01">Januari</option>
+                          <option value="02">Februari</option>
+                          <option value="03">Maret</option>
+                          <option value="04">April</option>
+                          <option value="05">Mei</option>
+                          <option value="06">Juni</option>
+                          <option value="07">Juli</option>
+                          <option value="08">Agustus</option>
+                          <option value="09">September</option>
+                          <option value="10">Oktober</option>
+                          <option value="11">November</option>
+                          <option value="12">Desember</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <table class="table datatable">
+              <thead>
+              <tr>
+                    <th>No</th>
+                    <th>Nama Pengirim</th>
+                    <th>Nama Event</th>
+                    <th>Tanggal Pengajuan</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
                   </tr>
                   </thead>
                   <tbody>
-                    <?php
+                  <?php
                     $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, tanggal_awal, tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC");
                       $no = 1;
                       while ($event = mysqli_fetch_array($query)) {
@@ -119,20 +164,20 @@ $csrf = $GLOBALS['csrf'];
                               <span class="badge bg-proses">Diajukan</span>
                             <?php }else if($event['status'] == 'proses'){ ?>
                               <span class="badge bg-terima">Diproses</span>
+
                             <?php } ?>
                           </td>
                           <td>
-                            <?php if($event['status'] == 'diajukan'){ ?>
+                          <?php if($event['status'] == 'diajukan'){ ?>
                               <button class="btn btn-lihat" onclick="proses(<?php echo $event['id_event'] ?>)"><i class="bi bi-eye-fill">Lihat</i></button>
                             <?php }else if($event['status'] == 'proses'){ ?>
-                              <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                              <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill">Lihat</i></a>
                             <?php } ?>
                           </td>
                       </tr>
-                    <?php $no++;
-                    } ?>
-                  </tr>
-                </tbody>
+                  <?php $no++;
+                  } ?>
+               </tbody>
               </table>
             </div>
           </div>
@@ -140,7 +185,6 @@ $csrf = $GLOBALS['csrf'];
         </div>
       </div>
     </section>
-
   </main><!-- End #main -->
 
 
@@ -186,7 +230,7 @@ $csrf = $GLOBALS['csrf'];
   <script src="/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
-  <!-- Template Main JS File -->
+  <!-- Template Main JS File --> 
   <script src="/public/assets/js/main.js"></script>
 
 </body>

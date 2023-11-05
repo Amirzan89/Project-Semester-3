@@ -3,14 +3,14 @@ require_once('../web/koneksi.php');
 require_once('../web/authenticate.php');
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
-$userAuth = authenticate($_POST,[
-  'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD']
-],$conn);
-if($userAuth['status'] == 'error'){
-	header('Location: /login.php');
-}else{
-	$userAuth = $userAuth['data'];
+$userAuth = authenticate($_POST, [
+  'uri' => $_SERVER['REQUEST_URI'],
+  'method' => $_SERVER['REQUEST_METHOD']
+], $conn);
+if ($userAuth['status'] == 'error') {
+  header('Location: /login.php');
+} else {
+  $userAuth = $userAuth['data'];
   // if($userAuth['role'] != 'super admin'){
   //   echo "<script>alert('Anda bukan super admin !')</script>";
   //   echo "<script>window.location.href = '/dashboard.php';</script>";
@@ -31,30 +31,23 @@ $csrf = $GLOBALS['csrf'];
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="/public/assets/img/LandingPage/favicon.png" rel="icon">
+  <link href="/public/assets/img/LandingPage/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
-  <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <!-- Vendor CSS Files -->
   <link href="/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/style.css" rel="stylesheet">
+  <link href="/public/assets/css/tempat.css" rel="stylesheet">
 
 </head>
 
 <body>
-  <script>
-	  var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-	</script>
+
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -68,17 +61,17 @@ $csrf = $GLOBALS['csrf'];
   <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
-        <?php
-        $nav = "seniman";
-        include('../sidebar.php');
-        ?>
+      <?php
+      $nav = "pentas";
+      include('../sidebar.php');
+      ?>
     </ul>
 
   </aside><!-- End Sidebar-->
 
   <main id="main" class="main">
 
-  <div class="pagetitle">
+    <div class="pagetitle">
       <h1>Formulir Pentas</h1>
       <nav>
         <ol class="breadcrumb">
@@ -95,93 +88,107 @@ $csrf = $GLOBALS['csrf'];
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">SURAT ADVIS PENYELENGGARAAN PERTUNJUKAN KESENIAN</h5>
-                <p>
-                Lampiran VI 2 Peraturan Bupati Nganjuk Nomor : 28 Tahun 2021 Tanggal, 21 September 2021, Tentang Rincian Tugas, Fungsi dan Tata Kerja Dinas Kepemudaan, Olahraga, Kebudayaan dan Pariwisata Daerah Kabupaten Nganjuk, Maka Kepala Dinas Kepemudaan, Olahraga, Kebudayaan dan Pariwisata Kabupaten Nganjuk setelah memperhatikan permohonan dari :
-                </p>
+              <h5 class="card-title  mt-3 mb-4"><strong>
+                  SURAT ADVIS
+                  <br>
+                  <u>PENYELENGGARAAN PERTUNJUKAN KESENIAN</u>
+                </strong>
+              </h5>
 
-              <form method="POST" action="../users/proses-tambah-user.php" >
+              <form method="POST" action="../users/proses-tambah-user.php">
                 <!-- <div class="row mb-3">
                   <label class="col-sm-2 col-form-label">ID USER</label>
                   <div class="col-sm-10">
                     <input type="text" class="form-control" value="Read only / Disabled" disabled>
                   </div>
                 </div> -->
-                <div class="row mb-3">
-                  <label for="inputText" class="col-sm-2 col-form-label">Nama Pemohon</label>
-                  <div class="col-sm-10">
-                  <input type="text" class="form-control" name="nama" placeholder="Nama Pemohon">
+                <form method="POST" action="">
+                  <div class="col-md-12">
+                    <label for="nik" class="form-label">Nomor Induk Seniman</label>
+                    <input type="text" class="form-control" id="nis" placeholder="Masukkan Nomor Induk Seniman">
                   </div>
-                </div>
-                <div class="row mb-3">
-                  <label for="inputtext" class="col-sm-2 col-form-label">Alamat</label>
-                  <div class="col-sm-10">
-                    <textarea class="form-control" style="height: 100px"></textarea>
+                  <br>
+                  <div class="col-md-12">
+                    <label for="nama_seniman" class="form-label">Nama Lengkap</label>
+                    <input type="text" class="form-control" name="nama" placeholder="Masukkan Nama Lengkap">
                   </div>
-                </div>
-                <div class="row mb-3">
-                  <label for="inputText" class="col-sm-2 col-form-label">Untuk Pentas</label>
-                  <div class="col-sm-10">
-                  <input type="text" class="form-control" name="phone" placeholder="Untuk Pentas">
+                  <br>
+                  <div class="col-md-12 ">
+                    <label for="alamat_seniman" class="form-label">Alamat</label>
+                    <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat" style="height: 100px;"></textarea>
                   </div>
-                </div>
-                <div class="row mb-3">
-                  <label for="inputDate" class="col-sm-2 col-form-label">Tanggal Lahir</label>
-                  <div class="col-sm-10">
+                  <br>
+                  <div class="col-md-12">
+                    <label for="no_telpon" class="form-label">Untuk Pentas</label>
+                    <input type="text" class="form-control" name="phone" placeholder="Contoh : Pentas Tari Tradisional">
+                  </div>
+                  <br>
+                  <div class="col-md-12">
+                    <label for="tanggal" class="form-label">Tanggal </label>
                     <input type="date" class="form-control" name="tanggalL" placeholder="Tanggal">
                   </div>
-                </div>
-                <div class="row mb-3">
-                  <label for="inputText" class="col-sm-2 col-form-label">Bertempat di</label>
-                  <div class="col-sm-10">
+                  <br>
+                  <div class="col-md-12">
+                    <label for="nama_organisasi" class="form-label">Bertempat Di</label>
                     <input type="text" class="form-control" name="tempatL" placeholder="contoh : Balai Budaya">
+                  </div>
+                </form> <br><br>
+
+                <div class="col-lg-12 col-md-4">
+                  <div class="card success-card revenue-card">
+                    <div class="card-body">
+                      <h6><strong>DENGAN PENGAJUAN FORMULIR INI, ANDA MENYETUJUI HAL- HAL BERIKUT :</strong></h6>
+                      <br>
+                      <h6>
+                        <ol start="1">
+                          <li>Tidak keberatan memberikan Surat Advis untuk mendapatkan ijin keramaian dari kepolisian. </li>
+                          <li>Surat Advis ini berlaku satu kali pentas. </li>
+                          <li>Pementasan kesenian tanpa Surat Advis merupakan pelanggaran Peraturan Daerah.</li>
+                          <li>Dilarang mengadakan pementasan kesenian yang bertentangan dengan Kepribadian Bangsa Indonesia.</li>
+                          <li>Tidak melanggar Tata Tertib dan bertentangan dengan norma-norma Agama.</li>
+                          <li>Advis ini adalah bukti Legalitas dari Organisasi Seni / Seniman bukan sebagai Ijin Pentas</li>
+                        </ol>
+                      </h6>
+                    </div>
                   </div>
                 </div>
 
-              </form><!-- End General Form Elements -->
-
-              <p>
-              Menyatakan tidak keberatan memberikan Surat Advis sebagai pelengkap Surat Induk nomor ... untuk mendapatkan ijin keramaian dari kepolisian. Surat Advis ini berlaku tgl ... (Satu kali pentas). Pementasan kesenian tanpa Surat Advis merupakan pelanggaran Peraturan Daerah.
-              </p>
             </div>
           </div>
-
         </div>
       </div>
     </section>
+
 
   </main>
   <!-- End #main -->
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <div class="copyright">
-      &copy; Copyright <strong><span>Huffle Puff</span></strong>. All Rights Reserved
-    </div>
-  </footer>
+        <?php include('../footer.php');
+        ?>
+    </footer>
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-        class="bi bi-arrow-up-short"></i></a>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-    <!-- Vendor JS Files -->
-    <script src="/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
-    <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Vendor JS Files -->
+  <script src="/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Template Main JS File -->
-    <script src="/public/assets/js/main.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        var currentPageURL = window.location.href;
-        var menuLinks = document.querySelectorAll('.nav-link');
-        menuLinks.forEach(function (menuLink) {
-          var menuLinkURL = menuLink.getAttribute('href');
-          if (currentPageURL === menuLinkURL) {
-            menuLink.parentElement.classList.add('active');
-          }
-        });
+  <!-- Template Main JS File -->
+  <script src="/public/assets/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var currentPageURL = window.location.href;
+      var menuLinks = document.querySelectorAll('.nav-link');
+      menuLinks.forEach(function(menuLink) {
+        var menuLinkURL = menuLink.getAttribute('href');
+        if (currentPageURL === menuLinkURL) {
+          menuLink.parentElement.classList.add('active');
+        }
       });
-
-    </script>
+    });
+  </script>
 </body>
 
 </html>

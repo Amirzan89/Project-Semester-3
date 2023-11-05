@@ -11,7 +11,7 @@ if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
 }else{
 	$userAuth = $userAuth['data'];
-  // if($userAuth['role'] != 'super admin' || $userAuth['role'] != 'admin seniman'){
+  // if($userAuth['role'] != 'super admin'){
   //   echo "<script>alert('Anda bukan super admin !')</script>";
   //   echo "<script>window.location.href = '/dashboard.php';</script>";
   //   exit();
@@ -30,7 +30,8 @@ $csrf = $GLOBALS['csrf'];
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="/public/assets/img/favicon.png" rel="icon">
+  <link href="/public/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -42,8 +43,26 @@ $csrf = $GLOBALS['csrf'];
 
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/nomor-induk.css" rel="stylesheet">
+  <link href="/public/assets/css/tempat.css" rel="stylesheet">
+  <style>
+    .ui-datepicker-calendar {
+      display: none;
+    }
+    
+    .srcDate {
+      float: right;
+      padding: 10px;
+    }
 
+    .inp {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+    }
+
+  </style>
 </head>
 
 <body>
@@ -91,12 +110,37 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h5 class="card-title"></h5>
+              <div class="srcDate">
+                  <div class="col-lg-12">
+                    <div class="row">
+                      <div class="col-lg-3">
+                        <input type="text" name="" id="" placeholder="Tahun" class="inp">
+                      </div>
+                      <div class="col-lg-5">
+                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
+                          <option value="01">Januari</option>
+                          <option value="02">Februari</option>
+                          <option value="03">Maret</option>
+                          <option value="04">April</option>
+                          <option value="05">Mei</option>
+                          <option value="06">Juni</option>
+                          <option value="07">Juli</option>
+                          <option value="08">Agustus</option>
+                          <option value="09">September</option>
+                          <option value="10">Oktober</option>
+                          <option value="11">November</option>
+                          <option value="12">Desember</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+              </div>
               <table class="table datatable">
               <thead>
                   <tr>
-                  <th scope="col">No</th>
+                    <th scope="col">No</th>
                     <th scope="col">Nomor Induk Seniman</th>
-                    <th scope="col">Nama Pemohon</th>
+                    <th scope="col">Nama Seniman</th>
                     <th scope="col">Tanggal awal</th>
                     <th scope="col">Tanggal akhir</th>
                     <th scope="col">Status</th>
@@ -123,23 +167,22 @@ $csrf = $GLOBALS['csrf'];
                         <?php } ?>
                       </td>
                       <td>
-                        <?php if($advis['status'] == 'diajukan'){ ?>
-                          <button class="btn btn-info" onclick="proses(<?php echo $advis['id_advis'] ?>)"><i class="bi bi-pencil-square">Lihat</i></button>
+                      <?php if($advis['status'] == 'diajukan'){ ?>
+                          <button class="btn btn-lihat" onclick="proses(<?php echo $advis['id_advis'] ?>)"><i class="bi bi-eye-fill">Lihat</i></button>
                         <?php }else if($advis['status'] == 'proses'){ ?>
-                          <a href="/pentas/detail_pentas.php?id_pentas=<?= $advis['id_advis'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                          <a href="/pentas/detail_pentas.php?id_pentas=<?= $advis['id_advis'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill">Lihat</i></a>
                         <?php } ?>
                       </td>
                     </tr>
                   <?php $no++;
                   } ?>
-               </tbody>
+                </tbody>
               </table>
             </div>
           </div>
-
         </div>
       </div>
-    </section>
+    </section> 
 
 
 

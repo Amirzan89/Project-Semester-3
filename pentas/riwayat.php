@@ -11,11 +11,11 @@ if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
 }else{
 	$userAuth = $userAuth['data'];
-  if($userAuth['role'] != 'super admin'){
-    echo "<script>alert('Anda bukan super admin !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
+  // if($userAuth['role'] != 'super admin'){
+  //   echo "<script>alert('Anda bukan super admin !')</script>";
+  //   echo "<script>window.location.href = '/dashboard.php';</script>";
+  //   exit();
+  // }
 }
 $csrf = $GLOBALS['csrf'];
 ?>
@@ -30,7 +30,8 @@ $csrf = $GLOBALS['csrf'];
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="/public/assets/img/favicon.png" rel="icon">
+  <link href="/public/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -46,18 +47,30 @@ $csrf = $GLOBALS['csrf'];
 
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/nomor-induk.css" rel="stylesheet">
+  <link href="/public/assets/css/tempat.css" rel="stylesheet">
+  <style>
+    .ui-datepicker-calendar {
+      display: none;
+    }
+    
+    .srcDate {
+      float: right;
+      padding: 10px;
+    }
 
+    .inp {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+    }
+
+  </style>
 </head>
 
 <body>
-  <script>
-	  var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-	</script>
+
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../header.php');
@@ -98,6 +111,31 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h5 class="card-title"></h5>
+              <div class="srcDate">
+                  <div class="col-lg-12">
+                    <div class="row">
+                      <div class="col-lg-3">
+                        <input type="text" name="" id="" placeholder="Tahun" class="inp">
+                      </div>
+                      <div class="col-lg-5">
+                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
+                          <option value="01">Januari</option>
+                          <option value="02">Februari</option>
+                          <option value="03">Maret</option>
+                          <option value="04">April</option>
+                          <option value="05">Mei</option>
+                          <option value="06">Juni</option>
+                          <option value="07">Juli</option>
+                          <option value="08">Agustus</option>
+                          <option value="09">September</option>
+                          <option value="10">Oktober</option>
+                          <option value="11">November</option>
+                          <option value="12">Desember</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+              </div>
               <table class="table datatable">
                 <thead>
                   <tr>
@@ -112,7 +150,7 @@ $csrf = $GLOBALS['csrf'];
                 </thead>
                 <tbody>
                   <?php
-                      $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(tgl_advis, '%d %M %Y') AS tanggal, status, catatan FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
+                      $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(tgl_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_selesai, status, catatan FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
                       $no = 1;
                       while ($pentas = mysqli_fetch_array($query)) {
                   ?>
@@ -120,43 +158,21 @@ $csrf = $GLOBALS['csrf'];
                       <td><?php echo $no?></td>
                       <td><?php echo $pentas['nomor_induk']?></td>
                       <td><?php echo $pentas['nama_advis']?></td>
-                      <td><?php echo $pentas['tanggal']?></td>
+                      <td><?php echo $pentas['tanggal_awal']?></td>
                       <td>
                         <?php if($pentas['status'] == 'diterima'){ ?>
-                          <span class="badge bg-success"><i class="bi bi-check-circle"></i>  Disetujui</span>
+                          <span class="badge bg-terima"><i class="bi bi-check-fill"></i>  Disetujui</span>
                         <?php }else if($pentas['status'] == 'ditolak'){ ?>
-                          <span class="badge bg-danger"><i class="bi bi-x-circle"></i>   Ditolak </span>
+                          <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i>   Ditolak </span>
                         <?php } ?>
                       </td>
                       <td><?php echo $pentas['catatan']?></td>
                       <td>
-                        <a href="/pentas/detail_pentas.php?id_pentas=<?= $pentas['id_advis'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                        <a href="/pentas/detail_pentas.php?id_pentas=<?= $pentas['id_advis'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                       </td>
                     </tr>
                   <?php $no++;
                   } ?>
-                  <!-- <tr>
-                    <th scope="row">1</th>
-                    <td>3576447103910003</td>
-                    <td>Puji Utami</td>
-                    <td>1 Oktober 2023</td>
-                    <td><span class="badge bg-success"><i class="bi bi-check-circle"></i>  Disetujui</span></td>
-                    <td></td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
-                      </button>
-                    </td>
-                  </tr> -->
-                  <!-- <tr>
-                    <th scope="row">2</th>
-                    <td>3576441606910003</td>
-                    <td>Muhammad Lutfi Hakim</td>
-                    <td>31 Agustus 2023</td>
-                    <td><span class="badge bg-danger"><i class="bi bi-x-circle"></i>   Ditolak </span></td>
-                    <td>Data kurang lengkap</td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye"></i> lihat
-                      </button>
-                    </td>
-                  </tr> -->
                 </tbody>
               </table>
 

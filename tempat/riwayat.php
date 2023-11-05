@@ -31,7 +31,8 @@ $csrf = $GLOBALS['csrf'];
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="/public/assets/img/landing-page/favicon.png" rel="icon">
+    <link href="/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
   <link
@@ -43,6 +44,25 @@ $csrf = $GLOBALS['csrf'];
   <link href="/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
   <!-- Template Main CSS File -->
   <link href="/public/assets/css/tempat.css" rel="stylesheet">
+  <style>
+    .ui-datepicker-calendar {
+      display: none;
+    }
+    
+    .srcDate {
+      float: right;
+      padding: 10px;
+    }
+
+    .inp {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+    }
+
+  </style>
 </head>
 
 <body>
@@ -89,7 +109,31 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h5 class="card-title"></h5>
-
+              <div class="srcDate">
+                  <div class="col-lg-12">
+                    <div class="row">
+                      <div class="col-lg-3">
+                        <input type="text" name="" id="" placeholder="Tahun" class="inp">
+                      </div>
+                      <div class="col-lg-5">
+                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
+                          <option value="01">Januari</option>
+                          <option value="02">Februari</option>
+                          <option value="03">Maret</option>
+                          <option value="04">April</option>
+                          <option value="05">Mei</option>
+                          <option value="06">Juni</option>
+                          <option value="07">Juli</option>
+                          <option value="08">Agustus</option>
+                          <option value="09">September</option>
+                          <option value="10">Oktober</option>
+                          <option value="11">November</option>
+                          <option value="12">Desember</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+              </div>
               <table class="table datatable">
                 <thead>
                   <tr>
@@ -115,35 +159,19 @@ $csrf = $GLOBALS['csrf'];
                     <td><?php echo $sewa['tgl_awal_peminjaman']; ?></td>
                     <td>
                       <?php if($sewa['status'] == 'diterima'){ ?>
-                        <button type="button" class="btn btn-success">
-                          <i class="bi bi-check-circle">Setuju</i>
-                        </button>
+                        <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i>  Disetujui</span>
                       <?php }else if($sewa['status'] == 'ditolak'){ ?>
-                      <button type="button" class="btn btn-danger">
-                        <i class="bi bi-x-circle">Tolak</i>
-                      </button>
+                        <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i>   Ditolak </span>
                       <?php } ?>
                     </td>
                     <td><?php echo $sewa['catatan']?></td>
                     <td>
-                      <a href="/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                      <a href="/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                     </td>
                   </tr>
                   <?php 
                   $no++;
                   } ?>
-                  <!-- <tr>
-                    <th scope="row">2</th>
-                    <td>Puji Utami</td>
-                    <td>Siraman Sedudo</td>
-                    <td>1 Oktober 2023</td>
-                    <td>
-                      <button type="button" class="btn btn-danger">
-                        <i class="bi bi-x-circle">Tolak</i>
-                      </button>
-                    </td>
-                    <td></td>
-                  </tr> -->
                 </tbody>
               </table>
 

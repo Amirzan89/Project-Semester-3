@@ -57,15 +57,16 @@
   # Page Title
   --------------------------------------------------------------*/
   .pagetitle {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
   }
   
   .pagetitle h1 {
     font-size: 24px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     font-weight: 600;
     color: #0c3924;
   }
+  
   
   /*--------------------------------------------------------------
   # Back to top button
@@ -252,6 +253,7 @@
     background-color: rgba(255, 255, 255, 0.6);
   }
   
+
   /* Alerts */
   .alert-heading {
     font-weight: 500;
@@ -837,25 +839,20 @@
   .dashboard .filter .dropdown-item {
     padding: 8px 15px;
   }
-  
+
+
   /* Info Cards */
-  .card-title a {
+  /* .card-title a {
     color: #0c3924; 
     font-size: 19px;
     font-weight: 500;
-    margin-left: 12px;
     text-decoration: none; 
-    transition: color 0.3s;}
+    transition: color 0.3s;} */
   
-    .card-title a:hover {
-      color: #61BB63; /* Change the color when hovering over the link */
-    }
-    .notif{
-      color: #0c3924;
-      margin-left: 12px;
-      margin-top: 10px;
-      font-size: 23px;
-    }
+/* .card-title a:hover {
+    color: #61BB63; 
+    } */
+
   .dashboard .info-card {
     padding-bottom: 10px;
   }
@@ -876,7 +873,49 @@
     flex-shrink: 0;
     flex-grow: 0;
   }
-  
+  /* Target the icon (i element) within the success-card when it is hovered */
+.card.success-card.revenue-card:hover i {
+  color: #61BB63; /* Change the color of the icon */
+}
+
+/* Target the card icon (rounded-circle) within the success-card when it is hovered */
+.card.success-card.revenue-card:hover .card-icon.rounded-circle {
+  background-color: #0c3924; /* Change the background color of the card icon */
+}
+.card.success-card.revenue-card:hover .card-title {
+  color: #0c3924;
+  transition: color 0.3s ease;
+}
+
+.card.success-card.revenue-card:hover h4 {
+  color: #0c3924;
+  /* Change the color of the number */
+}
+/* Target the card title */
+.card.success-card.revenue-card .card-title {
+  text-align: left;
+  margin-left: 8px;
+  font-size: 19px;
+}
+
+/* Target the number within the card body */
+.card.success-card.revenue-card .card-body h4 {
+  color: #0c3924;
+  font-size: 19px;
+}
+
+/* Target the card icon */
+/* .card.success-card.revenue-card i {
+  color: #0c3924;
+} */
+
+/* Target the background color of the card icon */
+.card.success-card.revenue-card .card-icon {
+  background-color: #61BB63;
+  color: #0c3924;
+}
+
+
   .dashboard .sales-card .card-icon {
     color: #4154f1;
     background: #f6f6fe;
@@ -1018,6 +1057,25 @@
   /*--------------------------------------------------------------
   # Icons list page
   --------------------------------------------------------------*/
+  .btn{
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+  }
+  .btn.btn-info {
+    background-color: #61BB63  ;
+    color: #fff; 
+    border: 2px solid #61BB63  ; 
+    border-radius: 5px;
+    text-align: center;
+  }
+  
+  .btn.btn-info:hover {
+    background-color: #4a8f4a ; 
+    border-color: #4a8f4a ;
+    color: #fff;
+  }
+
   .btn.btn-lihat {
     background-color: #FFC107 ;
     color: #fff; 
@@ -1045,6 +1103,20 @@
     border-color: #4a8f4a ;
     color: #fff;
   }
+  .btn.btn-proses {
+    background-color: #61BB63  ;
+    color: #fff; 
+    border: 2px solid #61BB63  ; 
+    border-radius: 5px;
+    text-align: center;
+  }
+  
+  .btn.btn-proses:hover {
+    background-color: #4a8f4a ; 
+    border-color: #4a8f4a ;
+    color: #fff;
+  }
+
   .btn.btn-hapus {
     background-color: #DC3545   ;
     color: #fff; 
@@ -1133,7 +1205,15 @@
       border-color: #5c636a ;
       color: #fff;
     }
-  
+    .badge.bg-proses {
+      background-color: #cf570a ;
+    color: #fff; 
+    border-radius: 5px;
+    font-size: 15px; 
+    text-align: center;
+    padding: 10px;
+    width: 110px;
+    }  
   .badge.bg-terima {
     background-color: #61BB63;
   color: #fff; 

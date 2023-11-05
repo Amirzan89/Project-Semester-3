@@ -30,7 +30,8 @@ $csrf = $GLOBALS['csrf'];
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="/public/assets/img/landing-page/favicon.png" rel="icon">
+    <link href="/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -92,41 +93,58 @@ $csrf = $GLOBALS['csrf'];
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">FORMULIR UPLOAD EVENT</h5>
+              <h5 class="card-title  mb-3 mt-3">Formulir Upload Event</h5>
 
               <form class="row g-3">
                 <div class="col-md-12">
-                  <label for="inputText" class="form-label">Nama Pengirim :</label>
+                  <label for="inputText" class="form-label">Nama Pengirim</label>
                   <input type="text" class="form-control" id="inputText">
                 </div>
                 <div class="col-md-12">
-                  <label for="inputText" class="form-label">Nama Event : </label>
+                  <label for="inputText" class="form-label">Nama Event</label>
                   <input type="text" class="form-control" id="inputText">
                 </div>
-                <div class="col-md-4">
-                    <label for="inputDate" class="form-label">Tanggal :</label>
-                    <input type="date" class="form-control" id="inputDate">
-                  </div>
-                <div class="col-md-8">
-                  <label for="inputText" class="form-label">Tempat :</label>
+                <div class="col-md-6">
+                  <label for="tanggal_awal" class="form-label">Tanggal Awal</label>
+                  <input type="date" class="form-control" id="tanggal_awal">
+                </div>
+                <div class="col-md-6">
+                  <label for="tanggal_akhir" class="form-label">Tanggal Akhir</label>
+                  <input type="date" class="form-control" id="tanggal_akhir">
+                </div>
+                <div class="col-md-12">
+                  <label for="inputText" class="form-label">Tempat</label>
                   <input type="text" class="form-control" id="inputText">
                 </div>
                 <div class="col-12">
-                  <label for="inputText" class="form-label">Deskripsi Event :</label>
+                  <label for="inputText" class="form-label">Deskripsi Event</label>
                   <textarea class="form-control" id="inputTextarea" style="height: 100px;"></textarea>
                 </div>
                 <div class="col-12">
-                  <label for="inputLink" class="form-label">Link Pendaftaran :</label>
+                  <label for="inputLink" class="form-label">Link Pendaftaran</label>
                   <input type="link" class="form-control" id="inputLink">
                 </div>
                 <div class="col-12">
-                  <label for="inputFile" class="form-label">Poster Event :</label>
+                  <label for="inputFile" class="form-label">Poster Event</label>
                   <input type="file" class="form-file-input form-control" id="inputFile">
                 </div>
-                <div class="text-center">
-                  <button type="kirim" class="btn btn-warning">Kirim</button>
-                </div>
               </form>
+              <br><br>
+              <div class="col-lg-12 col-md-4">
+                <div class="card success-card revenue-card">
+                  <div class="card-body">
+                    <h6><strong>DENGAN PENGAJUAN FORMULIR INI, ANDA MENYETUJUI HAL- HAL BERIKUT :</strong></h6>
+                    <br>
+                    <h6>
+                      <ol start="1">
+                        <li>Mengisi formulir dengan tepat dan jelas</li>
+                        <li>Jika sudah mengirimkan formulir dimohon untuk menunggu 1x24 jam untuk di verifikasi oleh admin </li>
+                        <li> Jika formulir belum diverifikasi dilarang mengirimkan formulir yang sama</li>
+                      </ol>
+                    </h6>
+                  </div>
+                </div>
+              </div>
               
               <!-- End General Form Elements -->
 

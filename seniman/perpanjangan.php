@@ -30,7 +30,8 @@ $csrf = $GLOBALS['csrf'];
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="/public/assets/img/favicon.png" rel="icon">
+  <link href="/public/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -43,7 +44,25 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- Template Main CSS File -->
   <link href="/public/assets/css/nomor-induk.css" rel="stylesheet">
+  <style>
+    .ui-datepicker-calendar {
+      display: none;
+    }
+    
+    .srcDate {
+      float: right;
+      padding: 10px;
+    }
 
+    .inp {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+    }
+
+  </style>
 </head>
 
 <body>
@@ -55,6 +74,7 @@ $csrf = $GLOBALS['csrf'];
     var number = "<?php echo $userAuth['number'] ?>";
     var role = "<?php echo $userAuth['role'] ?>";
 	</script>
+
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../header.php');
@@ -74,12 +94,12 @@ $csrf = $GLOBALS['csrf'];
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Pengajuan Nomer Induk Seniman</h1>
+      <h1>Verifikasi Pengajuan</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
           <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
-          <li class="breadcrumb-item active">Pengajuan Nomer Induk Seniman</li>
+          <li class="breadcrumb-item active">Verifikasi Pengajuan</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -91,7 +111,31 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h5 class="card-title"></h5>
-
+              <div class="srcDate">
+                  <div class="col-lg-12">
+                    <div class="row">
+                      <div class="col-lg-3">
+                        <input type="text" name="" id="" placeholder="Tahun" class="inp">
+                      </div>
+                      <div class="col-lg-5">
+                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
+                          <option value="01">Januari</option>
+                          <option value="02">Februari</option>
+                          <option value="03">Maret</option>
+                          <option value="04">April</option>
+                          <option value="05">Mei</option>
+                          <option value="06">Juni</option>
+                          <option value="07">Juli</option>
+                          <option value="08">Agustus</option>
+                          <option value="09">September</option>
+                          <option value="10">Oktober</option>
+                          <option value="11">November</option>
+                          <option value="12">Desember</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+              </div>
               <table class="table datatable">
               <thead>
                   <tr>
@@ -120,10 +164,10 @@ $csrf = $GLOBALS['csrf'];
                         <?php } ?>
                       </td>
                       <td>
-                        <?php if($seniman['status'] == 'diajukan'){ ?>
-                          <button class="btn btn-info" onclick="proses(<?php echo $seniman['id_seniman'] ?>)"><i class="bi bi-pencil-square">Lihat</i></button>
+                      <?php if($seniman['status'] == 'diajukan'){ ?>
+                          <button class="btn btn-lihat" onclick="proses(<?php echo $seniman['id_seniman'] ?>)"><i class="bi bi-eye-fill">Lihat</i></button>
                         <?php }else if($seniman['status'] == 'proses'){ ?>
-                          <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                          <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill">Lihat</i></a>
                         <?php } ?>
                       </td>
                     </tr>
@@ -144,10 +188,10 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include('footer.php');
+  <?php include('../footer.php');
     ?>
   </footer>
-
+  
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script>
     function proses(Id) {
@@ -169,6 +213,7 @@ $csrf = $GLOBALS['csrf'];
           if (xhr.status === 200) {
             window.location.href = "/seniman/detail_seniman.php?id_seniman="+Id;
           } else {
+            console.log(xhr.responseText);
             try {
                 eval(xhr.responseText);
             } catch (error) {
