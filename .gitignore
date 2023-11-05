@@ -12,6 +12,7 @@
 /pentas/preview
 /seniman/preview
 /web/.env
+kategori_seniman.json
 .env.backup
 .env.production
 .phpunit.result.cache

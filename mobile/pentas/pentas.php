@@ -5,27 +5,28 @@ class AdvisMobile{
     private static $database;
     private static $con;
     private static $folderPath;
-    private static $kategoriInp = [
-        'CAMP'=>'campursari',
-        'DLG'=>'dalang',
-        'JKP'=>'jaranan',
-        'KRW'=>'karawitan',
-        'MC'=>'mc',
-        'LDR'=>'ludruk',
-        'OKM'=>'organisasi kesenian musik',
-        'ORG'=>'organisasi',
-        'PRAM'=>'pramugari tayup',
-        'SGR'=>'sanggar',
-        'SIND'=>'sinden',
-        'VOC'=>'vocalis',
-        'WAR'=>'waranggono',
-        'BAR'=>'barongsai',
-        'KTR'=>'ketoprak',
-        'PTJ'=>'pataji',
-        'REOG'=>'reog',
-        'THR'=>'taman hiburan rakyat',
-        'PLWK'=>'pelawak'
-    ];
+    private static $jsonPath = __DIR__."/../../kategori_seniman.json";
+    // private static $kategoriInp = [
+    //     'CAMP'=>'campursari',
+    //     'DLG'=>'dalang',
+    //     'JKP'=>'jaranan',
+    //     'KRW'=>'karawitan',
+    //     'MC'=>'mc',
+    //     'LDR'=>'ludruk',
+    //     'OKM'=>'organisasi kesenian musik',
+    //     'ORG'=>'organisasi',
+    //     'PRAM'=>'pramugari tayup',
+    //     'SGR'=>'sanggar',
+    //     'SIND'=>'sinden',
+    //     'VOC'=>'vocalis',
+    //     'WAR'=>'waranggono',
+    //     'BAR'=>'barongsai',
+    //     'KTR'=>'ketoprak',
+    //     'PTJ'=>'pataji',
+    //     'REOG'=>'reog',
+    //     'THR'=>'taman hiburan rakyat',
+    //     'PLWK'=>'pelawak'
+    // ];
     public function __construct(){
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();
@@ -98,33 +99,37 @@ class AdvisMobile{
                 if(!isset($data['kategori']) || empty($data['kategori'])){
                     throw new Exception('Kategori harus di isi');
                 }
-                //check kategori
-                $query = "SELECT id_kategori_seniman FROM kategori_seniman WHERE nama_kategori = ? LIMIT 1";
-                $stmt[0] = self::$con->prepare($query);
-                $stmt[0]->bind_param('s', $data['kategori']);
             }else if($desc == 'get'){
                 if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                     throw new Exception('Kategori harus di isi');
                 }
-                $query = "SELECT nama_kategori FROM kategori_seniman WHERE id_kategori_seniman = ? LIMIT 1";
-                $stmt[0] = self::$con->prepare($query);
-                $stmt[0]->bind_param('s', $data['id_kategori']);
             }else if($desc == 'getINI'){
                 if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                     throw new Exception('Kategori harus di isi');
                 }
-                $query = "SELECT singkatan FROM kategori_seniman WHERE id_kategori_seniman = ? LIMIT 1";
-                $stmt[0] = self::$con->prepare($query);
-                $stmt[0]->bind_param('s', $data['id_kategori']);
             }
-            $stmt[0]->execute();
-            $kategoriDB = '';
-            $stmt[0]->bind_result($kategoriDB);
-            if(!$stmt[0]->fetch()){
-                $stmt[0]->close();
-                throw new Exception('Kategori seniman tidak ditemukan');
+            $jsonFile = file_get_contents(self::$jsonPath);
+            $jsonData = json_decode($jsonFile, true);
+            $result = null;
+            foreach($jsonData as $key => $item){
+                if($desc == 'check'){
+                    if (isset($item['nama_kategori']) && $item['nama_kategori'] == $data['kategori']) {
+                        $result = $item['id_kategori_seniman'];
+                    }
+                }else if($desc == 'get'){
+                    if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
+                        $result = $jsonData['nama_kategori'];
+                    }
+                }else if($desc == 'getINI'){
+                    if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
+                        $result = $item['singkatan'];
+                    }
+                }
             }
-            return $kategoriDB;
+            if($result === null){
+                throw new Exception('Data kategori tidak ditemukan');
+            }
+            return $result;
         }catch(Exception $e){
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);

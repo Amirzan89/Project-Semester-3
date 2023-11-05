@@ -6,22 +6,8 @@ class SenimanMobile{
     private static $database;
     private static $con;
     private static $folderPath;
+    private static $jsonPath = __DIR__."/../../kategori_seniman.json";
     private static $constID = '411.302';
-    // private static $kategori = [
-    //     'campursari'=>'CAMP',
-    //     'dalang'=>'DLG',
-    //     'jaranan'=>'JKP',
-    //     'karawitan'=>'KRW',
-    //     'mc'=>'MC',
-    //     'ludruk'=>'LDR',
-    //     'organisasi kesenian musik'=>'OKM',
-    //     'organisasi'=>'ORG',
-    //     'pramugari tayup'=>'PRAM',
-    //     'sanggar'=>'SGR',
-    //     'sinden'=>'SIND',
-    //     'vocalis'=>'VOC',
-    //     'waranggono'=>'WAR'
-    // ];
     public function __construct(){
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();

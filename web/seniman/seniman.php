@@ -4,53 +4,145 @@ class SenimanWebsite{
     private static $database;
     private static $con;
     private static $folderPath;
+    private static $jsonPath = __DIR__."/../../kategori_seniman.json";
     private static $constID = '411.302';
-    private static $kategoriInp = [
-        'campursari'=>'CAMP',
-        'dalang'=>'DLG',
-        'jaranan'=>'JKP',
-        'karawitan'=>'KRW',
-        'mc'=>'MC',
-        'ludruk'=>'LDR',
-        'organisasi kesenian musik'=>'OKM',
-        'organisasi'=>'ORG',
-        'pramugari tayup'=>'PRAM',
-        'sanggar'=>'SGR',
-        'sinden'=>'SIND',
-        'vocalis'=>'VOC',
-        'waranggono'=>'WAR',
-        'barongsai'=>'BAR',
-        'ketoprak'=>'KTR',
-        'pataji'=>'PTJ',
-        'reog'=>'REOG',
-        'taman hiburan rakyat'=>'THR',
-        'pelawak'=>'PLWK'
-    ];
-    private static $kategori = [
-        'CAMP',
-        'DLG',
-        'JKP',
-        'KRW',
-        'MC',
-        'LDR',
-        'OKM',
-        'ORG',
-        'PRAM',
-        'SGR',
-        'SIND',
-        'VOC',
-        'WAR',
-        'BAR',
-        'KTR',
-        'PTJ',
-        'REOG',
-        'THR',
-        'PLWK'
-    ];
+    // private static $kategoriInp = [
+    //     'campursari'=>'CAMP',
+    //     'dalang'=>'DLG',
+    //     'jaranan'=>'JKP',
+    //     'karawitan'=>'KRW',
+    //     'mc'=>'MC',
+    //     'ludruk'=>'LDR',
+    //     'organisasi kesenian musik'=>'OKM',
+    //     'organisasi'=>'ORG',
+    //     'pramugari tayup'=>'PRAM',
+    //     'sanggar'=>'SGR',
+    //     'sinden'=>'SIND',
+    //     'vocalis'=>'VOC',
+    //     'waranggono'=>'WAR',
+    //     'barongsai'=>'BAR',
+    //     'ketoprak'=>'KTR',
+    //     'pataji'=>'PTJ',
+    //     'reog'=>'REOG',
+    //     'taman hiburan rakyat'=>'THR',
+    //     'pelawak'=>'PLWK'
+    // ];
+    // private static $kategori = [
+    //     'CAMP',
+    //     'DLG',
+    //     'JKP',
+    //     'KRW',
+    //     'MC',
+    //     'LDR',
+    //     'OKM',
+    //     'ORG',
+    //     'PRAM',
+    //     'SGR',
+    //     'SIND',
+    //     'VOC',
+    //     'WAR',
+    //     'BAR',
+    //     'KTR',
+    //     'PTJ',
+    //     'REOG',
+    //     'THR',
+    //     'PLWK'
+    // ];
     public function __construct(){
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/../../private/seniman';
+    }
+    private function kategoriFile($data,$desc){
+        try{
+            $fileExist = file_exists(self::$jsonPath);
+            if (!$fileExist) {
+                //if file is delete will make new json file
+                $query = "SELECT * FROM kategori_seniman";
+                $stmt[0] = self::$con->prepare($query);
+                if(!$stmt[0]->execute()){
+                    $stmt[0]->close();
+                    throw new Exception('Data kategori seniman tidak ditemukan');
+                }
+                $result = $stmt[0]->get_result();
+                $kategoriData = [];
+                while ($row = $result->fetch_assoc()) {
+                    $kategoriData[] = $row;
+                }
+                $stmt[0]->close();
+                if ($kategoriData === null) {
+                    throw new Exception('Data kategori seniman tidak ditemukan');
+                }
+                $jsonData = json_encode($kategoriData, JSON_PRETTY_PRINT);
+                if (!file_put_contents(self::$jsonPath, $jsonData)) {
+                    echo "Gagal menyimpan file kategori json";
+                }
+            }
+            if($desc == 'get'){
+                //get kategori seniman
+                $jsonFile = file_get_contents(self::$jsonPath);
+                $jsonData = json_decode($jsonFile, true);
+                $result = null;
+                foreach($jsonData as $key => $item){
+                    if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori_seniman']) {
+                        $result = $jsonData[$key];
+                    }
+                }
+                if($result === null){
+                    throw new Exception('Data kategori tidak ditemukan');
+                }
+                return $result;
+            }else if($desc == 'tambah' && $fileExist == true){
+                //tambah kategori seniman
+                $jsonFile = file_get_contents(self::$jsonPath);
+                $jsonData = json_decode($jsonFile, true);
+                $new[$data['id_kategori_seniman']] = $data;
+                $jsonData = array_merge($jsonData, $new);
+                $jsonFile = json_encode($jsonData, JSON_PRETTY_PRINT);
+                file_put_contents(self::$jsonPath, $jsonFile);
+            }else if($desc == 'update'){
+                //update kategori seniman
+                $jsonFile = file_get_contents(self::$jsonPath);
+                $jsonData = json_decode($jsonFile, true);
+                foreach($jsonData as $key => $item){
+                    if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori_seniman']) {
+                        $jsonData[$key] = $data;
+                    }
+                }
+                $jsonData = array_values($jsonData);
+                $jsonFile = json_encode($jsonData, JSON_PRETTY_PRINT);
+                file_put_contents(self::$jsonPath, $jsonFile);
+            }else if($desc == 'hapus'){
+                //hapus kategori seniman
+                $jsonFile = file_get_contents(self::$jsonPath);
+                $jsonData = json_decode($jsonFile, true);
+                foreach($jsonData as $key => $item){
+                    if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori_seniman']) {
+                        unset($jsonData[$key]);
+                    }
+                }
+                $jsonData = array_values($jsonData);
+                $json = json_encode($jsonData, JSON_PRETTY_PRINT);
+                file_put_contents(self::$jsonPath, $json);
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
     }
     public static function getData($data){
         try{
@@ -132,6 +224,15 @@ class SenimanWebsite{
             $stmt[1]->execute();
             if ($stmt[1]->affected_rows > 0) {
                 $stmt[1]->close();
+                //update file
+                $insertedId = self::$con->insert_id;
+                $selectQuery = "SELECT * FROM kategori_seniman WHERE id_kategori_seniman = ?";
+                $stmt[2] = self::$con->prepare($selectQuery);
+                $stmt[2]->bind_param("i", $insertedId);
+                $stmt[2]->execute();
+                $result = $stmt[2]->get_result();
+                $kategoriData = $result->fetch_assoc();
+                $this->kategoriFile($kategoriData,'tambah');
                 echo json_encode(['status'=>'success','message'=>'Data Kategori Seniman berhasil ditambahkan']);
                 exit();
             } else {
@@ -199,6 +300,12 @@ class SenimanWebsite{
             $stmt[1]->execute();
             if ($stmt[1]->affected_rows > 0) {
                 $stmt[1]->close();
+                $kategori = [
+                    "id_kategori_seniman"=>$data['id_kategori'],
+                    "nama_kategori"=>$data['nama_kategori'],
+                    "singkatan"=>$data['singkatan']
+                ];
+                $this->kategoriFile($kategori,'update');
                 echo json_encode(['status'=>'success','message'=>'Data Kategori Seniman berhasil dubah']);
                 exit();
             } else {
@@ -250,11 +357,12 @@ class SenimanWebsite{
                 throw new Exception('Anda bukan admin');
             }
             //delete data
-            $query = "DELETE FROM kategori_seniman WHERE id_kategori = ?";
+            $query = "DELETE FROM kategori_seniman WHERE id_kategori_seniman = ?";
             $stmt[2] = self::$con->prepare($query);
             $stmt[2]->bind_param('s', $data['id_kategori']);
             if ($stmt[2]->execute()) {
                 $stmt[2]->close();
+                $this->kategoriFile(['id_kategori_seniman'=>$data['id_kategori']],'hapus');
                 header('Content-Type: application/json');
                 echo json_encode(['status'=>'success','message'=>'Data Kategori Seniman berhasil dihapus']);
                 exit();
@@ -329,18 +437,16 @@ class SenimanWebsite{
     // }
     private function generateNIS($data,$desc){
         try{
-            if(!isset($data['kategori']) || empty($data['kategori'])){
-                throw new Exception('Kategori harus di isi');
+            if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
+                throw new Exception('ID Kategori harus di isi');
             }
-            if (!in_array($data['kategori'], self::$kategori)) {
-                throw new Exception('Kategori invalid');
-            }
+            $kategoriData = $this->kategoriFile(['id_kategori_seniman'=>$data['id_kategori']],'get');
             //get last NIS
             date_default_timezone_set('Asia/Jakarta');
-            if($desc == 'tambah'){
-                $query = "SELECT COUNT(*) AS total FROM seniman WHERE nomor_induk LIKE '%/".date('Y')."' AND kategori = '".$data['kategori']."'";
+            if($desc == 'diterima'){
+                $query = "SELECT COUNT(*) AS total FROM seniman WHERE nomor_induk LIKE '%/".date('Y')."' AND id_kategori_seniman = '".$data['id_kategori']."'";
             }else if($desc == 'perpanjangan'){
-                $query = "SELECT COUNT(*) AS total FROM seniman WHERE nomor_induk LIKE '%/".(date('Y')+1)."' AND kategori = '".$data['kategori']."'";
+                $query = "SELECT COUNT(*) AS total FROM seniman WHERE nomor_induk LIKE '%/".(date('Y')+1)."' AND id_kategori_seniman = '".$data['id_kategori']."'";
             }else{
                 throw new Exception('Description invalid');
             }
@@ -355,12 +461,12 @@ class SenimanWebsite{
             }
             $stmt[0]->close();
             $total = str_pad($total, 3, '0', STR_PAD_LEFT);
-            if($desc == 'tambah'){
-                $nis = $data['kategori'].'/'.$total.'/'.self::$constID.'/'.date('Y');
+            if($desc == 'diterima'){
+                $nis = $kategoriData['singkatan'].'/'.$total.'/'.self::$constID.'/'.date('Y');
             }else if($desc == 'perpanjangan'){
-                $nis = $data['kategori'].'/'.$total.'/'.self::$constID.'/'.(date('Y')+1);
+                $nis = $kategoriData['singkatan'].'/'.$total.'/'.self::$constID.'/'.(date('Y')+1);
             }
-            return ['nis'=>$nis,'kategori'=>$data['kategori']];
+            return ['nis'=>$nis,'kategori'=>$data['id_kategori']];
         }catch(Exception $e){
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
@@ -423,36 +529,26 @@ class SenimanWebsite{
             }
             $stmt[0]->close();
             if(($role != 'admin seniman' && $role != 'super admin') || $role == 'masyarakat'){
-                http_response_code(400);
                 echo "<script>alert('Invalid role !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            // http_response_code(400);
-            // echo json_encode($data);
-            // exit();
             //check id seniman
-            $query = "SELECT status, kategori FROM seniman WHERE id_seniman = ?";
+            $query = "SELECT status, id_kategori_seniman FROM seniman WHERE id_seniman = ?";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_seniman']);
             $stmt[1]->execute();
             $statusDB = '';
-            $kategori = '';
-            $stmt[1]->bind_result($statusDB, $kategori);
+            $idKategori = '';
+            $stmt[1]->bind_result($statusDB, $idKategori);
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
-                http_response_code(400);
-                echo 'errororrr data ilang';
-                exit();
                 echo "<script>alert('Data Seniman tidak ditemukan')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             $stmt[1]->close();
-            http_response_code(400);
-            echo 'status '.$data['keterangan'];
-            exit();
-            //check status
+            //check status seniman
             if($data['keterangan'] ==  'proses' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
@@ -490,7 +586,7 @@ class SenimanWebsite{
                 $redirect = '/pengajuan.php';
                 $status = 'diterima';
                 $query = "UPDATE seniman SET nomor_induk = ?, status = ? WHERE id_seniman = ?";
-                $nomorInduk = $this->generateNIS(['kategori'=>$kategori],'tambah');
+                $nomorInduk = $this->generateNIS(['id_kategori'=>$idKategori],'diterima');
                 $stmt[2] = self::$con->prepare($query);
                 $stmt[2]->bind_param("ssi", $nomorInduk['nis'], $status, $data['id_seniman']);
             }else if($data['keterangan'] == 'ditolak'){
@@ -531,6 +627,7 @@ class SenimanWebsite{
                     'message' => $errorJson->message,
                 );
             }
+            http_response_code(400);
             echo "<script>alert('$error')</script>";
             echo "<script>window.history.back();</script>";
             exit();
@@ -580,22 +677,21 @@ class SenimanWebsite{
             }
             //check id seniman
             if($data['keterangan'] == 'diterima'){
-                $query = "SELECT status, kategori FROM seniman WHERE id_seniman = ?";
+                $query = "SELECT nomor_induk, status, id_kategori_seniman FROM seniman WHERE id_seniman = ?";
                 $stmt[1] = self::$con->prepare($query);
                 $stmt[1]->bind_param('s', $data['id_seniman']);
                 $stmt[1]->execute();
+                $nomorIndukDB = '';
                 $statusDB = '';
-                $kategori = '';
-                $stmt[1]->bind_result($statusDB, $kategori);
+                $idKategori = '';
+                $stmt[1]->bind_result($nomorIndukDB, $statusDB, $idKategori);
             }else{
-                $query = "SELECT nomor_induk, status, kategori FROM seniman WHERE id_seniman = ?";
+                $query = "SELECT status FROM seniman WHERE id_seniman = ?";
                 $stmt[1] = self::$con->prepare($query);
                 $stmt[1]->bind_param('s', $data['id_seniman']);
                 $stmt[1]->execute();
-                $nomor = '';
                 $statusDB = '';
-                $kategori = '';
-                $stmt[1]->bind_result($nomor, $statusDB, $kategori);
+                $stmt[1]->bind_result($statusDB);
             }
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
@@ -604,35 +700,64 @@ class SenimanWebsite{
                 exit();
             }
             $stmt[1]->close();
-            //check status
-            if($data['keterangan'] ==  'proses' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
+            //check status seniman
+            if($statusDB == 'diajukan'){
+                echo "<script>alert('Data Seniman sedan diajukan')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if($statusDB == 'proses'){
+                echo "<script>alert('Data seniman sedang di proses')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if($statusDB == 'ditolak'){
+                echo "<script>alert('Data seniman ditolak mohon cek kembali')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check perpanjangan
+            $query = "SELECT status FROM perpanjangan WHERE id_seniman = ?";
+            $stmt[2] = self::$con->prepare($query);
+            $stmt[2]->bind_param('s', $data['id_seniman']);
+            $stmt[2]->execute();
+            $statusPDB = '';
+            $stmt[2]->bind_result($statusPDB);
+            if(!$stmt[2]->fetch()){
+                $stmt[2]->close();
+                echo "<script>alert('Data perpanjangan tidak ditemukan')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check status perpanjangan
+            if($data['keterangan'] ==  'proses' && ($statusPDB == 'diterima' || $statusPDB == 'ditolak')){
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if($statusDB ==  'diajukan' && ($data['keterangan'] == 'diterima' || $data['keterangan'] == 'ditolak')){
+            if($statusPDB ==  'diajukan' && ($data['keterangan'] == 'diterima' || $data['keterangan'] == 'ditolak')){
                 echo "<script>alert('Data harus di proses')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if($data['keterangan'] ==  'ditolak' && $statusDB == 'diterima'){
+            if($data['keterangan'] ==  'ditolak' && $statusPDB == 'diterima'){
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if($data['keterangan'] ==  'diterima' && $statusDB == 'ditolak'){
+            if($data['keterangan'] ==  'diterima' && $statusPDB == 'ditolak'){
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             //update data
+            $redirect = '/perpanjangan.php';
             if($data['keterangan'] == 'proses'){
                 if(isset($data['catatan']) || !empty($data['catatan'])){
                     $data['catatan'] = '';
                 }
-                $redirect = '/perpanjangan.php';
                 $status = 'proses';
-                $query = "UPDATE seniman SET status = ? WHERE id_seniman = ?";
+                $query = "UPDATE perpanjangan SET status = ? WHERE id_seniman = ?";
                 $stmt[2] = self::$con->prepare($query);
                 $stmt[2]->bind_param("si", $status, $data['id_seniman']);
             }else if($data['keterangan'] == 'ditolak'){
@@ -641,57 +766,10 @@ class SenimanWebsite{
                     echo "<script>window.history.back();</script>";
                     exit();
                 }
-                $redirect = '/perpanjangan.php';
                 $status = 'ditolak';
-                $query = "UPDATE seniman SET status = ?, catatan = ? WHERE id_seniman = ?";
+                $query = "UPDATE perpanjangan SET status = ?, catatan = ? WHERE id_seniman = ?";
                 $stmt[2] = self::$con->prepare($query);
                 $stmt[2]->bind_param("ssi", $status, $data['catatan'], $data['id_seniman']);
-            }
-            if($data['keterangan'] == 'diterima'){
-                if(isset($data['catatan']) || !empty($data['catatan'])){
-                    $data['catatan'] = '';
-                }
-                //tambah histori
-                $query = "INSERT INTO histori_nis (nis, tahun, id_seniman) VALUES (?, ?, ?)";
-                $stmt[2] = self::$con->prepare($query);
-                $status = 'diajukan';
-                $tahun = explode("/", $nomor);
-                $tahun = end($tahun);
-                $stmt[2]->bind_param("sss", $nomor, $tahun, $data['id_seniman']);
-                $stmt[2]->execute();
-                if (!$stmt[2]->affected_rows > 0) {
-                    $stmt[2]->close();
-                    echo "<script>alert('Catatan harus di isi !')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
-                }
-                $redirect = '/perpanjangan.php';
-                $status = 'diterima';
-                $query = "UPDATE perpanjangan SET nomor_induk = ?, status = ? WHERE id_seniman = ?";
-                $nomorInduk = $this->generateNIS(['kategori'=>$kategori],'perpanjangan');
-                $stmt[2] = self::$con->prepare($query);
-                $stmt[2]->bind_param("ssi", $nomorInduk, $status, $data['id_seniman']);
-                $stmt[2]->execute();
-                if ($stmt[2]->affected_rows > 0) {
-                    $stmt[2]->close();
-                    //delete perpanjangan
-                    $query = "DELETE FROM perpanjangan WHERE id_seniman = ?";
-                    $stmt[3] = self::$con->prepare($query);
-                    $stmt[3]->bind_param('s', $data['id_seniman']);
-                    if ($stmt[3]->execute()) {
-                        $stmt[3]->close();
-                        echo "<script>alert('Status berhasil diubah')</script>";
-                        echo "<script>window.location.href = '/seniman". $redirect . "'; </script>";
-                        exit();
-                    } else {
-                        $stmt[3]->close();
-                        echo "<script>alert('Status gagal diubah')</script>";
-                        echo "<script>window.location.href = '/seniman". $redirect . "'; </script>";
-                        exit();
-                    }
-                } else {
-                    $stmt[2]->close();
-                }
             }else{
                 $stmt[2]->execute();
                 if ($stmt[2]->affected_rows > 0) {
@@ -705,6 +783,52 @@ class SenimanWebsite{
                     echo "<script>window.location.href = '/seniman". $redirect . "'; </script>";
                     exit();
                 }
+            }
+            if($data['keterangan'] == 'diterima'){
+                if(isset($data['catatan']) || !empty($data['catatan'])){
+                    $data['catatan'] = '';
+                }
+                //tambah histori
+                $query = "INSERT INTO histori_nis (nis, tahun, id_seniman) VALUES (?, ?, ?)";
+                $stmt[2] = self::$con->prepare($query);
+                $tahun = explode("/", $nomorIndukDB);
+                $tahun = end($tahun);
+                $stmt[2]->bind_param("sss", $nomorIndukDB, $tahun, $data['id_seniman']);
+                $stmt[2]->execute();
+                if (!$stmt[2]->affected_rows > 0) {
+                    $stmt[2]->close();
+                    echo "<script>alert('Error tambah data histori nomor induk !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
+                //hapus data perpanjangan
+                $query = "DELETE FROM perpanjangan WHERE id_seniman = ?";
+                $stmt[3] = self::$con->prepare($query);
+                $stmt[3]->bind_param('s', $data['id_seniman']);
+                if (!$stmt[3]->execute()) {
+                    $stmt[3]->close();
+                    echo "<script>alert('Error hapus data perpanjangan seniman')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
+                $stmt[3]->close();
+                //update nis 
+                $query = "UPDATE seniman SET nomor_induk = ? WHERE id_seniman = ?";
+                $nomorInduk = $this->generateNIS(['kategori'=>$idKategori],'perpanjangan');
+                $stmt[4] = self::$con->prepare($query);
+                $stmt[4]->bind_param("ssi", $nomorInduk['nis'], $status, $data['id_seniman']);
+                $stmt[4]->execute();
+                if (!$stmt[4]->affected_rows > 0) {
+                    $stmt[4]->close();
+                    echo "<script>alert('Status gagal diubah')</script>";
+                    echo "<script>window.location.href = '/seniman". $redirect . "'; </script>";
+                    exit();
+                }
+                $stmt[4]->close();
+                $redirect = '/perpanjangan.php';
+                echo "<script>alert('Status berhasil diubah')</script>";
+                echo "<script>window.location.href = '/seniman". $redirect . "'; </script>";
+                exit();
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -720,6 +844,7 @@ class SenimanWebsite{
                     'message' => $errorJson->message,
                 );
             }
+            http_response_code(400);
             echo "<script>alert('$error')</script>";
             echo "<script>window.history.back();</script>";
             exit();
@@ -760,11 +885,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $data = SenimanWebsite::handle();
     if(isset($data['_method'])){
         if($data['_method'] == 'PUT'){
-            if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc']) && $data['desc'] == 'kategori'){
-                $senimanWeb->ubahKategori($data);
+            if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc'])){
+                if($data['desc'] == 'kategori'){
+                    $senimanWeb->ubahKategori($data);
+                }
+                if($data['desc'] == 'perpanjangan'){
+                    $senimanWeb->prosesPerpanjangan($data);
+                }
             }
             if(isset($data['keterangan'])){
                 $senimanWeb->prosesSeniman($data);
+            }
+        }else if($data['_method'] == 'DELETE'){
+            if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc']) && $data['desc'] == 'kategori'){
+                $senimanWeb->hapusKategori($data);
             }
         }
     }
