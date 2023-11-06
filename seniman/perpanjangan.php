@@ -148,6 +148,7 @@ $csrf = $GLOBALS['csrf'];
                   </thead>
                   <tbody>
                   <?php
+                      // $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(tgl_pembuatan, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' AND MONTH(tgl_pembuatan) = ".date('m')." AND YEAR(tgl_pembuatan) = ".date('Y')." ORDER BY id_seniman DESC");
                       $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(tgl_pembuatan, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC");
                       $no = 1;
                       while ($seniman = mysqli_fetch_array($query)) {

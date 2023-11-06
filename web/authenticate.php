@@ -13,11 +13,6 @@ function authenticate($request,$data,$con = null){
         $path = isset($data['uri']) ? $data['uri'] : null;
     }
     $uri = $data['uri'];
-    // echo 'uri  '.$uri;
-    // echo "<br>";
-//     $parts = explode('?', $uri);
-//     echo  $parts[0];
-//     exit();
     if(isset($_COOKIE['token1'] ) && isset($_COOKIE['token3'])){
         $token1 = $_COOKIE['token1'];
         $token3 = $_COOKIE['token3'];

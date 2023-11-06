@@ -69,6 +69,7 @@ $csrf = $GLOBALS['csrf'];
 
 <body>
   <script>
+    var bulan = <?php echo date('m') ?>;
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
 		var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
@@ -116,22 +117,23 @@ $csrf = $GLOBALS['csrf'];
                   <div class="col-lg-12">
                     <div class="row">
                       <div class="col-lg-3">
-                        <input type="text" name="" id="" placeholder="Tahun" class="inp">
+                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>">
                       </div>
                       <div class="col-lg-5">
-                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
-                          <option value="01">Januari</option>
-                          <option value="02">Februari</option>
-                          <option value="03">Maret</option>
-                          <option value="04">April</option>
-                          <option value="05">Mei</option>
-                          <option value="06">Juni</option>
-                          <option value="07">Juli</option>
-                          <option value="08">Agustus</option>
-                          <option value="09">September</option>
-                          <option value="10">Oktober</option>
-                          <option value="11">November</option>
-                          <option value="12">Desember</option>
+                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="<?php echo date('M')  ?>">
+                          <option value="semua">semua</option>
+                          <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
+                          <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
+                          <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?> >Maret</option>
+                          <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?> >April</option>
+                          <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?> >Mei</option>
+                          <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?> >Juni</option>
+                          <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?> >Juli</option>
+                          <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?> >Agustus</option>
+                          <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?> >September</option>
+                          <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?> >Oktober</option>
+                          <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?> >November</option>
+                          <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?> >Desember</option>
                         </select>
                       </div>
                     </div>
@@ -150,10 +152,11 @@ $csrf = $GLOBALS['csrf'];
                   </thead>
                   <tbody>
                   <?php
+                    // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, tanggal_awal, tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' AND MONTH(tanggal_awal) = ".date('m')." AND YEAR(tanggal_awal) = ".date('Y')." ORDER BY id_event DESC");
                     $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, tanggal_awal, tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC");
-                      $no = 1;
-                      while ($event = mysqli_fetch_array($query)) {
-                    ?>
+                    $no = 1;
+                    while ($event = mysqli_fetch_array($query)) {
+                  ?>
                       <tr>
                           <td><?php echo $no; ?></td>
                           <td><?php echo $event['nama_pengirim']?></td>
@@ -196,6 +199,58 @@ $csrf = $GLOBALS['csrf'];
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script>
+    var tahunInput = document.getElementById('inpTahun');
+    var bulanInput = document.getElementById('inpBulan');
+    var tahun;
+    function getData(con = null){
+      var xhr = new XMLHttpRequest();
+      if(con == 'semua'){
+        var requestBody = {
+          id_user: idUser,
+          id_event: Id,
+          tanggal:'semua',
+          keterangan: 'get'
+        };
+      }else if(con == null){
+        var tanggal = bulanInput.value +'-'+tahunInput.value;
+        var requestBody = {
+          id_user: idUser,
+          id_event: Id,
+          tanggal:tanggal,
+          keterangan: 'get'
+        };
+      }
+      //open the request
+      xhr.open('POST', domain + "/web/event/event.php")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      //send the form data
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            window.location.href = "/event/detail_event.php?id_event="+Id;
+          } else {
+            try {
+              eval(xhr.responseText);
+            } catch (error) {
+              console.error('Error evaluating JavaScript:', error);
+            }
+          }
+        }
+      }
+    }
+    function tampilkanBulan(){
+      if(bulanInput.value == 'semua'){
+        tahun = tahunInput.value;
+        tahunInput.disabled = true;
+        tahunInput.value = '';
+        getData('semua');
+      }else{
+        tahunInput.disabled = false;
+        tahunInput.value = tahun;
+      }
+    }
     function proses(Id) {
       var xhr = new XMLHttpRequest();
       var requestBody = {

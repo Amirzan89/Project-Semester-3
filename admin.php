@@ -18,6 +18,12 @@ if($userAuth['status'] == 'error'){
   }
 }
 $csrf = $GLOBALS['csrf'];
+$query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role != 'masyarakat' AND role != 'super admin'"); 
+if ($query) {
+  $users = mysqli_fetch_all($query, MYSQLI_ASSOC);
+} else {
+  $users = array();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,10 +56,11 @@ $csrf = $GLOBALS['csrf'];
 <body>
   <script>
 		var csrfToken = "<?php echo $csrf ?>";
-        var email = "<?php echo $userAuth['email'] ?>";
-        var idUser = "<?php echo $userAuth['id_user'] ?>";
-        var number = "<?php echo $userAuth['number'] ?>";
-        var role = "<?php echo $userAuth['role'] ?>";
+    var email = "<?php echo $userAuth['email'] ?>";
+    var idUser = "<?php echo $userAuth['id_user'] ?>";
+    var number = "<?php echo $userAuth['number'] ?>";
+    var role = "<?php echo $userAuth['role'] ?>";
+    var dataUsers = <?php echo json_encode($users); ?>;
 	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -99,9 +106,8 @@ $csrf = $GLOBALS['csrf'];
                     <i class="bi bi-person-plus-fill"></i> Tambah Admin
                 </button>
               </a>
-              <!-- <button type="button" class="btn btn-outline-secondary"><a href="../users/form-tambah-user.php"> Tambah User</a></button> -->
               <!-- Table with stripped rows -->
-              <table class="table datatable">
+              <table class="table">
                 <thead>
                   <tr>
                     <th>NO</th>
@@ -117,23 +123,22 @@ $csrf = $GLOBALS['csrf'];
                 </thead>
                 <tbody>
                 <?php
-                    $query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role != 'masyarakat' AND role != 'super admin'"); 
                     $no = 1;
-                    while ($users = mysqli_fetch_array($query)) {
+                    foreach($users as $user) {
                     ?>
                       <tr>
                         <td><?php echo $no?></td>
-                        <td><?php echo $users['nama_lengkap'] ?></td>
-                        <td><?php echo $users['no_telpon'] ?></td>
-                        <td><?php echo $users['jenis_kelamin'] ?></td>
-                        <td><?php echo $users['tanggal_lahir'] ?></td>
-                        <td><?php echo $users['tempat_lahir'] ?></td>
-                        <td><?php echo $users['role'] ?></td>
-                        <td><?php echo $users['email'] ?></td>
+                        <td><?php echo $user['nama_lengkap'] ?></td>
+                        <td><?php echo $user['no_telpon'] ?></td>
+                        <td><?php echo $user['jenis_kelamin'] ?></td>
+                        <td><?php echo $user['tanggal_lahir'] ?></td>
+                        <td><?php echo $user['tempat_lahir'] ?></td>
+                        <td><?php echo $user['role'] ?></td>
+                        <td><?php echo $user['email'] ?></td>
                         <td>
-                          <a href="/admin/edit.php?id_user=<?= $users['id_user'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
-                          <a href="/admin/edit.php?id_user=<?= $users['id_user'] ?>" class="btn btn-info"><i class="bi bi-pencil-square"></i>Edit</a>
-                          <button type="button" class="btn btn-danger" onclick="openDelete(<?php echo $users['id_user']?>)"> <i class="bi bi-trash-fill">Hapus</i></button>
+                          <button type="button" class="btn btn-lihat" onclick="openDetail(<?php echo $user['id_user']?>)"> <i class="bi bi-eye-fill">Lihat</i></button>
+                          <a href="/admin/edit.php?id_user=<?= $user['id_user'] ?>" class="btn btn-info"><i class="bi bi-pencil-square"></i>Edit</a>
+                          <button type="button" class="btn btn-danger" onclick="openDelete(<?php echo $user['id_user']?>)"> <i class="bi bi-trash-fill">Hapus</i></button>
                         </td>
                       </tr>
                     <?php $no++;
@@ -146,6 +151,60 @@ $csrf = $GLOBALS['csrf'];
         </div>
       </div>
   </section>    
+  <!-- start modal detail -->
+  <div class="modal fade" id="modalDetail" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><strong>Detail Admin</strong></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+              <form method="" action="" enctype="" style="padding: 4px; padding-left: 4;">
+                  <!-- <input type="hidden" name="csrf_token" value="<?php // echo $csrf?>"> -->
+                    <div class="row mb-4">
+                      <label for="inputText" class="col-sm-2 col-form-label">Nama Lengkap</label>
+                      <div class="col-sm-10">
+                      <input type="text" class="form-control" id="inpNamaDetail" name="nama" placeholder="Nama Lengkap" readonly>
+                      </div>
+                    </div>
+                    <div class="row mb-4">
+                      <label for="inputText" class="col-sm-2 col-form-label">No Handphone</label>
+                      <div class="col-sm-10">
+                      <input type="text" class="form-control"id="inpPhoneDetail" name="phone" placeholder="No Handphone" readonly>
+                      </div>
+                    </div>
+                    <div class="row mb-4">
+                      <label for="inputText" class="col-sm-2 col-form-label">Jenis Kelamin</label>
+                      <div class="col-sm-10">
+                      <input type="text" class="form-control" id="inpKelaminDetail" name="phone" placeholder="Jenis Kelamin" readonly>
+                      </div>
+                    </div>
+                    <div class="row mb-4">
+                      <label for="inputText" class="col-sm-2 col-form-label">Tempat / Tanggal Lahir</label>
+                      <div class="col-sm-10">
+                      <input type="text" class="form-control" id="inpTTLDetail" name="phone" placeholder="Tempat / Tanggal Lahir" readonly>
+                      </div>
+                    </div>
+                    <div class="row mb-4">
+                      <label for="inputText" class="col-sm-2 col-form-label">Role</label>
+                      <div class="col-sm-10">
+                      <input type="text" class="form-control" id="inpRoleDetail" name="phone" placeholder="Role" readonly>
+                      </div>
+                    </div>
+                    <div class="row mb-4">
+                      <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
+                      <div class="col-sm-10">
+                        <input type="email" class="form-control" id="inpEmailDetail" name='email' placeholder="Email" readonly>
+                      </div>
+                    </div>
+              </form>
+          <div class="modal-footer">
+            <button type="cancel" class="btn btn-tambah" data-bs-dismiss="modal">Kembali</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end modal detail -->
   <!-- start modal delete -->
   <div class="modal fade" id="modalDelete" tabindex="-1">
     <div class="modal-dialog">
@@ -162,7 +221,7 @@ $csrf = $GLOBALS['csrf'];
           <form action="/web/User.php" id="deleteForm" method="POST">
             <input type="hidden" name="_method" value="DELETE">
             <input type="hidden" name="id_admin" value="<?php echo $userAuth['id_user'] ?>">
-            <input type="hidden" name="id_user" id="inpUser">
+            <input type="hidden" name="id_user" id="inpUserDelete">
             <button type="submit" class="btn btn-success" name="hapusAdmin">Hapus</button>
           </form>
         </div>
@@ -183,17 +242,39 @@ $csrf = $GLOBALS['csrf'];
       <i class="bi bi-arrow-up-short"></i>
     </a>
     <script>
-        var modal = document.getElementById('modalDelete');
-        var inpUser = document.getElementById('inpUser');
-        function openDelete(dataU){
-          inpUser.value = dataU;
-          var myModal = new bootstrap.Modal(modal);
-          myModal.show();
-        }
+      var modalDetail = document.getElementById('modalDetail');
+      var inpNamaDetail = document.getElementById('inpNamaDetail');
+      var inpPhoneDetail = document.getElementById('inpPhoneDetail');
+      var inpKelaminDetail = document.getElementById('inpKelaminDetail');
+      var inpTTLDetail = document.getElementById('inpTTLDetail');
+      var inpRoleDetail = document.getElementById('inpRoleDetail');
+      var inpEmailDetail = document.getElementById('inpEmailDetail');
+      var modalDelete = document.getElementById('modalDelete');
+      var inpUserDelete = document.getElementById('inpUserDelete');
+      function openDetail(dataU){
+        dataUsers.forEach((dataUser)=>{
+          if(dataUser.id_user == dataU){
+            inpNamaDetail.value = dataUser['nama_lengkap'];
+            inpPhoneDetail.value = dataUser['no_telpon'];
+            inpKelaminDetail.value = dataUser['jenis_kelamin'];
+            inpTTLDetail.value = dataUser['tempat_lahir']+'/'+dataUser['tanggal_lahir'];
+            inpRoleDetail.value = dataUser['role'];
+            inpEmailDetail.value = dataUser['email'];
+          }
+        });
+        var myModal = new bootstrap.Modal(modalDetail);
+        myModal.show();
+      }
+      function openDelete(dataU){
+        inpUserDelete.value = dataU;
+        var myModal = new bootstrap.Modal(modalDelete);
+        myModal.show();
+      }
     </script>
     <!-- Vendor JS Files -->
     <script src="/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/public/assets/vendor/tinymce/tinymce.min.js"></script>
     <!-- Template Main JS File -->
         <script src="/public/assets/js/admin/main.js"></script>
     <script>
@@ -207,7 +288,6 @@ $csrf = $GLOBALS['csrf'];
           }
         });
       });
-
     </script>
 </body>
 

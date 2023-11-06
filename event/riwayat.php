@@ -152,6 +152,7 @@ $csrf = $GLOBALS['csrf'];
                 </thead>
                 <tbody>
                   <?php
+                    // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' AND MONTH(tanggal_awal) = ".date('m')." AND YEAR(tanggal_awal) = ".date('Y'). " ORDER BY id_event DESC");
                     $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_event DESC");
                     $no = 1;
                     while ($event = mysqli_fetch_array($query)) {

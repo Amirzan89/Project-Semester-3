@@ -91,19 +91,19 @@ class Preview{
                 $previewURL = self::$folderEventDes .'/'. $randomString . '.'. $extension;
                 if (copy($file, $des)) {
                     header('Content-Type: application/json');
-                    echo json_encode(['status'=>'success','data'=>"$previewURL"]);
-                    exit();
+                    echo json_encode(['status'=>'success','data'=>"$previewURL"]);  
+                    // exit();
                     // header("Location: $previewURL");
                     // flush();
                     // exit();
-                    // $startTime = time();
-                    // $timeout = 5;
-                    // while (true) {
-                    //     if (time() - $startTime >= $timeout) {
-                    //         unlink($des);
-                    //         exit();
-                    //     }
-                    // }
+                    $startTime = time();
+                    $timeout = 5;
+                    while (true) {
+                        if (time() - $startTime >= $timeout) {
+                            unlink($des);
+                            exit();
+                        }
+                    }
                 } else {
                     echo "<script>alert('Sistem error')</script>";
                     echo "<script>window.history.back();</script>";
