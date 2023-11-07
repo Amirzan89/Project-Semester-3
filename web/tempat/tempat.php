@@ -10,10 +10,16 @@ class TempatWebsite{
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/../../public/img/tempat';
     }
-    public static function getTempat($data){
+    public static function getSewa($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('id user harus di isi');
+            }
+            if(!isset($data['tanggal']) || empty($data['tanggal'])){
+                throw new Exception('Tanggal harus di isi !');
+            }
+            if(!isset($data['desc']) || empty($data['desc'])){
+                throw new Exception('Deskripsi harus di isi !');
             }
             if($data['role'] != 'admin tempat' || $data['role'] == 'super admin'){
                 throw new Exception('invalid role');
@@ -33,6 +39,49 @@ class TempatWebsite{
             if($role == $data['role']){
                 throw new Exception('invalid role');
             }
+            //check and get data
+            if($data['tanggal'] == 'semua'){
+                if($data['desc'] == 'pengajuan'){
+                    $query = "SELECT id_sewa, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses'";
+                }else if($data['desc'] == 'riwayat'){
+                    // $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'ditolak' OR status = 'diterima'";
+                }else{
+                    throw new Exception('Deskripsi invalid !');
+                }
+                $stmt[1] = self::$con->prepare($query);
+            }else{
+                if($data['desc'] == 'pengajuan'){
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'diajukan 'OR status = 'proses') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ?";
+                }else if($data['desc'] == 'riwayat'){
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'ditolak 'OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ?";
+                }else{
+                    throw new Exception('Deskripsi invalid !');
+                }
+                $stmt[1] = self::$con->prepare($query);
+                $tanggal = explode('-',$data['tanggal']);
+                $month = $tanggal[0];
+                $year = $tanggal[1];
+                $stmt[1]->bind_param('ss', $month, $year);
+            }
+            if (!$stmt[1]->execute()) {
+                $stmt[1]->close();
+                throw new Exception('Data event tidak ditemukan');
+            }
+            $result = $stmt[1]->get_result();
+            $eventsData = array();
+            while ($row = $result->fetch_assoc()) {
+                $eventsData[] = $row;
+            }
+            $stmt[1]->close();
+            if ($eventsData === null) {
+                throw new Exception('Data event tidak ditemukan');
+            }
+            if (empty($eventsData)) {
+                throw new Exception('Data event tidak ditemukan');
+            }
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'message' => 'Data event berhasil didapatkan', 'data' => $eventsData]);
+            exit();
         }catch(Exception $e){
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
@@ -1022,7 +1071,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $tempatWeb->hapusTempat($data);
         }
     }else{
-        $tempatWeb->tambahTempat($data);
+        if(isset($data['desc'])){
+            if($data['desc'] == 'pengajuan' || $data['desc'] == 'riwayat'){
+                $tempatWeb->getSewa($data);
+            }
+        }else{
+            $tempatWeb->tambahTempat($data);
+        }
     }
 }
 ?>

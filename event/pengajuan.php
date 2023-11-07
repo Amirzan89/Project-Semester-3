@@ -152,8 +152,8 @@ $csrf = $GLOBALS['csrf'];
                   </thead>
                   <tbody id="tableEvent">
                   <?php
-                    // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, tanggal_awal, tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' AND MONTH(tanggal_awal) = ".date('m')." AND YEAR(tanggal_awal) = ".date('Y')." ORDER BY id_event DESC");
-                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC");
+                    // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_event DESC");
+                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC");
                     $no = 1;
                     while ($event = mysqli_fetch_array($query)) {
                   ?>
@@ -203,68 +203,70 @@ $csrf = $GLOBALS['csrf'];
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
-    function updateTable(dataT){
+    function updateTable(dataT = ''){
       while (tableEvent.firstChild) {
         tableEvent.removeChild(tableEvent.firstChild);
       }
-      // console.log(dataT);
+      console.log(dataT);
       var num = 1;
-      dataT.forEach(function (item){
-        var row = document.createElement('tr');
-        var td = document.createElement('td');
-        //data
-        td.innerText = num;
-        row.appendChild(td);
-        var td = document.createElement('td');
-        td.innerText = item['nama_pengirim'];
-        row.appendChild(td);
-        var td = document.createElement('td');
-        td.innerText = item['nama_event'];
-        row.appendChild(td);
-        var td = document.createElement('td');
-        td.innerText = item['tanggal_awal'];
-        row.appendChild(td);
-        //status
-        var span = document.createElement('span');
-        if(item['status'] == 'diajukan'){
-          span.classList.add('badge','bg-proses');
-          span.innerText = 'Diajukan';
-        }else if(item['status'] == 'proses'){
-          span.classList.add('badge','bg-terima');
-          span.innerText = 'Diproses';
-        }
-        var td = document.createElement('td');
-        td.appendChild(span);
-        row.appendChild(td);
-        //btn
-        if(item['status'] == 'diajukan'){
-          var btn = document.createElement('button');
-          var icon = document.createElement('i');
-          icon.classList.add('bi','bi-eye-fill');
-          icon.innerText = 'Lihat';
-          btn.appendChild(icon);
-          btn.classList.add('btn','btn-lihat');
-          btn.onclick = function (){
-            proses(`${item['id_event']}`);
+      if(dataT != ''){
+        dataT.forEach(function (item){
+          var row = document.createElement('tr');
+          var td = document.createElement('td');
+          //data
+          td.innerText = num;
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['nama_pengirim'];
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['nama_event'];
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['tanggal'];
+          row.appendChild(td);
+          //status
+          var span = document.createElement('span');
+          if(item['status'] == 'diajukan'){
+            span.classList.add('badge','bg-proses');
+            span.innerText = 'Diajukan';
+          }else if(item['status'] == 'proses'){
+            span.classList.add('badge','bg-terima');
+            span.innerText = 'Diproses';
           }
           var td = document.createElement('td');
-          td.appendChild(btn);
+          td.appendChild(span);
           row.appendChild(td);
-        }else if(item['status'] == 'proses'){
-          var link = document.createElement('a');
-          var icon = document.createElement('i');
-          icon.classList.add('bi','bi-eye-fill');
-          icon.innerText = 'Lihat';
-          link.appendChild(icon);
-          link.classList.add('btn','btn-lihat');
-          link.createAttribute('href',`/event/detail_event.php?id_event=${item['id_event']}`);
-          var td = document.createElement('td');
-          td.appendChild(link);
-          row.appendChild(td);
-        }
-        tableEvent.appendChild(row);
-        num++;
-      });
+          //btn
+          if(item['status'] == 'diajukan'){
+            var btn = document.createElement('button');
+            var icon = document.createElement('i');
+            icon.classList.add('bi','bi-eye-fill');
+            icon.innerText = 'Lihat';
+            btn.appendChild(icon);
+            btn.classList.add('btn','btn-lihat');
+            btn.onclick = function (){
+              proses(`${item['id_event']}`);
+            }
+            var td = document.createElement('td');
+            td.appendChild(btn);
+            row.appendChild(td);
+          }else if(item['status'] == 'proses'){
+            var link = document.createElement('a');
+            var icon = document.createElement('i');
+            icon.classList.add('bi','bi-eye-fill');
+            icon.innerText = 'Lihat';
+            link.appendChild(icon);
+            link.classList.add('btn','btn-lihat');
+            link.setAttribute('href',`/event/detail_event.php?id_event=${item['id_event']}`);
+            var td = document.createElement('td');
+            td.appendChild(link);
+            row.appendChild(td);
+          }
+          tableEvent.appendChild(row);
+          num++;
+        });
+      }
     }
     function getData(con = null){
       var xhr = new XMLHttpRequest();
@@ -272,14 +274,14 @@ $csrf = $GLOBALS['csrf'];
         var requestBody = {
           email: email,
           tanggal:'semua',
-          desc:'riwayat'
+          desc:'pengajuan'
         };
       }else if(con == null){
         var tanggal = bulanInput.value +'-'+tahunInput.value;
         var requestBody = {
           email: email,
           tanggal:tanggal,
-          desc:'riwayat'
+          desc:'pengajuan'
         };
       }
       //open the request

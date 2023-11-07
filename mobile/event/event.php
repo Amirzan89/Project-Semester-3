@@ -434,7 +434,6 @@ class EventMobile{
             }
             //check data event
             $query = "SELECT events.id_detail, status, poster_event FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = ? LIMIT 1";
-            // $query = "SELECT id_detail, status, poster_event FROM events WHERE BINARY id_event = ? AND status = 'diajukan' LIMIT 1";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_event']);
             $stmt[1]->execute();
@@ -467,17 +466,17 @@ class EventMobile{
                 }
             }
             //update database 
-            $query = "UPDATE events SET nama_pengirim = ? WHERE id_event = ?";
+            $query = "UPDATE events SET nama_pengirim = ?, updated_at = ? WHERE id_event = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param("si", $data['nama_pengirim'], $data['id_event']);
+            $stmt[2]->bind_param("ssi", $data['nama_pengirim'],$tanggalSekarangDB, $data['id_event']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
                 //update database
-                $query = "UPDATE detail_events SET nama_event = ?, deskripsi = ?, kategori = ?, tempat_event = ?, tanggal_awal = ?, tanggal_akhir = ?, link_pendaftaran = ?, updated_at = ? WHERE id_detail = ?";
+                $query = "UPDATE detail_events SET nama_event = ?, deskripsi = ?, kategori = ?, tempat_event = ?, tanggal_awal = ?, tanggal_akhir = ?, link_pendaftaran = ? WHERE id_detail = ?";
                 $stmt[3] = self::$con->prepare($query);
                 $data['kategori_event'] = strtoupper($data['kategori_event']);
-                $stmt[3]->bind_param("sssssssi", $data['nama_event'], $data['deskripsi'], $data['kategori_event'], $data['tempat'], $tanggal_awalDB, $tanggal_akhirDB, $data['link_pendaftaran'], $tanggalSekarangDB,  $id_detail);
+                $stmt[3]->bind_param("sssssssi", $data['nama_event'], $data['deskripsi'], $data['kategori_event'], $data['tempat'], $tanggal_awalDB, $tanggal_akhirDB, $data['link_pendaftaran'],  $id_detail);
                 $stmt[3]->execute();
                 if ($stmt[3]->affected_rows > 0) {
                     $stmt[3]->close();

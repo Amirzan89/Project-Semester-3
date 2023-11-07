@@ -12,7 +12,7 @@ class TempatMobile{
     }
     private static function loadEnv($path = null){
         if($path == null){
-            $path = ".env";
+            $path = __DIR__."/../../.env";
         }
         if (file_exists($path)) {
             $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -224,8 +224,8 @@ class TempatMobile{
             $tanggal_awalDB = date('Y-m-d H:i:s', $tanggal_awal);
             $tanggal_akhir = strtotime($data['tanggal_akhir_sewa']);
             $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
-            $tanggal_sekarang = date('Y-m-d H:i:s');
-            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            $tanggal_sekarangDB = date('Y-m-d H:i:s');
+            $tanggal_sekarang = strtotime($tanggal_sekarangDB);
             //tambah 1 minggu
             $tanggal_sekarang = strtotime('+1 week', $tanggal_sekarang);
             // Check if the date formats are valid
@@ -288,10 +288,10 @@ class TempatMobile{
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
             //save data
-            $query = "INSERT INTO sewa_tempat (nik_sewa, nama_tempat, nama_peminjam, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, surat_ket_sewa, tgl_awal_peminjaman, tgl_akhir_peminjaman, status, id_tempat, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO sewa_tempat (nik_sewa, nama_tempat, nama_peminjam, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, surat_ket_sewa, tgl_awal_peminjaman, tgl_akhir_peminjaman, status, created_at, updated_at, id_tempat, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
             $status = 'diajukan';
-            $stmt[2]->bind_param("sssssssssssii", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'],$data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $status, $data['id_tempat'], $data['id_user']);
+            $stmt[2]->bind_param("sssssssssssssii", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'],$data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $status, $tanggal_sekarangDB, $tanggal_sekarangDB, $data['id_tempat'], $data['id_user']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -401,8 +401,8 @@ class TempatMobile{
             $tanggal_awalDB = date('Y-m-d H:i:s', $tanggal_awal);
             $tanggal_akhir = strtotime($data['tanggal_akhir_sewa']);
             $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
-            $tanggal_sekarang = date('Y-m-d H:i:s');
-            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            $tanggal_sekarangDB = date('Y-m-d H:i:s');
+            $tanggal_sekarang = strtotime($tanggal_sekarangDB);
             //tambah 1 minggu
             $tanggal_sekarang = strtotime('+1 week', $tanggal_sekarang);
             // Check if the date formats are valid
@@ -471,9 +471,9 @@ class TempatMobile{
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
             //update data
-            $query = "UPDATE sewa_tempat SET nik_sewa = ?, nama_tempat = ?, nama_peminjam = ?, deskripsi_sewa_tempat = ?, nama_kegiatan_sewa = ?, jumlah_peserta = ?, instansi = ?, surat_ket_sewa = ?, tgl_awal_peminjaman = ?, tgl_akhir_peminjaman = ? WHERE id_sewa = ?";
+            $query = "UPDATE sewa_tempat SET nik_sewa = ?, nama_tempat = ?, nama_peminjam = ?, deskripsi_sewa_tempat = ?, nama_kegiatan_sewa = ?, jumlah_peserta = ?, instansi = ?, surat_ket_sewa = ?, tgl_awal_peminjaman = ?, tgl_akhir_peminjaman = ?, updated_at = ? WHERE id_sewa = ?";
             $stmt[3] = self::$con->prepare($query);
-            $stmt[3]->bind_param("ssssssssssi", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'], $data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $data['id_sewa']);
+            $stmt[3]->bind_param("sssssssssssi", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'], $data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $tanggal_sekarangDB, $data['id_sewa']);
             $stmt[3]->execute();
             if ($stmt[3]->affected_rows > 0) {
                 $stmt[3]->close();

@@ -123,7 +123,7 @@ $csrf = $GLOBALS['csrf'];
                       </div>
                       <div class="col-lg-5">
                         <select id="inpBulan" onchange="tampilkanBulan()" class="inp">
-                        <option value="semua">semua</option>
+                          <option value="semua">semua</option>
                           <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
                           <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
                           <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?> >Maret</option>
@@ -155,8 +155,8 @@ $csrf = $GLOBALS['csrf'];
                 </thead>
                 <tbody id="tableEvent">
                   <?php
-                    // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' AND MONTH(tanggal_awal) = ".date('m')." AND YEAR(tanggal_awal) = ".date('Y'). " ORDER BY id_event DESC");
-                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_event DESC");
+                    // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y'). " ORDER BY id_event DESC");
+                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_event DESC");
                     $no = 1;
                     while ($event = mysqli_fetch_array($query)) {
                   ?>
@@ -164,7 +164,7 @@ $csrf = $GLOBALS['csrf'];
                       <td><?php echo $no?></td>
                       <td><?php echo $event['nama_pengirim']?></td>
                       <td><?php echo $event['nama_event']?></td>
-                      <td><?php echo $event['tanggal_awal']?></td>
+                      <td><?php echo $event['tanggal']?></td>
                       <td>
                         <?php if($event['status'] == 'diterima'){ ?>
                           <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i>  Disetujui</span>
@@ -332,34 +332,6 @@ $csrf = $GLOBALS['csrf'];
           getData();
         }, 250);
       }, 5);
-    }
-    function proses(Id) {
-      var xhr = new XMLHttpRequest();
-      var requestBody = {
-        _method: 'PUT',
-        id_user: idUser,
-        id_event: Id,
-        keterangan: 'proses'
-      };
-      //open the request
-      xhr.open('POST', domain + "/web/event/event.php")
-      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      //send the form data
-      xhr.send(JSON.stringify(requestBody));
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState == XMLHttpRequest.DONE) {
-          if (xhr.status === 200) {
-            window.location.href = "/event/detail_event.php?id_event="+Id;
-          } else {
-            try {
-                eval(xhr.responseText);
-            } catch (error) {
-                console.error('Error evaluating JavaScript:', error);
-            }
-          }
-        }
-      }
     }
   </script>
   <!-- Vendor JS Files -->

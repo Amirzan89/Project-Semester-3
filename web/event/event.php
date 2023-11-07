@@ -74,18 +74,18 @@ class EventWebsite{
             //check and get data
             if($data['tanggal'] == 'semua'){
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses'";
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses'";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'ditolak' OR status = 'diterima'";
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'ditolak' OR status = 'diterima'";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
                 $stmt[1] = self::$con->prepare($query);
             }else{
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'diajukan 'OR status = 'proses') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ?";
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'diajukan 'OR status = 'proses') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ?";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'ditolak 'OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ?";
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'ditolak 'OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ?";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
