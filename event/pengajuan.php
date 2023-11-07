@@ -46,6 +46,7 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- Template Main CSS File -->
   <link href="/public/assets/css/event.css" rel="stylesheet">
+  <link href="/public/css/popup.css" rel="stylesheet">
   <style>
     .ui-datepicker-calendar {
       display: none;
@@ -69,7 +70,6 @@ $csrf = $GLOBALS['csrf'];
 
 <body>
   <script>
-    var bulan = <?php echo date('m') ?>;
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
 		var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
@@ -117,7 +117,7 @@ $csrf = $GLOBALS['csrf'];
                   <div class="col-lg-12">
                     <div class="row">
                       <div class="col-lg-3">
-                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>">
+                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
                       </div>
                       <div class="col-lg-5">
                         <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="<?php echo date('M')  ?>">
@@ -139,7 +139,7 @@ $csrf = $GLOBALS['csrf'];
                     </div>
                   </div>
               </div>
-              <table class="table datatable">
+              <table class="table">
               <thead>
               <tr>
                     <th>No</th>
@@ -150,18 +150,18 @@ $csrf = $GLOBALS['csrf'];
                     <th>Aksi</th>
                   </tr>
                   </thead>
-                  <tbody>
+                  <tbody id="tableEvent">
                   <?php
                     // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, tanggal_awal, tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' AND MONTH(tanggal_awal) = ".date('m')." AND YEAR(tanggal_awal) = ".date('Y')." ORDER BY id_event DESC");
-                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, tanggal_awal, tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC");
+                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC");
                     $no = 1;
                     while ($event = mysqli_fetch_array($query)) {
                   ?>
-                      <tr>
+                      <tr>  
                           <td><?php echo $no; ?></td>
                           <td><?php echo $event['nama_pengirim']?></td>
                           <td><?php echo $event['nama_event']?></td>
-                          <td><?php echo $event['tanggal_awal']?></td>
+                          <td><?php echo $event['tanggal']?></td>
                           <td>
                             <?php if($event['status'] == 'diajukan'){ ?>
                               <span class="badge bg-proses">Diajukan</span>
@@ -180,7 +180,7 @@ $csrf = $GLOBALS['csrf'];
                       </tr>
                   <?php $no++;
                   } ?>
-               </tbody>
+                </tbody>
               </table>
             </div>
           </div>
@@ -189,8 +189,7 @@ $csrf = $GLOBALS['csrf'];
       </div>
     </section>
   </main><!-- End #main -->
-
-
+  <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <?php include('../footer.php');
@@ -198,26 +197,89 @@ $csrf = $GLOBALS['csrf'];
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script src="/public/js/popup.js"></script>
   <script>
+    var tableEvent = document.getElementById('tableEvent');
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
+    function updateTable(dataT){
+      while (tableEvent.firstChild) {
+        tableEvent.removeChild(tableEvent.firstChild);
+      }
+      // console.log(dataT);
+      var num = 1;
+      dataT.forEach(function (item){
+        var row = document.createElement('tr');
+        var td = document.createElement('td');
+        //data
+        td.innerText = num;
+        row.appendChild(td);
+        var td = document.createElement('td');
+        td.innerText = item['nama_pengirim'];
+        row.appendChild(td);
+        var td = document.createElement('td');
+        td.innerText = item['nama_event'];
+        row.appendChild(td);
+        var td = document.createElement('td');
+        td.innerText = item['tanggal_awal'];
+        row.appendChild(td);
+        //status
+        var span = document.createElement('span');
+        if(item['status'] == 'diajukan'){
+          span.classList.add('badge','bg-proses');
+          span.innerText = 'Diajukan';
+        }else if(item['status'] == 'proses'){
+          span.classList.add('badge','bg-terima');
+          span.innerText = 'Diproses';
+        }
+        var td = document.createElement('td');
+        td.appendChild(span);
+        row.appendChild(td);
+        //btn
+        if(item['status'] == 'diajukan'){
+          var btn = document.createElement('button');
+          var icon = document.createElement('i');
+          icon.classList.add('bi','bi-eye-fill');
+          icon.innerText = 'Lihat';
+          btn.appendChild(icon);
+          btn.classList.add('btn','btn-lihat');
+          btn.onclick = function (){
+            proses(`${item['id_event']}`);
+          }
+          var td = document.createElement('td');
+          td.appendChild(btn);
+          row.appendChild(td);
+        }else if(item['status'] == 'proses'){
+          var link = document.createElement('a');
+          var icon = document.createElement('i');
+          icon.classList.add('bi','bi-eye-fill');
+          icon.innerText = 'Lihat';
+          link.appendChild(icon);
+          link.classList.add('btn','btn-lihat');
+          link.createAttribute('href',`/event/detail_event.php?id_event=${item['id_event']}`);
+          var td = document.createElement('td');
+          td.appendChild(link);
+          row.appendChild(td);
+        }
+        tableEvent.appendChild(row);
+        num++;
+      });
+    }
     function getData(con = null){
       var xhr = new XMLHttpRequest();
       if(con == 'semua'){
         var requestBody = {
-          id_user: idUser,
-          id_event: Id,
+          email: email,
           tanggal:'semua',
-          keterangan: 'get'
+          desc:'riwayat'
         };
       }else if(con == null){
         var tanggal = bulanInput.value +'-'+tahunInput.value;
         var requestBody = {
-          id_user: idUser,
-          id_event: Id,
+          email: email,
           tanggal:tanggal,
-          keterangan: 'get'
+          desc:'riwayat'
         };
       }
       //open the request
@@ -229,13 +291,13 @@ $csrf = $GLOBALS['csrf'];
       xhr.onreadystatechange = function () {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
-            window.location.href = "/event/detail_event.php?id_event="+Id;
+            var response = xhr.responseText;
+            updateTable(JSON.parse(response)['data']);
           } else {
-            try {
-              eval(xhr.responseText);
-            } catch (error) {
-              console.error('Error evaluating JavaScript:', error);
-            }
+            var response = xhr.responseText;
+            console.log(response);
+            updateTable();
+            return;
           }
         }
       }
@@ -245,11 +307,32 @@ $csrf = $GLOBALS['csrf'];
         tahun = tahunInput.value;
         tahunInput.disabled = true;
         tahunInput.value = '';
-        getData('semua');
+        setTimeout(() => {
+          getData('semua');
+        }, 250);
       }else{
-        tahunInput.disabled = false;
-        tahunInput.value = tahun;
+        if(tahunInput.disabled == true){
+          tahunInput.disabled = false;
+          tahunInput.value = tahun;
+        }
+        setTimeout(() => {
+          getData();
+        }, 250);
       }
+    }
+    function tampilkanTahun(){
+      setTimeout(() => {
+        var tahun = tahunInput.value;
+        tahun = tahun.replace(/\s/g, '');
+        if (isNaN(tahun)) {
+          showRedPopup('Tahun harus angka !');
+          console.log("Tahun harus angka");
+          return;
+        }
+        setTimeout(() => {
+          getData();
+        }, 250);
+      }, 50);
     }
     function proses(Id) {
       var xhr = new XMLHttpRequest();

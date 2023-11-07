@@ -49,6 +49,7 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- Template Main CSS File -->
   <link href="/public/assets/css/nomor-induk.css" rel="stylesheet">
+  <link href="/public/css/popup.css" rel="stylesheet">
   <style>
     .ui-datepicker-calendar {
       display: none;
@@ -72,6 +73,7 @@ $csrf = $GLOBALS['csrf'];
 
 <body>
   <script>
+    const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
 		var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
@@ -117,28 +119,29 @@ $csrf = $GLOBALS['csrf'];
                   <div class="col-lg-12">
                     <div class="row">
                       <div class="col-lg-3">
-                        <input type="text" name="" id="" placeholder="Tahun" class="inp">
+                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
                       </div>
                       <div class="col-lg-5">
-                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
-                          <option value="01">Januari</option>
-                          <option value="02">Februari</option>
-                          <option value="03">Maret</option>
-                          <option value="04">April</option>
-                          <option value="05">Mei</option>
-                          <option value="06">Juni</option>
-                          <option value="07">Juli</option>
-                          <option value="08">Agustus</option>
-                          <option value="09">September</option>
-                          <option value="10">Oktober</option>
-                          <option value="11">November</option>
-                          <option value="12">Desember</option>
+                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp">
+                        <option value="semua">semua</option>
+                          <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
+                          <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
+                          <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?> >Maret</option>
+                          <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?> >April</option>
+                          <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?> >Mei</option>
+                          <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?> >Juni</option>
+                          <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?> >Juli</option>
+                          <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?> >Agustus</option>
+                          <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?> >September</option>
+                          <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?> >Oktober</option>
+                          <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?> >November</option>
+                          <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?> >Desember</option>
                         </select>
                       </div>
                     </div>
                   </div>
               </div>
-              <table class="table datatable">
+              <table class="table">
                 <thead>
                   <tr>
                   <th scope="col">No</th>
@@ -150,7 +153,7 @@ $csrf = $GLOBALS['csrf'];
                     <th scope="col">Aksi</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="tableEvent">
                   <?php
                     // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' AND MONTH(tanggal_awal) = ".date('m')." AND YEAR(tanggal_awal) = ".date('Y'). " ORDER BY id_event DESC");
                     $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_event DESC");
@@ -187,7 +190,7 @@ $csrf = $GLOBALS['csrf'];
     </section>
 
   </main><!-- End #main -->
-
+  <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <?php include('../footer.php');
@@ -195,9 +198,170 @@ $csrf = $GLOBALS['csrf'];
   </footer>
   <!-- </footer> -->
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
-
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script src="/public/js/popup.js"></script>
+  <script>
+    var tableEvent = document.getElementById('tableEvent');
+    var tahunInput = document.getElementById('inpTahun');
+    var bulanInput = document.getElementById('inpBulan');
+    var tahun;
+    function updateTable(dataT = ''){
+      while (tableEvent.firstChild) {
+        tableEvent.removeChild(tableEvent.firstChild);
+      }
+      var num = 1;
+      if(dataT != ''){
+        console.log(dataT);
+        dataT.forEach(function (item){
+          console.log('data ');
+          var row = document.createElement('tr');
+          var td = document.createElement('td');
+          //data
+          td.innerText = num;
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['nama_pengirim'];
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['nama_event'];
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['tanggal_awal'];
+          row.appendChild(td);
+          //status
+          var span = document.createElement('span');
+          var icon = document.createElement('i');
+          if(item['status'] == 'ditolak'){
+            icon.innerText = 'Ditolak';
+            icon.classList.add('bi','bi-x-circle-fill');
+            span.appendChild(icon);
+            span.classList.add('badge','bg-tolak');
+          }else if(item['status'] == 'diterima'){
+            icon.innerText = 'Disetujui';
+            icon.classList.add('bi','bi-check-circle-fill');
+            span.appendChild(icon);
+            span.classList.add('badge','bg-terima');
+          }
+          var td = document.createElement('td');
+          td.appendChild(span);
+          row.appendChild(td);
+          //catatan
+          var td = document.createElement('td');
+          td.innerText = item['catatan'];
+          row.appendChild(td);
+          //btn
+          var link = document.createElement('a');
+          var icon = document.createElement('i');
+          icon.classList.add('bi','bi-eye-fill');
+          icon.innerText = 'Lihat';
+          link.appendChild(icon);
+          link.classList.add('btn','btn-lihat');
+          link.setAttribute('href',`/event/detail_event.php?id_event=${item['id_event']}`);
+          var td = document.createElement('td');
+          td.appendChild(link);
+          row.appendChild(td);
+          tableEvent.appendChild(row);
+          num++;
+        });
+      }
+    }
+    function getData(con = null){
+      var xhr = new XMLHttpRequest();
+      if(con == 'semua'){
+        var requestBody = {
+          email: email,
+          tanggal:'semua',
+          desc:'riwayat'
+        };
+      }else if(con == null){
+        var tanggal = bulanInput.value +'-'+tahunInput.value;
+        var requestBody = {
+          email: email,
+          tanggal:tanggal,
+          desc:'riwayat'
+        };
+      }
+      //open the request
+      xhr.open('POST', domain + "/web/event/event.php")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      //send the form data
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            var response = xhr.responseText;
+            updateTable(JSON.parse(response)['data']);
+          } else {
+            var response = xhr.responseText;
+            console.log(response);
+            updateTable();
+            return;
+          }
+        }
+      }
+    }
+    function tampilkanBulan(){
+      if(bulanInput.value == 'semua'){
+        tahun = tahunInput.value;
+        tahunInput.disabled = true;
+        tahunInput.value = '';
+        setTimeout(() => {
+          getData('semua');
+        }, 250);
+      }else{
+        if(tahunInput.disabled == true){
+          tahunInput.disabled = false;
+          tahunInput.value = tahun;
+        }
+        setTimeout(() => {
+          getData();
+        }, 250);
+      }
+    }
+    function tampilkanTahun(){
+      setTimeout(() => {
+        var tahun = tahunInput.value;
+        tahun = tahun.replace(/\s/g, '');
+        if (isNaN(tahun)) {
+          showRedPopup('Tahun harus angka !');
+          console.log("Tahun harus angka");
+          return;
+        }
+        setTimeout(() => {
+          getData();
+        }, 250);
+      }, 5);
+    }
+    function proses(Id) {
+      var xhr = new XMLHttpRequest();
+      var requestBody = {
+        _method: 'PUT',
+        id_user: idUser,
+        id_event: Id,
+        keterangan: 'proses'
+      };
+      //open the request
+      xhr.open('POST', domain + "/web/event/event.php")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      //send the form data
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            window.location.href = "/event/detail_event.php?id_event="+Id;
+          } else {
+            try {
+                eval(xhr.responseText);
+            } catch (error) {
+                console.error('Error evaluating JavaScript:', error);
+            }
+          }
+        }
+      }
+    }
+  </script>
   <!-- Vendor JS Files -->
   <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="/public/assets/vendor/simple-datatables/simple-datatables.js"></script>

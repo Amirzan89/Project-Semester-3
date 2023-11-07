@@ -9,7 +9,7 @@ class Jwt{
     }
     private static function loadEnv($path = null){
         if($path == null){
-            $path = ".env";
+            $path = __DIR__."/../.env";
         }
         if (file_exists($path)) {
             $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

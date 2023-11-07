@@ -3,7 +3,7 @@ require(__DIR__.'/../web/koneksi.php');
 require(__DIR__.'/../web/Jwt.php');
 $loadEnv = function($path = null){
     if($path == null){
-        $path = ".env";
+        $path = __DIR__."/../.env";
     }
     if (file_exists($path)) {
         $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

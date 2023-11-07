@@ -3,7 +3,7 @@ class Koneksi{
     private static $instance;
     private static function loadEnv($path = null){
         if($path == null){
-            $path = __DIR__."/.env";
+            $path = __DIR__."/../.env";
         }
         if (file_exists($path)) {
             $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

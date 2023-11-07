@@ -12,7 +12,7 @@ class MailMobile{
     private static $sendTime = [5, 15, 30, 60, 6*60, 12*60, 24*60];
     private static function loadEnv($path = null){
         if($path == null){
-            $path = __DIR__."/../web/.env";
+            $path = __DIR__."/../.env";
         }
         if (file_exists($path)) {
             $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

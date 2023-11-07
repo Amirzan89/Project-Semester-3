@@ -234,8 +234,8 @@ class EventMobile{
             $tanggal_awalDB = date('Y-m-d H:i:s', $tanggal_awal);
             $tanggal_akhir = strtotime($data['tanggal_akhir']);
             $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
-            $tanggal_sekarang = date('Y-m-d H:i:s');
-            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            $tanggalSekarangDB = date('Y-m-d H:i:s');
+            $tanggal_sekarang = strtotime($tanggalSekarangDB);
             if (!$tanggal_awal) {
                 throw new Exception('Format tanggal awal tidak valid !');
             }else if (!$tanggal_akhir) {
@@ -306,15 +306,15 @@ class EventMobile{
             $stmt = self::$con->prepare($query);
             $data['kategori_event'] = strtoupper($data['kategori_event']);
             $fileDb = $fileTime.$nameFile;
-            $stmt->bind_param("ssssssss",$data['nama_event'], $data['deskripsi'], $data['kategori_event'], $data['tempat'], $tanggal_awalDB, $tanggal_akhirDB, $data['link'],$fileDb);
+            $stmt->bind_param("ssssssss",$data['nama_event'], $data['deskripsi'], $data['kategori_event'], $data    ['tempat'], $tanggal_awalDB, $tanggal_akhirDB, $data['link'],$fileDb);
             $stmt->execute();
             if ($stmt->affected_rows > 0) {
                 $id = self::$con->insert_id;
                 //tambah data
-                $query = "INSERT INTO events (nama_pengirim, status, id_detail, id_sewa, id_user) VALUES (?, ?, ?, ?, ?)";
+                $query = "INSERT INTO events (nama_pengirim, status, created_at, updated_at, id_detail, id_sewa, id_user) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $stmt = self::$con->prepare($query);
                 $status = 'diajukan';
-                $stmt->bind_param("sssss", $data['nama_pengirim'], $status, $id, $data['id_tempat'],$data['id_user']);
+                $stmt->bind_param("sssssss", $data['nama_pengirim'], $status, $tanggalSekarangDB, $tanggalSekarangDB, $id, $data['id_tempat'],$data['id_user']);
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
                     header('Content-Type: application/json');
@@ -390,8 +390,8 @@ class EventMobile{
             $tanggal_awalDB = date('Y-m-d H:i:s', $tanggal_awal);
             $tanggal_akhir = strtotime($data['tanggal_akhir']);
             $tanggal_akhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
-            $tanggal_sekarang = date('Y-m-d H:i:s');
-            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            $tanggal_sekarangDB = date('Y-m-d H:i:s');
+            $tanggal_sekarang = strtotime($tanggal_sekarangDB);
             // Check if the date formats are valid
             if (!$tanggal_awal) {
                 throw new Exception('Format tanggal awal tidak valid !');
@@ -474,10 +474,10 @@ class EventMobile{
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
                 //update database
-                $query = "UPDATE detail_events SET nama_event = ?, deskripsi = ?, kategori = ?, tempat_event = ?, tanggal_awal = ?, tanggal_akhir = ?, link_pendaftaran = ? WHERE id_detail = ?";
+                $query = "UPDATE detail_events SET nama_event = ?, deskripsi = ?, kategori = ?, tempat_event = ?, tanggal_awal = ?, tanggal_akhir = ?, link_pendaftaran = ?, updated_at = ? WHERE id_detail = ?";
                 $stmt[3] = self::$con->prepare($query);
                 $data['kategori_event'] = strtoupper($data['kategori_event']);
-                $stmt[3]->bind_param("sssssssi", $data['nama_event'], $data['deskripsi'], $data['kategori_event'], $data['tempat'], $tanggal_awalDB, $tanggal_akhirDB, $data['link_pendaftaran'], $id_detail);
+                $stmt[3]->bind_param("sssssssi", $data['nama_event'], $data['deskripsi'], $data['kategori_event'], $data['tempat'], $tanggal_awalDB, $tanggal_akhirDB, $data['link_pendaftaran'], $tanggalSekarangDB,  $id_detail);
                 $stmt[3]->execute();
                 if ($stmt[3]->affected_rows > 0) {
                     $stmt[3]->close();

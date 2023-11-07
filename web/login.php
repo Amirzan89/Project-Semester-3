@@ -22,7 +22,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 }
 if(isset($_POST['login'])){
     try{
-        $email = $_POST["email"];
+        $email = htmlspecialchars($_POST["email"]);
         // $email = "Admin@gmail.com";
         $pass = $_POST["password"];
         $pass = "Admin@1234567890";

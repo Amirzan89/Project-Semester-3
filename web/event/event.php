@@ -45,6 +45,95 @@ class EventWebsite{
             exit();
         }
     }
+    public function getEvent($data){
+        try{
+            if(!isset($data['email']) || empty($data['email'])){
+                throw new Exception('Email harus di isi !');
+            }
+            if(!isset($data['tanggal']) || empty($data['tanggal'])){
+                throw new Exception('Tanggal harus di isi !');
+            }
+            if(!isset($data['desc']) || empty($data['desc'])){
+                throw new Exception('Deskripsi harus di isi !');
+            }
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['email']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                throw new Exception('User tidak ditemukan');
+            }
+            $stmt[0]->close();
+            if(($role != 'admin event' && $role != 'super admin') || $role == 'masyarakat'){
+                throw new Exception('Invalid role');
+            }
+            //check and get data
+            if($data['tanggal'] == 'semua'){
+                if($data['desc'] == 'pengajuan'){
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses'";
+                }else if($data['desc'] == 'riwayat'){
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'ditolak' OR status = 'diterima'";
+                }else{
+                    throw new Exception('Deskripsi invalid !');
+                }
+                $stmt[1] = self::$con->prepare($query);
+            }else{
+                if($data['desc'] == 'pengajuan'){
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'diajukan 'OR status = 'proses') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ?";
+                }else if($data['desc'] == 'riwayat'){
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'ditolak 'OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ?";
+                }else{
+                    throw new Exception('Deskripsi invalid !');
+                }
+                $stmt[1] = self::$con->prepare($query);
+                $tanggal = explode('-',$data['tanggal']);
+                $month = $tanggal[0];
+                $year = $tanggal[1];
+                $stmt[1]->bind_param('ss', $month, $year);
+            }
+            if (!$stmt[1]->execute()) {
+                $stmt[1]->close();
+                throw new Exception('Data event tidak ditemukan');
+            }
+            $result = $stmt[1]->get_result();
+            $eventsData = array();
+            while ($row = $result->fetch_assoc()) {
+                $eventsData[] = $row;
+            }
+            $stmt[1]->close();
+            if ($eventsData === null) {
+                throw new Exception('Data event tidak ditemukan');
+            }
+            if (empty($eventsData)) {
+                throw new Exception('Data event tidak ditemukan');
+            }
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'message' => 'Data event berhasil didapatkan', 'data' => $eventsData]);
+            exit();
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
+    }
     //khusus admin event dan super admin
     public function prosesEvent($data){
         try{
@@ -226,5 +315,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
     }
+    $eventWeb->getEvent($data);
 }
 ?>
