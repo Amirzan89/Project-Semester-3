@@ -190,8 +190,8 @@ class AdvisMobile{
             $tanggal_akhir = strtotime($data['tanggal_akhir']);
             $tanggalAwalDB = date('Y-m-d H:i:s', $tanggal_awal);
             $tanggalAkhirDB = date('Y-m-d H:i:s', $tanggal_akhir);
-            $tanggal_sekarang = date('Y-m-d H:i:s');
-            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            $tanggal_sekarangDB = date('Y-m-d H:i:s');
+            $tanggal_sekarang = strtotime($tanggal_sekarangDB);
             // Check if the date formats are valid
             if (!$tanggal_awal) {
                 throw new Exception('Format tanggal awal tidak valid !');
@@ -284,10 +284,10 @@ class AdvisMobile{
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
             //save data
-            $query = "INSERT INTO surat_advis (nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_awal, tgl_selesai, tempat_advis, surat_keterangan, status, id_user, id_seniman) VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?)";
+            $query = "INSERT INTO surat_advis (nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_awal, tgl_selesai, tempat_advis, surat_keterangan, status, created_at, updated_at, id_user, id_seniman) VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
             $status = 'diajukan';
-            $stmt[2]->bind_param("sssssssssii", $nisDB, $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalAwalDB, $tanggalAkhirDB, $data['tempat_pentas'], $fileSuratDB, $status, $data['id_user'], $data['id_seniman']);
+            $stmt[2]->bind_param("sssssssssssii", $nisDB, $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalAwalDB, $tanggalAkhirDB, $data['tempat_pentas'], $fileSuratDB, $status, $tanggal_sekarangDB, $tanggal_sekarangDB, $data['id_user'], $data['id_seniman']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -353,8 +353,8 @@ class AdvisMobile{
             date_default_timezone_set('Asia/Jakarta');
             $tanggal = strtotime($data['tanggal']);
             $tanggalDB = date('Y-m-d H:i:s', $tanggal);
-            $tanggal_sekarang = date('Y-m-d H:i:s');
-            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            $tanggal_sekarangDB = date('Y-m-d H:i:s');
+            $tanggal_sekarang = strtotime($tanggal_sekarangDB);
             // Check if the date formats are valid
             if (!$tanggal) {
                 throw new Exception('Format tanggal awal tidak valid !');
@@ -430,9 +430,9 @@ class AdvisMobile{
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
             //update data
-            $query = "UPDATE surat_advis SET nama_advis = ?, alamat_advis = ?, deskripsi_advis = ?, tgl_advis = ?, tempat_advis = ?, surat_keterangan = ? WHERE id_advis = ?";
+            $query = "UPDATE surat_advis SET nama_advis = ?, alamat_advis = ?, deskripsi_advis = ?, tgl_advis = ?, tempat_advis = ?, surat_keterangan = ?, updated_at = ?, WHERE id_advis = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param("ssssssi", $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalDB, $data['tempat_pentas'], $fileSuratDB, $data['id_advis']);
+            $stmt[2]->bind_param("sssssssi", $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalDB, $data['tempat_pentas'], $fileSuratDB, $tanggal_sekarangDB, $data['id_advis']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();

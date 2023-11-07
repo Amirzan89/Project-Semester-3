@@ -315,6 +315,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
     }
-    $eventWeb->getEvent($data);
+    if(isset($data['desc'])){
+        if($data['desc'] == 'pengajuan' || $data['desc'] == 'riwayat'){
+            $eventWeb->getEvent($data);
+        }
+    }
 }
 ?>

@@ -138,7 +138,7 @@ $csrf = $GLOBALS['csrf'];
                     </div>
                   </div>
               </div>
-              <table class="table">
+              <table class="table datatable">
               <thead>
                   <tr>
                     <th scope="col">No</th>
@@ -150,7 +150,7 @@ $csrf = $GLOBALS['csrf'];
                   </thead>
                   <tbody id="tableSeniman">
                   <?php
-                      // $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_seniman DESC");
+                      // $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_seniman DESC");
                       $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC");
                       $no = 1;
                       while ($seniman = mysqli_fetch_array($query)) {

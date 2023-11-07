@@ -44,6 +44,7 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- Template Main CSS File -->
   <link href="/public/assets/css/tempat.css" rel="stylesheet">
+  <link href="/public/css/popup.css" rel="stylesheet">
   <style>
     .ui-datepicker-calendar {
       display: none;
@@ -114,43 +115,43 @@ $csrf = $GLOBALS['csrf'];
                   <div class="col-lg-12">
                     <div class="row">
                       <div class="col-lg-3">
-                        <input type="text" name="" id="" placeholder="Tahun" class="inp">
+                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
                       </div>
                       <div class="col-lg-5">
-                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
-                          <option value="01">Januari</option>
-                          <option value="02">Februari</option>
-                          <option value="03">Maret</option>
-                          <option value="04">April</option>
-                          <option value="05">Mei</option>
-                          <option value="06">Juni</option>
-                          <option value="07">Juli</option>
-                          <option value="08">Agustus</option>
-                          <option value="09">September</option>
-                          <option value="10">Oktober</option>
-                          <option value="11">November</option>
-                          <option value="12">Desember</option>
+                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="<?php echo date('M')  ?>">
+                          <option value="semua">semua</option>
+                          <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
+                          <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
+                          <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?> >Maret</option>
+                          <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?> >April</option>
+                          <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?> >Mei</option>
+                          <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?> >Juni</option>
+                          <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?> >Juli</option>
+                          <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?> >Agustus</option>
+                          <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?> >September</option>
+                          <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?> >Oktober</option>
+                          <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?> >November</option>
+                          <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?> >Desember</option>
                         </select>
                       </div>
                     </div>
                   </div>
               </div>
-              <table class="table datatable">
+              <table class="table">
               <thead>
                   <tr>
                     <th scope="col">No</th>
                     <th scope="col">Nomor Induk Seniman</th>
                     <th scope="col">Nama Seniman</th>
-                    <th scope="col">Tanggal awal</th>
-                    <th scope="col">Tanggal akhir</th>
+                    <th scope="col">Tanggal Pengajuan</th>
                     <th scope="col">Status</th>
                     <th scope="col">Aksi</th>
                   </tr>
                   </thead>
-                  <tbody>
+                  <tbody id="tablePentas">
                     <?php
-                      // $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(tgl_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_akhir, status, catatan FROM surat_advis WHERE status = 'diajukan' OR status = 'proses' AND MONTH(tgl_awal) = ".date('m')." AND YEAR(tgl_awal) = ".date('Y'). " ORDER BY id_advis DESC");
-                      $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(tgl_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_akhir, status, catatan FROM surat_advis WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_advis DESC");
+                      // $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM surat_advis WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y'). " ORDER BY id_advis DESC");
+                      $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM surat_advis WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_advis DESC");
                       $no = 1;
                       while ($advis = mysqli_fetch_array($query)) {
                     ?>
@@ -158,8 +159,7 @@ $csrf = $GLOBALS['csrf'];
                       <td><?php echo $no?></td>
                       <td><?php echo $advis['nomor_induk']?></td>
                       <td><?php echo $advis['nama_advis']?></td>
-                      <td><?php echo $advis['tanggal_awal']?></td>
-                      <td><?php echo $advis['tanggal_akhir']?></td>
+                      <td><?php echo $advis['tanggal']?></td>
                       <td>
                         <?php if($advis['status'] == 'diajukan'){ ?>
                           <span class="badge bg-proses">Diajukan</span>
@@ -188,7 +188,7 @@ $csrf = $GLOBALS['csrf'];
 
 
   </main><!-- End #main -->
-
+  <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <?php include('../footer.php');
@@ -196,7 +196,143 @@ $csrf = $GLOBALS['csrf'];
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script src="/public/js/popup.js"></script>
   <script>
+    var tablePentas = document.getElementById('tablePentas');
+    var tahunInput = document.getElementById('inpTahun');
+    var bulanInput = document.getElementById('inpBulan');
+    var tahun;
+    function updateTable(dataT = ''){
+      while (tablePentas.firstChild) {
+        tablePentas.removeChild(tablePentas.firstChild);
+      }
+      var num = 1;
+      if(dataT != ''){
+        dataT.forEach(function (item){
+          var row = document.createElement('tr');
+          var td = document.createElement('td');
+          //data
+          td.innerText = num;
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['nomor_induk'];
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['nama_advis'];
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['tanggal'];
+          row.appendChild(td);
+          //status
+          var span = document.createElement('span');
+          if(item['status'] == 'diajukan'){
+            span.classList.add('badge','bg-proses');
+            span.innerText = 'Diajukan';
+          }else if(item['status'] == 'proses'){
+            span.classList.add('badge','bg-terima');
+            span.innerText = 'Diproses';
+          }
+          var td = document.createElement('td');
+          td.appendChild(span);
+          row.appendChild(td);
+          //btn
+          if(item['status'] == 'diajukan'){
+            var btn = document.createElement('button');
+            var icon = document.createElement('i');
+            icon.classList.add('bi','bi-eye-fill');
+            icon.innerText = 'Lihat';
+            btn.appendChild(icon);
+            btn.classList.add('btn','btn-lihat');
+            btn.onclick = function (){
+              proses(`${item['id_advis']}`);
+            }
+            var td = document.createElement('td');
+            td.appendChild(btn);
+            row.appendChild(td);
+          }else if(item['status'] == 'proses'){
+            var link = document.createElement('a');
+            var icon = document.createElement('i');
+            icon.classList.add('bi','bi-eye-fill');
+            icon.innerText = 'Lihat';
+            link.appendChild(icon);
+            link.classList.add('btn','btn-lihat');
+            link.setAttribute('href',`/pentas/detail_pentas.php?id_pentas=${item['id_advis']}`);
+            var td = document.createElement('td');
+            td.appendChild(link);
+            row.appendChild(td);
+          }
+          tablePentas.appendChild(row);
+          num++;
+        });
+      }
+    }
+    function getData(con = null){
+      var xhr = new XMLHttpRequest();
+      if(con == 'semua'){
+        var requestBody = {
+          email: email,
+          tanggal:'semua',
+          desc:'pengajuan'
+        };
+      }else if(con == null){
+        var tanggal = bulanInput.value +'-'+tahunInput.value;
+        var requestBody = {
+          email: email,
+          tanggal:tanggal,
+          desc:'pengajuan'
+        };
+      }
+      //open the request
+      xhr.open('POST', domain + "/web/pentas/pentas.php")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      //send the form data
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            var response = xhr.responseText;
+            updateTable(JSON.parse(response)['data']);
+          } else {
+            var response = xhr.responseText;
+            console.log(response);
+            updateTable();
+            return;
+          }
+        }
+      }
+    }
+    function tampilkanBulan(){
+      if(bulanInput.value == 'semua'){
+        tahun = tahunInput.value;
+        tahunInput.disabled = true;
+        tahunInput.value = '';
+        setTimeout(() => {
+          getData('semua');
+        }, 250);
+      }else{
+        if(tahunInput.disabled == true){
+          tahunInput.disabled = false;
+          tahunInput.value = tahun;
+        }
+        setTimeout(() => {
+          getData();
+        }, 250);
+      }
+    }
+    function tampilkanTahun(){
+      setTimeout(() => {
+        var tahun = tahunInput.value;
+        tahun = tahun.replace(/\s/g, '');
+        if (isNaN(tahun)) {
+          showRedPopup('Tahun harus angka !');
+          return;
+        }
+        setTimeout(() => {
+          getData();
+        }, 250);
+      }, 50);
+    }
     function proses(Id) {
       var xhr = new XMLHttpRequest();
       var requestBody = {

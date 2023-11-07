@@ -69,7 +69,7 @@ $csrf = $GLOBALS['csrf'];
 </head>
 
 <body>
-<script>
+  <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
 	  var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
@@ -137,7 +137,7 @@ $csrf = $GLOBALS['csrf'];
                                 </div>
                               </div>
                             </div>
-                            <table class="table">
+                            <table class="table datatable">
                                 <thead>
                                     <tr>
                                         <th class="col"><strong>No.</th>
@@ -150,7 +150,7 @@ $csrf = $GLOBALS['csrf'];
                                 </thead>
                                 <tbody id="tableSewa">
                                   <?php
-                                    // $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses' AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_sewa DESC");
+                                    // $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM sewa_tempat WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_sewa DESC");
                                     $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_sewa DESC");
                                     $no = 1;
                                     while ($sewa = mysqli_fetch_array($query)) {
@@ -243,7 +243,7 @@ $csrf = $GLOBALS['csrf'];
             btn.appendChild(icon);
             btn.classList.add('btn','btn-lihat');
             btn.onclick = function (){
-              proses(`${item['id_event']}`);
+              proses(`${item['id_sewa']}`);
             }
             var td = document.createElement('td');
             td.appendChild(btn);

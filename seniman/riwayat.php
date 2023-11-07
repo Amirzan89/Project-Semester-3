@@ -210,7 +210,6 @@ $csrf = $GLOBALS['csrf'];
       }
       var num = 1;
       if(dataT != ''){
-        console.log(dataT);
         dataT.forEach(function (item){
           var row = document.createElement('tr');
           var td = document.createElement('td');
