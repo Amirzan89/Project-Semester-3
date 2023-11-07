@@ -207,7 +207,6 @@ $csrf = $GLOBALS['csrf'];
       while (tableEvent.firstChild) {
         tableEvent.removeChild(tableEvent.firstChild);
       }
-      console.log(dataT);
       var num = 1;
       if(dataT != ''){
         dataT.forEach(function (item){
@@ -328,7 +327,6 @@ $csrf = $GLOBALS['csrf'];
         tahun = tahun.replace(/\s/g, '');
         if (isNaN(tahun)) {
           showRedPopup('Tahun harus angka !');
-          console.log("Tahun harus angka");
           return;
         }
         setTimeout(() => {

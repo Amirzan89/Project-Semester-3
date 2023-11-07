@@ -12,8 +12,8 @@ class TempatWebsite{
     }
     public static function getSewa($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                throw new Exception('id user harus di isi');
+            if(!isset($data['email']) || empty($data['email'])){
+                throw new Exception('Email harus di isi');
             }
             if(!isset($data['tanggal']) || empty($data['tanggal'])){
                 throw new Exception('Tanggal harus di isi !');
@@ -21,13 +21,10 @@ class TempatWebsite{
             if(!isset($data['desc']) || empty($data['desc'])){
                 throw new Exception('Deskripsi harus di isi !');
             }
-            if($data['role'] != 'admin tempat' || $data['role'] == 'super admin'){
-                throw new Exception('invalid role');
-            }
             //check user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['email']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
@@ -36,24 +33,24 @@ class TempatWebsite{
                 throw new Exception('user tidak ditemukan');
             }
             $stmt[0]->close();
-            if($role == $data['role']){
-                throw new Exception('invalid role');
+            if(($role != 'admin tempat' && $role != 'super admin') || $role == 'masyarakat'){
+                throw new Exception('Invalid role');
             }
             //check and get data
             if($data['tanggal'] == 'semua'){
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_sewa, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses'";
+                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_sewa DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    // $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'ditolak' OR status = 'diterima'";
+                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM sewa_tempat WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_sewa DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
                 $stmt[1] = self::$con->prepare($query);
             }else{
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'diajukan 'OR status = 'proses') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ?";
+                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM sewa_tempat WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_sewa DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'ditolak 'OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ?";
+                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM sewa_tempat WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_sewa DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
@@ -65,7 +62,7 @@ class TempatWebsite{
             }
             if (!$stmt[1]->execute()) {
                 $stmt[1]->close();
-                throw new Exception('Data event tidak ditemukan');
+                throw new Exception('Data sewa tempat tidak ditemukan');
             }
             $result = $stmt[1]->get_result();
             $eventsData = array();
@@ -74,13 +71,13 @@ class TempatWebsite{
             }
             $stmt[1]->close();
             if ($eventsData === null) {
-                throw new Exception('Data event tidak ditemukan');
+                throw new Exception('Data sewa tempat tidak ditemukan');
             }
             if (empty($eventsData)) {
-                throw new Exception('Data event tidak ditemukan');
+                throw new Exception('Data sewa tempat tidak ditemukan');
             }
             header('Content-Type: application/json');
-            echo json_encode(['status' => 'success', 'message' => 'Data event berhasil didapatkan', 'data' => $eventsData]);
+            echo json_encode(['status' => 'success', 'message' => 'Data sewa tempat berhasil didapatkan', 'data' => $eventsData]);
             exit();
         }catch(Exception $e){
             $error = $e->getMessage();

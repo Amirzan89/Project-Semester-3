@@ -44,6 +44,7 @@ $csrf = $GLOBALS['csrf'];
   <link href="/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
   <!-- Template Main CSS File -->
   <link href="/public/assets/css/tempat.css" rel="stylesheet">
+  <link href="/public/css/popup.css" rel="stylesheet">
   <style>
     .ui-datepicker-calendar {
       display: none;
@@ -148,10 +149,10 @@ $csrf = $GLOBALS['csrf'];
                     <th scope="col">Aksi</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="tableSewa">
                 <?php
-                    // $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, tgl_akhir_peminjaman, status, catatan FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' AND MONTH(tgl_awal_peminjaman) = ".date('m')." AND YEAR(tgl_awal_peminjaman) = ".date('Y')." ORDER BY id_sewa DESC");
-                    $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, tgl_akhir_peminjaman, status, catatan FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_sewa DESC");
+                    // $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, tgl_akhir_peminjaman, status, catatan FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_sewa DESC");
+                    $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_sewa DESC");
                     $no = 1;
                     while ($sewa = mysqli_fetch_array($query)) {
                     ?>
@@ -159,7 +160,7 @@ $csrf = $GLOBALS['csrf'];
                     <td><?php echo $no; ?></td>
                     <td><?php echo $sewa['nama_peminjam']; ?></td>
                     <td><?php echo $sewa['nama_tempat']; ?></td>
-                    <td><?php echo $sewa['tgl_awal_peminjaman']; ?></td>
+                    <td><?php echo $sewa['tanggal']; ?></td>
                     <td>
                       <?php if($sewa['status'] == 'diterima'){ ?>
                         <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i>  Disetujui</span>
@@ -186,7 +187,7 @@ $csrf = $GLOBALS['csrf'];
     </section>
 
   </main><!-- End #main -->
-
+  <div id="redPopup" style="display:none"></div>
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
@@ -197,32 +198,30 @@ $csrf = $GLOBALS['csrf'];
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script src="/public/js/popup.js"></script>
   <script>
-    var tableEvent = document.getElementById('tableEvent');
+    var tableSewa = document.getElementById('tableSewa');
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
     function updateTable(dataT = ''){
-      while (tableEvent.firstChild) {
-        tableEvent.removeChild(tableEvent.firstChild);
+      while (tableSewa.firstChild) {
+        tableSewa.removeChild(tableSewa.firstChild);
       }
       var num = 1;
       if(dataT != ''){
-        console.log(dataT);
         dataT.forEach(function (item){
-          console.log('data ');
           var row = document.createElement('tr');
           var td = document.createElement('td');
           //data
           td.innerText = num;
           row.appendChild(td);
           var td = document.createElement('td');
-          td.innerText = item['nama_pengirim'];
+          td.innerText = item['nama_peminjam'];
           row.appendChild(td);
           var td = document.createElement('td');
-          td.innerText = item['nama_event'];
+          td.innerText = item['nama_tempat'];
           row.appendChild(td);
           var td = document.createElement('td');
-          td.innerText = item['tanggal_awal'];
+          td.innerText = item['tanggal'];
           row.appendChild(td);
           //status
           var span = document.createElement('span');
@@ -256,7 +255,7 @@ $csrf = $GLOBALS['csrf'];
           var td = document.createElement('td');
           td.appendChild(link);
           row.appendChild(td);
-          tableEvent.appendChild(row);
+          tableSewa.appendChild(row);
           num++;
         });
       }
@@ -321,7 +320,6 @@ $csrf = $GLOBALS['csrf'];
         tahun = tahun.replace(/\s/g, '');
         if (isNaN(tahun)) {
           showRedPopup('Tahun harus angka !');
-          console.log("Tahun harus angka");
           return;
         }
         setTimeout(() => {

@@ -211,9 +211,7 @@ $csrf = $GLOBALS['csrf'];
       }
       var num = 1;
       if(dataT != ''){
-        console.log(dataT);
         dataT.forEach(function (item){
-          console.log('data ');
           var row = document.createElement('tr');
           var td = document.createElement('td');
           //data
@@ -226,7 +224,7 @@ $csrf = $GLOBALS['csrf'];
           td.innerText = item['nama_event'];
           row.appendChild(td);
           var td = document.createElement('td');
-          td.innerText = item['tanggal_awal'];
+          td.innerText = item['tanggal'];
           row.appendChild(td);
           //status
           var span = document.createElement('span');
