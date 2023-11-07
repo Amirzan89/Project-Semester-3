@@ -250,7 +250,7 @@ $csrf = $GLOBALS['csrf'];
           icon.innerText = 'Lihat';
           link.appendChild(icon);
           link.classList.add('btn','btn-lihat');
-          link.setAttribute('href',`/event/detail_event.php?id_event=${item['id_event']}`);
+          link.setAttribute('href',`/seniman/detail_seniman.php?id_seniman=${item['id_seniman']}`);
           var td = document.createElement('td');
           td.appendChild(link);
           row.appendChild(td);

@@ -176,6 +176,8 @@ class SenimanWebsite{
                     $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'riwayat'){
                     $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_seniman DESC";
+                }else if($data['desc'] == 'data'){
+                    $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' ORDER BY id_seniman DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
@@ -185,6 +187,8 @@ class SenimanWebsite{
                     $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'riwayat'){
                     $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                }else if($data['desc'] == 'data'){
+                    $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
@@ -952,7 +956,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if($data['desc'] == 'kategori'){
             $senimanWeb->tambahKategori($data);
         }
-        if($data['desc'] == 'pengajuan' || $data['desc'] == 'riwayat'){
+        if($data['desc'] == 'pengajuan' || $data['desc'] == 'riwayat' || $data['desc'] == 'data'){
             $senimanWeb->getSeniman($data);
         }
     } 

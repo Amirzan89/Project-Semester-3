@@ -3,14 +3,14 @@ require_once('../web/koneksi.php');
 require_once('../web/authenticate.php');
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
-$userAuth = authenticate($_POST,[
-  'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD']
-],$conn);
-if($userAuth['status'] == 'error'){
-	header('Location: /login.php');
-}else{
-	$userAuth = $userAuth['data'];
+$userAuth = authenticate($_POST, [
+  'uri' => $_SERVER['REQUEST_URI'],
+  'method' => $_SERVER['REQUEST_METHOD']
+], $conn);
+if ($userAuth['status'] == 'error') {
+  header('Location: /login.php');
+} else {
+  $userAuth = $userAuth['data'];
   // if($userAuth['role'] != 'super admin'){
   //   echo "<script>alert('Anda bukan super admin !')</script>";
   //   echo "<script>window.location.href = '/dashboard.php';</script>";
@@ -21,6 +21,7 @@ $csrf = $GLOBALS['csrf'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -30,7 +31,8 @@ $csrf = $GLOBALS['csrf'];
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="/public/assets/img/favicon.png" rel="icon">
+  <link href="/public/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -43,17 +45,47 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- Template Main CSS File -->
   <link href="/public/assets/css/nomor-induk.css" rel="stylesheet">
+  <link href="/public/css/popup.css" rel="stylesheet">
+  <style>
+    .ui-datepicker-calendar {
+      display: none;
+    }
+    
+    .srcDate {
+      float: right;
+      margin-top: 70px;
+      margin-left: 10px;
+      margin-right: 10px;
 
+
+    }
+
+    .kategori {
+      float: right;
+      margin-top: 10px;
+
+    }
+
+    .inp {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+    }
+
+  </style>
 </head>
 
 <body>
   <script>
-	  var csrfToken = "<?php echo $csrf ?>";
+    const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
+		var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
     var number = "<?php echo $userAuth['number'] ?>";
     var role = "<?php echo $userAuth['role'] ?>";
-	</script>
+    </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../header.php');
@@ -64,8 +96,8 @@ $csrf = $GLOBALS['csrf'];
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php
-        $nav = 'seniman'; 
-        include('../sidebar.php');
+      $nav = 'seniman';
+      include('../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
@@ -77,7 +109,7 @@ $csrf = $GLOBALS['csrf'];
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/seniman.php">Nomor Induk Seniman</a></li>
+          <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
           <li class="breadcrumb-item active">Data Seniman</li>
         </ol>
       </nav>
@@ -90,69 +122,96 @@ $csrf = $GLOBALS['csrf'];
           <div class="card">
             <div class="card-body">
               <h5 class="card-title"></h5>
-              <a href="tambah.php" class="btn btn-primary">
-  <i class="bi bi-person-plus-fill"></i> Tambahkan data seniman
-</a>
-              <!-- <button type="button" class="btn btn-primary" href="formulir-baru.php"><i class="bi bi-person-plus-fill"></i> Tambahkan data seniman</button> -->
-
+              <div class="kategori">
+                  <div class="col-lg-12">
+                    <div class="row">
+                      <div class="col-lg-8">
+                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
+                          <option value="01">Campusari</option>
+                          <option value="02">Dalang</option>
+                          <option value="03">Jaranan</option>
+                          <option value="04">Karawitan</option>
+                          <option value="05">MC</option>
+                          <option value="06">Ludruk</option>
+                          <option value="07">Organisasi Kesenian Musik</option>
+                          <option value="08">Pramugari Tayup</option>
+                          <option value="09">Sanggar</option>
+                          <option value="10">Sinden</option>
+                          <option value="11">Vocalis</option>
+                          <option value="12">Waranggo</option>
+                          <option value="13">Barongsai</option>
+                          <option value="14">Ketoprak</option>
+                          <option value="15">Pataji</option>
+                          <option value="16">Reog</option>
+                          <option value="17">THR</option>
+                          <option value="18">Pelawak</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <a href="tambah-seniman.php" class="btn btn-primary">
+                <i class="bi bi-person-plus-fill"></i> Tambah Seniman
+              </a>
+              <div class="srcDate">
+                  <div class="col-lg-12">
+                    <div class="row">
+                      <div class="col-lg-3">
+                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
+                      </div>
+                      <div class="col-lg-5">
+                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp">
+                          <option value="semua">semua</option>
+                          <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
+                          <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
+                          <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?> >Maret</option>
+                          <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?> >April</option>
+                          <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?> >Mei</option>
+                          <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?> >Juni</option>
+                          <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?> >Juli</option>
+                          <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?> >Agustus</option>
+                          <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?> >September</option>
+                          <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?> >Oktober</option>
+                          <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?> >November</option>
+                          <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?> >Desember</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+              </div>
               <table class="table datatable">
-              <thead>
+                <thead>
                   <tr>
                     <th>No</th>
                     <th>Nomor Induk Seniman</th>
+                    <th>Kategori</th>
                     <th>Nama Seniman</th>
                     <th>Nomor Telepon</th>
                     <th>Aksi</th>
                   </tr>
-                  </thead>
-                  <tbody>
+                </thead>
+                <tbody id="tableSeniman">
                   <?php
-                      $query = mysqli_query($conn, "SELECT id_seniman, nomor_induk, nama_seniman, no_telpon FROM seniman WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_seniman ASC");
-                      $no = 1;
-                      while ($seniman = mysqli_fetch_array($query)) {
+                    // $query = mysqli_query($conn, "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_seniman DESC");
+                    $query = mysqli_query($conn, "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' ORDER BY id_seniman DESC");
+                    $no = 1;
+                    while ($seniman = mysqli_fetch_array($query)) {
                   ?>
-                  <tr>
-                    <td><?php echo $no ?></td>
-                    <td><?php echo $seniman['nomor_induk'] ?></td>
-                    <td><?php echo $seniman['nama_seniman'] ?></td>
-                    <td><?php echo $seniman['no_telpon'] ?></td>
-                    <td>
-                      <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-warning"><i class="bi bi-eye-fill">Lihat</i></a>
-                      <button type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i>  edit </button>
-                      <button type="button" class="btn btn-danger"><i class="bi bi-trash-fill"></i>  hapus</button>
-                    </td>
-                  </tr>
+                    <tr>
+                      <td><?php echo $no ?></td>
+                      <td><?php echo $seniman['nomor_induk'] ?></td>
+                      <td><?php echo $seniman['nama_kategori'] ?></td>
+                      <td><?php echo $seniman['nama_seniman'] ?></td>
+                      <td><?php echo $seniman['no_telpon'] ?></td>
+                      <td>
+                        <a href="/halaman/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
+                        <button type="button" class="btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit </button>
+                        <button type="button" class="btn btn-hapus"><i class="bi bi-trash-fill"></i> Hapus</button>
+                      </td>
+                    </tr>
                   <?php $no++;
                   } ?>
-                  <!-- <tr>
-                    <td>1</td>
-                    <td>3576447103910003
-                    </td>
-                    <td>Puji Utami</td>
-                    <td>0857362457957</td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye-fill"></i>  lihat
-                    </button>
-                    <button type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i>  edit
-                    </button>
-                    <button type="button" class="btn btn-danger"><i class="bi bi-trash-fill"></i>  hapus
-                    </button>
-                    </td>
-                  </tr> -->
-                  <!-- <tr>
-                    <td>2</td>
-                    <td>3576441606910003
-                    </td>
-                    <td>Muhammad Lutfi Hakim</td>
-                    <td>0881334394400</td>
-                    <td><button type="button" class="btn btn-warning"><i class="bi bi-eye-fill"></i>  lihat
-                    </button>
-                    <button type="button" class="btn btn-success"><i class="bi bi-pencil-fill"></i>  edit
-                    </button>
-                    <button type="button" class="btn btn-danger"><i class="bi bi-trash-fill"></i>  hapus
-                    </button>
-                    </td>
-                  </tr> -->
-               </tbody>
+                </tbody>
               </table>
             </div>
           </div>
@@ -160,19 +219,145 @@ $csrf = $GLOBALS['csrf'];
         </div>
       </div>
     </section>
-
-
-
   </main><!-- End #main -->
-
+  <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include('footer.php');
+    <?php include('../footer.php');
     ?>
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
+  <script src="/public/js/popup.js"></script>
+  <script>
+    var tableSeniman = document.getElementById('tableSeniman');
+    var tahunInput = document.getElementById('inpTahun');
+    var bulanInput = document.getElementById('inpBulan');
+    var tahun;
+    function updateTable(dataT = ''){
+      while (tableSeniman.firstChild) {
+        tableSeniman.removeChild(tableSeniman.firstChild);
+      }
+      var num = 1;
+      if(dataT != ''){
+        dataT.forEach(function (item){
+          var row = document.createElement('tr');
+          var td = document.createElement('td');
+          //data
+          td.innerText = num;
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['nomor_induk'];
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['nama_kategori'];
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['nama_seniman'];
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['no_telpon'];
+          row.appendChild(td);
+          //btn 1
+          var td = document.createElement('td');
+          var link = document.createElement('a');
+          var icon = document.createElement('i');
+          icon.classList.add('bi','bi-eye-fill');
+          icon.innerText = 'Lihat';
+          link.appendChild(icon);
+          link.classList.add('btn','btn-lihat');
+          link.setAttribute('href',`/seniman/detail_seniman.php?id_seniman=${item['id_seniman']}`);
+          td.appendChild(link);
+          //btn 2
+          var btn = document.createElement('button');
+          var icon = document.createElement('i');
+          icon.classList.add('bi','bi-pencil-fill');
+          icon.innerText = 'Edit';
+          btn.appendChild(icon);
+          btn.classList.add('btn','btn-edit');
+          td.appendChild(btn);
+          //btn 3
+          var btn = document.createElement('button');
+          var icon = document.createElement('i');
+          icon.classList.add('bi','bi-trash-fill');
+          icon.innerText = 'Hapus';
+          btn.appendChild(icon);
+          btn.classList.add('btn','btn-hapus');
+          td.appendChild(btn);
+          row.appendChild(td);
+          tableSeniman.appendChild(row);
+          num++;
+        });
+      }
+    }
+    function getData(con = null){
+      var xhr = new XMLHttpRequest();
+      if(con == 'semua'){
+        var requestBody = {
+          email: email,
+          tanggal:'semua',
+          desc:'data'
+        };
+      }else if(con == null){
+        var tanggal = bulanInput.value +'-'+tahunInput.value;
+        var requestBody = {
+          email: email,
+          tanggal:tanggal,
+          desc:'data'
+        };
+      }
+      //open the request
+      xhr.open('POST', domain + "/web/seniman/seniman.php")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      //send the form data
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            var response = xhr.responseText;
+            updateTable(JSON.parse(response)['data']);
+          } else {
+            var response = xhr.responseText;
+            console.log(response);
+            updateTable();
+            return;
+          }
+        }
+      }
+    }
+    function tampilkanBulan(){
+      if(bulanInput.value == 'semua'){
+        tahun = tahunInput.value;
+        tahunInput.disabled = true;
+        tahunInput.value = '';
+        setTimeout(() => {
+          getData('semua');
+        }, 250);
+      }else{
+        if(tahunInput.disabled == true){
+          tahunInput.disabled = false;
+          tahunInput.value = tahun;
+        }
+        setTimeout(() => {
+          getData();
+        }, 250);
+      }
+    }
+    function tampilkanTahun(){
+      setTimeout(() => {
+        var tahun = tahunInput.value;
+        tahun = tahun.replace(/\s/g, '');
+        if (isNaN(tahun)) {
+          showRedPopup('Tahun harus angka !');
+          return;
+        }
+        setTimeout(() => {
+          getData();
+        }, 250);
+      }, 5);
+    }
+  </script>
   <!-- Vendor JS Files -->
   <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
