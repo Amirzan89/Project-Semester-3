@@ -118,7 +118,7 @@ $csrf = $GLOBALS['csrf'];
                         <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
                       </div>
                       <div class="col-lg-5">
-                      <select id="inpBulan" onchange="tampilkanBulan()" class="inp">
+                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp">
                           <option value="semua">semua</option>
                           <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
                           <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
@@ -151,7 +151,7 @@ $csrf = $GLOBALS['csrf'];
                 </thead>
                 <tbody id="tableSewa">
                 <?php
-                    // $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, tgl_akhir_peminjaman, status, catatan FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_sewa DESC");
+                    // $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, tgl_akhir_peminjaman, status, catatan FROM sewa_tempat WHERE (status = 'diterima' OR status = 'ditolak') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_sewa DESC");
                     $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_sewa DESC");
                     $no = 1;
                     while ($sewa = mysqli_fetch_array($query)) {

@@ -48,6 +48,7 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- Template Main CSS File -->
   <link href="/public/assets/css/nomor-induk.css" rel="stylesheet">
+  <link href="/public/css/popup.css" rel="stylesheet">
   <style>
     .ui-datepicker-calendar {
       display: none;
@@ -71,7 +72,14 @@ $csrf = $GLOBALS['csrf'];
 </head>
 
 <body>
-
+  <script>
+    const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
+		var csrfToken = "<?php echo $csrf ?>";
+    var email = "<?php echo $userAuth['email'] ?>";
+    var idUser = "<?php echo $userAuth['id_user'] ?>";
+    var number = "<?php echo $userAuth['number'] ?>";
+    var role = "<?php echo $userAuth['role'] ?>";
+    </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include('../header.php');
@@ -112,22 +120,23 @@ $csrf = $GLOBALS['csrf'];
                   <div class="col-lg-12">
                     <div class="row">
                       <div class="col-lg-3">
-                        <input type="text" name="" id="" placeholder="Tahun" class="inp">
+                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
                       </div>
                       <div class="col-lg-5">
-                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
-                          <option value="01">Januari</option>
-                          <option value="02">Februari</option>
-                          <option value="03">Maret</option>
-                          <option value="04">April</option>
-                          <option value="05">Mei</option>
-                          <option value="06">Juni</option>
-                          <option value="07">Juli</option>
-                          <option value="08">Agustus</option>
-                          <option value="09">September</option>
-                          <option value="10">Oktober</option>
-                          <option value="11">November</option>
-                          <option value="12">Desember</option>
+                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp">
+                          <option value="semua">semua</option>
+                          <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
+                          <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
+                          <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?> >Maret</option>
+                          <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?> >April</option>
+                          <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?> >Mei</option>
+                          <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?> >Juni</option>
+                          <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?> >Juli</option>
+                          <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?> >Agustus</option>
+                          <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?> >September</option>
+                          <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?> >Oktober</option>
+                          <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?> >November</option>
+                          <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?> >Desember</option>
                         </select>
                       </div>
                     </div>
@@ -144,10 +153,10 @@ $csrf = $GLOBALS['csrf'];
                     <th scope="col">Aksi</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="tableSeniman">
                   <?php
-                      // $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(tgl_pembuatan, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE status = 'diterima' OR status = 'ditolak' AND MONTH(tgl_pembuatan) = ".date('m')." AND YEAR(tgl_pembuatan) = ".date('Y')." ORDER BY id_seniman DESC");
-                      $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(tgl_pembuatan, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_seniman DESC");
+                      // $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE (status = 'diterima' OR status = 'ditolak') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_seniman DESC");
+                      $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_seniman DESC");
                       $no = 1;
                       while ($seniman = mysqli_fetch_array($query)) {
                   ?>
@@ -164,7 +173,7 @@ $csrf = $GLOBALS['csrf'];
                       </td>
                       <td><?php echo $seniman['catatan']?></td>
                       <td>
-                        <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
+                        <a href="/halaman/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                       </td>
                     </tr>
                   <?php $no++;
@@ -180,7 +189,7 @@ $csrf = $GLOBALS['csrf'];
     </section>
 
   </main><!-- End #main -->
-
+  <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <?php include('../footer.php');
@@ -188,8 +197,137 @@ $csrf = $GLOBALS['csrf'];
   </footer>
   <!-- </footer> -->
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script src="/public/js/popup.js"></script>
+  <script>
+    var tableSeniman = document.getElementById('tableSeniman');
+    var tahunInput = document.getElementById('inpTahun');
+    var bulanInput = document.getElementById('inpBulan');
+    var tahun;
+    function updateTable(dataT = ''){
+      while (tableSeniman.firstChild) {
+        tableSeniman.removeChild(tableSeniman.firstChild);
+      }
+      var num = 1;
+      if(dataT != ''){
+        console.log(dataT);
+        dataT.forEach(function (item){
+          var row = document.createElement('tr');
+          var td = document.createElement('td');
+          //data
+          td.innerText = num;
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['nama_seniman'];
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['tanggal'];
+          row.appendChild(td);
+          //status
+          var span = document.createElement('span');
+          var icon = document.createElement('i');
+          if(item['status'] == 'ditolak'){
+            icon.innerText = 'Ditolak';
+            icon.classList.add('bi','bi-x-circle-fill');
+            span.appendChild(icon);
+            span.classList.add('badge','bg-tolak');
+          }else if(item['status'] == 'diterima'){
+            icon.innerText = 'Disetujui';
+            icon.classList.add('bi','bi-check-circle-fill');
+            span.appendChild(icon);
+            span.classList.add('badge','bg-terima');
+          }
+          var td = document.createElement('td');
+          td.appendChild(span);
+          row.appendChild(td);
+          //catatan
+          var td = document.createElement('td');
+          td.innerText = item['catatan'];
+          row.appendChild(td);
+          //btn
+          var link = document.createElement('a');
+          var icon = document.createElement('i');
+          icon.classList.add('bi','bi-eye-fill');
+          icon.innerText = 'Lihat';
+          link.appendChild(icon);
+          link.classList.add('btn','btn-lihat');
+          link.setAttribute('href',`/event/detail_event.php?id_event=${item['id_event']}`);
+          var td = document.createElement('td');
+          td.appendChild(link);
+          row.appendChild(td);
+          tableSeniman.appendChild(row);
+          num++;
+        });
+      }
+    }
+    function getData(con = null){
+      var xhr = new XMLHttpRequest();
+      if(con == 'semua'){
+        var requestBody = {
+          email: email,
+          tanggal:'semua',
+          desc:'riwayat'
+        };
+      }else if(con == null){
+        var tanggal = bulanInput.value +'-'+tahunInput.value;
+        var requestBody = {
+          email: email,
+          tanggal:tanggal,
+          desc:'riwayat'
+        };
+      }
+      //open the request
+      xhr.open('POST', domain + "/web/seniman/seniman.php")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      //send the form data
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            var response = xhr.responseText;
+            updateTable(JSON.parse(response)['data']);
+          } else {
+            var response = xhr.responseText;
+            console.log(response);
+            updateTable();
+            return;
+          }
+        }
+      }
+    }
+    function tampilkanBulan(){
+      if(bulanInput.value == 'semua'){
+        tahun = tahunInput.value;
+        tahunInput.disabled = true;
+        tahunInput.value = '';
+        setTimeout(() => {
+          getData('semua');
+        }, 250);
+      }else{
+        if(tahunInput.disabled == true){
+          tahunInput.disabled = false;
+          tahunInput.value = tahun;
+        }
+        setTimeout(() => {
+          getData();
+        }, 250);
+      }
+    }
+    function tampilkanTahun(){
+      setTimeout(() => {
+        var tahun = tahunInput.value;
+        tahun = tahun.replace(/\s/g, '');
+        if (isNaN(tahun)) {
+          showRedPopup('Tahun harus angka !');
+          return;
+        }
+        setTimeout(() => {
+          getData();
+        }, 250);
+      }, 5);
+    }
+  </script>
 
   <!-- Vendor JS Files -->
   <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

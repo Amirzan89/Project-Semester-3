@@ -223,8 +223,8 @@ class SenimanMobile{
                 throw new Exception('Format tanggal lahir tidak valid');
             }
             date_default_timezone_set('Asia/Jakarta');
-            $tanggal_sekarang = date('Y-m-d');
-            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            $tanggal_sekarangDB = date('Y-m-d');
+            $tanggal_sekarang = strtotime($tanggal_sekarangDB);
             if ($tanggal_lahir > $tanggal_sekarang){
                 throw new Exception('Tanggal tidak boleh lebih kurang dari sekarang !');
             }
@@ -320,12 +320,12 @@ class SenimanMobile{
                 unlink($fileFotoPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
-            $query = "INSERT INTO seniman (nik, nama_seniman,jenis_kelamin,kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi,jumlah_anggota,ktp_seniman,pass_foto, surat_keterangan, tgl_pembuatan, tgl_berlaku, status, id_kategori_seniman, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO seniman (nik, nama_seniman,jenis_kelamin,kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi,jumlah_anggota,ktp_seniman,pass_foto, surat_keterangan, tgl_pembuatan, tgl_berlaku, created_at, updated_at, status, id_kategori_seniman, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
             $status = 'diajukan';
             $now = date('Y-m-d');
             $end = date('Y-m-d',strtotime('12/31/' . date('Y')));
-            $stmt[2]->bind_param("ssssssssssssssssss", $data['nik'], $data['nama_seniman'], $data['jenis_kelamin'], $data['kecamatan'], $data['tempat_lahir'], $data['tanggal_lahir'], $data['alamat_seniman'],$data['no_telpon'], $data['nama_organisasi'], $data['jumlah_anggota'],$fileKtpDB,$fileFotoDB, $fileSuratDB, $now, $end, $status, $kategori, $data['id_user']);
+            $stmt[2]->bind_param("ssssssssssssssssssss", $data['nik'], $data['nama_seniman'], $data['jenis_kelamin'], $data['kecamatan'], $data['tempat_lahir'], $data['tanggal_lahir'], $data['alamat_seniman'],$data['no_telpon'], $data['nama_organisasi'], $data['jumlah_anggota'],$fileKtpDB,$fileFotoDB, $fileSuratDB, $now, $end, $tanggal_sekarangDB, $tanggal_sekarangDB, $status, $kategori, $data['id_user']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -426,8 +426,8 @@ class SenimanMobile{
                 throw new Exception('Format tanggal lahir tidak valid');
             }
             date_default_timezone_set('Asia/Jakarta');
-            $tanggal_sekarang = date('Y-m-d');
-            $tanggal_sekarang = strtotime($tanggal_sekarang);
+            $tanggal_sekarangDB = date('Y-m-d');
+            $tanggal_sekarang = strtotime($tanggal_sekarangDB);
             if ($tanggal_lahir > $tanggal_sekarang){
                 throw new Exception('Tanggal tidak boleh lebih kurang dari sekarang !');
             }
@@ -526,9 +526,9 @@ class SenimanMobile{
                 unlink($fileFotoPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
-            $query = "UPDATE seniman SET nik = ?, nama_seniman = ?, jenis_kelamin = ?, kecamatan = ?, tempat_lahir = ?, tanggal_lahir = ?, alamat_seniman = ?, no_telpon = ?, nama_organisasi = ?, jumlah_anggota = ?, ktp_seniman = ?, pass_foto = ?, surat_keterangan = ?, id_kategori_seniman = ? WHERE id_seniman = ?";
+            $query = "UPDATE seniman SET nik = ?, nama_seniman = ?, jenis_kelamin = ?, kecamatan = ?, tempat_lahir = ?, tanggal_lahir = ?, alamat_seniman = ?, no_telpon = ?, nama_organisasi = ?, jumlah_anggota = ?, ktp_seniman = ?, pass_foto = ?, surat_keterangan = ?, updated_at = ?, id_kategori_seniman = ? WHERE id_seniman = ?";
             $stmt[1] = self::$con->prepare($query);
-            $stmt[1]->bind_param("sssssssssssssss", $data['nik'], $data['nama_seniman'], $data['jenis_kelamin_seniman'], $data['kecamatan'], $data['tempat_lahir'],$data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'], $fileKtpDB, $fileFotoDB, $fileSuratDB, $kategori, $data['id_seniman']);
+            $stmt[1]->bind_param("ssssssssssssssss", $data['nik'], $data['nama_seniman'], $data['jenis_kelamin_seniman'], $data['kecamatan'], $data['tempat_lahir'],$data['tanggal_lahir'], $data['alamat'],$data['no_telpon'], $data['nama_organisasi'], $data['anggota_organisasi'], $fileKtpDB, $fileFotoDB, $fileSuratDB, $tanggal_sekarangDB, $kategori, $data['id_seniman']);
             $stmt[1]->execute();
             if ($stmt[1]->affected_rows > 0) {
                 $stmt[1]->close();

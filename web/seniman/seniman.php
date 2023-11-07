@@ -144,18 +144,21 @@ class SenimanWebsite{
             exit();
         }
     }
-    public static function getData($data){
+    public static function getSeniman($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                throw new Exception('id user harus di isi');
+            if(!isset($data['email']) || empty($data['email'])){
+                throw new Exception('Email harus di isi');
             }
-            if($data['role'] != 'admin seniman' || $data['role'] == 'super admin'){
-                throw new Exception('invalid role');
+            if(!isset($data['tanggal']) || empty($data['tanggal'])){
+                throw new Exception('Tanggal harus di isi !');
+            }
+            if(!isset($data['desc']) || empty($data['desc'])){
+                throw new Exception('Deskripsi harus di isi !');
             }
             //check user
-            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
+            $stmt[0]->bind_param('s', $data['email']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
@@ -164,9 +167,52 @@ class SenimanWebsite{
                 throw new Exception('user tidak ditemukan');
             }
             $stmt[0]->close();
-            if($role == $data['role']){
-                throw new Exception('invalid role');
+            if(($role != 'admin tempat' && $role != 'super admin') || $role == 'masyarakat'){
+                throw new Exception('Invalid role');
             }
+            //check and get data
+            if($data['tanggal'] == 'semua'){
+                if($data['desc'] == 'pengajuan'){
+                    $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC";
+                }else if($data['desc'] == 'riwayat'){
+                    $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_seniman DESC";
+                }else{
+                    throw new Exception('Deskripsi invalid !');
+                }
+                $stmt[1] = self::$con->prepare($query);
+            }else{
+                if($data['desc'] == 'pengajuan'){
+                    $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                }else if($data['desc'] == 'riwayat'){
+                    $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                }else{
+                    throw new Exception('Deskripsi invalid !');
+                }
+                $stmt[1] = self::$con->prepare($query);
+                $tanggal = explode('-',$data['tanggal']);
+                $month = $tanggal[0];
+                $year = $tanggal[1];
+                $stmt[1]->bind_param('ss', $month, $year);
+            }
+            if (!$stmt[1]->execute()) {
+                $stmt[1]->close();
+                throw new Exception('Data seniman tidak ditemukan');
+            }
+            $result = $stmt[1]->get_result();
+            $eventsData = array();
+            while ($row = $result->fetch_assoc()) {
+                $eventsData[] = $row;
+            }
+            $stmt[1]->close();
+            if ($eventsData === null) {
+                throw new Exception('Data seniman tidak ditemukan');
+            }
+            if (empty($eventsData)) {
+                throw new Exception('Data seniman tidak ditemukan');
+            }
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'message' => 'Data seniman berhasil didapatkan', 'data' => $eventsData]);
+            exit();
         }catch(Exception $e){
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
@@ -902,8 +948,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
     }
-    if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc']) &&  $data['desc'] == 'kategori'){
-        $senimanWeb->tambahKategori($data);
-    }
+    if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc'])){
+        if($data['desc'] == 'kategori'){
+            $senimanWeb->tambahKategori($data);
+        }
+        if($data['desc'] == 'pengajuan' || $data['desc'] == 'riwayat'){
+            $senimanWeb->getSeniman($data);
+        }
+    } 
 }
 ?>
