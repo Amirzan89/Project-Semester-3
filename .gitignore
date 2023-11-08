@@ -11,7 +11,7 @@
 /tempat/preview
 /pentas/preview
 /seniman/preview
-/web/.env
+.env
 kategori_seniman.json
 .env.backup
 .env.production
