@@ -18,6 +18,30 @@ if ($userAuth['status'] == 'error') {
   // }
 }
 $csrf = $GLOBALS['csrf'];
+$path = __DIR__."/../../kategori_seniman.json";
+$fileExist = file_exists($path);
+if ($fileExist) {
+  //get kategori seniman
+  $jsonFile = file_get_contents($path);
+  $kategoriSeniman = json_decode($jsonFile, true);
+}else{
+    //if file is delete will make new json file
+    $query = "SELECT * FROM kategori_seniman";
+    $stmt[0] = $conn->prepare($query);
+    if(!$stmt[0]->execute()){
+      $stmt[0]->close();
+      throw new Exception('Data kategori seniman tidak ditemukan');
+    }
+    $resultDB = $stmt[0]->get_result();
+    $kategoriSeniman = [];
+    while ($row = $resultDB->fetch_assoc()) {
+        $kategoriSeniman[] = $row;
+    }
+    $stmt[0]->close();
+    if ($kategoriSeniman === null) {
+        throw new Exception('Data kategori seniman tidak ditemukan');
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,7 +96,7 @@ $csrf = $GLOBALS['csrf'];
       border-radius: 5px;
       font-size: 16px;
       width: 100%;
-    }
+    }
 
   </style>
 </head>
@@ -126,25 +150,13 @@ $csrf = $GLOBALS['csrf'];
                   <div class="col-lg-12">
                     <div class="row">
                       <div class="col-lg-8">
-                        <select id="bulanDropdown" onchange="tampilkanBulan()" class="inp">
-                          <option value="01">Campusari</option>
-                          <option value="02">Dalang</option>
-                          <option value="03">Jaranan</option>
-                          <option value="04">Karawitan</option>
-                          <option value="05">MC</option>
-                          <option value="06">Ludruk</option>
-                          <option value="07">Organisasi Kesenian Musik</option>
-                          <option value="08">Pramugari Tayup</option>
-                          <option value="09">Sanggar</option>
-                          <option value="10">Sinden</option>
-                          <option value="11">Vocalis</option>
-                          <option value="12">Waranggo</option>
-                          <option value="13">Barongsai</option>
-                          <option value="14">Ketoprak</option>
-                          <option value="15">Pataji</option>
-                          <option value="16">Reog</option>
-                          <option value="17">THR</option>
-                          <option value="18">Pelawak</option>
+                        <select id="inpKategori" onchange="tampilkanKategori()" class="inp">
+                          <option value="semua">semua</option>
+                          <?php
+                            foreach($kategoriSeniman as $n){
+                              echo "<option value='".$n['id_kategori_seniman']."'>".$n['nama_kategori']."</option>";
+                            }
+                          ?>
                         </select>
                       </div>
                     </div>
@@ -233,6 +245,7 @@ $csrf = $GLOBALS['csrf'];
     var tableSeniman = document.getElementById('tableSeniman');
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
+    var kategoriInput = document.getElementById('inpKategori');
     var tahun;
     function updateTable(dataT = ''){
       while (tableSeniman.firstChild) {
@@ -296,6 +309,7 @@ $csrf = $GLOBALS['csrf'];
         var requestBody = {
           email: email,
           tanggal:'semua',
+          kategori:kategoriInput.value,
           desc:'data'
         };
       }else if(con == null){
@@ -303,6 +317,7 @@ $csrf = $GLOBALS['csrf'];
         var requestBody = {
           email: email,
           tanggal:tanggal,
+          kategori:kategoriInput.value,
           desc:'data'
         };
       }
@@ -319,7 +334,7 @@ $csrf = $GLOBALS['csrf'];
             updateTable(JSON.parse(response)['data']);
           } else {
             var response = xhr.responseText;
-            console.log(response);
+            // console.log(response);
             updateTable();
             return;
           }
@@ -356,6 +371,9 @@ $csrf = $GLOBALS['csrf'];
           getData();
         }, 250);
       }, 5);
+    }
+    function tampilkanKategori(){
+      tampilkanBulan();
     }
   </script>
   <!-- Vendor JS Files -->

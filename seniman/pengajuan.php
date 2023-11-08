@@ -292,7 +292,7 @@ $csrf = $GLOBALS['csrf'];
             updateTable(JSON.parse(response)['data']);
           } else {
             var response = xhr.responseText;
-            console.log(response);
+            // console.log(response);
             updateTable();
             return;
           }

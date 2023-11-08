@@ -167,7 +167,7 @@ class SenimanWebsite{
                 throw new Exception('user tidak ditemukan');
             }
             $stmt[0]->close();
-            if(($role != 'admin tempat' && $role != 'super admin') || $role == 'masyarakat'){
+            if(($role != 'admin seniman' && $role != 'super admin') || $role == 'masyarakat'){
                 throw new Exception('Invalid role');
             }
             //check and get data
@@ -177,7 +177,14 @@ class SenimanWebsite{
                 }else if($data['desc'] == 'riwayat'){
                     $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'data'){
-                    $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' ORDER BY id_seniman DESC";
+                    if(!isset($data['kategori']) || empty($data['kategori'])){
+                        throw new Exception('Kategori Seniman harus di isi !');
+                    }
+                    if($data['kategori'] == 'semua'){
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' ORDER BY id_seniman DESC";
+                    }else{
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND seniman.id_kategori_seniman = ".$data['kategori']." ORDER BY id_seniman DESC";
+                    }
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
@@ -188,7 +195,14 @@ class SenimanWebsite{
                 }else if($data['desc'] == 'riwayat'){
                     $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'data'){
-                    $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                    if(!isset($data['kategori']) || empty($data['kategori'])){
+                        throw new Exception('Kategori Seniman harus di isi !');
+                    }
+                    if($data['kategori'] == 'semua'){
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                    }else{
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND seniman.id_kategori_seniman = ".$data['kategori']." AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                    }
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
