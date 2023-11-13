@@ -11,11 +11,11 @@ if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
 }else{
 	$userAuth = $userAuth['data'];
-  if($userAuth['role'] != 'super admin'){
-    echo "<script>alert('Anda bukan super admin !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
+  // if($userAuth['role'] != 'super admin'){
+  //   echo "<script>alert('Anda bukan super admin !')</script>";
+  //   echo "<script>window.location.href = '/dashboard.php';</script>";
+  //   exit();
+  // }
 }
 $csrf = $GLOBALS['csrf'];
 ?>
@@ -140,8 +140,8 @@ $csrf = $GLOBALS['csrf'];
                   </div>
               </div>
               <table class="table datatable">
-              <thead>
-              <tr>
+                <thead>
+                  <tr>
                     <th>No</th>
                     <th>Nama Pengirim</th>
                     <th>Nama Event</th>
@@ -149,8 +149,8 @@ $csrf = $GLOBALS['csrf'];
                     <th>Status</th>
                     <th>Aksi</th>
                   </tr>
-                  </thead>
-                  <tbody id="tableEvent">
+                </thead>
+                <tbody id="tableEvent">
                   <?php
                     // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_event DESC");
                     $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC");

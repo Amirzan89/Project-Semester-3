@@ -376,6 +376,9 @@ class Jwt{
         }
     }
 }
+// if($_SERVER['REQUEST_METHOD'] == 'GET'){
+//     include(__DIR__.'/../notfound.php');
+// }
 // $headers = array('alg'=>'HS256','typ'=>'JWT');
 // $payload = array('sub'=>'1234567890','name'=>'John Doe', 'admin'=>true, 'exp'=>(time() + 60));
 // $jwt = generate_jwt($headers, $payload);

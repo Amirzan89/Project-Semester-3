@@ -10,7 +10,7 @@ class MailMobile{
     private static $con;
     private static $timeZone = 'Asia/Jakarta';
     private static $sendTime = [5, 15, 30, 60, 6*60, 12*60, 24*60];
-    private static function loadEnv($path = null){
+    public function loadEnv($path = null){
         if($path == null){
             $path = __DIR__."/../.env";
         }
@@ -46,7 +46,7 @@ class MailMobile{
     }
     public function __construct(){
         try {
-            self::loadEnv();
+            $this->loadEnv();
             self::$database = koneksi::getInstance();
             self::$con = self::$database->getConnection();
             $this->mail = new PHPMailer(true);
@@ -560,9 +560,20 @@ class MailMobile{
         }
     }
 }
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $mailMobile = new MailMobile();
-    $data = MailMobile::handle();
+if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    include(__DIR__.'/../notfound.php');
+}
+$mailMobile = new MailMobile();
+$mailMobile->loadEnv(); 
+$createVerifyEmail = function ($data) use ($mailMobile){
+    $mailMobile->createVerifyEmail($data);
+};
+$createForgotPassword = function ($data) use ($mailMobile){
+    $mailMobile->createForgotPassword($data);
+};
+if($_SERVER['APP_TESTING']){
+    if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        $data = MailMobile::handle();
     if(isset($data['desc']) && !is_null($data['desc']) && !empty($data['desc'])){
         if($data['desc'] == 'email'){
             $mailMobile->createVerifyEmail($data);
@@ -582,13 +593,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     // }else{
     //     $mailMobile->sewaTempat($data);
     // }
-}
-if($_SERVER['REQUEST_METHOD'] == 'PUT'){
-    // $mailMobile = new MailMobile();
-    // $mailMobile->editSewaTempat(MailMobile::handle());
-}
-if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-    // $mailMobile = new MailMobile();
-    // $mailMobile->hapusSewaTempat(MailMobile::handle());
+    }
+    if($_SERVER['REQUEST_METHOD'] == 'PUT'){
+        // $mailMobile = new MailMobile();
+        // $mailMobile->editSewaTempat(MailMobile::handle());
+    }
+    if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+        // $mailMobile = new MailMobile();
+        // $mailMobile->hapusSewaTempat(MailMobile::handle());
+    }
 }
 ?>

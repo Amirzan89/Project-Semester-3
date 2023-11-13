@@ -1,6 +1,8 @@
 <?php
-require_once('web/koneksi.php');
-require_once('web/authenticate.php');
+require_once(__DIR__.'web/koneksi.php');
+require_once(__DIR__.'web/authenticate.php');
+require_once(__DIR__.'env.php');
+loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
 $userAuth = authenticate($_POST,[
@@ -10,10 +12,11 @@ $userAuth = authenticate($_POST,[
 if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
 }else{
-	$userAuth = $userAuth['data'];
-  // if($userAuth['role'] != 'super admin'){
-  //   header('Location: /dashboard.php');
-  // }
+    $userAuth = $userAuth['data'];
+    // if($userAuth['role'] != 'super admin'){
+        //   header('Location: /dashboard.php');
+        // }
+    $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : '/public';
 }
 $csrf = $GLOBALS['csrf'];
 ?>

@@ -34,8 +34,8 @@ class User{
                 echo "<script>alert('Password minimal 8 angka !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
-            } elseif (strlen($data['pass']) > 25) {
-                echo "<script>alert('Password maksimal 25 angka !')</script>";
+            } elseif (strlen($data['pass']) > 15) {
+                echo "<script>alert('Password maksimal 15 angka !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
@@ -250,8 +250,8 @@ class User{
                     echo "<script>window.history.back();</script>";
                     exit();
                 }
-                if (strlen($data['pass']) > 25) {
-                    echo "<script>alert('Password maksimal 25 karakter !');</script>";
+                if (strlen($data['pass']) > 15) {
+                    echo "<script>alert('Password maksimal 15 karakter !');</script>";
                     echo "<script>window.history.back();</script>";
                     exit();
                 }
@@ -1578,6 +1578,9 @@ class User{
         }
     }
 }
+// if($_SERVER['REQUEST_METHOD'] == 'GET'){
+//     include(__DIR__.'/../notfound.php');
+// }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = new User();
     $data = User::handle();
@@ -1601,14 +1604,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user->hapusUser($data);
             }
         }
-    }
-}
-if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    if(isset($_SERVER['HTTP_REFERER'])){
-        $previousUrl = $_SERVER['HTTP_REFERER'];
-        $path = parse_url($previousUrl, PHP_URL_PATH);
-    }else{
-        $path = isset($data['uri']) ? $data['uri'] : null;
     }
 }
 ?>

@@ -38,4 +38,7 @@ class Koneksi{
     }
     private static $pool = [];
 }
+// if($_SERVER['REQUEST_METHOD'] == 'GET'){
+//     include(__DIR__.'/../notfound.php');
+// }
 ?>

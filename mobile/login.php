@@ -1,7 +1,7 @@
 <?php
 require(__DIR__.'/../web/koneksi.php');
 require(__DIR__.'/../web/Jwt.php');
-$loadEnv = function($path = null){
+function loadEnv($path = null){
     if($path == null){
         $path = __DIR__."/../.env";
     }
@@ -16,76 +16,91 @@ $loadEnv = function($path = null){
         }
     }
 };
-function Login($data,$loadEnv){
+function Login($data){
     try{
         $email = $data["email"];
         // $email = "Admin@gmail.com";
-        $pass = $data["password"];
-        $pass = "Admin@1234567890";
+        // $pass = $data["password"];
+        // $data['password'] = "Admin@1234567890";
         if(!isset($email) || empty($email)){
             throw new Exception('Email harus di isi !');
         } else if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             throw new Exception('Email invalid !');
-        }else if(!isset($pass) || empty($pass)){
-            throw new Exception('Password harus di isi !');
-        }else{
-            $db = koneksi::getInstance();
-            $con = $db->getConnection();
-            $query = "SELECT password FROM users WHERE BINARY email = ? LIMIT 1";
+        }
+        $db = koneksi::getInstance();
+        $con = $db->getConnection();
+        if($data['desc'] == 'google'){
+            $query = "SELECT * FROM users WHERE BINARY email = ?";
             $stmt[0] = $con->prepare($query);
             $stmt[0]->bind_param('s', $email);
-            $stmt[0]->execute();
-            $passDb = '';
-            $stmt[0]->bind_result($passDb);
-            if ($stmt[0]->fetch()) {
-                if(!password_verify($pass,$passDb)){
-                    $stmt[0]->close();
-                    throw new Exception('Password salah !');
-                }else{
-                    $stmt[0]->close();
-                    $result = Jwt::createToken($data,$con,$loadEnv);
-                    if(is_null($result)){
-                        throw new Exception(json_encode(['status' => 'error', 'message' => 'create token error','code'=>500]));
-                    }else{
-                        if($result['status'] == 'error'){
-                            throw new Exception(json_encode($result));
-                        }else{
-                            $loadEnv();
-                            // $data1 = ['email'=>$email,'number'=>$result['number'],'expire'=>time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED'])];
-                            // $encoded = base64_encode(json_encode($data1));
-                            // setcookie('token1', $encoded, time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
-                            // setcookie('token2', $result['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
-                            // setcookie('token3', $result['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
-                            // header('Location: /dashboard.php');
-                            header('Content-Type: application/json');
-                            echo json_encode(['status'=>'success','message'=>'login berhasil']);
-                        }
-                    }
-                }
-            }else{
+            if(!$stmt[0]->execute()){
                 $stmt[0]->close();
-                throw new Exception('Email tidak ditemukan !');
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Email tidak ditemukan !','kode'=>2]));
             }
+            $result = $stmt[0]->get_result();
+            $usersData = $result->fetch_assoc();
+            $stmt[0]->close();
+            if ($usersData === null) {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Pengguna tidak ditemukan','kode'=>2]));
+            }
+            if(in_array($usersData['role'],['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Role Invalid','kode'=>2]));
+            }
+            unset($usersData['password']);
+            unset($usersData['foto']);
+            header('Content-Type: application/json');
+            echo json_encode(['status'=>'success','message'=>'Data Tersedia', 'kode'=>1, 'data'=>$usersData]);
+            exit();
+        }else if($data['desc'] == 'login'){
+            if(!isset($data['password']) || empty($data['password'])){
+                throw new Exception('Password harus di isi !');
+            }
+            $query = "SELECT * FROM users WHERE BINARY email = ?";
+            $stmt[0] = $con->prepare($query);
+            $stmt[0]->bind_param('s', $email);
+            if(!$stmt[0]->execute()){
+                $stmt[0]->close();
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Email tidak ditemukan !','kode'=>2]));
+            }
+            $result = $stmt[0]->get_result();
+            $usersData = $result->fetch_assoc();
+            $stmt[0]->close();
+            if ($usersData === null) {
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Pengguna tidak ditemukan','kode'=>2]));
+            }
+            if(!password_verify($data['password'],$usersData['password'])){
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Password Salah','kode'=>2]));
+            }
+            if(in_array($usersData['role'],['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Role invalid','kode'=>3]));
+            }
+            unset($usersData['password']);
+            unset($usersData['foto']);
+            header('Content-Type: application/json');
+            echo json_encode(['status'=>'success','message'=>'Data Tersedia', 'kode'=>1, 'data'=>$usersData]);
+            exit();
         }
     }catch(Exception $e){
-        echo $e->getTraceAsString();
         $error = $e->getMessage();
         $errorJson = json_decode($error, true);
         if ($errorJson === null) {
             $responseData = array(
                 'status' => 'error',
-                'message' => $error,
+                'pesan' => $error,
+                'kode'=>2
             );
         }else{
             if($errorJson['message']){
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $errorJson['message'],
+                    'pesan' => $errorJson['message'],
+                    'kode'=>2
                 );
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $errorJson->message,
+                    'pesan' => $errorJson['message'],
+                    'kode'=>2
                 );
             }
         }
@@ -95,15 +110,7 @@ function Login($data,$loadEnv){
         exit();
     }
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input_data = file_get_contents("php://input");
-    $data = json_decode($input_data, true);
-    // echo json_encode($data);
-    // exit();
-    Login($data,$loadEnv);
-}
-//protection
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    header('Location: /');
+    include(__DIR__.'/../notfound.php');
 }
 ?>

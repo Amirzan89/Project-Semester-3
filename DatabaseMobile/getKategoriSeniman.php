@@ -1,22 +1,11 @@
 <?php
-
-require('Koneksi.php');
-
-// Membuat query SQL untuk mengambil data kategori
-$sql = "SELECT id_kategori_seniman, nama_kategori FROM kategori_seniman";
-$result = $konek->query($sql);
-
-if ($result->num_rows > 0) {
-    $kategori = array();
-    while ($row = $result->fetch_assoc()) {
-        $kategori[] = $row;
-    }
-    
-} else {
-    echo "Tidak ada data kategori.";
+require_once(__DIR__ . '/../mobile/seniman/seniman.php');
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = SenimanMobile::handle();
+    $getKategori($data);
 }
-echo json_encode($kategori);
-// Menutup koneksi ke database
-$konek->close();
-
+//protection
+if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    include(__DIR__.'/../notfound.php');
+}
 ?>

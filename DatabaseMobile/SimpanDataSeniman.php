@@ -1,7 +1,6 @@
 <?php
 require('Koneksi.php');
 
-
 $id_user = $_POST['id_user'];
     
     $sql = "SELECT * FROM seniman WHERE id_user = '$id_user' LIMIT 1";

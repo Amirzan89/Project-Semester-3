@@ -257,7 +257,7 @@ class PentasWebsite{
     }
 }
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    echo 'ilang';
+    include(__DIR__.'/../../notfound.php');
 }
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $pentasWeb = new PentasWebsite();

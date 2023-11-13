@@ -468,7 +468,7 @@ class EventMobile{
             //update database 
             $query = "UPDATE events SET nama_pengirim = ?, updated_at = ? WHERE id_event = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param("ssi", $data['nama_pengirim'],$tanggalSekarangDB, $data['id_event']);
+            $stmt[2]->bind_param("ssi", $data['nama_pengirim'],$tanggal_sekarangDB, $data['id_event']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -623,26 +623,45 @@ class EventMobile{
         }
     }
 }
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $EventMobile = new EventMobile();
-    $data = EventMobile::handle();
-    if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan'])){
-        if($data['keterangan'] == 'get full event'){
-            $EventMobile->getFullEvent($data);
-        }else if($data['keterangan'] == 'get event'){
-            $EventMobile->getEvent($data);
-        }else if($data['keterangan'] == 'get detail'){
-            $EventMobile->getDetailEvent($data);
+function loadEnv($path = null){
+    if($path == null){
+        $path = __DIR__."/../../.env";
+    }
+    if (file_exists($path)) {
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+                list($key, $value) = explode('=', $line, 2);
+                $_ENV[trim($key)] = trim($value);
+                $_SERVER[trim($key)] = trim($value);
+            }
         }
-    } 
-    $EventMobile->tambahEventMasyarakat(EventMobile::handle());
+    }
+};
+loadEnv();
+if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    include(__DIR__.'/../../notfound.php');
 }
-if($_SERVER['REQUEST_METHOD'] == 'PUT'){
-    $EventMobile = new EventMobile();
-    $EventMobile->editEvent(EventMobile::handle());
-}
-if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-    $EventMobile = new EventMobile();
-    $EventMobile->hapusEvent(EventMobile::handle());
+$EventMobile = new EventMobile();
+if($_SERVER['APP_TESTING']){
+    if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        $data = EventMobile::handle();
+        if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan'])){
+            if($data['keterangan'] == 'get full event'){
+                $EventMobile->getFullEvent($data);
+            }else if($data['keterangan'] == 'get event'){
+                $EventMobile->getEvent($data);
+            }else if($data['keterangan'] == 'get detail'){
+                $EventMobile->getDetailEvent($data);
+            }
+        } 
+        $EventMobile->tambahEventMasyarakat(EventMobile::handle());
+    }
+    if($_SERVER['REQUEST_METHOD'] == 'PUT'){
+        $EventMobile->editEvent(EventMobile::handle());
+    }
+    if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+        $EventMobile->hapusEvent(EventMobile::handle());
+    }
 }
 ?>

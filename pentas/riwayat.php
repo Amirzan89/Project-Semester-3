@@ -140,16 +140,16 @@ $csrf = $GLOBALS['csrf'];
                     </div>
                   </div>
               </div>
-              <table class="table">
+              <table class="table datatable">
                 <thead>
                   <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">Nomor Induk Seniman</th>
-                    <th scope="col">Nama Pemohon</th>
-                    <th scope="col">Tanggal Pengajuan</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Keterangan</th>
-                    <th scope="col">Aksi</th>
+                    <th >No</th>
+                    <th >Nomor Induk Seniman</th>
+                    <th >Nama Pemohon</th>
+                    <th >Tanggal Pengajuan</th>
+                    <th >Status</th>
+                    <th >Keterangan</th>
+                    <th >Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="tablePentas">
@@ -201,6 +201,7 @@ $csrf = $GLOBALS['csrf'];
   <script src="/public/js/popup.js"></script>
   <script>
     var tablePentas = document.getElementById('tablePentas');
+    console.log(tablePentas);
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
@@ -210,6 +211,7 @@ $csrf = $GLOBALS['csrf'];
       }
       var num = 1;
       if(dataT != ''){
+        // console.log(dataT);
         dataT.forEach(function (item){
           var row = document.createElement('tr');
           var td = document.createElement('td');
@@ -217,7 +219,10 @@ $csrf = $GLOBALS['csrf'];
           td.innerText = num;
           row.appendChild(td);
           var td = document.createElement('td');
-          td.innerText = item['nama_seniman'];
+          td.innerText = item['nomor_induk'];
+          row.appendChild(td);
+          var td = document.createElement('td');
+          td.innerText = item['nama_advis'];
           row.appendChild(td);
           var td = document.createElement('td');
           td.innerText = item['tanggal'];
@@ -276,7 +281,7 @@ $csrf = $GLOBALS['csrf'];
         };
       }
       //open the request
-      xhr.open('POST', domain + "/web/seniman/seniman.php")
+      xhr.open('POST', domain + "/web/pentas/pentas.php")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data

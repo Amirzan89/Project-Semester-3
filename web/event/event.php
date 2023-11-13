@@ -305,6 +305,9 @@ class EventWebsite{
         }
     }
 }
+// if($_SERVER['REQUEST_METHOD'] == 'GET'){
+//     include(__DIR__.'/../../notfound.php');
+// }
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $eventWeb = new EventWebsite();
     $data = EventWebsite::handle();

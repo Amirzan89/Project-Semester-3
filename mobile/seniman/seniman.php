@@ -42,33 +42,78 @@ class SenimanMobile{
                 if(!isset($data['kategori']) || empty($data['kategori'])){
                     throw new Exception('Kategori harus di isi');
                 }
-                //check kategori
-                $query = "SELECT id_kategori_seniman FROM kategori_seniman WHERE singkatan = ? LIMIT 1";
-                $stmt[0] = self::$con->prepare($query);
-                $stmt[0]->bind_param('s', $data['kategori']);
+                $jsonFile = file_get_contents(self::$jsonPath);
+                $jsonData = json_decode($jsonFile, true);
+                $result = null;
+                foreach($jsonData as $key => $item){
+                    if (isset($item['singkatan_kategori']) && $item['singkatan_kategori'] == $data['kategori']) {
+                        $result = $jsonData[$key]['id_kategori_seniman'];
+                    }
+                }
+                if($result === null){
+                    throw new Exception('Data kategori tidak ditemukan');
+                }
+                return $result;
             }else if($desc == 'get'){
                 if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                     throw new Exception('Kategori harus di isi');
                 }
-                $query = "SELECT nama_kategori FROM kategori_seniman WHERE id_kategori_seniman = ? LIMIT 1";
-                $stmt[0] = self::$con->prepare($query);
-                $stmt[0]->bind_param('s', $data['id_kategori']);
+                $jsonFile = file_get_contents(self::$jsonPath);
+                $jsonData = json_decode($jsonFile, true);
+                $result = null;
+                foreach($jsonData as $key => $item){
+                    if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
+                        $result = $jsonData[$key]['nama_kategori'];
+                    }
+                }
+                if($result === null){
+                    throw new Exception('Data kategori tidak ditemukan');
+                }
+                return $result;
+            }else if($desc == 'get nama'){
+                if(!isset($data['NamaKategori']) || empty($data['NamaKategori'])){
+                    throw new Exception('Kategori harus di isi');
+                }
+                $jsonFile = file_get_contents(self::$jsonPath);
+                $jsonData = json_decode($jsonFile, true);
+                $result = null;
+                foreach($jsonData as $key => $item){
+                    if (isset($item['nama_kategori']) && $item['nama_kategori'] == $data['NamaKategori']) {
+                        $result = $jsonData[$key];
+                    }
+                }
+                if($result === null){
+                    throw new Exception('Data kategori tidak ditemukan');
+                }
+                return $result;
+            }else if($desc == 'get all'){
+                $jsonFile = file_get_contents(self::$jsonPath);
+                $jsonData = json_decode($jsonFile, true);
+                $result = null;
+                // foreach($jsonData as $key => $item){
+                //     unset($jsonData[$key]['singkatan_kategori']);
+                // }
+                if($result === null){
+                    throw new Exception('Data kategori tidak ditemukan');
+                }
+                return $result;
             }else if($desc == 'getINI'){
                 if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                     throw new Exception('Kategori harus di isi');
                 }
-                $query = "SELECT singkatan FROM kategori_seniman WHERE id_kategori_seniman = ? LIMIT 1";
-                $stmt[0] = self::$con->prepare($query);
-                $stmt[0]->bind_param('s', $data['id_kategori']);
+                $jsonFile = file_get_contents(self::$jsonPath);
+                $jsonData = json_decode($jsonFile, true);
+                $result = null;
+                foreach($jsonData as $key => $item){
+                    if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
+                        $result = $jsonData[$key]['singkatan_kategori'];
+                    }
+                }
+                if($result === null){
+                    throw new Exception('Data kategori tidak ditemukan');
+                }
+                return $result;
             }
-            $stmt[0]->execute();
-            $kategoriDB = '';
-            $stmt[0]->bind_result($kategoriDB);
-            if(!$stmt[0]->fetch()){
-                $stmt[0]->close();
-                throw new Exception('Kategori seniman tidak ditemukan');
-            }
-            return $kategoriDB;
         }catch(Exception $e){
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
@@ -157,7 +202,7 @@ class SenimanMobile{
             exit();
         }
     }
-    public function regisrasiSeniman($data){
+    public function registrasiSeniman($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('ID User harus di isi');
@@ -974,7 +1019,7 @@ class SenimanMobile{
             $requestData = json_decode($rawData, true);
             if ($requestData === null && json_last_error() !== JSON_ERROR_NONE) {
                 http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
+                echo json_encode(['status' => 'error', 'pesan' => 'Invalid JSON data']);
                 exit();
             }
             return $requestData;
@@ -986,49 +1031,115 @@ class SenimanMobile{
             return $requestData;
         } else {
             http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
+            echo json_encode(['status' => 'error', 'pesan' => 'Unsupported content type']);
             exit();
         }
     }
 }
-if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    echo 'ilang';
-}
-if($_SERVER['REQUEST_METHOD'] == 'PUT'){
-    $senimanMobile = new SenimanMobile();
-    $data = SenimanMobile::handle();
-    if($data['keterangan'] == 'perpanjang'){
-        $senimanMobile->editPerpanjangan($data);
-    }else{
-        $senimanMobile->editSeniman(SenimanMobile::handle());
+function loadEnv($path = null){
+    if($path == null){
+        $path = __DIR__."/../../.env";
     }
-}
-if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-    $senimanMobile = new SenimanMobile();
-    $senimanMobile->hapusSeniman(SenimanMobile::handle());
-}
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $senimanMobile = new SenimanMobile();
-    $data = SenimanMobile::handle();
-    if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan']) && $data['keterangan'] == 'get'){
-        $senimanMobile->getSeniman($data);
-    }
-    if(isset($_POST['_method'])){
-        if($_POST['_method'] == 'PUT'){
-            if(isset($data['keterangan']) && !empty($data['kategori']) && !is_null($data['kategori']) && $data['keterangan'] == 'perpanjang'){
-                $senimanMobile->editPerpanjangan($data);
-            }else{
-                $senimanMobile->editSeniman($data);
+    if (file_exists($path)) {
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+                list($key, $value) = explode('=', $line, 2);
+                $_ENV[trim($key)] = trim($value);
+                $_SERVER[trim($key)] = trim($value);
             }
-        }else if($_POST['_method'] == 'DELETE'){
-            $senimanMobile->hapusSeniman($data);
         }
-    }else{
-        if(isset($data['keterangan']) && !empty($data['kategori']) && !is_null($data['kategori']) && $data['keterangan'] == 'perpanjang'){
-            $senimanMobile->buatPerpanjangan($data);
+    }
+};
+loadEnv();
+if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    include(__DIR__.'/../../notfound.php');
+}
+$senimanMobile = new SenimanMobile;
+if($_SERVER['APP_TESTING']){
+    if($_SERVER['REQUEST_METHOD'] == 'PUT'){
+        $data = SenimanMobile::handle();
+            if($data['keterangan'] == 'perpanjang'){
+            $senimanMobile->editPerpanjangan($data);
         }else{
-            $senimanMobile->regisrasiSeniman($data);
+            $senimanMobile->editSeniman(SenimanMobile::handle());
+        }
+    }
+    if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+        $senimanMobile->hapusSeniman(SenimanMobile::handle());
+    }
+    if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        $data = SenimanMobile::handle();
+        if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan']) && $data['keterangan'] == 'get'){
+            $senimanMobile->getSeniman($data);
+        }
+        if(isset($_POST['_method'])){
+            if($_POST['_method'] == 'PUT'){
+                if(isset($data['keterangan']) && !empty($data['kategori']) && !is_null($data['kategori']) && $data['keterangan'] == 'perpanjang'){
+                    $senimanMobile->editPerpanjangan($data);
+                }else{
+                    $senimanMobile->editSeniman($data);
+                }
+            }else if($_POST['_method'] == 'DELETE'){
+                $senimanMobile->hapusSeniman($data);
+            }
+        }else{
+            if(isset($data['keterangan']) && !empty($data['kategori']) && !is_null($data['kategori']) && $data['keterangan'] == 'perpanjang'){
+                $senimanMobile->buatPerpanjangan($data);
+            }else{
+                $senimanMobile->registrasiSeniman($data);
+            }
         }
     }
 }
+$getSeniman = function ($data) use ($senimanMobile){
+    $senimanMobile->getSeniman($data);
+};
+$getKategori = function ($data) use ($senimanMobile){
+    $kategori = $senimanMobile->kategori($data,'get all');
+    if(empty($kategori) && is_null($kategori)){
+        header("Content-Type: application/json");
+        $data = [
+            'kode'=>1,
+            'pesan'=>'Tidak ada data kategori',
+        ];
+        echo json_encode($data);
+        exit();
+    }
+    header("Content-Type: application/json");
+    foreach($kategori as $key => $item){
+        unset($kategori[$key]['singkatan_kategori']);
+    }
+    echo json_encode($kategori);
+    exit();
+};
+$getNamaKategori = function ($data) use ($senimanMobile){
+    $kategori = $senimanMobile->kategori($data,'get nama');
+    if(empty($kategori) && is_null($kategori)){
+        header("Content-Type: application/json");
+        $data = [
+            'kode'=>1,
+            'pesan'=>'Nama Kategori tidak tersedia',
+        ];
+        echo json_encode($data);
+        exit();
+    }
+    header("Content-Type: application/json");
+    $data = [
+        'kode'=>1,
+        'pesan'=>'Data tersedia',
+        'data'=>$kategori
+    ];
+    echo json_encode($data);
+    exit();
+};
+$tambahSeniman = function ($data) use ($senimanMobile){
+    $senimanMobile->registrasiSeniman($data);
+};
+$updateSeniman = function ($data) use ($senimanMobile){
+    $senimanMobile->editSeniman($data);
+};
+// $updatePasswordProfile = function ($data) use ($senimanMobile){
+//     $senimanMobile->($data);
+// };
 ?>

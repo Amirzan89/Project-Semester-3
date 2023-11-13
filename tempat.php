@@ -1,6 +1,8 @@
 <?php
-require_once('web/koneksi.php');
-require_once('web/authenticate.php');
+require_once(__DIR__.'web/koneksi.php');
+require_once(__DIR__.'web/authenticate.php');
+require_once(__DIR__.'env.php');
+loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
 $userAuth = authenticate($_POST, [
@@ -16,6 +18,7 @@ if ($userAuth['status'] == 'error') {
   //   echo "<script>window.location.href = '/dashboard.php';</script>";
   //   exit();
   // }
+  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : '/public';
 }
 $csrf = $GLOBALS['csrf'];
 
@@ -55,7 +58,7 @@ $csrf = $GLOBALS['csrf'];
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include('header.php');
+    <?php include(__DIR__.'header.php');
     ?>
   </header>
   <!-- End Header -->
@@ -65,7 +68,7 @@ $csrf = $GLOBALS['csrf'];
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php
       $nav = 'tempat';
-      include('sidebar.php');
+      include(__DIR__.'sidebar.php');
       ?>
     </ul>
   </aside>
@@ -166,7 +169,7 @@ $csrf = $GLOBALS['csrf'];
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include('footer.php');
+    <?php include(__DIR__.'footer.php');
     ?>
   </footer>
 

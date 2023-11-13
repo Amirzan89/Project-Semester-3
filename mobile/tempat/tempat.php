@@ -605,35 +605,51 @@ class TempatMobile{
     }
 }
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    echo 'ilang';
+    include(__DIR__.'/../../notfound.php');
 }
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $tempatMobile = new TempatMobile();
-    $data = TempatMobile::handle();
-    if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan'])){
-        if($data['keterangan'] == 'get sewa'){
-            $tempatMobile->getSewa($data);
-        }else if($data['keterangan'] == 'get tempat'){
-            $tempatMobile->getTempat($data);
+function loadEnv($path = null){
+    if($path == null){
+        $path = __DIR__."/../../.env";
+    }
+    if (file_exists($path)) {
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+                list($key, $value) = explode('=', $line, 2);
+                $_ENV[trim($key)] = trim($value);
+                $_SERVER[trim($key)] = trim($value);
+            }
         }
     }
-    if(isset($data['_method'])){
-        if($data['_method'] == 'PUT'){
-            $tempatMobile->editSewaTempat($data);
+};
+loadEnv();
+$tempatMobile = new TempatMobile();
+if($_SERVER['APP_TESTING']){
+    if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        $data = TempatMobile::handle();
+        if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan'])){
+            if($data['keterangan'] == 'get sewa'){
+                $tempatMobile->getSewa($data);
+            }else if($data['keterangan'] == 'get tempat'){
+                $tempatMobile->getTempat($data);
+            }
         }
-        if($data['_method'] == 'DELETE'){
-            $tempatMobile->hapusSewaTempat($data);
+        if(isset($data['_method'])){
+            if($data['_method'] == 'PUT'){
+                $tempatMobile->editSewaTempat($data);
+            }
+            if($data['_method'] == 'DELETE'){
+                $tempatMobile->hapusSewaTempat($data);
+            }
+        }else{
+            $tempatMobile->buatSewaTempat($data);
         }
-    }else{
-        $tempatMobile->buatSewaTempat($data);
     }
-}
-if($_SERVER['REQUEST_METHOD'] == 'PUT'){
-    $tempatMobile = new TempatMobile();
-    $tempatMobile->editSewaTempat(TempatMobile::handle());
-}
-if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-    $tempatMobile = new TempatMobile();
-    $tempatMobile->hapusSewaTempat(TempatMobile::handle());
+    if($_SERVER['REQUEST_METHOD'] == 'PUT'){
+        $tempatMobile->editSewaTempat(TempatMobile::handle());
+    }
+    if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+        $tempatMobile->hapusSewaTempat(TempatMobile::handle());
+    }
 }
 ?>

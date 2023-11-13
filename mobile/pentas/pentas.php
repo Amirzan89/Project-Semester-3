@@ -122,7 +122,7 @@ class AdvisMobile{
                     }
                 }else if($desc == 'getINI'){
                     if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
-                        $result = $item['singkatan'];
+                        $result = $item['singkatan_kategori'];
                     }
                 }
             }
@@ -559,32 +559,48 @@ class AdvisMobile{
         }
     }
 }
+function loadEnv($path = null){
+    if($path == null){
+        $path = __DIR__."/../../.env";
+    }
+    if (file_exists($path)) {
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+                list($key, $value) = explode('=', $line, 2);
+                $_ENV[trim($key)] = trim($value);
+                $_SERVER[trim($key)] = trim($value);
+            }
+        }
+    }
+};
+loadEnv();
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    echo 'ilang';
+    include(__DIR__.'/../../notfound.php');
 }
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $pentasMobile = new AdvisMobile();
-    $data = AdvisMobile::handle();
-    if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan']) && $data['keterangan'] == 'get'){
-        $pentasMobile->getPentas($data);
-    }
-    if(isset($data['_method'])){
-        if($data['_method'] == 'PUT'){
-            $pentasMobile->editPentas($data);
+$pentasMobile = new AdvisMobile();
+if($_SERVER['APP_TESTING']){
+    if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        $data = AdvisMobile::handle();
+        if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan']) && $data['keterangan'] == 'get'){
+            $pentasMobile->getPentas($data);
         }
-        if($data['_method'] == 'DELETE'){
-            $pentasMobile->hapusPentas($data);
+        if(isset($data['_method'])){
+            if($data['_method'] == 'PUT'){
+                $pentasMobile->editPentas($data);
+            }
+            if($data['_method'] == 'DELETE'){
+                $pentasMobile->hapusPentas($data);
+            }
+        }else{
+            $pentasMobile->tambahPentas($data);
         }
-    }else{
-        $pentasMobile->tambahPentas($data);
     }
-}
-if($_SERVER['REQUEST_METHOD'] == 'PUT'){
-    $pentasMobile = new AdvisMobile();
-    $pentasMobile->editPentas(AdvisMobile::handle());
-}
-if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-    $pentasMobile = new AdvisMobile();
-    $pentasMobile->hapusPentas(AdvisMobile::handle());
+    if($_SERVER['REQUEST_METHOD'] == 'PUT'){
+        $pentasMobile->editPentas(AdvisMobile::handle());
+    }
+    if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+        $pentasMobile->hapusPentas(AdvisMobile::handle());
+    }
 }
 ?>

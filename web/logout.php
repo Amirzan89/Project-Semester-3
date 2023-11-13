@@ -1,4 +1,7 @@
 <?php 
+if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    include(__DIR__.'/../notfound.php');
+}
 require_once('jwt.php');
 require_once('koneksi.php');
 $jwt = new Jwt();

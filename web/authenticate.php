@@ -185,4 +185,7 @@ function authenticate($request,$data,$con = null){
         echo $e->getTraceAsString();
     }
 }
+// if($_SERVER['REQUEST_METHOD'] == 'GET'){
+//     include(__DIR__.'/../notfound.php');
+// }
 ?>

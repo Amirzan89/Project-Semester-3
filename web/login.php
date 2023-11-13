@@ -18,7 +18,7 @@ $loadEnv = function($path = null){
 };
 //protection
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    header('Location: /');
+    include(__DIR__.'/../notfound.php');
 }
 if(isset($_POST['login'])){
     try{

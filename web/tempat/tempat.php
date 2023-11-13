@@ -1052,7 +1052,7 @@ class TempatWebsite{
     }
 }
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    echo 'not found';
+    include(__DIR__.'/../../notfound.php');
 }
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $tempatWeb = new TempatWebsite();

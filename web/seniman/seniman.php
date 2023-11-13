@@ -282,7 +282,7 @@ class SenimanWebsite{
             if($role != 'super admin' && $role != 'admin seniman'){
                 throw new Exception('Anda bukan admin');
             }
-            $query = "INSERT INTO kategori_seniman (nama_kategori, singkatan) VALUES (?, ?)";
+            $query = "INSERT INTO kategori_seniman (nama_kategori, singkatan_kategori) VALUES (?, ?)";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param("ss",$data['nama_kategori'], $data['singkatan']);
             $stmt[1]->execute();
@@ -358,7 +358,7 @@ class SenimanWebsite{
             if($role != 'super admin' && $role != 'admin seniman'){
                 throw new Exception('Anda bukan admin');
             }
-            $query = "UPDATE kategori_seniman SET nama_kategori = ?, singkatan = ? WHERE id_kategori_seniman = ?";
+            $query = "UPDATE kategori_seniman SET nama_kategori = ?, singkatan_kategori = ? WHERE id_kategori_seniman = ?";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param("sss", $data['nama_kategori'], $data['singkatan'], $data['id_kategori']);
             $stmt[1]->execute();
@@ -942,7 +942,7 @@ class SenimanWebsite{
     }
 }
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    echo 'ilang';
+    include(__DIR__.'/../../notfound.php');
 }
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $senimanWeb = new SenimanWebsite();

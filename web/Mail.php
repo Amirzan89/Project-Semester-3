@@ -1,4 +1,7 @@
 <?php
+if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    include(__DIR__.'/../notfound.php');
+}
 // namespace Controllers\Mail;
 // require_once 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
