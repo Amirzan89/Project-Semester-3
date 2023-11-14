@@ -22,10 +22,8 @@ class SenimanMobile{
         if (isset($matches[1])) {
             $baseName = $matches[1];
             $number = isset($matches[2]) ? (int)$matches[2] : null;
-    
             return ['name' => $baseName, 'number' => $number];
         }
-    
         return null;
     }
     private function manageFile($data, $desc, $opt){
