@@ -16,12 +16,15 @@ $loadEnv = function($path = null){
         }
     }
 };
+// echo json_encode($_POST);
 //protection
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
     include(__DIR__.'/../notfound.php');
 }
 if(isset($_POST['login'])){
     try{
+        // echo 'login';
+        // exit();
         $email = htmlspecialchars($_POST["email"]);
         // $email = "Admin@gmail.com";
         $pass = $_POST["password"];

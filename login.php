@@ -37,9 +37,7 @@ $csrf = $GLOBALS['csrf'];
             <img style="width: 400px;" src="/public/img/icon/utama/login.svg">
         </div>
         <div class="login-content">
-            
-            <form>
-                
+            <form action="web/login.php" method="post" class="form-login" id="loginForm">
                 <h2>Selamat Datang!</h2>
                 <div class="input-div one">
                     <div class="i">
@@ -47,7 +45,8 @@ $csrf = $GLOBALS['csrf'];
                     </div>
                     <div>
                         <h5>Email</h5>
-                        <input class="input" type="text">
+                        <input type="email" name="email" id="inpEmail" class="input">
+                        <!-- <input class="input" type="text"> -->
                     </div>
                 </div>
                 <div class="input-div pass">
@@ -56,37 +55,38 @@ $csrf = $GLOBALS['csrf'];
                     </div>
                     <div class="div">
                         <h5>Kata Sandi</h5>
-                        <input class="input" type="password">
+                        <input type="password" name="password" id="inpPassword" class="input">
+                        <!-- <input class="input" type="password"> -->
                     </div>
                 </div>
-                <input type="submit" class="btn" value="Masuk">
+                <input type="submit" class="btn" name="login" value="Masuk" id="submit">
+                <!-- <input type="submit" class="btn" value="Masuk" name="login"> -->
                 </div>
             </form>
         </div>
     </div>
-<script> const inputs = document.querySelectorAll(".input");
-
-
-function addcl(){
-	let parent = this.parentNode.parentNode;
-	parent.classList.add("focus");
-}
-
-function remcl(){
-	let parent = this.parentNode.parentNode;
-	if(this.value == ""){
-		parent.classList.remove("focus");
-	}
-}
-
-
-inputs.forEach(input => {
-	input.addEventListener("focus", addcl);
-	input.addEventListener("blur", remcl);
-});
-
+    <div id="preloader" style="display: none;"></div>
+    <div id="greenPopup" style="display:none"></div>
+    <div id="redPopup" style="display:none"></div>
+    <script> 
+        const inputs = document.querySelectorAll(".input");
+        function addcl(){
+        	let parent = this.parentNode.parentNode;
+            console.log('tambah focus');
+        	parent.classList.add("focus");
+        }
+        function remcl(){
+            console.log('tambah blur');
+        	let parent = this.parentNode.parentNode;
+        	if(this.value == ""){
+        		parent.classList.remove("focus");
+        	}
+        }
+        inputs.forEach(input => {
+        	input.addEventListener("focus", addcl);
+        	input.addEventListener("blur", remcl);
+        });
 </script>
-<script src="public/js/utama/login.js"></script>
 </body>
 
 </html>
