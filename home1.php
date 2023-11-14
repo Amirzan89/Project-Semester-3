@@ -1,8 +1,24 @@
 <?php 
-require_once('web/koneksi.php');
-require_once('web/authenticate.php');
-$database = koneksi::getInstance();
-$con = $database->getConnection();
+require_once(__DIR__.'/web/koneksi.php');
+require_once(__DIR__.'/web/authenticate.php'); 
+require_once(__DIR__.'/env.php');
+loadEnv();
+$db = koneksi::getInstance();
+$con = $db->getConnection();
+$userAuth = authenticate($_POST,[
+    'uri'=>$_SERVER['REQUEST_URI'],
+    'method'=>$_SERVER['REQUEST_METHOD'
+    ]
+],$con);
+if($userAuth['status'] == 'success'){
+    $userAuth = $userAuth['data'];
+    if(!in_array($userAuth['role'],['super admin','admin seniman','admin tempat','admin sewa','admin pentas'])){
+        header('Location: /dashboard.php');
+    }
+    $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
+}
+// echo json_encode($userAuth);
+// exit();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,8 +31,8 @@ $con = $database->getConnection();
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="/public/assets/img/LandingPage/favicon.png" rel="icon">
-    <link href="/public/assets/img/LandingPage/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="<?php echo $tPath; ?>/public/assets/img/LandingPage/favicon.png" rel="icon">
+    <link href="<?php echo $tPath; ?>/public/assets/img/LandingPage/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link
@@ -24,16 +40,16 @@ $con = $database->getConnection();
         rel="stylesheet">
 
     <!-- Vendor CSS Files -->
-    <link href="/public/assets/vendor/aos/aos.css" rel="stylesheet">
-    <link href="/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="/public/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="/public/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-    <link href="/public/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="/public/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="<?php echo $tPath; ?>/public/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="<?php echo $tPath; ?>/public/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="<?php echo $tPath; ?>/public/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="<?php echo $tPath; ?>/public/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="<?php echo $tPath; ?>/public/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
     <!-- Template Main CSS File -->
-    <link href="/public/assets/css/LandingPage.css" rel="stylesheet">
+    <link href="<?php echo $tPath; ?>/public/assets/css/LandingPage.css" rel="stylesheet">
 </head>
 
 <body>
@@ -74,7 +90,7 @@ $con = $database->getConnection();
                         ?>
                         <div class="col">
                             <div class="card">
-                                <img src="/public/img/event<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" />
+                                <img src="<?php echo $tPath; ?>/public/img/event<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" />
                                 <div class="card-body">
                                     <h5 class="card-title"><?php echo $events['nama_event']?></h5>
                                     <p class="card-text">
@@ -96,7 +112,7 @@ $con = $database->getConnection();
                     </div>
                         <!-- <div class="col">
                             <div class="card">
-                                <img src="/public/assets/img/LandingPage/event1.png" class="card-img-top"
+                                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event1.png" class="card-img-top"
                                     alt="Hollywood Sign on The Hill" />
                                 <div class="card-body">
                                     <h5 class="card-title">FESTIVAL PULANG KAMPUNG</h5>
@@ -116,7 +132,7 @@ $con = $database->getConnection();
                         </div> -->
                         <!-- <div class="col">
                             <div class="card">
-                                <img src="/public/assets/img/LandingPage/event2.png" class="card-img-top"
+                                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event2.png" class="card-img-top"
                                     alt="Los Angeles Skyscrapers" />
                                 <div class="card-body">
                                     <h5 class="card-title">SIRAMAN SEDUDO</h5>
@@ -136,7 +152,7 @@ $con = $database->getConnection();
                         </div> -->
                         <!-- <div class="col">
                             <div class="card">
-                                <img src="/public/assets/img/LandingPage/event3.png" class="card-img-top" alt="Skyscrapers" />
+                                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event3.png" class="card-img-top" alt="Skyscrapers" />
                                 <div class="card-body">
                                     <h5 class="card-title">PAWAI BUDAYA</h5>
                                     <p class="card-text">
@@ -155,7 +171,7 @@ $con = $database->getConnection();
                         </div> -->
                         <!-- <div class="col">
                             <div class="card">
-                                <img src="/public/assets/img/LandingPage/event3.png" class="card-img-top" alt="Skyscrapers" />
+                                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event3.png" class="card-img-top" alt="Skyscrapers" />
                                 <div class="card-body">
                                     <h5 class="card-title">PAWAI BUDAYA</h5>
                                     <p class="card-text">
@@ -174,7 +190,7 @@ $con = $database->getConnection();
                         </div> -->
                         <!-- <div class="col">
                             <div class="card">
-                                <img src="/public/assets/img/LandingPage/event1.png" class="card-img-top"
+                                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event1.png" class="card-img-top"
                                     alt="Hollywood Sign on The Hill" />
                                 <div class="card-body">
                                     <h5 class="card-title">FESTIVAL PULANG KAMPUNG</h5>
@@ -194,7 +210,7 @@ $con = $database->getConnection();
                         </div> -->
                         <!-- <div class="col">
                             <div class="card">
-                                <img src="/public/assets/img/LandingPage/event2.png" class="card-img-top"
+                                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event2.png" class="card-img-top"
                                     alt="Los Angeles Skyscrapers" />
                                 <div class="card-body">
                                     <h5 class="card-title">SIRAMAN SEDUDO</h5>
@@ -269,16 +285,16 @@ $con = $database->getConnection();
             class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
-    <script src="/public/assets/vendor/aos/aos.js"></script>
-    <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/public/assets/vendor/glightbox/js/glightbox.min.js"></script>
-    <script src="/public/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-    <script src="/public/assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="/public/assets/vendor/waypoints/noframework.waypoints.js"></script>
-    <script src="/public/assets/vendor/php-email-form/validate.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/vendor/aos/aos.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/vendor/waypoints/noframework.waypoints.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/vendor/php-email-form/validate.js"></script>
 
     <!-- Template Main JS File -->
-    <script src="/public/assets/js/LandingPage.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/js/LandingPage.js"></script>
 
 </body>
 

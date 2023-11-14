@@ -1,6 +1,8 @@
 <?php
-require_once('../web/koneksi.php');
-require_once('../web/authenticate.php');
+require_once(__DIR__.'/../web/koneksi.php');
+require_once(__DIR__.'/../web/authenticate.php');
+require_once(__DIR__.'/../env.php');
+loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
 $userAuth = authenticate($_POST, [
@@ -11,11 +13,13 @@ if ($userAuth['status'] == 'error') {
   header('Location: /login.php');
 } else {
   $userAuth = $userAuth['data'];
-  // if($userAuth['role'] != 'super admin'){
-  //   echo "<script>alert('Anda bukan super admin !')</script>";
-  //   echo "<script>window.location.href = '/dashboard.php';</script>";
-  //   exit();
-  // }
+  if(!in_array($userAuth['role'],['super admin','admin event'])){
+    echo "<script>alert('Anda bukan admin event !')</script>";
+    echo "<script>window.location.href = '/dashboard.php';</script>";
+    exit();
+  }
+  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
+  $csrf = $GLOBALS['csrf'];
   if (isset($_GET['id_event']) && !empty($_GET['id_event'])) {
     $id = $_GET['id_event'];
     $sql = mysqli_query($conn, "SELECT id_event, nama_pengirim, status, catatan, events.id_detail, id_event, nama_event, deskripsi, kategori, tempat_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, link_pendaftaran FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = '$id'");
@@ -24,7 +28,6 @@ if ($userAuth['status'] == 'error') {
     header('Location: /event.php');
   }
 }
-$csrf = $GLOBALS['csrf'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -38,7 +41,7 @@ $csrf = $GLOBALS['csrf'];
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -46,13 +49,13 @@ $csrf = $GLOBALS['csrf'];
     href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
     rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/event.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/css/event.css" rel="stylesheet">
 
 </head>
 
@@ -68,7 +71,7 @@ $csrf = $GLOBALS['csrf'];
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include('../header.php');
+    <?php include(__DIR__.'/../header.php');
     ?>
   </header><!-- End Header -->
 
@@ -77,7 +80,7 @@ $csrf = $GLOBALS['csrf'];
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php
       $nav = 'event';
-      include('../sidebar.php');
+      include(__DIR__.'/../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
@@ -274,7 +277,7 @@ $csrf = $GLOBALS['csrf'];
     <!-- end modal tolak -->
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include('../footer.php');
+    <?php include(__DIR__.'/../footer.php');
     ?>
   </footer>
 
@@ -377,12 +380,12 @@ $csrf = $GLOBALS['csrf'];
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
   <!-- Template Main JS File -->
-  <script src="/public/assets/js/main.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
 
 </body>
 

@@ -1,13 +1,22 @@
 <?php 
-require_once('web/koneksi.php');
+require_once(__DIR__.'/web/koneksi.php');
+require_once(__DIR__.'/web/authenticate.php'); 
+require_once(__DIR__.'/env.php');
+loadEnv();
 $db = koneksi::getInstance();
 $con = $db->getConnection();
-require('web/authenticate.php'); 
 $userAuth = authenticate($_POST,[
-    'uri'=>$_SERVER['REQUEST_URI'],
-    'method'=>$_SERVER['REQUEST_METHOD'
+      'uri'=>$_SERVER['REQUEST_URI'],
+      'method'=>$_SERVER['REQUEST_METHOD'
     ]
 ],$con);
+if($userAuth['status'] == 'success'){
+  $userAuth = $userAuth['data'];
+  if(!in_array($userAuth['role'],['super admin','admin seniman','admin tempat','admin sewa','admin pentas'])){
+    header('Location: /dashboard.php');
+  }
+  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,8 +30,8 @@ $userAuth = authenticate($_POST,[
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/assets/img/LandingPage/favicon.png" rel="icon">
-  <link href="/public/assets/img/LandingPage/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?php echo $tPath; ?>/public/assets/img/LandingPage/favicon.png" rel="icon">
+  <link href="<?php echo $tPath; ?>/public/assets/img/LandingPage/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link
@@ -30,16 +39,16 @@ $userAuth = authenticate($_POST,[
     rel="stylesheet">
 
   <!-- Vendor CSS Files -->
-  <link href="/public/assets/vendor/aos/aos.css" rel="stylesheet">
-  <link href="/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/public/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="/public/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  <link href="/public/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="/public/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/LandingPage.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/css/LandingPage.css" rel="stylesheet">
 </head>
 
 <body>
@@ -81,7 +90,7 @@ $userAuth = authenticate($_POST,[
           </div>
         </div>
         <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-in" data-aos-delay="200">
-          <img src="/public/assets/img/LandingPage/hero.png" class="img-fluid animated" alt="">
+          <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/hero.png" class="img-fluid animated" alt="">
         </div>
       </div>
     </div>
@@ -97,7 +106,7 @@ $userAuth = authenticate($_POST,[
 
       <div class="row">
         <div class="col-lg-6 d-flex align-items-center" data-aos="fade-right" data-aos-delay="100">
-          <img src="/public/assets/img/LandingPage/hero2.png" class="img-fluid" alt="">
+          <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/hero2.png" class="img-fluid" alt="">
         </div>
         <div class="col-lg-6 pt-4 pt-lg-0 content" data-aos="fade-left" data-aos-delay="100">
           <br>
@@ -136,7 +145,7 @@ $userAuth = authenticate($_POST,[
           ?>
             <div class="col">
               <div class="card">
-              <img src="/public/img/event<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" />
+              <img src="<?php echo $tPath; ?>/public/img/event<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" />
                 <div class="card-body">
                   <h5 class="card-title"><?php echo $events['nama_event']?></h5>
                   <p class="card-text">
@@ -150,7 +159,7 @@ $userAuth = authenticate($_POST,[
           <?php } ?>
             <!-- <div class="col">
               <div class="card">
-                <img src="/public/assets/img/LandingPage/event1.png" class="card-img-top" alt="Hollywood Sign on The Hill" />
+                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event1.png" class="card-img-top" alt="Hollywood Sign on The Hill" />
                 <div class="card-body">
                   <h5 class="card-title">FESTIVAL PULANG KAMPUNG</h5>
                   <p class="card-text">
@@ -163,7 +172,7 @@ $userAuth = authenticate($_POST,[
             </div> -->
             <!-- <div class="col">
               <div class="card">
-                <img src="/public/assets/img/LandingPage/event2.png" class="card-img-top" alt="Los Angeles Skyscrapers" />
+                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event2.png" class="card-img-top" alt="Los Angeles Skyscrapers" />
                 <div class="card-body">
                   <h5 class="card-title">SIRAMAN SEDUDO</h5>
                   <p class="card-text">
@@ -176,7 +185,7 @@ $userAuth = authenticate($_POST,[
             </div> -->
             <!-- <div class="col">
               <div class="card">
-                <img src="/public/assets/img/LandingPage/event3.png" class="card-img-top" alt="Skyscrapers" />
+                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event3.png" class="card-img-top" alt="Skyscrapers" />
                 <div class="card-body">
                   <h5 class="card-title">PAWAI BUDAYA</h5>
                   <p class="card-text">
@@ -211,11 +220,11 @@ $userAuth = authenticate($_POST,[
           while ($tempat = mysqli_fetch_array($query)) {
           ?>
             <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-              <div class="portfolio-img"><img src="/public/img/tempat<?php echo $tempat['foto_tempat']?>" class="img-fluid" alt=""></div>
+              <div class="portfolio-img"><img src="<?php echo $tPath; ?>/public/img/tempat<?php echo $tempat['foto_tempat']?>" class="img-fluid" alt=""></div>
               <div class="portfolio-info">
                 <h4><?php echo $tempat['nama_tempat']?></h4>
                 <!-- <p>Gedung</p> -->
-                <a href="/public/img/tempat<?php echo $tempat['foto_tempat']?>" data-gallery="portfolioGallery"
+                <a href="<?php echo $tPath; ?>/public/img/tempat<?php echo $tempat['foto_tempat']?>" data-gallery="portfolioGallery"
                   class="portfolio-lightbox preview-link" title="Balai Budaya"><i class="bx bx-plus"></i></a>
                 <a href="/home2.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
               </div>
@@ -237,7 +246,7 @@ $userAuth = authenticate($_POST,[
         <div class="row">
           <div class="col-lg-6">
             <div class="member d-flex align-items-start" data-aos="zoom-in" data-aos-delay="100">
-              <div class="pic"><img src="/public/assets/img/LandingPage/layanan1.png" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/layanan1.png" class="img-fluid" alt=""></div>
               <div class="member-info">
                 <h4>Upload Event</h4>
                 <p>Masyrakar dapat mengupload event atau kegiatan yang akan dilaksanakan.</p>
@@ -251,7 +260,7 @@ $userAuth = authenticate($_POST,[
 
           <div class="col-lg-6 mt-4 mt-lg-0">
             <div class="member d-flex align-items-start" data-aos="zoom-in" data-aos-delay="200">
-              <div class="pic"><img src="/public/assets/img/LandingPage/layanan2.png" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/layanan2.png" class="img-fluid" alt=""></div>
               <div class="member-info">
                 <h4>Peminjaman Gedung/Tempat</h4>
                 <p>Masyarakat dapat mengajukan peminjaman gedung dan tempat wisata yang dikelola oleh DISPARPORABUD.
@@ -266,7 +275,7 @@ $userAuth = authenticate($_POST,[
 
           <div class="col-lg-6 mt-4">
             <div class="member d-flex align-items-start" data-aos="zoom-in" data-aos-delay="300">
-              <div class="pic"><img src="/public/assets/img/LandingPage/layanan3.png" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/layanan3.png" class="img-fluid" alt=""></div>
               <div class="member-info">
                 <h4>Nomer Induk Seniman</h4>
                 <p>Masyarakat dapat mendaftarkan nomer induk seniman dan memperpanjang masa berlaku kartu.</p>
@@ -280,7 +289,7 @@ $userAuth = authenticate($_POST,[
 
           <div class="col-lg-6 mt-4">
             <div class="member d-flex align-items-start" data-aos="zoom-in" data-aos-delay="400">
-              <div class="pic"><img src="/public/assets/img/LandingPage/layanan4.png" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/layanan4.png" class="img-fluid" alt=""></div>
               <div class="member-info">
                 <h4>Surat Advis / Izin Pentas</h4>
                 <p>Masyarakat dapat mengajukan surat advis / surat perizinan pentas kesenian.</p>
@@ -367,16 +376,16 @@ $userAuth = authenticate($_POST,[
       class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="/public/assets/vendor/aos/aos.js"></script>
-  <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/public/assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="/public/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="/public/assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="/public/assets/vendor/waypoints/noframework.waypoints.js"></script>
-  <script src="/public/assets/vendor/php-email-form/validate.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/aos/aos.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/waypoints/noframework.waypoints.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/php-email-form/validate.js"></script>
 
   <!-- Template Main JS File -->
-  <script src="/public/assets/js/LandingPage.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/js/LandingPage.js"></script>
   
 </body>
 

@@ -12,6 +12,7 @@ class SenimanMobile{
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/../../private/seniman';
+        self::$perpanjangnPath = __DIR__.'/../../private/perpanjangan';
     }
     public function kategori($data, $desc){
         try{

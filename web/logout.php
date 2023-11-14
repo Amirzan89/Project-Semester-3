@@ -2,8 +2,8 @@
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
     include(__DIR__.'/../notfound.php');
 }
-require_once('jwt.php');
-require_once('koneksi.php');
+require_once(__DIR__.'/jwt.php');
+require_once(__DIR__.'/koneksi.php');
 $jwt = new Jwt();
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $rawData = file_get_contents("php://input");

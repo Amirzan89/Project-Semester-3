@@ -1,7 +1,7 @@
 <?php
-require('User.php');
-require('Jwt.php');
-require_once('koneksi.php');
+require(__DIR__.'/User.php');
+require(__DIR__.'/Jwt.php');
+require_once(__DIR__.'/koneksi.php');
 function authenticate($request,$data,$con = null){
     try{
     $user = new User();
@@ -19,9 +19,9 @@ function authenticate($request,$data,$con = null){
         $tokenDecode1 = json_decode(base64_decode($token1),true);
         $email = $tokenDecode1['email'];
         $number = $tokenDecode1['number'];
-        $authPage = ['login.php','home.php' ,'home.php', 'home.php','home.php','password/reset','verify/password','verify/email','auth/redirect','auth/google','/'];
+        $authPage = ['login.php','home.php' ,'home1.php', 'home2.php','home3.php','home4.php','home5.php','home6.php','password/reset','verify/password','verify/email','auth/redirect','auth/google','/'];
         if(in_array(ltrim($data['uri'],'/'),$authPage) && $data['method'] == "GET"){
-            $auth = ['/login.php','/register.php','/home.php','/password/reset','/verify/password','/verify/email','/auth/redirect','/auth/google','/'];
+            $auth = ['/login.php','/register.php','/home.php','/home1.php','/home2.php','/home3.php','/home4.php','/home5.php','/home6.php','/password/reset','/verify/password','/verify/email','/auth/redirect','/auth/google','/'];
             if (in_array(ltrim($path,'/'), $authPage)) {
                 header('Location: /dashboard.php');
             } else {

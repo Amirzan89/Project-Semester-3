@@ -1,5 +1,5 @@
 <?php
-require_once("koneksi.php");
+require_once(__DIR__."/koneksi.php");
 class Jwt{ 
     private static $database;
     private static $con;

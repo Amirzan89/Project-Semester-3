@@ -1,6 +1,6 @@
 <?php
-require ('koneksi.php');
-require('Jwt.php');
+require_once(__DIR__.'/koneksi.php');
+require_once(__DIR__.'/Jwt.php');
 $loadEnv = function($path = null){
     if($path == null){
         $path = ".env";

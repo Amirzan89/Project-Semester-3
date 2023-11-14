@@ -1,5 +1,5 @@
 <?php 
-require_once('koneksi.php');
+require_once(__DIR__.'/koneksi.php');
 class User{
     private static $sizeImg = 5 * 1024 * 1024;
     private static $database;

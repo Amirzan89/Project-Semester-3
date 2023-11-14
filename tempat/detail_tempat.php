@@ -1,30 +1,33 @@
 <?php
-require_once('../web/koneksi.php');
-require_once('../web/authenticate.php');
+require_once(__DIR__.'/../web/koneksi.php');
+require_once(__DIR__.'/../web/authenticate.php');
+require_once(__DIR__.'/../env.php');
+loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
 $userAuth = authenticate($_POST,[
-  'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD'
-  ]
+    'uri'=>$_SERVER['REQUEST_URI'],
+    'method'=>$_SERVER['REQUEST_METHOD'
+    ]
 ],$conn);
 if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
 }else{
 	$userAuth = $userAuth['data'];
-  if($userAuth['role'] != 'super admin'){
-    echo "<script>alert('Anda bukan super admin !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
-}
-$csrf = $GLOBALS['csrf'];
-if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
-  $id  = $_GET['id_tempat'];
-  $sql  = mysqli_query($conn, "SELECT * FROM list_tempat WHERE `id_tempat` = '" . $id . "'");
-  $tempat = mysqli_fetch_assoc($sql);
-}else{
-    header('Location: /tempat/data_tempat.php');
+    if(!in_array($userAuth['role'],['super admin','admin tempat'])){
+        echo "<script>alert('Anda bukan admin tempat !')</script>";
+        echo "<script>window.location.href = '/dashboard.php';</script>";
+        exit();
+    }
+    $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
+    $csrf = $GLOBALS['csrf'];
+    if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
+        $id  = $_GET['id_tempat'];
+        $sql  = mysqli_query($conn, "SELECT * FROM list_tempat WHERE `id_tempat` = '" . $id . "'");
+        $tempat = mysqli_fetch_assoc($sql);
+    }else{
+        header('Location: /tempat/data_tempat.php');
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -38,7 +41,7 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -46,13 +49,13 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
     href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
     rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
 
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/tempat.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/css/tempat.css" rel="stylesheet">
 
 </head>
 
@@ -68,7 +71,7 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
     </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include('../header.php');
+    <?php include(__DIR__.'/../header.php');
     ?>
     </header><!-- End Header -->
 
@@ -77,7 +80,7 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
   <ul class="sidebar-nav" id="sidebar-nav">
     <?php 
     $nav = 'tempat';
-    include('../sidebar.php');
+    include(__DIR__.'/../sidebar.php');
     ?>
     </ul>
   </aside><!-- End Sidebar-->
@@ -153,7 +156,7 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
     </main><!-- End #main -->
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include('../footer.php');
+    <?php include(__DIR__.'/../footer.php');
     ?>
   </footer>
   <script>
@@ -235,12 +238,12 @@ if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
       class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
   <!-- Template Main JS File -->
-  <script src="/public/assets/js/main.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
 
 </body>
 

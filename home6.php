@@ -1,3 +1,23 @@
+<?php 
+require_once(__DIR__.'/web/koneksi.php');
+require_once(__DIR__.'/web/authenticate.php'); 
+require_once(__DIR__.'/env.php');
+loadEnv();
+$db = koneksi::getInstance();
+$con = $db->getConnection();
+$userAuth = authenticate($_POST,[
+      'uri'=>$_SERVER['REQUEST_URI'],
+      'method'=>$_SERVER['REQUEST_METHOD'
+    ]
+],$con);
+if($userAuth['status'] == 'success'){
+  $userAuth = $userAuth['data'];
+  if(!in_array($userAuth['role'],['super admin','admin seniman','admin tempat','admin sewa','admin pentas'])){
+      header('Location: /dashboard.php');
+  }
+}
+$tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,23 +30,23 @@
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/assets/img/LandingPage/favicon.png" rel="icon">
-  <link href="/public/assets/img/LandingPage/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?php echo $tPath; ?>/public/assets/img/LandingPage/favicon.png" rel="icon">
+  <link href="<?php echo $tPath; ?>/public/assets/img/LandingPage/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
-  <link href="/public/assets/vendor/aos/aos.css" rel="stylesheet">
-  <link href="/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/public/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="/public/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  <link href="/public/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="/public/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/LandingPage.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/css/LandingPage.css" rel="stylesheet">
 
   <!-- =======================================================
   * Template Name: Arsha - v4.7.1
@@ -105,7 +125,7 @@
    
           </div>
 
-          <div class="col-lg-5 align-items-stretch order-1 order-lg-2 img" style='background-image: url("/public/assets/img/LandingPage/hero4.png");' data-aos="zoom-in" data-aos-delay="150">&nbsp;</div>
+          <div class="col-lg-5 align-items-stretch order-1 order-lg-2 img" style='background-image: url("<?php echo $tPath; ?>/public/assets/img/LandingPage/hero4.png");' data-aos="zoom-in" data-aos-delay="150">&nbsp;</div>
         </div>
 
       </div>
@@ -116,7 +136,7 @@
   
         <div class="row">
           <div class="col-lg-6 d-flex align-items-center" data-aos="fade-right" data-aos-delay="100">
-            <img src="/public/assets/img/LandingPage/prosedur.png" class="img-fluid" alt="">
+            <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/prosedur.png" class="img-fluid" alt="">
           </div>
           <div class="col-lg-6 pt-4 pt-lg-0 content" data-aos="fade-left" data-aos-delay="100">
             <br>
@@ -192,16 +212,16 @@
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="/public/assets/vendor/aos/aos.js"></script>
-  <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/public/assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="/public/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="/public/assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="/public/assets/vendor/waypoints/noframework.waypoints.js"></script>
-  <script src="/public/assets/vendor/php-email-form/validate.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/aos/aos.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/waypoints/noframework.waypoints.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/php-email-form/validate.js"></script>
 
   <!-- Template Main JS File -->
-  <script src="/public/assets/js/LandingPage.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/js/LandingPage.js"></script>
 
 </body>
 

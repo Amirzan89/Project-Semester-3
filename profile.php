@@ -1,6 +1,8 @@
 <?php
-require_once('web/koneksi.php');
-require_once('web/authenticate.php');
+require_once(__DIR__.'/web/koneksi.php');
+require_once(__DIR__.'/web/authenticate.php');
+require_once(__DIR__.'/env.php');
+loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
 $userAuth = authenticate($_POST, [
@@ -12,11 +14,12 @@ if ($userAuth['status'] == 'error') {
   header('Location: /login.php');
 } else {
   $userAuth = $userAuth['data'];
-  if ($userAuth['role'] != 'super admin') {
-    echo "<script>alert('Anda bukan super admin !')</script>";
+  if($userAuth['role'] == 'masyarakat'){
+    echo "<script>alert('Anda bukan admin !')</script>";
     echo "<script>window.location.href = '/dashboard.php';</script>";
     exit();
   }
+  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
   $csrf = $GLOBALS['csrf'];
 }
 ?>
@@ -32,7 +35,7 @@ if ($userAuth['status'] == 'error') {
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/public/img/icon/utama/logo.png" rel="icon">
+  <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -40,11 +43,11 @@ if ($userAuth['status'] == 'error') {
     href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
     rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="/public/assets/css/admin.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/assets/css/style.css" rel="stylesheet">
 
 </head>
 
@@ -60,7 +63,7 @@ if ($userAuth['status'] == 'error') {
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <?php
-    include('header.php');
+    include(__DIR__.'/header.php');
     ?>
 
   </header><!-- End Header -->
@@ -71,7 +74,7 @@ if ($userAuth['status'] == 'error') {
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php
       $nav = 'admin';
-      include('sidebar.php');
+      include(__DIR__.'/sidebar.php');
       ?>
     </ul>
 
@@ -189,7 +192,7 @@ if ($userAuth['status'] == 'error') {
                   <!-- <form > -->
                   <form method="POST" action="/web/User.php" enctype="multipart/form-data">
                     <input type="hidden" name="_method" value="PUT">
-                    <input type="hidden" name="id_user" value="<?php echo $userAuth['id_admin'] ?>">
+                    <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
                     <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
                     <div class="row mb-3">
                       <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Foto Profil</label>
@@ -227,13 +230,13 @@ if ($userAuth['status'] == 'error') {
                       <legend class="col-form-label col-sm-2 pt-0">Jenis Kelamin</legend>
                       <div class="col-sm-10">
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" name="jenisK" value="laki-laki" <?php echo ($users['jenis_kelamin'] == 'laki-laki') ? 'checked' : ''; ?>>
+                          <input class="form-check-input" type="radio" name="jenisK" value="laki-laki" <?php echo ($userAuth['jenis_kelamin'] == 'laki-laki') ? 'checked' : ''; ?>>
                           <label class="form-check-label" for="gridRadios1">
                             Laki-Laki
                           </label>
                         </div>
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" name="jenisK" value="perempuan" <?php echo ($users['jenis_kelamin'] == 'perempuan') ? 'checked' : ''; ?>>
+                          <input class="form-check-input" type="radio" name="jenisK" value="perempuan" <?php echo ($userAuth['jenis_kelamin'] == 'perempuan') ? 'checked' : ''; ?>>
                           <label class="form-check-label" for="gridRadios2">
                             Perempuan
                           </label>
@@ -338,7 +341,7 @@ if ($userAuth['status'] == 'error') {
     <div class="copyright">
 
       <?php
-      include('footer.php');
+      include(__DIR__.'/footer.php');
       ?>
 
     </div>
@@ -348,11 +351,11 @@ if ($userAuth['status'] == 'error') {
       class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
   <!-- Template Main JS File -->
-  <script src="/public/assets/js/admin/main.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/js/admin/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       var currentPageURL = window.location.href;

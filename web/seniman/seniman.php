@@ -6,48 +6,6 @@ class SenimanWebsite{
     private static $folderPath;
     private static $jsonPath = __DIR__."/../../kategori_seniman.json";
     private static $constID = '411.302';
-    // private static $kategoriInp = [
-    //     'campursari'=>'CAMP',
-    //     'dalang'=>'DLG',
-    //     'jaranan'=>'JKP',
-    //     'karawitan'=>'KRW',
-    //     'mc'=>'MC',
-    //     'ludruk'=>'LDR',
-    //     'organisasi kesenian musik'=>'OKM',
-    //     'organisasi'=>'ORG',
-    //     'pramugari tayup'=>'PRAM',
-    //     'sanggar'=>'SGR',
-    //     'sinden'=>'SIND',
-    //     'vocalis'=>'VOC',
-    //     'waranggono'=>'WAR',
-    //     'barongsai'=>'BAR',
-    //     'ketoprak'=>'KTR',
-    //     'pataji'=>'PTJ',
-    //     'reog'=>'REOG',
-    //     'taman hiburan rakyat'=>'THR',
-    //     'pelawak'=>'PLWK'
-    // ];
-    // private static $kategori = [
-    //     'CAMP',
-    //     'DLG',
-    //     'JKP',
-    //     'KRW',
-    //     'MC',
-    //     'LDR',
-    //     'OKM',
-    //     'ORG',
-    //     'PRAM',
-    //     'SGR',
-    //     'SIND',
-    //     'VOC',
-    //     'WAR',
-    //     'BAR',
-    //     'KTR',
-    //     'PTJ',
-    //     'REOG',
-    //     'THR',
-    //     'PLWK'
-    // ];
     public function __construct(){
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();

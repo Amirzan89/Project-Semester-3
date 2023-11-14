@@ -12,6 +12,7 @@ class Koneksi{
                     list($key, $value) = explode('=', $line, 2);
                     $_ENV[trim($key)] = trim($value);
                     $_SERVER[trim($key)] = trim($value);
+                    $_SERVER['LOAD_ENV'] = true;
                 }
             }
         }
@@ -29,8 +30,6 @@ class Koneksi{
         $this->conn = new \mysqli('p:'.$_SERVER['DB_HOST'].':'.$_SERVER['DB_PORT'], $_SERVER['DB_USERNAME'], $_SERVER['DB_PASSWORD'], $_SERVER['DB_DATABASE']);
         if ($this->conn->connect_error) {
             throw new Exception("Tidak bisa membuat koneksi");
-        } else {
-            // echo "nyambung cuyy<br>";
         }
     }
     public function getConnection() {
@@ -38,7 +37,4 @@ class Koneksi{
     }
     private static $pool = [];
 }
-// if($_SERVER['REQUEST_METHOD'] == 'GET'){
-//     include(__DIR__.'/../notfound.php');
-// }
 ?>
