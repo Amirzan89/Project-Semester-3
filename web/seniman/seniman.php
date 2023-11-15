@@ -20,20 +20,19 @@ class SenimanWebsite{
                 $stmt[0] = self::$con->prepare($query);
                 if(!$stmt[0]->execute()){
                     $stmt[0]->close();
-                    throw new Exception('Data kategori seniman tidak ditemukan');
+                    throw new Exception('Data file tidak ditemukan');
                 }
                 $result = $stmt[0]->get_result();
-                $kategoriData = [];
+                $fileData = [];
                 while ($row = $result->fetch_assoc()) {
-                    $kategoriData[] = $row;
+                    $fileData[] = $row;
                 }
                 $stmt[0]->close();
-                if ($kategoriData === null) {
-                    throw new Exception('Data kategori seniman tidak ditemukan');
-                }
-                $jsonData = json_encode($kategoriData, JSON_PRETTY_PRINT);
-                if (!file_put_contents(self::$jsonPath, $jsonData)) {
-                    echo "Gagal menyimpan file kategori json";
+                if (!empty($fileData) && $fileData !== null) {
+                    $jsonData = json_encode($fileData, JSON_PRETTY_PRINT);
+                    if (!file_put_contents(self::$jsonPath, $jsonData)) {
+                        echo "Gagal menyimpan file sistem";
+                    }
                 }
             }
             if($desc == 'get'){
@@ -50,14 +49,37 @@ class SenimanWebsite{
                     throw new Exception('Data kategori tidak ditemukan');
                 }
                 return $result;
-            }else if($desc == 'tambah' && $fileExist == true){
-                //tambah kategori seniman
-                $jsonFile = file_get_contents(self::$jsonPath);
-                $jsonData = json_decode($jsonFile, true);
-                $new[$data['id_kategori_seniman']] = $data;
-                $jsonData = array_merge($jsonData, $new);
-                $jsonFile = json_encode($jsonData, JSON_PRETTY_PRINT);
-                file_put_contents(self::$jsonPath, $jsonFile);
+            }else if($desc == 'tambah'){
+                //check if file exist
+                if (!$fileExist) {
+                    //if file is delete will make new json file
+                    $query = "SELECT * FROM kategori_seniman";
+                    $stmt[0] = self::$con->prepare($query);
+                    if(!$stmt[0]->execute()){
+                        $stmt[0]->close();
+                        throw new Exception('Data file tidak ditemukan');
+                    }
+                    $result = $stmt[0]->get_result();
+                    $fileData = [];
+                    while ($row = $result->fetch_assoc()) {
+                        $fileData[] = $row;
+                    }
+                    $stmt[0]->close();
+                    if (!empty($fileData) && $fileData !== null) {
+                        $jsonData = json_encode($fileData, JSON_PRETTY_PRINT);
+                        if (!file_put_contents(self::$jsonPath, $jsonData)) {
+                            echo "Gagal menyimpan file sistem";
+                        }
+                    }
+                }else{
+                    //tambah kategori seniman
+                    $jsonFile = file_get_contents(self::$jsonPath);
+                    $jsonData = json_decode($jsonFile, true);
+                    $new[$data['id_kategori_seniman']] = $data;
+                    $jsonData = array_merge($jsonData, $new);
+                    $jsonFile = json_encode($jsonData, JSON_PRETTY_PRINT);
+                    file_put_contents(self::$jsonPath, $jsonFile);
+                }
             }else if($desc == 'update'){
                 //update kategori seniman
                 $jsonFile = file_get_contents(self::$jsonPath);
@@ -246,7 +268,7 @@ class SenimanWebsite{
             $stmt[1]->execute();
             if ($stmt[1]->affected_rows > 0) {
                 $stmt[1]->close();
-                //update file
+                //tambah file
                 $insertedId = self::$con->insert_id;
                 $selectQuery = "SELECT * FROM kategori_seniman WHERE id_kategori_seniman = ?";
                 $stmt[2] = self::$con->prepare($selectQuery);

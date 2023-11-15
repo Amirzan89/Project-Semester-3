@@ -23,15 +23,13 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 }
 if(isset($_POST['login'])){
     try{
-        // echo 'login';
-        // exit();
         $email = htmlspecialchars($_POST["email"]);
         // $email = "Admin@gmail.com";
         $pass = $_POST["password"];
         $pass = "Admin@1234567890";
         if(!isset($email) || empty($email)){
             echo "<script>alert('Email tidak boleh kosong')</script>";
-            echo "<script>window.history.back();</script>";
+            echo "<script>window.history.back();</script>"; 
             exit();
         } else if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
             echo "<script>alert('Email yang anda masukkan ivalid')</script>";

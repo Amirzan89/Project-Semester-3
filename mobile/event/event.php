@@ -263,18 +263,18 @@ class EventMobile{
             if($role != 'masyarakat'){
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'anda bukan masyarakat','code'=>400]));
             }
-            //check id_tempat
-            if (isset($data['id_tempat']) & !empty($data['id_tempat'])) {
-                $query = "SELECT id_tempat FROM list_tempat WHERE BINARY id_tempat = ? LIMIT 1";
-                $stmt[1] = self::$con->prepare($query);
-                $stmt[1]->bind_param('s', $data['id_tempat']);
-                $stmt[1]->execute();
-                if (!$stmt[1]->fetch()) {
-                    $stmt[1]->close();
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Data tempat tidak ditemukan','code'=>500]));
-                }
-                $stmt[1]->close();
-            }
+            // //check id_tempat
+            // if (isset($data['id_tempat']) & !empty($data['id_tempat'])) {
+            //     $query = "SELECT id_tempat FROM list_tempat WHERE BINARY id_tempat = ? LIMIT 1";
+            //     $stmt[1] = self::$con->prepare($query);
+            //     $stmt[1]->bind_param('s', $data['id_tempat']);
+            //     $stmt[1]->execute();
+            //     if (!$stmt[1]->fetch()) {
+            //         $stmt[1]->close();
+            //         throw new Exception(json_encode(['status' => 'error', 'message' => 'Data tempat tidak ditemukan','code'=>500]));
+            //     }
+            //     $stmt[1]->close();
+            // }
             //get last id event
             $query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '".$_SERVER['DB_DATABASE']."' AND TABLE_NAME = 'events' ";
             $stmt[1] = self::$con->prepare($query);
@@ -314,7 +314,7 @@ class EventMobile{
                 $query = "INSERT INTO events (nama_pengirim, status, created_at, updated_at, id_detail, id_sewa, id_user) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $stmt = self::$con->prepare($query);
                 $status = 'diajukan';
-                $stmt->bind_param("sssssss", $data['nama_pengirim'], $status, $tanggalSekarangDB, $tanggalSekarangDB, $id, $data['id_tempat'],$data['id_user']);
+                $stmt->bind_param("sssssss", $data['nama_pengirim'], $status, $tanggalSekarangDB, $tanggalSekarangDB, $id, $data['id_user']);
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
                     header('Content-Type: application/json');
