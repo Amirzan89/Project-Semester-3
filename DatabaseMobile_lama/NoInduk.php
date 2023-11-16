@@ -22,7 +22,7 @@ $suratKeterangan = $_FILES['surat_keterangan'];
 $passFoto = $_FILES['pass_foto'];
 
 // Direktori penyimpanan file
-$uploadDirKTP = 'uploads/ktp_seniman/';
+$uploadDirKTP = 'uploads/ktp_seniman/'; 
 $uploadDirSurat = 'uploads/surat_keterangan/';
 $uploadDirPassFoto = 'uploads/pass_foto/';
 

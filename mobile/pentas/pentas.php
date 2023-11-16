@@ -13,13 +13,177 @@ class AdvisMobile{
         self::$folderPath = __DIR__.'/../../private/pentas';
     }
     private static function getBaseFileName($fileName) {
-        preg_match('/^([^_\d]+)(?:_(\d+))?\./', $fileName, $matches);
+        preg_match('/^([^\(]+)(?:\((\d+)\))?(\.\w+)?$/', $fileName, $matches);
         if (isset($matches[1])) {
             $baseName = $matches[1];
-            $number = isset($matches[2]) ? (int)$matches[2] : null;
+            $number = isset($matches[2]) ? (int)$matches[2] : 0;
             return ['name' => $baseName, 'number' => $number];
         }
         return null;
+    }
+    private function manageFile($data, $desc, $opt){
+        try{
+            $filePath = self::$folderFile;
+            $fileExist = file_exists($filePath);
+            if (!$fileExist || empty($fileExist) || is_null($fileExist)) {
+                //if file is delete will make new json file
+                $query = "SELECT id_advis, surat_keterangan FROM perpanjangan";
+                $stmt[0] = self::$con->prepare($query);
+                if(!$stmt[0]->execute()){
+                    $stmt[0]->close();
+                    throw new Exception('Data file tidak ditemukan');
+                }
+                $result = $stmt[0]->get_result();
+                $fileData = [];
+                while ($row = $result->fetch_assoc()) {
+                    $fileData[] = $row;
+                }
+                $stmt[0]->close();
+                if (!empty($fileData) && $fileData !== null) {
+                    $jsonData = json_encode($fileData, JSON_PRETTY_PRINT);
+                    if (!file_put_contents($filePath, $jsonData)) {
+                        echo "Gagal menyimpan file sistem";
+                    }
+                }
+            }
+            if($desc == 'tambah'){
+                //check if file exist
+                if (!$fileExist) {
+                    //if file is delete will make new json file
+                        $query = "SELECT id_perpanjangan, ktp_seniman, pass_foto, surat_keterangan FROM perpanjangan";
+                    $stmt[0] = self::$con->prepare($query);
+                    if(!$stmt[0]->execute()){
+                        $stmt[0]->close();
+                        throw new Exception('Data file tidak ditemukan');
+                    }
+                    $result = $stmt[0]->get_result();
+                    $fileData = [];
+                    while ($row = $result->fetch_assoc()) {
+                        $fileData[] = $row;
+                    }
+                    $stmt[0]->close();
+                    if (!empty($fileData) && $fileData !== null) {
+                        $jsonData = json_encode($fileData, JSON_PRETTY_PRINT);
+                        if (!file_put_contents($filePath, $jsonData)) {
+                            echo "Gagal menyimpan file sistem";
+                        }
+                    }
+                }else{
+                    //tambah data file
+                    $jsonFile = file_get_contents($filePath);
+                    $jsonData = json_decode($jsonFile, true);
+                    array_push($jsonData, $data);
+                    $jsonFile = json_encode($jsonData, JSON_PRETTY_PRINT);
+                    file_put_contents($filePath, $jsonFile);
+                }
+            }else if($desc == 'get'){
+                if(!isset($data['nama_file']) || empty($data['nama_file'])){
+                    throw new Exception('Nama file harus di isi');
+                }
+                $jsonFile = file_get_contents($filePath);
+                $jsonData = json_decode($jsonFile, true);
+                $fileNameNew = $data['nama_file'];
+                $fileData = array();
+                if($opt['col'] == 'ktp'){
+                    //get data
+                    foreach($jsonData as $key => $item){
+                        if (isset($item['ktp_seniman'])){
+                            $file = self::getBaseFileName(pathinfo($item['ktp_seniman'])['filename']);
+                            if($file['name'] == pathinfo($data['nama_file'])['filename']) {
+                                array_push($fileData,['name'=>$file['name'],'number'=>$file['number']]);
+                            }
+                        }
+                    }
+                    //get number
+                    $num = '';
+                    if(is_null($fileData) || empty($fileData)){
+                        $fileNameNew = $data['nama_file'];
+                    }else{
+                        foreach ($fileData as $file) {
+                            if (isset($file['number']) && $file['number'] > $num) {
+                                $num = $file['number'];
+                            }
+                        }
+                        if(empty($num)){
+                            $fileNameNew = pathinfo($data['nama_file'])['filename'].'(1).'.pathinfo($data['nama_file'])['extension'];
+                        }else{
+                            $fileNameNew = pathinfo($data['nama_file'])['filename'].'('.($num+1).').'.pathinfo($data['nama_file'])['extension'];
+                        }
+                    }
+                }else if($opt['col'] == 'foto'){
+                    foreach($jsonData as $key => $item){
+                        if (isset($item['pass_foto'])){
+                            $file = self::getBaseFileName(pathinfo($item['pass_foto'])['filename']);
+                            if($file['name'] == pathinfo($data['nama_file'])['filename']) {
+                                array_push($fileData,['name'=>$file['name'],'number'=>$file['number']]);
+                            }
+                        } 
+                    }
+                    //get number
+                    $num = '';
+                    if(is_null($fileData) || empty($fileData)){
+                        $fileNameNew = $data['nama_file'];
+                    }else{
+                        foreach ($fileData as $file) {
+                            if (isset($file['number']) && $file['number'] > $num) {
+                                $num = $file['number'];
+                            }
+                        }
+                        if(empty($num)){
+                            $fileNameNew = pathinfo($data['nama_file'])['filename'].'(1).'.pathinfo($data['nama_file'])['extension'];
+                        }else{
+                            $fileNameNew = pathinfo($data['nama_file'])['filename'].'('.($num+1).').'.pathinfo($data['nama_file'])['extension'];
+                        }
+                    }
+                }else if($opt['col'] == 'surat'){
+                    foreach($jsonData as $key => $item){
+                        if (isset($item['surat_keterangan'])){
+                            $file = self::getBaseFileName(pathinfo($item['surat_keterangan'])['filename']);
+                            echo 'surattt '.json_encode($file);
+                            echo "\n";
+                            if($file['name'] == pathinfo($data['nama_file'])['filename']) {
+                                array_push($fileData,['name'=>$file['name'],'number'=>$file['number']]);
+                            }
+                        }
+                    }
+                    //get number
+                    $num = '';
+                    if(is_null($fileData) || empty($fileData)){
+                        $fileNameNew = $data['nama_file'];
+                    }else{
+                        foreach ($fileData as $file) {
+                            if (isset($file['number']) && $file['number'] > $num) {
+                                $num = $file['number'];
+                            }
+                        }
+                        if(empty($num)){
+                            $fileNameNew = pathinfo($data['nama_file'])['filename'].'(1).'.pathinfo($data['nama_file'])['extension'];
+                        }else{
+                            $fileNameNew = pathinfo($data['nama_file'])['filename'].'('.($num+1).').'.pathinfo($data['nama_file'])['extension'];
+                        }
+                    }
+                }
+                return $fileNameNew;
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
     }
     private static function manageFile($data, $desc, $opt){
         try{
