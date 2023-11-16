@@ -83,7 +83,7 @@ class SenimanMobile{
                     if (!empty($fileData) && $fileData !== null) {
                         $jsonData = json_encode($fileData, JSON_PRETTY_PRINT);
                         if (!file_put_contents($filePath, $jsonData)) {
-                            echo "Gagal menyimpan file sistem";
+                            throw new Exception('Gagal menyimpan file sistem');
                         }
                     }
                 }else{
@@ -157,8 +157,6 @@ class SenimanMobile{
                     foreach($jsonData as $key => $item){
                         if (isset($item['surat_keterangan'])){
                             $file = self::getBaseFileName(pathinfo($item['surat_keterangan'])['filename']);
-                            echo 'surattt '.json_encode($file);
-                            echo "\n";
                             if($file['name'] == pathinfo($data['nama_file'])['filename']) {
                                 array_push($fileData,['name'=>$file['name'],'number'=>$file['number']]);
                             }
@@ -225,7 +223,7 @@ class SenimanMobile{
                 }
                 $jsonData = json_encode($kategoriData, JSON_PRETTY_PRINT);
                 if (!file_put_contents(self::$jsonPath, $jsonData)) {
-                    echo "Gagal menyimpan file sistem";
+                    throw new Exception('Gagal menyimpan file sistem');
                 }
             }
             if($desc == 'check'){
@@ -448,7 +446,7 @@ class SenimanMobile{
                 throw new Exception('pass foto harus di isi');
             }
             if (!isset($_FILES['surat_keterangan']) || empty($_FILES['surat_keterangan'])) {
-                throw new Exception('Surat keternangan harus di isi');
+                throw new Exception('Surat keterangan harus di isi');
             }
             if ($_FILES['ktp_seniman']['error'] !== UPLOAD_ERR_OK) {
                 throw new Exception('gagal upload ktp file');
@@ -515,10 +513,6 @@ class SenimanMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileKtp['name']],'get',['table'=>'seniman','col'=>'ktp']);
-            echo 'foto '.json_encode($nameFile);
-            echo "\n";
-            // echo 'name file '.$nameFile;
-            // exit();
             $fileKtpPath = self::$folderPath.$folderKtp.'/'.$nameFile;
             $fileKtpDB = $nameFile;
             if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
@@ -538,8 +532,6 @@ class SenimanMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileFoto['name']],'get',['table'=>'seniman','col'=>'foto']);
-            echo 'foto '.json_encode($nameFile);
-            echo "\n";
             $fileFotoPath = self::$folderPath.$folderPassFoto.'/'.$nameFile;
             $fileFotoDB = $nameFile;
             if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
@@ -560,9 +552,6 @@ class SenimanMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get',['table'=>'seniman','col'=>'surat']);
-            echo 'surat '.json_encode($nameFile);
-            echo "\n";
-            // exit();
             $fileSuratPath = self::$folderPath.$folderSurat.'/'.$nameFile;
             $fileSuratDB = $nameFile;
             if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
@@ -581,6 +570,7 @@ class SenimanMobile{
                 $stmt[2]->close();
                 //tambah data to file
                 self::manageFile(['id_seniman'=>self::$con->insert_id,'ktp_seniman'=>$fileKtpDB, 'pass_foto'=>$fileFotoDB, 'surat_keterangan'=>$fileSuratDB],'tambah',['table'=>'seniman']);
+                header('Content-Type: application/json');
                 echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil ditambahkan']);
                 exit();
             } else {
@@ -1013,8 +1003,6 @@ class SenimanMobile{
             $nameFile = self::manageFile(['nama_file'=>$fileKtp['name']],'get',['table'=>'perpanjangan','col'=>'ktp']);
             $fileKtpPath = self::$perpanjanganPath.$folderKtp.'/'.$nameFile;
             $fileKtpDB = $nameFile;
-            echo 'ktp '.json_encode($nameFile);
-            echo "\n";
             if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
@@ -1032,10 +1020,8 @@ class SenimanMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileFoto['name']],'get',['table'=>'perpanjangan','col'=>'foto']);
-            echo 'foto '.json_encode($nameFile);
-            echo "\n";
             $fileFotoPath = self::$perpanjanganPath.$folderPassFoto.'/'.$nameFile;
-                $fileFotoDB = $nameFile;
+            $fileFotoDB = $nameFile;
             if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
                 unlink($fileKtpPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
@@ -1054,10 +1040,8 @@ class SenimanMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get',['table'=>'perpanjangan','col'=>'surat']);
-            echo 'surat '.json_encode($nameFile);
             $fileSuratPath = self::$perpanjanganPath.$folderSurat.'/'.$nameFile;
             $fileSuratDB = $nameFile;
-            exit();
             if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
                 unlink($fileKtpPath);
                 unlink($fileFotoPath);

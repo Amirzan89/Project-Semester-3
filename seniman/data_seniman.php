@@ -219,7 +219,7 @@ if ($userAuth['status'] == 'error') {
                       <td><?php echo $seniman['nama_seniman'] ?></td>
                       <td><?php echo $seniman['no_telpon'] ?></td>
                       <td>
-                        <a href="/halaman/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
+                        <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
                         <button type="button" class="btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit </button>
                         <button type="button" class="btn btn-hapus"><i class="bi bi-trash-fill"></i> Hapus</button>
                       </td>

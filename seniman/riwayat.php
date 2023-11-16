@@ -176,7 +176,7 @@ if($userAuth['status'] == 'error'){
                       </td>
                       <td><?php echo $seniman['catatan']?></td>
                       <td>
-                        <a href="/halaman/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
+                        <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                       </td>
                     </tr>
                   <?php $no++;
