@@ -179,7 +179,7 @@ class SenimanMobile{
                         }
                     }
                 }
-                return $fileNameNew;
+                return '/'.$fileNameNew;
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -513,7 +513,7 @@ class SenimanMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileKtp['name']],'get',['table'=>'seniman','col'=>'ktp']);
-            $fileKtpPath = self::$folderPath.$folderKtp.'/'.$nameFile;
+            $fileKtpPath = self::$folderPath.$folderKtp.$nameFile;
             $fileKtpDB = $nameFile;
             if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
@@ -532,7 +532,7 @@ class SenimanMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileFoto['name']],'get',['table'=>'seniman','col'=>'foto']);
-            $fileFotoPath = self::$folderPath.$folderPassFoto.'/'.$nameFile;
+            $fileFotoPath = self::$folderPath.$folderPassFoto.$nameFile;
             $fileFotoDB = $nameFile;
             if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
                 unlink($fileKtpPath);
@@ -552,7 +552,7 @@ class SenimanMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get',['table'=>'seniman','col'=>'surat']);
-            $fileSuratPath = self::$folderPath.$folderSurat.'/'.$nameFile;
+            $fileSuratPath = self::$folderPath.$folderSurat.$nameFile;
             $fileSuratDB = $nameFile;
             if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
                 unlink($fileKtpPath);
@@ -1001,7 +1001,7 @@ class SenimanMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileKtp['name']],'get',['table'=>'perpanjangan','col'=>'ktp']);
-            $fileKtpPath = self::$perpanjanganPath.$folderKtp.'/'.$nameFile;
+            $fileKtpPath = self::$perpanjanganPath.$folderKtp.$nameFile;
             $fileKtpDB = $nameFile;
             if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
@@ -1020,7 +1020,7 @@ class SenimanMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileFoto['name']],'get',['table'=>'perpanjangan','col'=>'foto']);
-            $fileFotoPath = self::$perpanjanganPath.$folderPassFoto.'/'.$nameFile;
+            $fileFotoPath = self::$perpanjanganPath.$folderPassFoto.$nameFile;
             $fileFotoDB = $nameFile;
             if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
                 unlink($fileKtpPath);
@@ -1040,7 +1040,7 @@ class SenimanMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get',['table'=>'perpanjangan','col'=>'surat']);
-            $fileSuratPath = self::$perpanjanganPath.$folderSurat.'/'.$nameFile;
+            $fileSuratPath = self::$perpanjanganPath.$folderSurat.$nameFile;
             $fileSuratDB = $nameFile;
             if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
                 unlink($fileKtpPath);

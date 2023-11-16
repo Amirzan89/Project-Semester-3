@@ -21,7 +21,7 @@ class AdvisMobile{
         }
         return null;
     }
-    private function manageFile($data, $desc, $opt){
+    private function manageFile($data, $desc, $opt = null){
         try{
             $filePath = self::$folderFile;
             $fileExist = file_exists($filePath);
@@ -110,7 +110,7 @@ class AdvisMobile{
                         }
                     }
                 }
-                return $fileNameNew;
+                return '/'.$fileNameNew;
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -132,72 +132,6 @@ class AdvisMobile{
             exit();
         }
     }
-    // private static function manageFile($data, $desc, $opt){
-    //     try{
-    //         $fileExist = file_exists(self::$folderFile);
-    //         if (!$fileExist) {
-    //             //if file is delete will make new json file
-    //             $query = "SELECT id_sewa, surat_keterangan FROM sewa_tempat";
-    //             $stmt[0] = self::$con->prepare($query);
-    //             if(!$stmt[0]->execute()){
-    //                 $stmt[0]->close();
-    //                 throw new Exception('Data file tidak ditemukan');
-    //             }
-    //             $result = $stmt[0]->get_result();
-    //             $fileData = [];
-    //             while ($row = $result->fetch_assoc()) {
-    //                 $fileData[] = $row;
-    //             }
-    //             $stmt[0]->close();
-    //             if ($fileData === null) {
-    //                 throw new Exception('Data file tidak ditemukan');
-    //             }
-    //             $jsonData = json_encode($fileData, JSON_PRETTY_PRINT);
-    //             if (!file_put_contents(self::$folderFile, $jsonData)) {
-    //                    throw new Exception('Gagal menyimpan file sistem');
-    //             }
-    //         }
-    //         if($desc == 'get'){
-    //             if(!isset($data['nama_file']) || empty($data['nama_file'])){
-    //                 throw new Exception('Nama file harus di isi');
-    //             }
-    //             $jsonFile = file_get_contents(self::$folderFile);
-    //             $jsonData = json_decode($jsonFile, true);
-    //             $result = null;
-    //             if($opt['col'] == 'surat'){
-    //                 foreach($jsonData as $key => $item){
-    //                     if (isset($item['surat_keterangan'])){
-    //                         $file = self::getBaseFileName(pathinfo($item['surat_keterangan'])['filename']);
-    //                         if($file['name'] == pathinfo($data['nama_file'])['filename']) {
-    //                             $result = $data['nama_file'].($file['number']+1).'.'.pathinfo($data['nama_file'])['extension'];
-    //                         }
-    //                     }
-    //                 }
-    //                 if($result === null){
-    //                     throw new Exception('Error saat proses file');
-    //                 }
-    //             }
-    //             return $result;
-    //         }
-    //     }catch(Exception $e){
-    //         $error = $e->getMessage();
-    //         $errorJson = json_decode($error, true);
-    //         if ($errorJson === null) {
-    //             $responseData = array(
-    //                 'status' => 'error',
-    //                 'message' => $error,
-    //             );
-    //         }else{
-    //             $responseData = array(
-    //                 'status' => 'error',
-    //                 'message' => $errorJson['message'],
-    //             );
-    //         }
-    //         header('Content-Type: application/json');
-    //         isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
-    //         exit();
-    //     }
-    // }
     public function getPentas($data){
         try{
             if(!isset($data['email']) || empty($data['email'])){
@@ -456,7 +390,7 @@ class AdvisMobile{
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get', ['col'=>'surat']);
-            $fileSuratPath = self::$folderPath.'/'.$nameFile;
+            $fileSuratPath = self::$folderPath.$nameFile;
             $fileSuratDB = $nameFile;
             if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
@@ -469,7 +403,7 @@ class AdvisMobile{
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
-                self::manageFile(['id_advis'=>self::$con->insert_id, 'surat_keterangan'=>$fileSuratDB],'tambah',['table'=>'seniman']);
+                self::manageFile(['id_advis'=>self::$con->insert_id, 'surat_keterangan'=>$fileSuratDB],'tambah');
                 header('Content-Type: application/json');
                 echo json_encode(['status'=>'success','message'=>'Data Pentas berhasil ditambahkan']);
                 exit();

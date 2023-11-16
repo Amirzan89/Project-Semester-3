@@ -30,20 +30,21 @@ class TempatMobile{
         }
     }
     private static function getBaseFileName($fileName) {
-        preg_match('/^([^_\d]+)(?:_(\d+))?\./', $fileName, $matches);
+        preg_match('/^([^\(]+)(?:\((\d+)\))?(\.\w+)?$/', $fileName, $matches);
         if (isset($matches[1])) {
             $baseName = $matches[1];
-            $number = isset($matches[2]) ? (int)$matches[2] : null;
+            $number = isset($matches[2]) ? (int)$matches[2] : 0;
             return ['name' => $baseName, 'number' => $number];
         }
         return null;
     }
-    private static function manageFile($data, $desc, $opt){
+    private function manageFile($data, $desc, $opt = null){
         try{
-            $fileExist = file_exists(self::$folderFile);
-            if (!$fileExist) {
+            $filePath = self::$folderFile;
+            $fileExist = file_exists($filePath);
+            if (!$fileExist || empty($fileExist) || is_null($fileExist)) {
                 //if file is delete will make new json file
-                $query = "SELECT id_sewa, surat_keterangan FROM sewa_tempat";
+                $query = "SELECT id_sewa, surat_ket_sewa FROM sewa_tempat";
                 $stmt[0] = self::$con->prepare($query);
                 if(!$stmt[0]->execute()){
                     $stmt[0]->close();
@@ -55,35 +56,78 @@ class TempatMobile{
                     $fileData[] = $row;
                 }
                 $stmt[0]->close();
-                if ($fileData === null) {
-                    throw new Exception('Data file tidak ditemukan');
-                }
-                $jsonData = json_encode($fileData, JSON_PRETTY_PRINT);
-                if (!file_put_contents(self::$folderFile, $jsonData)) {
-                    echo "Gagal menyimpan file sistem";
+                if (!empty($fileData) && $fileData !== null) {
+                    $jsonData = json_encode($fileData, JSON_PRETTY_PRINT);
+                    if (!file_put_contents($filePath, $jsonData)) {
+                        throw new Exception('Gagal menyimpan file sistem');
+                    }
                 }
             }
-            if($desc == 'get'){
+            if($desc == 'tambah'){
+                //check if file exist
+            if (!$fileExist) {
+                    //if file is delete will make new json file
+                    $query = "SELECT id_sewa, surat_ket_sewa FROM sewa_tempat";
+                    $stmt[0] = self::$con->prepare($query);
+                    if(!$stmt[0]->execute()){
+                        $stmt[0]->close();
+                        throw new Exception('Data file tidak ditemukan');
+                    }
+                    $result = $stmt[0]->get_result();
+                    $fileData = [];
+                    while ($row = $result->fetch_assoc()) {
+                        $fileData[] = $row;
+                    }
+                    $stmt[0]->close();
+                    if (!empty($fileData) && $fileData !== null) {
+                        $jsonData = json_encode($fileData, JSON_PRETTY_PRINT);
+                        if (!file_put_contents($filePath, $jsonData)) {
+                            throw new Exception('Gagal menyimpan file sistem');
+                        }
+                    }
+                }else{
+                    //tambah data file
+                    $jsonFile = file_get_contents($filePath);
+                    $jsonData = json_decode($jsonFile, true);
+                    array_push($jsonData, $data);
+                    $jsonFile = json_encode($jsonData, JSON_PRETTY_PRINT);
+                    file_put_contents($filePath, $jsonFile);
+                }
+            }else if($desc == 'get'){
                 if(!isset($data['nama_file']) || empty($data['nama_file'])){
                     throw new Exception('Nama file harus di isi');
                 }
-                $jsonFile = file_get_contents(self::$folderFile);
+                $jsonFile = file_get_contents($filePath);
                 $jsonData = json_decode($jsonFile, true);
-                $result = null;
+                $fileNameNew = $data['nama_file'];
+                $fileData = array();
                 if($opt['col'] == 'surat'){
                     foreach($jsonData as $key => $item){
-                        if (isset($item['surat_keterangan'])){
-                            $file = self::getBaseFileName(pathinfo($item['surat_keterangan'])['filename']);
+                        if (isset($item['surat_ket_sewa'])){
+                            $file = self::getBaseFileName(pathinfo($item['surat_ket_sewa'])['filename']);
                             if($file['name'] == pathinfo($data['nama_file'])['filename']) {
-                                $result = $data['nama_file'].($file['number']+1).'.'.pathinfo($data['nama_file'])['extension'];
+                                array_push($fileData,['name'=>$file['name'],'number'=>$file['number']]);
                             }
                         }
                     }
-                    if($result === null){
-                        throw new Exception('Error saat proses file');
+                    //get number
+                    $num = '';
+                    if(is_null($fileData) || empty($fileData)){
+                        $fileNameNew = $data['nama_file'];
+                    }else{
+                        foreach ($fileData as $file) {
+                            if (isset($file['number']) && $file['number'] > $num) {
+                                $num = $file['number'];
+                            }
+                        }
+                        if(empty($num)){
+                            $fileNameNew = pathinfo($data['nama_file'])['filename'].'(1).'.pathinfo($data['nama_file'])['extension'];
+                        }else{
+                            $fileNameNew = pathinfo($data['nama_file'])['filename'].'('.($num+1).').'.pathinfo($data['nama_file'])['extension'];
+                        }
                     }
                 }
-                return $result;
+                return '/'.$fileNameNew;
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -251,13 +295,13 @@ class TempatMobile{
             if (!isset($data['nama_tempat']) || empty($data['nama_tempat'])) {
                 throw new Exception('Nama tempat harus di isi !');
             }
-            if (!isset($data['nik_penyewa']) || empty($data['nik_penyewa'])) {
+            if (!isset($data['nik']) || empty($data['nik'])) {
                 throw new Exception('Nik penyewa harus di isi !');
             }
-            if (!is_numeric($data['nik_penyewa'])) {
+            if (!is_numeric($data['nik'])) {
                 throw new Exception('Nik penyewa harus berisi hanya angka !');
             }
-            if (strlen($data['nik_penyewa']) > 16) {
+            if (strlen($data['nik']) > 16) {
                 throw new Exception('Nik penyewa maksimal 16 angka !');
             }
             if (!isset($data['nama_peminjam']) || empty($data['nama_peminjam'])) {
@@ -371,10 +415,11 @@ class TempatMobile{
             $query = "INSERT INTO sewa_tempat (nik_sewa, nama_tempat, nama_peminjam, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, surat_ket_sewa, tgl_awal_peminjaman, tgl_akhir_peminjaman, status, created_at, updated_at, id_tempat, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
             $status = 'diajukan';
-            $stmt[2]->bind_param("sssssssssssssii", $data['nik_penyewa'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'],$data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $status, $tanggal_sekarangDB, $tanggal_sekarangDB, $data['id_tempat'], $data['id_user']);
+            $stmt[2]->bind_param("sssssssssssssii", $data['nik'], $data['nama_tempat'], $data['nama_peminjam'], $data['deskripsi'],$data['nama_kegiatan_sewa'], $data['jumlah_peserta'], $data['instansi'], $fileSuratDB, $tanggal_awalDB, $tanggal_akhirDB, $status, $tanggal_sekarangDB, $tanggal_sekarangDB, $data['id_tempat'], $data['id_user']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
+                self::manageFile(['id_sewa'=>self::$con->insert_id, 'surat_keterangan'=>$fileSuratDB],'tambah');
                 header('Content-Type: application/json');
                 echo json_encode(['status'=>'success','message'=>'Data sewa tempat berhasil ditambahkan']);
                 exit();
