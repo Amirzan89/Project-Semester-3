@@ -25,25 +25,25 @@ class MailMobile{
             }
         }
     }
-    public function testing(){
-        $mail = new PHPMailer(true);
-        $mail->Host = 'smtp.gmail.com';
-        $mail->isSMTP();
-        $mail->SMTPAuth = true;
-        $mail->Username = 'amirzanfikri5@gmail.com';
-        $mail->Password = 'vamvwrdfyewbhkca';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-        try {
-            $mail->setFrom($_SERVER['MAIL_FROM_ADDRESS'], 'gabutt');
-            $mail->Body = 'This is the email body content.';
-            $mail->addAddress('amirzanfikri5@gmail.com','Amirzan');
-            $mail->send();
-            echo 'Email sent successfully';
-        } catch (Exception $e) {
-            echo 'Email could not be sent. Mailer Error: ' . $mail->ErrorInfo;
-        }
-    }
+    // public function testing(){
+    //     $mail = new PHPMailer(true);
+    //     $mail->Host = 'smtp.gmail.com';
+    //     $mail->isSMTP();
+    //     $mail->SMTPAuth = true;
+    //     $mail->Username = 'amirzanfikri5@gmail.com';
+    //     $mail->Password = 'vamvwrdfyewbhkca';
+    //     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    //     $mail->Port = 587;
+    //     try {
+    //         $mail->setFrom($_SERVER['MAIL_FROM_ADDRESS'], 'gabutt');
+    //         $mail->Body = 'This is the email body content.';
+    //         $mail->addAddress('amirzanfikri5@gmail.com','Amirzan');
+    //         $mail->send();
+    //         echo 'Email sent successfully';
+    //     } catch (Exception $e) {
+    //         echo 'Email could not be sent. Mailer Error: ' . $mail->ErrorInfo;
+    //     }
+    // }
     public function __construct(){
         try {
             $this->loadEnv();

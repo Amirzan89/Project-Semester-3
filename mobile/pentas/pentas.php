@@ -1,6 +1,6 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
-class AdvisMobile{
+class PentasMobile{
     private static $sizeFile = 5 * 1024 * 1024;
     private static $database;
     private static $con;
@@ -261,19 +261,19 @@ class AdvisMobile{
             if(!isset($data['nomor_induk']) || empty($data['nomor_induk'])){
                 throw new Exception('ID Seniman harus di isi !');
             }
-            if(!isset($data['nama']) || empty($data['nama'])){
+            if(!isset($data['nama_advis']) || empty($data['nama_advis'])){
                 throw new Exception('Nama advis harus di isi !');
             }
-            if (!isset($data['alamat']) || empty($data['alamat'])) {
+            if (!isset($data['alamat_advis']) || empty($data['alamat_advis'])) {
                 throw new Exception(' Alamat harus di isi !');
             }
-            if (strlen($data['alamat']) > 100) {
+            if (strlen($data['alamat_advis']) > 100) {
                 throw new Exception(' Alamat maksimal 100 karakter !');
             }
-            if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
+            if (!isset($data['deskripsi_advis']) || empty($data['deskripsi_advis'])) {
                 throw new Exception(' Deskripsi harus di isi !');
             }
-            if (strlen($data['deskripsi']) > 25) {
+            if (strlen($data['deskripsi_advis']) > 25) {
                 throw new Exception(' Deskripsi maksimal 25 angka !');
             }
             if(!isset($data['nama_pentas']) || empty($data['nama_pentas'])){
@@ -285,7 +285,7 @@ class AdvisMobile{
             if (!isset($data['tanggal_akhir']) || empty($data['tanggal_akhir'])) {
                 throw new Exception('Tanggal akhir harus di isi !');
             }
-            if (!isset($data['tempat_pentas']) || empty($data['tempat_pentas'])) {
+            if (!isset($data['tempat_advis']) || empty($data['tempat_advis'])) {
                 throw new Exception(' Tempat pentas harus di isi !');
             }
             if (!isset($_FILES['surat_keterangan']) || empty($_FILES['surat_keterangan'])) {
@@ -399,7 +399,7 @@ class AdvisMobile{
             $query = "INSERT INTO surat_advis (nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_awal, tgl_selesai, tempat_advis, surat_keterangan, status, created_at, updated_at, id_user, id_seniman) VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
             $status = 'diajukan';
-            $stmt[2]->bind_param("sssssssssssii", $data['nomor_induk'], $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalAwalDB, $tanggalAkhirDB, $data['tempat_pentas'], $fileSuratDB, $status, $tanggal_sekarangDB, $tanggal_sekarangDB, $data['id_user'], $data['id_seniman']);
+            $stmt[2]->bind_param("sssssssssssii", $data['nomor_induk'], $data['nama_advis'], $data['alamat_advis'], $data['deskripsi_advis'], $tanggalAwalDB, $tanggalAkhirDB, $data['tempat_advis'], $fileSuratDB, $status, $tanggal_sekarangDB, $tanggal_sekarangDB, $data['id_user'], $data['id_seniman']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -691,10 +691,10 @@ loadEnv();
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
     include(__DIR__.'/../../notfound.php');
 }
-$pentasMobile = new AdvisMobile();
+$pentasMobile = new PentasMobile();
 if($_SERVER['APP_TESTING']){
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
-        $data = AdvisMobile::handle();
+        $data = PentasMobile::handle();
         if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan']) && $data['keterangan'] == 'get'){
             $pentasMobile->getPentas($data);
         }
@@ -710,10 +710,16 @@ if($_SERVER['APP_TESTING']){
         }
     }
     if($_SERVER['REQUEST_METHOD'] == 'PUT'){
-        $pentasMobile->editPentas(AdvisMobile::handle());
+        $pentasMobile->editPentas(PentasMobile::handle());
     }
     if($_SERVER['REQUEST_METHOD'] == 'DELETE'){
-        $pentasMobile->hapusPentas(AdvisMobile::handle());
+        $pentasMobile->hapusPentas(PentasMobile::handle());
     }
 }
+$tambahPentas = function ($data) use ($pentasMobile){
+    $pentasMobile->tambahPentas($data);
+};
+$updatePentas = function ($data) use ($pentasMobile){
+    $pentasMobile->editPentas($data);
+};
 ?>
