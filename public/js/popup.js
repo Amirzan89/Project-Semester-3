@@ -1,6 +1,38 @@
 const redPopup = document.querySelector('div#redPopup');
 const greenPopup = document.querySelector('div#greenPopup');
 var isPopupVisible = false;
+function showGreenPopup(data, div = null){
+    if(div == 'dashboard'){
+        greenPopup.innerHTML = `
+            <div class="bg" onclick="closePopup('green',true)"></div>
+            <div class="kotak">
+                <div class="bunder1"></div>
+                <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+            </div>
+            <span class="closePopup" onclick="closePopup('green',true)">X</span>
+            <label>${data.message}</label>
+        `;
+        greenPopup.style.display = 'block';
+        setTimeout(() => {
+            dashboardPage();
+        }, 3000);
+    }else{
+        let dataa = JSON.stringify(data);
+            greenPopup.innerHTML = `
+                <div class="bg" onclick="closePopup('green',true)"></div>
+                <div class="kotak">
+                    <div class="bunder1"></div>
+                    <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+                </div>
+                <span class="closePopup" onclick="closePopup('green',true)">X</span>
+                <label>${data.message}</label>
+            `;
+            greenPopup.style.display = 'block';
+            setTimeout(() => {
+                closePopup('green');
+            }, 3000);
+    }
+}
 function showRedPopup(data, div){
     if(div == 'otp' && !isPopupVisible){
         redPopup.innerHTML = `

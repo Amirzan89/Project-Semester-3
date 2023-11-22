@@ -56,7 +56,47 @@ if($userAuth['status'] == 'error'){
 
   <!-- Template Main CSS File -->
   <link href="<?php echo $tPath; ?>/public/assets/css/tempat.css" rel="stylesheet">
+    <style>
+        #divImg {
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 800px;
+            width: 100%;
+            max-height: 450px;
+            height: 450px;
+        }
 
+        #divText {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            translate: -50% -50%;
+            font-size: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #divText i {
+            font-size: 65px;
+        }
+
+        #inpImg {
+            display: block;
+            margin: auto;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+        }
+
+        @media (max-width: 480px) {}
+
+        @media (min-width: 481px) and (max-width: 767px) {}
+
+        @media (min-width: 768px) {}
+    </style>
 </head>
 
 <body>
@@ -100,12 +140,89 @@ if($userAuth['status'] == 'error'){
         <section class="section dashboard">
             <div class="row">
                 <div class="col-lg-12">
+                    <!-- Default Card -->
                     <div class="card">
+                        <div class="card-body"> <br>
+                            <form action="/web/tempat/tempat.php" method="POST" class="row"
+                                enctype="multipart/form-data">
+                                <input type="hidden" name="_method" value="PUT">
+                                <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user']; ?>">
+                                <input type="hidden" name="id_tempat" value="<?php echo $id; ?>">
+                                <div class="col-md-6">
+                                    <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+                                        <div class="carousel-inner" id="divImg" ondrop="dropHandler(event)" ondragover="dragHandler(event,'over')" ondragleave="dragHandler(event,'leave')">
+                                            <div class="carousel-item active">
+                                                <!-- <input class="form-control" type="file" multiple="false" id="inpFile" name="foto" style="display:none"> -->
+                                                <img src="<?php echo $tPath ?>/public/img/tempat<?php echo $tempat['foto_tempat'] ?>"
+                                                    id="inpImg" class="d-block" alt="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <br>
+                                    <label for="inputText"><strong>Nama Tempat</strong></label>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-12">
+                                            <input type="text" name="nama_tempat" class="form-control"
+                                                placeholder="Masukkan Nama Tempat"
+                                                value="<?php echo $tempat['nama_tempat'] ?>">
+                                        </div>
+                                    </div>
+                                    <label for="inputText"><strong>Alamat Tempat</strong></label>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-12">
+                                            <input type="text" name="alamat" class="form-control"
+                                                placeholder="Masukkan Alamat Tempat"
+                                                value="<?php echo $tempat['alamat_tempat'] ?>">
+                                        </div>
+                                    </div>
+                                    <label for="inputText"><strong>Nama Pengelola</strong></label>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-12">
+                                            <input type="text" name="nama_pengelola" class="form-control"
+                                                placeholder="Masukkan nama pengelola"
+                                                value="<?php echo $tempat['pengelola'] ?>">
+                                        </div>
+                                    </div>
+                                    <label for="inputText"><strong>Nomor pengelola</strong></label>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-12">
+                                            <input type="text" name="phone" class="form-control"
+                                                placeholder="Masukkan Nomor pengelola"
+                                                value="<?php echo $tempat['contact_person'] ?>">
+                                        </div>
+                                    </div>
+                                    <label for="inputText"><strong>Deskripsi Tempat</strong></label>
+                                    <div class="col-sm-12">
+                                        <textarea class="form-control" name="deskripsi" style="height: 80px"
+                                            placeholder="Masukkan Deskripsi Tempat"><?php echo $tempat['deskripsi_tempat'] ?></textarea>
+                                    </div>
+                                    <br>
+                                    <div class="row mb-3">
+                                    <label for="inputNumber" class="col-sm-2 col-form-label">Gambar tempat</label>
+                                    <div class="col-sm-10">
+                                        <button class="btn btn-info" type="button" onclick="preview('foto')"> Lihat Foto Tempat </button>
+                                        <button class="btn btn-info" type="button" onclick="download('foto')"> Download Foto Tempat </button>
+                                    </div>
+                                </div>
+                                <div class="row mb-3 justify-content-end">
+                                    <div class="col-sm-10 text-end">
+                                        <a href="/tempat/data_tempat.php" class="btn btn-info"><i>kembali</i></a>
+                                        <a href="/tempat/edit_detail_tempat.php?id_tempat=<?= $id ?>" class="btn btn-info"><i class="bi bi-pencil-square">edit</i></a>
+                                        </a>
+                                        <a href="/users/proses-hapus-user.php?id_user=<?= $tempat['id_user'] ?>" onclick="return confirm('Anda yakin ingin menghapus data <?php echo $tempat['nama_lengkap']; ?>?');" class="btn btn-danger"><i class="bi bi-trash-fill">Hapus</i></a>
+                                    </div>
+                                </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div><!-- End Default Card -->
+                    <!-- <div class="card">
                         <div class="card-body">
                             <div class="card-body d-flex justify-content-center align-items-center">
                                 <h5 class="card-title text-center">Data Detail Tempat</h5>
                             </div>
-                            <!-- General Form Elements -->
                             <form>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Nama Tempat</label>
@@ -120,7 +237,13 @@ if($userAuth['status'] == 'error'){
                                     </div>
                                 </div>
                                 <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Contact Person</label>
+                                    <label for="inputText" class="col-sm-2 col-form-label">Nama pengelola</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" value="<?php echo $tempat['pengelola']?>" readonly>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Nomor pengelola</label>
                                     <div class="col-sm-10">
                                         <input type="text" class="form-control" value="<?php echo $tempat['contact_person']?>" readonly>
                                     </div>
@@ -141,14 +264,13 @@ if($userAuth['status'] == 'error'){
                                 <div class="row mb-3 justify-content-end">
                                     <div class="col-sm-10 text-end">
                                         <a href="/tempat/edit_detail_tempat.php?id_tempat=<?= $id ?>" class="btn btn-info"><i class="bi bi-pencil-square">edit</i></a>
-                                            <!-- <button class="btn btn-primary">Edit</button> -->
                                         </a>
                                         <a href="/users/proses-hapus-user.php?id_user=<?= $tempat['id_user'] ?>" onclick="return confirm('Anda yakin ingin menghapus data <?php echo $tempat['nama_lengkap']; ?>?');" class="btn btn-danger"><i class="bi bi-trash-fill">Hapus</i></a>
                                     </div>
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </section>

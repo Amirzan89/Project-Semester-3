@@ -311,10 +311,10 @@ class EventMobile{
             if ($stmt->affected_rows > 0) {
                 $id = self::$con->insert_id;
                 //tambah data
-                $query = "INSERT INTO events (nama_pengirim, status, created_at, updated_at, id_detail, id_sewa, id_user) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $query = "INSERT INTO events (nama_pengirim, status, created_at, updated_at, id_detail, id_user) VALUES (?, ?, ?, ?, ?, ?)";
                 $stmt = self::$con->prepare($query);
                 $status = 'diajukan';
-                $stmt->bind_param("sssssss", $data['nama_pengirim'], $status, $tanggalSekarangDB, $tanggalSekarangDB, $id, $data['id_user']);
+                $stmt->bind_param("ssssss", $data['nama_pengirim'], $status, $tanggalSekarangDB, $tanggalSekarangDB, $id, $data['id_user']);
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
                     header('Content-Type: application/json');

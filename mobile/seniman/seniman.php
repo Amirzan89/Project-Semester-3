@@ -1372,4 +1372,4 @@ $tambahSeniman = function ($data) use ($senimanMobile){
 $updateSeniman = function ($data) use ($senimanMobile){
     $senimanMobile->editSeniman($data);
 };
-?>
+?>  

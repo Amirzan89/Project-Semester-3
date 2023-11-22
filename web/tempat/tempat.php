@@ -102,59 +102,40 @@ class TempatWebsite{
     public function tambahTempat($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID tempat harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('ID User harus di isi !');
             }
             if (!isset($data['nama_tempat']) || empty($data['nama_tempat'])) {
-                echo "<script>alert('Nama tempat harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nama tempat harus di isi !');
             }
             if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
-                echo "<script>alert('Deskripsi tempat harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Deskripsi tempat harus di isi !');
             }
             if (!isset($data['alamat']) || empty($data['alamat'])) {
-                echo "<script>alert('Alamat tempat harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Alamat tempat harus di isi !');
+            }
+            if (!isset($data['nama_pengelola']) || empty($data['nama_pengelola'])) {
+                throw new Exception('Nama pengelola harus di isi !');
             }
             if (!isset($data['phone']) || empty($data['phone'])) {
-                echo "<script>alert('nomer telepon harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon harus di isi !');
             }
             if (!is_numeric($data['phone'])) {
-                echo "<script>alert('Nomer telepon harus berisi hanya angka.')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon harus berisi hanya angka !');
             }
             if (strlen($data['phone']) < 8) {
-                echo "<script>alert('Nomer telpon minimal 8 karakter !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon minimal 8 angka !');
             }
             if (strlen($data['phone']) > 15) {
-                echo "<script>alert('Nomer telpon maksimal 15 karakter !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon maksimal 15 angka !');
             }
             if (substr($data['phone'], 0, 2) !== '08') {
-                echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon harus dimulai dengan 08 !');
             }
             if (!isset($_FILES['foto']) || empty($_FILES['foto'])) {
-                echo "<script>alert('Foto tempat harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Foto tempat harus di isi !');
             }
             if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
-                echo "<script>alert('Gagal upload foto')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Gagal Upload foto !');
             }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -165,15 +146,11 @@ class TempatWebsite{
             $stmt[0]->bind_result($role);
             if(!$stmt[0]->fetch()){
                 $stmt[0]->close();
-                echo "<script>alert('User tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('User tidak ditemukan');
             }
             $stmt[0]->close();
             if(($role != 'admin tempat' && $role != 'super admin') || $role == 'masyarakat'){
-                echo "<script>alert('Invalid role !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Invalid role');
             }
             //get last id Tempat
             $query = "SELECT id_tempat FROM list_tempat ORDER BY id_tempat DESC LIMIT 1";
@@ -195,38 +172,30 @@ class TempatWebsite{
             $size = filesize($fileFoto['name']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= 4 * 1024 * 1024) {
-                    echo "<script>alert('File terlalu besar')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Ukuran gambar maksimal 4 MB');
                 }
             } else {
-                echo "<script>alert('invalid format file')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Format file harus png, jpg, jpeg');
             }
             //simpan file
             $nameFile = '/'.$idTempat.'.'.$extension; 
             $fileFotoPath = self::$folderPath.$nameFile;
             if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
-                echo "<script>alert('Gagal menyimpan file')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Gagal menyimpan file');
             }
-            $query = "INSERT INTO list_tempat (nama_tempat, alamat_tempat, deskripsi_tempat, contact_person,foto_tempat) VALUES (?, ?, ?, ?, ?)";
+            $query = "INSERT INTO list_tempat (nama_tempat, alamat_tempat, deskripsi_tempat, pengelola, contact_person,foto_tempat) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param("sssss", $data['nama_tempat'],$data['alamat'],$data['deskripsi'], $data['phone'], $nameFile);
+            $stmt[2]->bind_param("ssssss", $data['nama_tempat'],$data['alamat'],$data['deskripsi'], $data['nama_pengelola'], $data['phone'], $nameFile);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
-                echo "<script>alert('Data tempat berhasil ditambahkan')</script>";
-                echo "<script>window.location.href = '/tempat/data_tempat.php';</script>";
+                header('Content-Type: application/json');
+                echo json_encode(['status'=>'success','message'=>'Data tempat berhasil ditambahkan']);
                 exit();
             } else {
                 $stmt[2]->close();
                 unlink($fileFotoPath);
-                echo "<script>alert('Data tempat gagal ditambahkan')</script>";
-                echo "<script>window.location.href = '/tempat/data_tempat.php';</script>";
-                exit();
+                throw new Exception('Data tempat gagal ditambahkan');
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -242,8 +211,9 @@ class TempatWebsite{
                     'message' => $errorJson['message'],
                 );
             }
-            echo "<script>alert('$error')</script>";
-            echo "<script>window.history.back();</script>";
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
             exit();
         }
     }
@@ -251,64 +221,43 @@ class TempatWebsite{
     public function editTempat($data){
         try{
             if(!isset($data['id_user']) || empty($data['id_user'])){
-                echo "<script>alert('ID User harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('ID User harus di isi !');
             }
             if(!isset($data['id_tempat']) || empty($data['id_tempat'])){
-                echo "<script>alert('ID tempat harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('ID Tempat harus di isi !');
             }
             if (!isset($data['nama_tempat']) || empty($data['nama_tempat'])) {
-                echo "<script>alert('Nama tempat harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
-                echo "<script>alert('Deskripsi tempat harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            if (!isset($data['phone']) || empty($data['phone'])) {
-                echo "<script>alert('nomer telepon harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            if (!is_numeric($data['phone'])) {
-                echo "<script>alert('Nomer telepon harus berisi hanya angka.')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            if (strlen($data['phone']) < 8) {
-                echo "<script>alert('Nomer telpon minimal 8 karakter !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            if (strlen($data['phone']) > 15) {
-                echo "<script>alert('Nomer telpon maksimal 15 karakter !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            if (substr($data['phone'], 0, 2) !== '08') {
-                echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nama tempat harus di isi !');
             }
             if (!isset($data['alamat']) || empty($data['alamat'])) {
-                echo "<script>alert('Alamat tempat harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Alamat tempat harus di isi !');
+            }
+            if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
+                throw new Exception('Deskrispi tempat harus di isi !');
+            }
+            if (!isset($data['nama_pengelola']) || empty($data['nama_pengelola'])) {
+                throw new Exception('Nama pengelola harus di isi !');
+            }
+            if (!isset($data['phone']) || empty($data['phone'])) {
+                throw new Exception('Nomor telepon harus di isi !');
+            }
+            if (!is_numeric($data['phone'])) {
+                throw new Exception('Nomor telepon harus berisi hanya angka');
+            }
+            if (strlen($data['phone']) < 8) {
+                throw new Exception('Nomor telepon minimal 8 angka');
+            }
+            if (strlen($data['phone']) > 15) {
+                throw new Exception('Nomor telepon maksimal 15 angka');
+            }
+            if (substr($data['phone'], 0, 2) !== '08') {
+                throw new Exception('Nomor telepon harus dimulai dengan 08');
             }
             if (!isset($_FILES['foto']) || empty($_FILES['foto'])) {
-                echo "<script>alert('Foto tempat harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Foto tempat harus di isi !');
             }
             if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
-                echo "<script>alert('Gagal upload foto')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Gagal upload foto');
             }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -319,16 +268,13 @@ class TempatWebsite{
             $stmt[0]->bind_result($role);
             if(!$stmt[0]->fetch()){
                 $stmt[0]->close();
-                echo "<script>alert('User tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('User tidak ditemukan');
             }
             $stmt[0]->close();
             if(($role != 'admin tempat' && $role != 'super admin') || $role == 'masyarakat'){
-                echo "<script>alert('Invalid role !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Invalid role');
             }
+            // if ($fileFoto['error'] === UPLOAD_ERR_OK && is_uploaded_file($fileFoto['tmp_name'])) {
             //check id Tempat
             $query = "SELECT id_tempat FROM list_tempat WHERE id_tempat = ?";
             $stmt[1] = self::$con->prepare($query);
@@ -336,9 +282,7 @@ class TempatWebsite{
             $stmt[1]->execute();
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
-                echo "<script>alert('Data tempat tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Data tempat tidak ditemukan');
             }
             $stmt[1]->close();
             //proses file
@@ -347,39 +291,31 @@ class TempatWebsite{
             $size = filesize($fileFoto['tmp_name']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= 4 * 1024 * 1024) {
-                    echo "<script>alert('File terlalu besar')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Ukuran file maksimal 4 MB');
                 }
             } else {
-                echo "<script>alert('File invalid format')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Format file harus png, jpeg, jpg');
             }
             //simpan file
             $nameFile = '/'.$data['id_tempat'].'.'.$extension;  
             $fileFotoPath = self::$folderPath.$nameFile;
             if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
-                echo "<script>alert('Gagal menyimpan file')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Gagal menyimpan file');
             }
             //update data
-            $query = "UPDATE list_tempat SET nama_tempat = ?, alamat_tempat = ?, deskripsi_tempat = ?, contact_person = ?, foto_tempat = ? WHERE id_tempat = ?
+            $query = "UPDATE list_tempat SET nama_tempat = ?, alamat_tempat = ?, deskripsi_tempat = ?, pengelola = ?, contact_person = ?, foto_tempat = ? WHERE id_tempat = ?
             ";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param("ssssss", $data['nama_tempat'],$data['alamat'],$data['deskripsi'], $data['phone'], $nameFile, $data['id_tempat']);
+            $stmt[2]->bind_param("ssssss", $data['nama_tempat'],$data['alamat'],$data['deskripsi'], $data['nama_pengelola'], $data['phone'], $nameFile, $data['id_tempat']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
-                echo "<script>alert('Data Tempat berhasil diubah')</script>";
-                echo "<script>window.location.href = '/tempat/data_tempat.php';</script>";
+                header('Content-Type: application/json');
+                echo json_encode(['status'=>'success','message'=>'Data tempat berhasil diubah']);
                 exit();
             } else {
                 $stmt[2]->close();
-                echo "<script>alert('Data Tempat gagal diubah')</script>";
-                echo "<script>window.location.href = '/tempat/data_tempat.php';</script>";
-                exit();
+                throw new Exception('Data tempat gagal diubah');
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -395,9 +331,9 @@ class TempatWebsite{
                     'message' => $errorJson['message'],
                 );
             }
-            echo "<script>alert('$error')</script>";
-            echo "<script>window.history.back();</script>";
-            exit();
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
         }
     }
     public function hapusTempat($data){

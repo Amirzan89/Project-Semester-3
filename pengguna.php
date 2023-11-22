@@ -267,8 +267,8 @@ if($userAuth['status'] == 'error'){
         }
     </script>
         <!-- Vendor JS Files -->
-    <script src="..<?php echo $tPath; ?>/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
-    <script src="..<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
     <!-- Template Main JS File -->
         <script src="<?php echo $tPath; ?>/public/assets/js/admin/main.js"></script>

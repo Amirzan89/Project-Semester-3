@@ -34,25 +34,67 @@ if($userAuth['status'] == 'error'){
   <meta content="" name="keywords">
 
   <!-- Favicons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
-  <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <!-- Vendor CSS Files -->
   <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
-
-
-  <!-- Template Main CSS File -->
   <link href="<?php echo $tPath; ?>/public/assets/css/tempat.css" rel="stylesheet">
-
+  <link href="<?php echo $tPath; ?>/public/css/style.css" rel="stylesheet">
+  <!-- Template Main CSS File -->
+  <link href="<?php echo $tPath; ?>/public/css/popup.css" rel="stylesheet">
+  <style>
+    div.drag#divImg{
+      border:4px solid black;
+    }
+    #divImg{
+      position: relative;
+      left:50%;
+      transform: translateX(-50%);
+      max-width: 800px;
+      width:100%;
+      max-height: 450px;
+      height: 450px;
+      border:4px dashed gray;
+      cursor:pointer;
+    }
+    #divText{
+      position: absolute;
+      left:50%;
+      top:50%;
+      translate: -50% -50%;
+      font-size:25px;
+      text-align: center;
+      display:flex;
+      flex-direction: column;
+    }
+    #divText i{
+      font-size:65px;
+    }
+    #inpImg {
+      display: block;
+      margin: auto;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+    }
+    @media (max-width: 480px) {
+    }
+    @media (min-width: 481px) and (max-width: 767px) {
+    }
+    @media (min-width: 768px) {
+    }
+  </style>
 </head>
 
 <body>
   <script>
+    var tPath = "<?php echo $tPath ?>";
     var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
@@ -98,14 +140,20 @@ if($userAuth['status'] == 'error'){
                   <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user']; ?>">
                     <div class="col-md-6">
                       <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-inner">
+                        <div class="carousel-inner" id="divImg" ondrop="dropHandler(event)" ondragover="dragHandler(event,'over')" ondragleave="dragHandler(event,'leave')">
+                          <div id="divText">
+                            <i class="fa-solid fa-images"></i>
+                            <span id="imgText">Pilih atau jatuhkan file gambar tempat </span>
+                          </div>
                           <div class="carousel-item active">
-                            <img src="assets/img/slides-1.jpg" class="d-block w-100" alt="...">
+                            <input class="form-control" type="file" multiple="false" id="inpFile" name="foto" style="display:none">
+                            <img src="" id="inpImg" class="d-block" alt="">
                           </div>
                         </div>
                       </div>
                     </div>
                     <div class="col-md-6">
+                      <br>
                       <label for="inputText"><strong>Nama Tempat</strong></label>
                       <div class="row mb-3">
                         <div class="col-sm-12">
@@ -118,23 +166,24 @@ if($userAuth['status'] == 'error'){
                           <input type="text" name="alamat" class="form-control" placeholder="Masukkan Alamat Tempat">
                         </div>
                       </div>
-                      <label for="inputText"><strong>Contact Person</strong></label>
+                      <label for="inputText"><strong>Nama Pengelola</strong></label>
                       <div class="row mb-3">
                         <div class="col-sm-12">
-                          <input type="text" name="phone" class="form-control" placeholder="Masukkan Contact Person">
+                          <input type="text" name="nama_pengelola" class="form-control" placeholder="Masukkan nama pengelola">
+                        </div>
+                      </div>
+                      <label for="inputText"><strong>Nomor pengelola</strong></label>
+                      <div class="row mb-3">
+                        <div class="col-sm-12">
+                          <input type="text" name="phone" class="form-control" placeholder="Masukkan Nomor pengelola">
                         </div>
                       </div>
                       <label for="inputText"><strong>Deskripsi Tempat</strong></label>
                       <div class="col-sm-12">
                         <textarea class="form-control" name="deskripsi" style="height: 80px" placeholder="Masukkan Deskripsi Tempat"></textarea>
                       </div>
-                      <div class="row mb-3">
-                          <label for="inputNumber" class="col-sm-2 col-form-label">Gambar tempat</label>
-                          <div class="col-sm-10">
-                              <input class="form-control" type="file" id="formFile" name="foto">
-                          </div>
-                      </div> <br>
-                      <button type="submit" class="btn btn-primary">Tambah</button>
+                      <br>
+                      <button type="button" class="btn btn-primary" onclick="upload()">Tambah</button>
                     </div>
                   </form>
                 </div>
@@ -152,9 +201,111 @@ if($userAuth['status'] == 'error'){
     ?>
   </footer>
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
-
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i>
+    </a>
+  <div id="greenPopup" style="display:none"></div>
+  <div id="redPopup" style="display:none"></div>
+  <script src="<?php  echo $tPath ?>/public/js/popup.js"></script>
+  <script>
+    const maxSizeInBytes = 4 * 1024 * 1024; //max file 4MB
+    var divText = document.getElementById('divText');
+    var divImg = document.getElementById('divImg');
+    var inpFile = document.getElementById('inpFile');
+    var imgText = document.getElementById('imgText');
+    var fileImg;
+    divImg.addEventListener("click", function(){
+      inpFile.click();
+    });
+    function upload(){
+      //check file 
+      if(fileImg == null){
+        showRedPopup('Gambar harus di isi !');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('id_user',idUser);
+      formData.append('nama_tempat', document.querySelector('input[name="nama_tempat"]').value);
+      formData.append('alamat', document.querySelector('input[name="alamat"]').value);
+      formData.append('nama_pengelola', document.querySelector('input[name="nama_pengelola"]').value);
+      formData.append('phone', document.querySelector('input[name="phone"]').value);
+      formData.append('deskripsi', document.querySelector('textarea[name="deskripsi"]').value);
+      formData.append('foto', fileImg, fileImg.name);
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/web/tempat/tempat.php', true);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          showGreenPopup(JSON.parse(xhr.responseText));
+          setTimeout(() => {
+                window.location.href = '/tempat/data_tempat.php';
+            }, 3000);
+          return;
+        } else {
+          showRedPopup(JSON.parse(xhr.responseText));
+          return;
+        }
+      };
+      xhr.onerror = function () {
+        showRedPopup('Request gagal');
+        return;
+      };
+      xhr.send(formData);
+    }
+    inpFile.addEventListener('change',function(e){
+      if (e.target.files.length === 1) {
+        const file = e.target.files[0];
+        if (file.type.startsWith('image/')) {
+          if (file.size <= maxSizeInBytes) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+            document.getElementById('inpImg').src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+          fileImg = file;
+          //delete inside box
+          divText.innerHTML = "";
+          divImg.style.borderStyle = "none";
+          divImg.style.borderWidth = "0px";
+          divImg.style.borderColor = "transparent";
+          } else {
+            showRedPopup('Ukuran maksimal gambar 4MB !');
+          }
+        } else {
+          showRedPopup('File harus Gambar !');
+        }
+      }
+    });
+    function dropHandler(event) {
+      event.preventDefault();
+      if (event.dataTransfer.items) {
+        const file = event.dataTransfer.items[0].getAsFile();
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            document.getElementById('inpImg').src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+          fileImg = file;
+          //delete inside box
+          divText.innerHTML = "";
+          divImg.style.borderStyle = "none";
+          divImg.style.borderWidth = "0px";
+          divImg.style.borderColor = "transparent";
+        } else {
+          showRedPopup('File harus Gambar !');
+        }
+      }
+    }
+    function dragHandler(event, con){
+      event.preventDefault();
+      if(con == 'over'){
+        imgText.innerText = 'Jatuhkan file';
+        divImg.classList.add('drag');
+      }else if(con == 'leave'){
+        imgText.innerText = 'Pilih atau jatuhkan file gambar tempat';
+        divImg.classList.remove('drag');
+      }
+    }
+  </script>
   <!-- Vendor JS Files -->
   <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
