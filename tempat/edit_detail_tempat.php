@@ -115,6 +115,8 @@ if ($userAuth['status'] == 'error') {
         var idTempat = "<?php echo $id ?>";
         var number = "<?php echo $userAuth['number'] ?>";
         var role = "<?php echo $userAuth['role'] ?>";
+        var tempats = <?php echo json_encode($tempat) ?>;
+        var tPath = "<?php echo $tPath ?>";
     </script>
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
@@ -214,7 +216,7 @@ if ($userAuth['status'] == 'error') {
                                     <br>
                                     <div class="col-sm-10 text-end">
                                         <a href="/tempat/detail_tempat.php" class="btn btn-info"><i>kembali</i></a>
-                                        <button class="btn btn-info" onclick="upload()"><i class="bi bi-pencil-square">edit</i></button>
+                                        <button type="button" class="btn btn-info" onclick="upload()"><i class="bi bi-pencil-square">edit</i></button>
                                         <a href="/tempat/detail_tempat.php?id_tempat=<?= $id ?>" class="btn btn-danger">Batal</a>
                                     </div>
                                 </div>
@@ -232,8 +234,9 @@ if ($userAuth['status'] == 'error') {
         ?>
     </footer>
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-            class="bi bi-arrow-up-short"></i></a>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <div id="greenPopup" style="display:none"></div>
+    <div id="redPopup" style="display:none"></div>
 
     <!-- Vendor JS Files -->
     <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -249,14 +252,19 @@ if ($userAuth['status'] == 'error') {
         var divImg = document.getElementById('divImg');
         var inpFile = document.getElementById('inpFile');
         var imgText = document.getElementById('imgText');
-        var fileImg;
+        var fileImg = '';
         divImg.addEventListener("click", function () {
             inpFile.click();
         });
         function upload() {
-            if(fileImg == null){
-                showRedPopup('Gambar harus di isi !');
-                return;
+            var inpNamaTempat = document.querySelector("input[name='nama_tempat']").value;
+            var inpAlamatTempat = document.querySelector("input[name='alamat']").value;
+            var inpDeskripsiTempat = document.querySelector("textarea[name='deskripsi']").value;
+            var inpNamaPengelola = document.querySelector("input[name='nama_pengelola']").value;
+            var inpTLP = document.querySelector("input[name='phone']").value;
+            //check data if edit or not
+            if(fileImg === null || fileImg === '' && inpNamaTempat === tempats.nama_tempat && inpAlamatTempat === tempats.alamat_tempat && inpDeskripsiTempat === tempats.deskripsi_tempat && inpNamaPengelola === tempats.pengelola && inpTLP === tempats.contact_person){
+                showRedPopup('Data belum diubah');
             }
             const formData = new FormData();
             formData.append('_method','PUT');
@@ -264,22 +272,29 @@ if ($userAuth['status'] == 'error') {
             formData.append('id_tempat',idTempat);
             formData.append('nama_tempat', document.querySelector('input[name="nama_tempat"]').value);
             formData.append('alamat', document.querySelector('input[name="alamat"]').value);
+            formData.append('deskripsi', document.querySelector('textarea[name="deskripsi"]').value);
             formData.append('nama_pengelola', document.querySelector('input[name="nama_pengelola"]').value);
             formData.append('phone', document.querySelector('input[name="phone"]').value);
-            formData.append('deskripsi', document.querySelector('textarea[name="deskripsi"]').value);
-            formData.append('foto', fileImg, fileImg.name);
+            if(fileImg !== null || fileImg !== ''){
+                formData.append('foto', fileImg, fileImg.name);
+            }
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/web/tempat.php', true);
+            xhr.open('POST', '/web/tempat/tempat.php', true);
             xhr.onload = function () {
                 if (xhr.status === 200) {
-                    console.log('Upload successful:');
-                    console.log(xhr.responseText);
+                    showGreenPopup(JSON.parse(xhr.responseText));
+                    setTimeout(() => {
+                        window.location.href = '/tempat/data_tempat.php';
+                    }, 1500);
+                    return;
                 } else {
-                    console.error('Upload failed. Status:', xhr.status);
+                    showRedPopup(JSON.parse(xhr.responseText));
+                    return;
                 }
             };
             xhr.onerror = function () {
-                console.error('Request failed');
+                showRedPopup('Request gagal');
+                return;
             };
             xhr.send(formData);
         }

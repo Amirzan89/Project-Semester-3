@@ -716,7 +716,7 @@ class SenimanMobile{
             //proses file
             $fileKtp = $_FILES['foto_ktp'];
             $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileKtp['tmp_name']);
+            $size = filesize($fileKtp['name']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= self::$sizeImg) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
@@ -735,7 +735,7 @@ class SenimanMobile{
             //proses file
             $fileFoto = $_FILES['pass_foto'];
             $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileFoto['tmp_name']);
+            $size = filesize($fileFoto['name']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= self::$sizeImg) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));

@@ -274,39 +274,46 @@ class TempatWebsite{
             if(($role != 'admin tempat' && $role != 'super admin') || $role == 'masyarakat'){
                 throw new Exception('Invalid role');
             }
-            // if ($fileFoto['error'] === UPLOAD_ERR_OK && is_uploaded_file($fileFoto['tmp_name'])) {
             //check id Tempat
-            $query = "SELECT id_tempat FROM list_tempat WHERE id_tempat = ?";
+            $query = "SELECT foto_tempat FROM list_tempat WHERE id_tempat = ?";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_tempat']);
             $stmt[1]->execute();
+            $fotoDB = '';
+            $stmt[1]->bind_result($fotoDB);
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
                 throw new Exception('Data tempat tidak ditemukan');
             }
             $stmt[1]->close();
-            //proses file
-            $fileFoto = $_FILES['foto'];
-            $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileFoto['tmp_name']);
-            if (in_array($extension,['png','jpeg','jpg'])) {
-                if ($size >= 4 * 1024 * 1024) {
-                    throw new Exception('Ukuran file maksimal 4 MB');
+            //check if user upload file
+            $updateGambar = false;
+            if(isset($_FILES['foto']) && !empty($_FILES['foto']) && !empty($_FILES['foto'])){
+                //replace file
+                $fileFoto = $_FILES['foto'];
+                $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
+                $size = filesize($fileFoto['name']);
+                unlink(self::$folderPath.$fotoDB);
+                if (in_array($extension,['png','jpeg','jpg'])) {
+                    if ($size >= 4 * 1024 * 1024) {
+                        throw new Exception('Ukuran file maksimal 4 MB');
+                    }
+                } else {
+                    throw new Exception('Format file harus png, jpeg, jpg');
                 }
-            } else {
-                throw new Exception('Format file harus png, jpeg, jpg');
-            }
-            //simpan file
-            $nameFile = '/'.$data['id_tempat'].'.'.$extension;  
-            $fileFotoPath = self::$folderPath.$nameFile;
-            if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
-                throw new Exception('Gagal menyimpan file');
+                //simpan file
+                $nameFile = '/'.$data['id_tempat'].'.'.$extension;  
+                $fileFotoPath = self::$folderPath.$nameFile;
+                if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
+                    throw new Exception('Gagal menyimpan file');
+                }
+                $updateGambar = true;
             }
             //update data
             $query = "UPDATE list_tempat SET nama_tempat = ?, alamat_tempat = ?, deskripsi_tempat = ?, pengelola = ?, contact_person = ?, foto_tempat = ? WHERE id_tempat = ?
             ";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param("ssssss", $data['nama_tempat'],$data['alamat'],$data['deskripsi'], $data['nama_pengelola'], $data['phone'], $nameFile, $data['id_tempat']);
+            $stmt[2]->bind_param("sssssss", $data['nama_tempat'],$data['alamat'],$data['deskripsi'], $data['nama_pengelola'], $data['phone'], $nameFile, $data['id_tempat']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -315,6 +322,12 @@ class TempatWebsite{
                 exit();
             } else {
                 $stmt[2]->close();
+                if($updateGambar == true){
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','message'=>'Data tempat berhasil diubah']);
+                    exit();
+                    //
+                }
                 throw new Exception('Data tempat gagal diubah');
             }
         }catch(Exception $e){

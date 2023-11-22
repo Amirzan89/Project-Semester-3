@@ -218,59 +218,6 @@ if($userAuth['status'] == 'error'){
                             </form>
                         </div>
                     </div><!-- End Default Card -->
-                    <!-- <div class="card">
-                        <div class="card-body">
-                            <div class="card-body d-flex justify-content-center align-items-center">
-                                <h5 class="card-title text-center">Data Detail Tempat</h5>
-                            </div>
-                            <form>
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Nama Tempat</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $tempat['nama_tempat']?>" readonly>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Alamat Tempat</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $tempat['alamat_tempat']?>" readonly>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Nama pengelola</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $tempat['pengelola']?>" readonly>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Nomor pengelola</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="<?php echo $tempat['contact_person']?>" readonly>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Deskripsi Kegiatan</label>
-                                    <div class="col-sm-10">
-                                        <textarea class="form-control" style="height: 100px" readonly><?php echo $tempat['deskripsi_tempat']?></textarea>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputNumber" class="col-sm-2 col-form-label">Gambar tempat</label>
-                                    <div class="col-sm-10">
-                                        <button class="btn btn-info" type="button" onclick="preview('foto')"> Lihat Foto Tempat </button>
-                                        <button class="btn btn-info" type="button" onclick="download('foto')"> Download Foto Tempat </button>
-                                    </div>
-                                </div>
-                                <div class="row mb-3 justify-content-end">
-                                    <div class="col-sm-10 text-end">
-                                        <a href="/tempat/edit_detail_tempat.php?id_tempat=<?= $id ?>" class="btn btn-info"><i class="bi bi-pencil-square">edit</i></a>
-                                        </a>
-                                        <a href="/users/proses-hapus-user.php?id_user=<?= $tempat['id_user'] ?>" onclick="return confirm('Anda yakin ingin menghapus data <?php echo $tempat['nama_lengkap']; ?>?');" class="btn btn-danger"><i class="bi bi-trash-fill">Hapus</i></a>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div> -->
                 </div>
             </div>
         </section>
