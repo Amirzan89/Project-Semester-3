@@ -31,11 +31,11 @@ class User{
                 echo "<script>window.history.back();</script>";
                 exit();
             } elseif (strlen($data['pass']) < 8) {
-                echo "<script>alert('Password minimal 8 angka !')</script>";
+                echo "<script>alert('Password minimal 8 karakter !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
-            } elseif (strlen($data['pass']) > 15) {
-                echo "<script>alert('Password maksimal 15 angka !')</script>";
+            } elseif (strlen($data['pass']) > 25) {
+                echo "<script>alert('Password maksimal 15 karakter !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
@@ -59,12 +59,12 @@ class User{
                 exit();
             }
             if (strlen($data['phone']) < 8) {
-                echo "<script>alert('Nomer telpon minimal 8 karakter !')</script>";
+                echo "<script>alert('Nomer telpon minimal 8 angka !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
             if (strlen($data['phone']) > 15) {
-                echo "<script>alert('Nomer telpon maksimal 15 karakter !')</script>";
+                echo "<script>alert('Nomer telpon maksimal 15 angka !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }

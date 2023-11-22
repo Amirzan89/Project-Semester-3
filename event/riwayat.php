@@ -151,13 +151,11 @@ if($userAuth['status'] == 'error'){
                     <th scope="col">Nama Event</th>
                     <th scope="col">Tanggal Pengajuan</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Keterangan</th>
                     <th scope="col">Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="tableEvent">
                   <?php
-                    // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'diterima' OR status = 'ditolak') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y'). " ORDER BY id_event DESC");
                     $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_event DESC");
                     $no = 1;
                     while ($event = mysqli_fetch_array($query)) {
@@ -174,7 +172,6 @@ if($userAuth['status'] == 'error'){
                           <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i>   Ditolak </span>
                         <?php } ?>
                       </td>
-                      <td><?php echo $event['catatan']?></td>
                       <td>
                         <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                       </td>

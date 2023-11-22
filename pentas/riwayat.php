@@ -151,13 +151,11 @@ if($userAuth['status'] == 'error'){
                     <th >Nama Pemohon</th>
                     <th >Tanggal Pengajuan</th>
                     <th >Status</th>
-                    <th >Keterangan</th>
                     <th >Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="tablePentas">
                   <?php
-                      // $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_selesai, status, catatan FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_advis DESC");
                       $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_selesai, status, catatan FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
                       $no = 1;
                       while ($pentas = mysqli_fetch_array($query)) {
@@ -174,7 +172,6 @@ if($userAuth['status'] == 'error'){
                           <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i>   Ditolak </span>
                         <?php } ?>
                       </td>
-                      <td><?php echo $pentas['catatan']?></td>
                       <td>
                         <a href="/pentas/detail_pentas.php?id_pentas=<?= $pentas['id_advis'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                       </td>

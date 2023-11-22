@@ -13,7 +13,7 @@ if($userAuth['status'] == 'error'){
 	header('Location: /login.php');
 }else{
 	$userAuth = $userAuth['data'];
-  if(!in_array($userAuth['role'],['super admin'])){
+  if(!in_array($userAuth['role'],['super admin','admin event','admin pentas','admin seniman','admin tempat'])){
     echo "<script>alert('Anda bukan super admin !')</script>";
     echo "<script>window.location.href = '/dashboard.php';</script>";
     exit();
