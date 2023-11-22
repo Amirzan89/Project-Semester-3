@@ -169,7 +169,7 @@ class TempatWebsite{
             //proses file
             $fileFoto = $_FILES['foto'];
             $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileFoto['name']);
+            $size = filesize($fileFoto['tmp_name']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= 4 * 1024 * 1024) {
                     throw new Exception('Ukuran gambar maksimal 4 MB');
@@ -288,12 +288,11 @@ class TempatWebsite{
             $stmt[1]->close();
             //check if user upload file
             $updateGambar = false;
-            if(isset($_FILES['foto']) && !empty($_FILES['foto']) && !empty($_FILES['foto'])){
+            if(isset($_FILES['foto']) && !empty($_FILES['foto']) && !empty($_FILES['foto']['name'])){
                 //replace file
                 $fileFoto = $_FILES['foto'];
                 $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-                $size = filesize($fileFoto['name']);
-                unlink(self::$folderPath.$fotoDB);
+                $size = filesize($fileFoto['tmp_name']);
                 if (in_array($extension,['png','jpeg','jpg'])) {
                     if ($size >= 4 * 1024 * 1024) {
                         throw new Exception('Ukuran file maksimal 4 MB');
@@ -304,6 +303,7 @@ class TempatWebsite{
                 //simpan file
                 $nameFile = '/'.$data['id_tempat'].'.'.$extension;  
                 $fileFotoPath = self::$folderPath.$nameFile;
+                unlink(self::$folderPath.$fotoDB);
                 if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
                     throw new Exception('Gagal menyimpan file');
                 }
@@ -326,7 +326,6 @@ class TempatWebsite{
                     header('Content-Type: application/json');
                     echo json_encode(['status'=>'success','message'=>'Data tempat berhasil diubah']);
                     exit();
-                    //
                 }
                 throw new Exception('Data tempat gagal diubah');
             }

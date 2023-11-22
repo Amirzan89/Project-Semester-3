@@ -1,7 +1,7 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
 class PentasMobile{
-    private static $sizeFile = 5 * 1024 * 1024;
+    private static $sizeFile = 10 * 1024 * 1024;
     private static $database;
     private static $con;
     private static $folderPath;
@@ -380,10 +380,10 @@ class PentasMobile{
             //proses file
             $fileSurat = $_FILES['surat_keterangan'];
             $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileSurat['size']);
+            $size = filesize($fileSurat['tmp_name']);
             if ($extension === 'pdf') {
                 if ($size >= self::$sizeFile) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeFile / (1024 * 1024)).'MB','code'=>500]));
                 }
             } else {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus pdf','code'=>500]));
@@ -523,24 +523,29 @@ class PentasMobile{
             }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
                 throw new Exception('Data sudah diverifikasi');
             }
-            //proses file
-            $fileSurat = $_FILES['surat_keterangan'];
-            $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileSurat['size']);
-            if ($extension === 'pdf') {
-                if ($size >= self::$sizeFile) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+            //check if user upload file
+            $updateSurat = false;
+            if(isset($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']['name'])){
+                //proses file
+                $fileSurat = $_FILES['surat_keterangan'];
+                $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
+                $size = filesize($fileSurat['tmp_name']);
+                if ($extension === 'pdf') {
+                    if ($size >= self::$sizeFile) {
+                        throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeFile / (1024 * 1024)).'MB','code'=>500]));
+                    }
+                } else {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus pdf','code'=>500]));
                 }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus pdf','code'=>500]));
-            }
-            //replace file
-            $nameFile = '/'.$data['id_advis'].'.'.$extension;
-            $fileSuratPath = self::$folderPath.$nameFile;
-            $fileSuratDB = $nameFile;
-            unlink(self::$folderPath.$suratDB);
-            if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                //replace file
+                $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get', ['col'=>'surat']);
+                $fileSuratPath = self::$folderPath.$nameFile;
+                $fileSuratDB = $nameFile;
+                if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                }
+                unlink(self::$folderPath.$suratDB);
+                $updateSurat = true;
             }
             //update data
             $query = "UPDATE surat_advis SET nama_advis = ?, alamat_advis = ?, deskripsi_advis = ?, tgl_advis = ?, tempat_advis = ?, surat_keterangan = ?, updated_at = ?, WHERE id_advis = ?";
@@ -554,6 +559,11 @@ class PentasMobile{
                 exit();
             } else {
                 $stmt[2]->close();
+                if($updateSurat == true){
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','message'=>'Data pentas berhasil diubah']);
+                    exit();
+                }
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Pentas gagal diubah','code'=>500]));
             }
         }catch(Exception $e){

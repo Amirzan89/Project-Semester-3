@@ -2,7 +2,7 @@
 require_once(__DIR__ . '/../../web/koneksi.php');
 class SenimanMobile{
     private static $sizeFile = 5 * 1024 * 1024;
-    private static $sizeImg = 5 * 1024 * 1024;
+    private static $sizeImg = 4 * 1024 * 1024;
     private static $database;
     private static $con;
     private static $folderPath;
@@ -506,7 +506,7 @@ class SenimanMobile{
             $size = filesize($fileKtp['tmp_name']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= self::$sizeImg) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeImg / (1024 * 1024)).'MB','code'=>500]));
                 }
             } else {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus jpg, png, jpeg','code'=>500]));
@@ -525,7 +525,7 @@ class SenimanMobile{
             $size = filesize($fileFoto['tmp_name']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= self::$sizeImg) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeImg / (1024 * 1024)).'MB','code'=>500]));
                 }
             } else {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus png, jpeg, jpg','code'=>500]));
@@ -545,7 +545,7 @@ class SenimanMobile{
             $size = filesize($fileSurat['tmp_name']);
             if ($extension === 'pdf') {
                 if ($size >= self::$sizeFile) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeFile / (1024 * 1024)). 'MB','code'=>500]));
                 }
             } else {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus pdf','code'=>500]));
@@ -713,66 +713,82 @@ class SenimanMobile{
             $folderKtp = '/ktp';
             $folderPassFoto = '/pass_foto';
             $folderSurat = '/surat_keterangan';
-            //proses file
-            $fileKtp = $_FILES['foto_ktp'];
-            $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileKtp['name']);
-            if (in_array($extension,['png','jpeg','jpg'])) {
-                if ($size >= self::$sizeImg) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+            //check if user upload file
+            $updateKTP = false;
+            if(isset($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']['name'])){
+                //proses file
+                $fileKtp = $_FILES['foto_ktp'];
+                $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
+                $size = filesize($fileKtp['tmp_name']);
+                if (in_array($extension,['png','jpeg','jpg'])) {
+                    if ($size >= self::$sizeImg) {
+                        throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeImg / (1024 * 1024)).'MB','code'=>500]));
+                    }
+                } else {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Format foto Ktp harus png, jpeg, jpg','code'=>500]));
                 }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format foto Ktp harus png, jpeg, jpg','code'=>500]));
-            }
-            //replace file
-            $nameFile = '/'.$data['id_seniman'].'.'.$extension;  
-            $fileKtpPath = self::$folderPath.$folderKtp.$nameFile;
-            $fileKtpDB = $nameFile;
-            unlink(self::$folderPath.$folderKtp.$ktpDB);
-            if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
-            }
-            //proses file
-            $fileFoto = $_FILES['pass_foto'];
-            $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileFoto['name']);
-            if (in_array($extension,['png','jpeg','jpg'])) {
-                if ($size >= self::$sizeImg) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                //replace file
+                $nameFile = self::manageFile(['nama_file'=>$fileKtp['name']],'get',['table'=>'seniman','col'=>'ktp']);
+                $fileKtpPath = self::$folderPath.$folderKtp.$nameFile;
+                $fileKtpDB = $nameFile;
+                if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
                 }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format pass foto harus png, jpeg, jpg','code'=>500]));
-            }
-            //replace file
-            $nameFile = '/'.$data['id_seniman'].'.'.$extension;
-            $fileFotoPath = self::$folderPath.$folderPassFoto.$nameFile;
-            $fileFotoDB = $nameFile;
-            unlink(self::$folderPath.$folderPassFoto.$fotoDB);
-            if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
-                unlink($fileKtpPath);
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                unlink(self::$folderPath.$folderKtp.$ktpDB);
+                $updateKTP = true;
             }
 
-            //proses file
-            $fileSurat = $_FILES['surat_keterangan'];
-            $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileSurat['name']);
-            if ($extension === 'pdf') {
-                if ($size >= self::$sizeFile) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+            //check if user upload file
+            $updateGambar = false;
+            if(isset($_FILES['pass_foto']) && !empty($_FILES['pass_foto']) && !empty($_FILES['pass_foto']['name'])){
+                //proses file
+                $fileFoto = $_FILES['pass_foto'];
+                $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
+                $size = filesize($fileFoto['tmp_name']);
+                if (in_array($extension,['png','jpeg','jpg'])) {
+                    if ($size >= self::$sizeImg) {
+                        throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeImg / (1024 * 1024)).'MB','code'=>500]));
+                    }
+                } else {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Format pass foto harus png, jpeg, jpg','code'=>500]));
                 }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
+                //replace file
+                $nameFile = self::manageFile(['nama_file'=>$fileFoto['name']],'get',['table'=>'seniman','col'=>'foto']);
+                $fileFotoPath = self::$folderPath.$folderPassFoto.$nameFile;
+                $fileFotoDB = $nameFile;
+                if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
+                    unlink($fileKtpPath);
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                }
+                unlink(self::$folderPath.$folderPassFoto.$fotoDB);
+                $updateGambar = true;
             }
-            //simpan file
-            $nameFile = '/'.$data['id_seniman'].'.'.$extension;
-            $fileSuratPath = self::$folderPath.$folderSurat.$nameFile;
-            $fileSuratDB = $nameFile;
-            unlink(self::$folderPath.$folderSurat.$suratDB);
-            if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
-                unlink($fileKtpPath);
-                unlink($fileFotoPath);
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+
+            //check if user upload file
+            $updateSurat = false;
+            if(isset($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']['name'])){
+                //proses file
+                $fileSurat = $_FILES['surat_keterangan'];
+                $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
+                $size = filesize($fileSurat['tmp_name']);
+                if ($extension === 'pdf') {
+                    if ($size >= self::$sizeFile) {
+                        throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeFile / (1024 * 1024)).'MB','code'=>500]));
+                    }
+                } else {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
+                }
+                //simpan file
+                $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get',['table'=>'seniman','col'=>'surat']);
+                $fileSuratPath = self::$folderPath.$folderSurat.$nameFile;
+                $fileSuratDB = $nameFile;
+                if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
+                    unlink($fileKtpPath);
+                    unlink($fileFotoPath);
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                }
+                unlink(self::$folderPath.$folderSurat.$suratDB);
+                $updateSurat = true;
             }
             $query = "UPDATE seniman SET nik = ?, nama_seniman = ?, jenis_kelamin = ?, kecamatan = ?, tempat_lahir = ?, tanggal_lahir = ?, alamat_seniman = ?, no_telpon = ?, nama_organisasi = ?, jumlah_anggota = ?, ktp_seniman = ?, pass_foto = ?, surat_keterangan = ?, updated_at = ?, id_kategori_seniman = ? WHERE id_seniman = ?";
             $stmt[1] = self::$con->prepare($query);
@@ -780,10 +796,16 @@ class SenimanMobile{
             $stmt[1]->execute();
             if ($stmt[1]->affected_rows > 0) {
                 $stmt[1]->close();
+                header('Content-Type: application/json');
                 echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil dubah']);
                 exit();
             } else {
                 $stmt[1]->close();
+                if($updateKTP == true ||$updateGambar == true ||$updateSurat == true){
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','message'=>'Data seniman berhasil diubah']);
+                    exit();
+                }
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal diubah','code'=>500]));
             }
         }catch(Exception $e){
@@ -994,7 +1016,7 @@ class SenimanMobile{
             $size = filesize($fileKtp['tmp_name']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= self::$sizeImg) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeImg / (1024 * 1024)).'MB','code'=>500]));
                 }
             } else {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Format foto ktp harus png, jpeg, jpg','code'=>500]));
@@ -1013,7 +1035,7 @@ class SenimanMobile{
             $size = filesize($fileFoto['tmp_name']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= self::$sizeImg) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeImg / (1024 * 1024)).'MB','code'=>500]));
                 }
             } else {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Format pass foto harus png, jpeg, jpg','code'=>500]));
@@ -1033,7 +1055,7 @@ class SenimanMobile{
             $size = filesize($fileSurat['tmp_name']);
             if ($extension === 'pdf') {
                 if ($size >= self::$sizeFile) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeFile / (1024 * 1024)).'MB','code'=>500]));
                 }
             } else {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
@@ -1152,67 +1174,82 @@ class SenimanMobile{
             $folderKtp = '/ktp';
             $folderPassFoto = '/pass_foto';
             $folderSurat = '/surat_keterangan';
-            //proses file
-            $fileKtp = $_FILES['foto_ktp'];
-            $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileKtp['name']);
-            if (in_array($extension,['png','jpeg','jpg'])) {
-                if ($size >= self::$sizeImg) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+            //check if user upload file
+            $updateKTP = false;
+            if(isset($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']['name'])){
+                //proses file
+                $fileKtp = $_FILES['foto_ktp'];
+                $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
+                $size = filesize($fileKtp['tmp_name']);
+                if (in_array($extension,['png','jpeg','jpg'])) {
+                    if ($size >= self::$sizeImg) {
+                        throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeImg / (1024 * 1024)).'MB','code'=>500]));
+                    }
+                } else {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Format foto ktp harus png, jpeg, jpg','code'=>500]));
                 }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format foto ktp harus png, jpeg, jpg','code'=>500]));
-            }
-            //replace file
-            $nameFile = '/'.$data['id_seniman'].'.'.$extension;  
-            $fileKtpPath = self::$perpanjanganPath.$folderKtp.$nameFile;
-            $fileKtpDB = $nameFile;
-            // unlink(self::$folderPath.$folderKtp.$ktpDB);
-            if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                //replace file
+                $nameFile = self::manageFile(['nama_file'=>$fileKtp['name']],'get',['table'=>'perpanjangan','col'=>'ktp']);
+                $fileKtpPath = self::$perpanjanganPath.$folderKtp.$nameFile;
+                $fileKtpDB = $nameFile;
+                if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                }
+                unlink(self::$folderPath.$folderKtp.$ktpDB);
+                $updateKTP = true;
             }
 
-            //proses file
-            $fileFoto = $_FILES['pass_foto'];
-            $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileFoto['name']);
-            if (in_array($extension,['png','jpeg','jpg'])) {
-                if ($size >= self::$sizeImg) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+            //check if user upload file
+            $updateGambar = false;
+            if(isset($_FILES['pass_foto']) && !empty($_FILES['pass_foto']) && !empty($_FILES['pass_foto']['name'])){
+                //proses file
+                $fileFoto = $_FILES['pass_foto'];
+                $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
+                $size = filesize($fileFoto['tmp_name']);
+                if (in_array($extension,['png','jpeg','jpg'])) {
+                    if ($size >= self::$sizeImg) {
+                        throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeImg / (1024 * 1024)).'MB','code'=>500]));
+                    }
+                } else {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Format pass foto harus png, jpeg, jpg','code'=>500]));
                 }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format pass foto harus png, jpeg, jpg','code'=>500]));
-            }
-            //replace file
-            $nameFile = '/'.$data['id_seniman'].'.'.$extension;
-            $fileFotoPath = self::$perpanjanganPath.$folderPassFoto.$nameFile;
-            $fileFotoDB = $nameFile;
-            unlink(self::$folderPath.$folderPassFoto.$fotoDB);
-            if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
-                unlink($fileKtpPath);
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                //replace file
+                $nameFile = self::manageFile(['nama_file'=>$fileFoto['name']],'get',['table'=>'perpanjangan','col'=>'foto']);
+                $fileFotoPath = self::$perpanjanganPath.$folderPassFoto.$nameFile;
+                $fileFotoDB = $nameFile;
+                if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
+                    unlink($fileKtpPath);
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                }
+                unlink(self::$folderPath.$folderPassFoto.$fotoDB);
+                $updateGambar = true;
             }
 
-            //proses file
-            $fileSurat = $_FILES['surat_keterangan'];
-            $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileSurat['name']);
-            if ($extension === 'pdf') {
-                if ($size >= self::$sizeFile) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+            //check if user upload file
+            $updateSurat = false;
+            if(isset($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']['name'])){
+                //proses file
+                $fileSurat = $_FILES['surat_keterangan'];
+                $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
+                $size = filesize($fileSurat['tmp_name']);
+                if ($extension === 'pdf') {
+                    if ($size >= self::$sizeFile) {
+                        throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeFile / (1024 * 1024)).'MB','code'=>500]));
+                    }
+                } else {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
                 }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
-            }
-            //replace file
-            $nameFile = '/'.$data['id_seniman'].'.'.$extension;
-            $fileSuratPath = self::$perpanjanganPath.$folderSurat.$nameFile;
-            $fileSuratDB = $nameFile;
-            unlink(self::$folderPath.$folderSurat.$suratDB);
-            if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
-                unlink($fileKtpPath);
-                unlink($fileFotoPath);
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                //replace file
+                $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get',['table'=>'perpanjangan','col'=>'surat']);
+                $fileSuratPath = self::$perpanjanganPath.$folderSurat.$nameFile;
+                $fileSuratDB = $nameFile;
+                if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
+                    unlink($fileKtpPath);
+                    unlink($fileFotoPath);
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                }
+                unlink(self::$folderPath.$folderSurat.$suratDB);
+                $updateSurat = true;
             }
             $query = "UPDATE perpanjangan SET nik = ?, ktp_seniman = ?, pass_foto = ?, surat_keterangan = ? WHERE id_seniman = ?";
             $stmt[1] = self::$con->prepare($query);
@@ -1220,10 +1257,15 @@ class SenimanMobile{
             $stmt[1]->execute();
             if ($stmt[1]->affected_rows > 0) {
                 $stmt[1]->close();
-                echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil dubah']);
+                echo json_encode(['status'=>'success','message'=>'Data perpanjangan seniman berhasil dubah']);
                 exit();
             } else {
                 $stmt[1]->close();
+                if($updateKTP == true ||$updateGambar == true ||$updateSurat == true){
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','message'=>'Data perpanjangan seniman berhasil diubah']);
+                    exit();
+                }
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal diubah','code'=>500]));
             }
         }catch(Exception $e){
@@ -1283,7 +1325,7 @@ function loadEnv($path = null){
             }
         }
     }
-};
+}
 loadEnv();
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
     include(__DIR__.'/../../notfound.php');
