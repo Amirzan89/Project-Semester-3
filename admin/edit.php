@@ -42,6 +42,7 @@ if($userAuth['status'] == 'error'){
   <meta content="" name="keywords">
 
   <!-- Favicons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
 
   <!-- Google Fonts -->
@@ -55,7 +56,48 @@ if($userAuth['status'] == 'error'){
 
   <!-- Template Main CSS File -->
   <link href="<?php echo $tPath; ?>/public/assets/css/style.css" rel="stylesheet">
-
+  <link href="<?php echo $tPath; ?>/public/css/popup.css" rel="stylesheet">
+  <style>
+    div.drag#divImg{
+      border:4px solid black;
+    }
+    #divImg{
+      position: relative;
+      left:0;
+      max-width: 300px;
+      width:100%;
+      max-height: 200px;
+      height: 200px;
+      cursor:pointer;
+    }
+    #divText{
+      position: relative;
+      left:50%;
+      top:50%;
+      translate: -50% -50%;
+      font-size:22px;
+      text-align: center;
+      display:flex;
+      flex-direction: column;
+    }
+    #divText i{
+      font-size:65px;
+    }
+    #inpImg {
+      display: block;
+      margin: auto;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+    }
+    @media (max-width: 480px) {
+    }
+    @media (min-width: 481px) and (max-width: 767px) {
+    }
+    @media (min-width: 768px) {
+    }
+  </style>
 </head>
 
 <body>
@@ -63,8 +105,12 @@ if($userAuth['status'] == 'error'){
 	  var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
+    var idAdminData = "<?php echo $id ?>";
     var number = "<?php echo $userAuth['number'] ?>";
     var role = "<?php echo $userAuth['role'] ?>";
+    var users = <?php echo json_encode($users) ?>;
+    var tPath = "<?php echo $tPath ?>";
+
 	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -176,11 +222,14 @@ if($userAuth['status'] == 'error'){
                 <div class="row mb-3">
                   <label for="inputPassword" class="col-sm-2 col-form-label">foto</label>
                   <div class="col-sm-10">
-                    <input type="file" class="form-control" name='foto'>
+                    <div id="divImg" ondrop="dropHandler(event)" ondragover="dragHandler(event,'over')" ondragleave="dragHandler(event,'leave')">
+                      <input class="form-control" type="file" multiple="false" id="inpFile" name="foto" style="display:none">
+                      <img src="/private/profile/admin<?php echo $users['foto'] ?>" id="inpImg" class="d-block" alt="">
+                    </div>
                   </div>
                 </div>
                 <div class="row mb-3">
-                <button type="submit" class="btn btn-success" name="editAdmin">Edit Data</button>
+                <button type="button" class="btn btn-success" name="editAdmin" onclick="upload()">Edit Data</button>
                 </div>
 
               </form><!-- End General Form Elements -->
@@ -202,15 +251,130 @@ if($userAuth['status'] == 'error'){
     </div>
   </footer>
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-        class="bi bi-arrow-up-short"></i></a>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
+    <div id="greenPopup" style="display:none"></div>
+    <div id="redPopup" style="display:none"></div>
     <!-- Vendor JS Files -->
     <script src="<?php echo $tPath; ?>/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
     <!-- Template Main JS File -->
     <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
+  <script src="<?php  echo $tPath ?>/public/js/popup.js"></script>
+  <script>
+    const maxSizeInBytes = 4 * 1024 * 1024; //max file 4MB
+    var divImg = document.getElementById('divImg');
+    var inpFile = document.getElementById('inpFile');
+    var imgText = document.getElementById('imgText');
+    var fileImg = '';
+    divImg.addEventListener("click", function(){
+      inpFile.click();
+    });
+    function upload(){
+      var inpNama = document.querySelector("input[name='nama']").value;
+      var inpTLP = document.querySelector("input[name='phone']").value;
+      var inpJenis = document.querySelector("input[name='jenisK']").value;
+      var inpTempat = document.querySelector("input[name='tempatL']").value;
+      var inpTanggal = document.querySelector("input[name='tanggalL']").value;
+      var inpRole = document.querySelector("select[name='role']").value;
+      var inpEmail = document.querySelector("input[name='email']").value;
+      var inpPass = document.querySelector("input[name='pass']").value;
+      //check data if edit or not
+      if((fileImg === null || fileImg === '') && inpNama === users.nama_lengkap && inpTLP === users.no_telpon && inpJenis === users.jenis_kelamin && inpTempat === users.tempat_lahir && inpTanggal === users.tanggal_lahir && inpRole === users.role && inpEmail === users.email){
+          showRedPopup('Data belum diubah');
+      }
+      const formData = new FormData();
+      formData.append('editAdmin','');
+      formData.append('_method','PUT');
+      formData.append('id_admin',idUser);
+      formData.append('id_user',idAdminData);
+      formData.append('nama', document.querySelector('input[name="nama"]').value);
+      formData.append('phone', document.querySelector('input[name="phone"]').value);
+      formData.append('jenisK', document.querySelector('input[name="jenisK"]:checked').value);
+      formData.append('tempatL', document.querySelector('input[name="tempatL"]').value);
+      formData.append('tanggalL', document.querySelector('input[name="tanggalL"]').value);
+      formData.append('role', document.querySelector('select[name="role"]').value);
+      formData.append('email', document.querySelector('input[name="email"]').value);
+      formData.append('pass', document.querySelector('input[name="pass"]').value);
+      if(fileImg !== null || fileImg !== ''){
+        formData.append('foto', fileImg, fileImg.name);
+      }
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/web/User.php', true);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          showGreenPopup(JSON.parse(xhr.responseText));
+          setTimeout(() => {
+                window.location.href = '/admin.php';
+            }, 1500);
+          return;
+        } else {
+          showRedPopup(JSON.parse(xhr.responseText));
+          return;
+        }
+      };
+      xhr.onerror = function () {
+        showRedPopup('Request gagal');
+        return;
+      };
+      xhr.send(formData);
+    }
+    inpFile.addEventListener('change',function(e){
+      if (e.target.files.length === 1) {
+        const file = e.target.files[0];
+        if (file.type.startsWith('image/')) {
+          if (file.size <= maxSizeInBytes) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+            document.getElementById('inpImg').src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+          fileImg = file;
+          //delete inside box
+          divImg.style.borderStyle = "none";
+          divImg.style.borderWidth = "0px";
+          divImg.style.borderColor = "transparent";
+          } else {
+            showRedPopup('Ukuran maksimal gambar 4MB !');
+          }
+        } else {
+          showRedPopup('File harus Gambar !');
+        }
+      }
+    });
+    function dropHandler(event) {
+      event.preventDefault();
+      if (event.dataTransfer.items) {
+        const file = event.dataTransfer.items[0].getAsFile();
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            document.getElementById('inpImg').src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+          fileImg = file;
+          //delete inside box
+          divImg.style.borderStyle = "none";
+          divImg.style.borderWidth = "0px";
+          divImg.style.borderColor = "transparent";
+        } else {
+          showRedPopup('File harus Gambar !');
+        }
+      }
+    }
+    function dragHandler(event, con){
+      event.preventDefault();
+      if(con == 'over'){
+        imgText.innerText = 'Jatuhkan file';
+        divImg.classList.add('drag');
+      }else if(con == 'leave'){
+        imgText.innerText = 'Pilih atau jatuhkan file gambar tempat';
+        divImg.classList.remove('drag');
+      }
+    }
+    </script>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         var currentPageURL = window.location.href;
@@ -222,7 +386,6 @@ if($userAuth['status'] == 'error'){
           }
         });
       });
-
     </script>
 </body>
 

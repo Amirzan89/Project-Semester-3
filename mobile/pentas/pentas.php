@@ -525,7 +525,7 @@ class PentasMobile{
             }
             //check if user upload file
             $updateSurat = false;
-            if(isset($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']['name'])){
+            if(isset($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']['name']) && $_FILES['surat_keterangan']['error'] !== 4){
                 //proses file
                 $fileSurat = $_FILES['surat_keterangan'];
                 $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);

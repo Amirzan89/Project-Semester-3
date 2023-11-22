@@ -152,9 +152,7 @@ if($userAuth['status'] == 'error'){
                                     <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
                                         <div class="carousel-inner" id="divImg" ondrop="dropHandler(event)" ondragover="dragHandler(event,'over')" ondragleave="dragHandler(event,'leave')">
                                             <div class="carousel-item active">
-                                                <!-- <input class="form-control" type="file" multiple="false" id="inpFile" name="foto" style="display:none"> -->
-                                                <img src="<?php echo $tPath ?>/public/img/tempat<?php echo $tempat['foto_tempat'] ?>"
-                                                    id="inpImg" class="d-block" alt="">
+                                                <img src="<?php echo $tPath ?>/public/img/tempat<?php echo $tempat['foto_tempat'] ?>" id="inpImg" class="d-block" alt="">
                                             </div>
                                         </div>
                                     </div>
@@ -228,7 +226,7 @@ if($userAuth['status'] == 'error'){
     <?php include(__DIR__.'/../footer.php');
     ?>
   </footer>
-  <script>
+    <script>
         //preview data
         function preview(desc){
             if (desc != 'foto'){

@@ -715,7 +715,7 @@ class SenimanMobile{
             $folderSurat = '/surat_keterangan';
             //check if user upload file
             $updateKTP = false;
-            if(isset($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']['name'])){
+            if(isset($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']['name']) && $_FILES['foto_ktp']['error'] !== 4){
                 //proses file
                 $fileKtp = $_FILES['foto_ktp'];
                 $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
@@ -740,7 +740,7 @@ class SenimanMobile{
 
             //check if user upload file
             $updateGambar = false;
-            if(isset($_FILES['pass_foto']) && !empty($_FILES['pass_foto']) && !empty($_FILES['pass_foto']['name'])){
+            if(isset($_FILES['pass_foto']) && !empty($_FILES['pass_foto']) && !empty($_FILES['pass_foto']['name']) && $_FILES['pass_foto']['error'] !== 4){
                 //proses file
                 $fileFoto = $_FILES['pass_foto'];
                 $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
@@ -766,7 +766,7 @@ class SenimanMobile{
 
             //check if user upload file
             $updateSurat = false;
-            if(isset($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']['name'])){
+            if(isset($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']['name']) && $_FILES['surat_keterangan']['error'] !== 4){
                 //proses file
                 $fileSurat = $_FILES['surat_keterangan'];
                 $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
@@ -1176,7 +1176,7 @@ class SenimanMobile{
             $folderSurat = '/surat_keterangan';
             //check if user upload file
             $updateKTP = false;
-            if(isset($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']['name'])){
+            if(isset($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']) && !empty($_FILES['foto_ktp']['name']) && $_FILES['foto_ktp']['error'] !== 4){
                 //proses file
                 $fileKtp = $_FILES['foto_ktp'];
                 $extension = pathinfo($fileKtp['name'], PATHINFO_EXTENSION);
@@ -1201,7 +1201,7 @@ class SenimanMobile{
 
             //check if user upload file
             $updateGambar = false;
-            if(isset($_FILES['pass_foto']) && !empty($_FILES['pass_foto']) && !empty($_FILES['pass_foto']['name'])){
+            if(isset($_FILES['pass_foto']) && !empty($_FILES['pass_foto']) && !empty($_FILES['pass_foto']['name']) && $_FILES['pass_foto']['error'] !== 4){
                 //proses file
                 $fileFoto = $_FILES['pass_foto'];
                 $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
@@ -1227,7 +1227,7 @@ class SenimanMobile{
 
             //check if user upload file
             $updateSurat = false;
-            if(isset($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']['name'])){
+            if(isset($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']['name']) && $_FILES['surat_keterangan']['error'] !== 4){
                 //proses file
                 $fileSurat = $_FILES['surat_keterangan'];
                 $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);

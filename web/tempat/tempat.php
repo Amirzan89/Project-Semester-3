@@ -288,7 +288,7 @@ class TempatWebsite{
             $stmt[1]->close();
             //check if user upload file
             $updateGambar = false;
-            if(isset($_FILES['foto']) && !empty($_FILES['foto']) && !empty($_FILES['foto']['name'])){
+            if(isset($_FILES['foto']) && !empty($_FILES['foto']) && !empty($_FILES['foto']['name']) && $_FILES['foto']['error'] !== 4){
                 //replace file
                 $fileFoto = $_FILES['foto'];
                 $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);

@@ -212,7 +212,7 @@ if($userAuth['status'] == 'error'){
     var divImg = document.getElementById('divImg');
     var inpFile = document.getElementById('inpFile');
     var imgText = document.getElementById('imgText');
-    var fileImg;
+    var fileImg = '';
     divImg.addEventListener("click", function(){
       inpFile.click();
     });
@@ -237,7 +237,7 @@ if($userAuth['status'] == 'error'){
           showGreenPopup(JSON.parse(xhr.responseText));
           setTimeout(() => {
                 window.location.href = '/tempat/data_tempat.php';
-            }, 3000);
+            }, 1500);
           return;
         } else {
           showRedPopup(JSON.parse(xhr.responseText));

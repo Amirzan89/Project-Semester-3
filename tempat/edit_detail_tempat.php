@@ -162,14 +162,10 @@ if ($userAuth['status'] == 'error') {
                                 <input type="hidden" name="id_tempat" value="<?php echo $id; ?>">
                                 <div class="col-md-6">
                                     <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
-                                        <div class="carousel-inner" id="divImg" ondrop="dropHandler(event)"
-                                            ondragover="dragHandler(event,'over')"
-                                            ondragleave="dragHandler(event,'leave')">
+                                        <div class="carousel-inner" id="divImg" ondrop="dropHandler(event)" ondragover="dragHandler(event,'over')" ondragleave="dragHandler(event,'leave')">
                                             <div class="carousel-item active">
-                                                <input class="form-control" type="file" multiple="false" id="inpFile"
-                                                    name="foto" style="display:none">
-                                                <img src="<?php echo $tPath ?>/public/img/tempat<?php echo $tempat['foto_tempat'] ?>"
-                                                    id="inpImg" class="d-block" alt="">
+                                                <input class="form-control" type="file" multiple="false" id="inpFile" name="foto" style="display:none">
+                                                <img src="<?php echo $tPath ?>/public/img/tempat<?php echo $tempat['foto_tempat'] ?>" id="inpImg" class="d-block" alt="">
                                             </div>
                                         </div>
                                     </div>
@@ -263,7 +259,7 @@ if ($userAuth['status'] == 'error') {
             var inpNamaPengelola = document.querySelector("input[name='nama_pengelola']").value;
             var inpTLP = document.querySelector("input[name='phone']").value;
             //check data if edit or not
-            if(fileImg === null || fileImg === '' && inpNamaTempat === tempats.nama_tempat && inpAlamatTempat === tempats.alamat_tempat && inpDeskripsiTempat === tempats.deskripsi_tempat && inpNamaPengelola === tempats.pengelola && inpTLP === tempats.contact_person){
+            if((fileImg === null || fileImg === '') && inpNamaTempat === tempats.nama_tempat && inpAlamatTempat === tempats.alamat_tempat && inpDeskripsiTempat === tempats.deskripsi_tempat && inpNamaPengelola === tempats.pengelola && inpTLP === tempats.contact_person){
                 showRedPopup('Data belum diubah');
             }
             const formData = new FormData();
