@@ -7,7 +7,7 @@ function showGreenPopup(data, div = null){
             <div class="bg" onclick="closePopup('green',true)"></div>
             <div class="kotak">
                 <div class="bunder1"></div>
-                <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+                <div class="icon"><img src="${window.location.origin + tPath}/public/assets/img/check.png" alt=""></div>
             </div>
             <span class="closePopup" onclick="closePopup('green',true)">X</span>
             <label>${data.message}</label>
@@ -22,7 +22,7 @@ function showGreenPopup(data, div = null){
                 <div class="bg" onclick="closePopup('green',true)"></div>
                 <div class="kotak">
                     <div class="bunder1"></div>
-                    <div class="icon"><img src="${window.location.origin + tPath}/assets/img/check.png" alt=""></div>
+                    <div class="icon"><img src="${window.location.origin + tPath}/public/assets/img/check.png" alt=""></div>
                 </div>
                 <span class="closePopup" onclick="closePopup('green',true)">X</span>
                 <label>${data.message}</label>

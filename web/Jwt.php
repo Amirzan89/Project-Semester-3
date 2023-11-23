@@ -1,6 +1,6 @@
 <?php
 require_once(__DIR__."/koneksi.php");
-class Jwt{ 
+class Jwt{
     private static $database;
     private static $con;
     public function __construct(){
@@ -112,21 +112,20 @@ class Jwt{
                 $exp = (time()+intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']));
                 $data['exp'] = $exp;
                 $token = self::generate_jwt($headers, $data, $key);
-                // echo 'token '.$token;
                 return ['status'=>'success','data'=>$token];
             }
         }catch(UnexpectedValueException $e){
             return ['status'=>'error','message'=>$e->getMessage()];
         }
     }
-    private static function checkTotalLoginWebsite($data,$con){
+    private static function checkTotalLoginWebsite($data){
         try{
             $email = $data['email'];
             if(empty($email) || is_null($email)){
                 return ['status'=>'error','message'=>'email empty'];
             }else{
                 $query = "SELECT COUNT(*) AS total FROM refresh_token WHERE BINARY email = ? AND device = 'website'";
-                $stmt = $con->prepare($query);
+                $stmt = self::$con->prepare($query);
                 $stmt->bind_param('s', $email);
                 $stmt->execute();
                 $result = '';
@@ -206,7 +205,7 @@ class Jwt{
             return ['status'=>'error','message'=>$e->getMessage()];
         }
     }
-    public static function createToken($data,$con, $loadEnv = null){
+    public function createToken($data, $loadEnv = null){
         try{
             $emailInput = $data['email'];
             if(empty($emailInput) || is_null($emailInput)){
@@ -216,7 +215,7 @@ class Jwt{
                 $userColumns = ['id_user','nama_lengkap','no_telpon','jenis_kelamin','tanggal_lahir','tempat_lahir','email','role', 'foto'];
                 $columns = implode(',', $userColumns);
                 $query = "SELECT $columns FROM users WHERE BINARY email = ? LIMIT 1";
-                $stmt[0] = $con->prepare($query);
+                $stmt[0] = self::$con->prepare($query);
                 $stmt[0]->bind_param('s', $emailInput);
                 $stmt[0]->execute();
                 $bindResultArray = [];
@@ -237,7 +236,7 @@ class Jwt{
                     $now1 = new DateTime('now', new DateTimeZone('Asia/Jakarta'));
                     $now1 = $now1->format('Y-m-d H:i:s');
                     //check total login on website
-                    $number = self::checkTotalLoginWebsite(['email'=>$emailInput],$con);
+                    $number = self::checkTotalLoginWebsite(['email'=>$emailInput]);
                     $device = 'website';
                     if($number['status'] == 'error'){
                         return $number;
@@ -253,7 +252,7 @@ class Jwt{
                         $Rexp = time()+$Rexp;
                         //get id_user
                         $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
-                        $stmt[0] = $con->prepare($query);
+                        $stmt[0] = self::$con->prepare($query);
                         $stmt[0]->bind_param('s', $data['email']);
                         $stmt[0]->execute();
                         $idUser = '';
@@ -262,17 +261,17 @@ class Jwt{
                         $stmt[0]->close();
                         if($number['data'] >= 3){
                             $query = "DELETE FROM refresh_token WHERE BINARY email = ? AND device = 'website' AND number = 1";
-                            $stmt[1] = $con->prepare($query);
+                            $stmt[1] = self::$con->prepare($query);
                             $stmt[1]->bind_param('s', $emailInput);
                             if ($stmt[1]->execute()) {
                                 $stmt[1]->close();
                                 $query = "UPDATE refresh_token SET number = number - 1 WHERE BINARY email = ? AND device = 'website' AND number BETWEEN 1 AND 3";
-                                $stmt[2] = $con->prepare($query);
+                                $stmt[2] = self::$con->prepare($query);
                                 $stmt[2]->bind_param('s', $emailInput);
                                 $stmt[2]->execute();
                                 $stmt[2]->close();
                                 $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at,id_user) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                                $stmt[3] = $con->prepare($query);
+                                $stmt[3] = self::$con->prepare($query);
                                 $number['data'] = 3;
                                 $resultDb['number'] = 3;
                                 $resultDb['exp'] = $exp;
@@ -300,7 +299,7 @@ class Jwt{
                             }
                         //if user has not login 
                         }else{
-                            $number = self::checkTotalLoginWebsite(['email'=>$emailInput],$con);
+                            $number = self::checkTotalLoginWebsite(['email'=>$emailInput]);
                             if($number['status'] == 'error'){
                                 $number['data'] = 1;
                                 $resultDb['number'] = 1;
@@ -333,7 +332,7 @@ class Jwt{
                                 ];
                             }
                             $query = "INSERT INTO refresh_token (email,token, device, number, created_at, updated_at,id_user) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                            $stmt[1] = $con->prepare($query);
+                            $stmt[1] = self::$con->prepare($query);
                             $stmt[1]->bind_param("sssisss", $emailInput, $Rtoken, $device, $number['data'], $now1, $now1,$idUser);
                             $stmt[1]->execute();
                             if ($stmt[1]->affected_rows > 0) {

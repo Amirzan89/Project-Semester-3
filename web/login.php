@@ -56,7 +56,8 @@ if(isset($_POST['login'])){
                     exit();
                 }
                 $stmt[0]->close();
-                $result = Jwt::createToken($_POST,$con,$loadEnv);
+                $jwt = new Jwt();
+                $result = $jwt->createToken($_POST,$loadEnv);
                 if(is_null($result)){
                     echo "<script>alert('Create token error')</script>";
                     echo "<script>window.history.back();</script>";

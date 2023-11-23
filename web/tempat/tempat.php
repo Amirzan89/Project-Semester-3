@@ -303,9 +303,11 @@ class TempatWebsite{
                 //simpan file
                 $nameFile = '/'.$data['id_tempat'].'.'.$extension;  
                 $fileFotoPath = self::$folderPath.$nameFile;
-                unlink(self::$folderPath.$fotoDB);
                 if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
                     throw new Exception('Gagal menyimpan file');
+                }
+                if($extension != pathinfo($fotoDB, PATHINFO_EXTENSION)){
+                    unlink(self::$folderPath.$fotoDB);
                 }
                 $updateGambar = true;
             }

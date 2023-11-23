@@ -252,8 +252,16 @@ class User{
                 throw new Exception('Pengguna tidak ditemukan !');
             }
             $stmt[0]->close();
-            if($role != 'super admin'){
-                throw new Exception('Anda bukan super admin !');
+            if(isset($data['desc'])){
+                if($data['desc'] !== 'profile'){
+                    if($role != 'super admin' || isset($data['desc'])){
+                        throw new Exception('Anda bukan super admin !');
+                    }
+                }
+            }else{
+                if($role != 'super admin'){
+                    throw new Exception('Anda bukan super admin !');
+                }
             }
             //check data user
             $query = "SELECT foto FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -298,8 +306,15 @@ class User{
                 if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
                     throw new Exception('Gagal menyimpan file !');
                 }
-                unlink(self::$folderPath.$folderAdmin.$fotoDB);
+                //check extension
+                if($extension != pathinfo($fotoDB, PATHINFO_EXTENSION)){
+                    unlink(self::$folderPath.$folderAdmin.$fotoDB);
+                }
                 $updateGambar = true;
+            }
+            if(!isset($jwt) || empty($jwt) || is_null($jwt)){
+                require_once(__DIR__.'/Jwt.php');
+                $jwt = new Jwt();
             }
             //jika admin mengubah password
             if(isset($data['pass']) && !empty($data['pass'])){
@@ -310,6 +325,24 @@ class User{
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
                     $stmt->close();
+                    if(isset($data['desc']) && $data['desc'] == 'profile'){
+                        //update cookie
+                        $result = $jwt->createToken(['email'=>$data['email']]);
+                        if(is_null($result)){
+                            throw new Exception('Update token error');
+                        }else{
+                            if($result['status'] == 'error'){
+                                throw new Exception($result);
+                            }else{
+                                //delete old cookie
+                                setcookie('token2', '', time() - 3600, '/');
+                                setcookie('token3', '', time() - 3600, '/');
+                                //create new cookie
+                                setcookie('token2', $result['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
+                                setcookie('token3', $result['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
+                            }
+                        }
+                    }
                     header('Content-Type: application/json');
                     echo json_encode(['status'=>'success','message'=>'Akun admin berhasil diubah']);
                     exit();
@@ -329,6 +362,24 @@ class User{
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
                     $stmt->close();
+                    if(isset($data['desc']) && $data['desc'] == 'profile'){
+                        //update cookie
+                        $result = $jwt->createToken(['email'=>$data['email']]);
+                        if(is_null($result)){
+                            throw new Exception('Update token error');
+                        }else{
+                            if($result['status'] == 'error'){
+                                throw new Exception($result);
+                            }else{
+                                //delete old cookie
+                                setcookie('token2', '', time() - 3600, '/');
+                                setcookie('token3', '', time() - 3600, '/');
+                                //create new cookie
+                                setcookie('token2', $result['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
+                                setcookie('token3', $result['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
+                            }
+                        }
+                    }
                     header('Content-Type: application/json');
                     echo json_encode(['status'=>'success','message'=>'Akun admin berhasil diubah']);
                     exit();

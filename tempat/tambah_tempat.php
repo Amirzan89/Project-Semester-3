@@ -213,15 +213,20 @@ if($userAuth['status'] == 'error'){
     var inpFile = document.getElementById('inpFile');
     var imgText = document.getElementById('imgText');
     var fileImg = '';
+    var uploadStat = false;
     divImg.addEventListener("click", function(){
       inpFile.click();
     });
     function upload(){
+      if(uploadStat){
+        return;
+      }
       //check file 
       if(fileImg == null){
         showRedPopup('Gambar harus di isi !');
         return;
       }
+      uploadStat = true;
       const formData = new FormData();
       formData.append('id_user',idUser);
       formData.append('nama_tempat', document.querySelector('input[name="nama_tempat"]').value);
@@ -237,7 +242,7 @@ if($userAuth['status'] == 'error'){
           showGreenPopup(JSON.parse(xhr.responseText));
           setTimeout(() => {
                 window.location.href = '/tempat/data_tempat.php';
-            }, 1500);
+            }, 1000);
           return;
         } else {
           showRedPopup(JSON.parse(xhr.responseText));

@@ -269,10 +269,14 @@ if($userAuth['status'] == 'error'){
     var inpFile = document.getElementById('inpFile');
     var imgText = document.getElementById('imgText');
     var fileImg = '';
+    var uplaodStat = false;
     divImg.addEventListener("click", function(){
       inpFile.click();
     });
     function upload(){
+      if(uplaodStat){
+        return;
+      }
       var inpNama = document.querySelector("input[name='nama']").value;
       var inpTLP = document.querySelector("input[name='phone']").value;
       var inpJenis = document.querySelector("input[name='jenisK']").value;
@@ -285,6 +289,7 @@ if($userAuth['status'] == 'error'){
       if((fileImg === null || fileImg === '') && inpNama === users.nama_lengkap && inpTLP === users.no_telpon && inpJenis === users.jenis_kelamin && inpTempat === users.tempat_lahir && inpTanggal === users.tanggal_lahir && inpRole === users.role && inpEmail === users.email){
           showRedPopup('Data belum diubah');
       }
+      uplaodStat = true;
       const formData = new FormData();
       formData.append('editAdmin','');
       formData.append('_method','PUT');
@@ -308,7 +313,7 @@ if($userAuth['status'] == 'error'){
           showGreenPopup(JSON.parse(xhr.responseText));
           setTimeout(() => {
                 window.location.href = '/admin.php';
-            }, 1500);
+            }, 1000);
           return;
         } else {
           showRedPopup(JSON.parse(xhr.responseText));

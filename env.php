@@ -1,6 +1,6 @@
 <?php 
 function loadEnv(){
-    if(!$_SERVER['LOAD_ENV']){
+    if(!isset($_SERVER['LOAD_ENV'])){
         $path = ".env";
         if (file_exists($path)) {
             $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

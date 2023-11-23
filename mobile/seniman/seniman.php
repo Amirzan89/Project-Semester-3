@@ -734,7 +734,9 @@ class SenimanMobile{
                 if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
                 }
-                unlink(self::$folderPath.$folderKtp.$ktpDB);
+                if($extension != pathinfo($ktpDB, PATHINFO_EXTENSION)){
+                    unlink(self::$folderPath.$folderKtp.$ktpDB);
+                }
                 $updateKTP = true;
             }
 
@@ -760,7 +762,9 @@ class SenimanMobile{
                     unlink($fileKtpPath);
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
                 }
-                unlink(self::$folderPath.$folderPassFoto.$fotoDB);
+                if($extension != pathinfo($fotoDB, PATHINFO_EXTENSION)){
+                    unlink(self::$folderPath.$folderPassFoto.$fotoDB);
+                }
                 $updateGambar = true;
             }
 
@@ -1195,7 +1199,9 @@ class SenimanMobile{
                 if (!move_uploaded_file($fileKtp['tmp_name'], $fileKtpPath)) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
                 }
-                unlink(self::$folderPath.$folderKtp.$ktpDB);
+                if($extension != pathinfo($ktpDB, PATHINFO_EXTENSION)){
+                    unlink(self::$folderPath.$folderKtp.$ktpDB);
+                }
                 $updateKTP = true;
             }
 
@@ -1221,7 +1227,9 @@ class SenimanMobile{
                     unlink($fileKtpPath);
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
                 }
-                unlink(self::$folderPath.$folderPassFoto.$fotoDB);
+                if($extension != pathinfo($fotoDB, PATHINFO_EXTENSION)){
+                    unlink(self::$folderPath.$folderPassFoto.$fotoDB);
+                }
                 $updateGambar = true;
             }
 

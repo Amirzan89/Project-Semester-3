@@ -249,10 +249,14 @@ if ($userAuth['status'] == 'error') {
         var inpFile = document.getElementById('inpFile');
         var imgText = document.getElementById('imgText');
         var fileImg = '';
+        var uploadStat = false;
         divImg.addEventListener("click", function () {
             inpFile.click();
         });
         function upload() {
+            if(uploadStat){
+                return;
+            }
             var inpNamaTempat = document.querySelector("input[name='nama_tempat']").value;
             var inpAlamatTempat = document.querySelector("input[name='alamat']").value;
             var inpDeskripsiTempat = document.querySelector("textarea[name='deskripsi']").value;
@@ -262,6 +266,7 @@ if ($userAuth['status'] == 'error') {
             if((fileImg === null || fileImg === '') && inpNamaTempat === tempats.nama_tempat && inpAlamatTempat === tempats.alamat_tempat && inpDeskripsiTempat === tempats.deskripsi_tempat && inpNamaPengelola === tempats.pengelola && inpTLP === tempats.contact_person){
                 showRedPopup('Data belum diubah');
             }
+            uploadStat = true;
             const formData = new FormData();
             formData.append('_method','PUT');
             formData.append('id_user',idUser);
@@ -281,7 +286,7 @@ if ($userAuth['status'] == 'error') {
                     showGreenPopup(JSON.parse(xhr.responseText));
                     setTimeout(() => {
                         window.location.href = '/tempat/data_tempat.php';
-                    }, 1500);
+                    }, 1000);
                     return;
                 } else {
                     showRedPopup(JSON.parse(xhr.responseText));

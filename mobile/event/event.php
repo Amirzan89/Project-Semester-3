@@ -451,7 +451,7 @@ class EventMobile{
             }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
                 throw new Exception('Data sudah diverifikasi');
             }
-            //if upload file then update file
+            //if upload file then replace file
             if (isset($data['poster_event']) & !empty($data['poster_event'])) {
                 $base64Image = $data['poster_event'];
                 $base64Image = str_replace('data:image/jpeg;base64,', '', $base64Image);
@@ -459,8 +459,9 @@ class EventMobile{
                 if ($imageData === false) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'Error decoding image','code'=>500]));
                 }
+                //replace file
                 $filePath = self::$folderPath.$path;
-                //save file
+                unlink($filePath);
                 if (!file_put_contents($filePath, $imageData)) {
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'Failed to save image','code'=>500]));
                 }
