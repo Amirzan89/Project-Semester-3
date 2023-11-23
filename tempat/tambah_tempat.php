@@ -245,11 +245,13 @@ if($userAuth['status'] == 'error'){
             }, 1000);
           return;
         } else {
+          uploadStat = false;
           showRedPopup(JSON.parse(xhr.responseText));
           return;
         }
       };
       xhr.onerror = function () {
+        uploadStat = false;
         showRedPopup('Request gagal');
         return;
       };

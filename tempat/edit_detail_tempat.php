@@ -276,7 +276,7 @@ if ($userAuth['status'] == 'error') {
             formData.append('deskripsi', document.querySelector('textarea[name="deskripsi"]').value);
             formData.append('nama_pengelola', document.querySelector('input[name="nama_pengelola"]').value);
             formData.append('phone', document.querySelector('input[name="phone"]').value);
-            if(fileImg !== null || fileImg !== ''){
+            if(fileImg !== null && fileImg !== ''){
                 formData.append('foto', fileImg, fileImg.name);
             }
             const xhr = new XMLHttpRequest();
@@ -289,11 +289,13 @@ if ($userAuth['status'] == 'error') {
                     }, 1000);
                     return;
                 } else {
+                    uploadStat = false;
                     showRedPopup(JSON.parse(xhr.responseText));
                     return;
                 }
             };
             xhr.onerror = function () {
+                uploadStat = false;
                 showRedPopup('Request gagal');
                 return;
             };

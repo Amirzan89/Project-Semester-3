@@ -279,7 +279,7 @@ if($userAuth['status'] == 'error'){
         showRedPopup('Gambar harus di isi !');
         return;
       }
-      var uploadStat = false;
+      var uploadStat = true;
       const formData = new FormData();
       formData.append('tambahAdmin','');
       formData.append('id_user',idUser);
@@ -302,11 +302,13 @@ if($userAuth['status'] == 'error'){
             }, 1000);
           return;
         } else {
+          uploadStat = false;
           showRedPopup(JSON.parse(xhr.responseText));
           return;
         }
       };
       xhr.onerror = function () {
+        uploadStat = false;
         showRedPopup('Request gagal');
         return;
       };

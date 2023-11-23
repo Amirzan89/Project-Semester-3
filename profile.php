@@ -460,7 +460,7 @@ if ($userAuth['status'] == 'error') {
         formData.append('role', document.querySelector('select[name="role"]').value);
       <?php } ?>
       formData.append('email', document.querySelector('input[name="email"]').value);
-      if(fileImg !== null || fileImg !== ''){
+      if(fileImg !== null && fileImg !== ''){
         formData.append('foto', fileImg, fileImg.name);
       }
       const xhr = new XMLHttpRequest();
@@ -473,11 +473,13 @@ if ($userAuth['status'] == 'error') {
             }, 1000);
           return;
         } else {
+          uploadStat = false;
           showRedPopup(JSON.parse(xhr.responseText));
           return;
         }
       };
       xhr.onerror = function () {
+        uploadStat = false;
         showRedPopup('Request gagal');
         return;
       };
