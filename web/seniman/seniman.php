@@ -603,16 +603,26 @@ class SenimanWebsite{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if($data['keterangan'] ==  'ditolak' && $statusDB == 'diterima'){
+            if($data['keterangan'] ==  'ditolak' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if($data['keterangan'] ==  'diterima' && $statusDB == 'ditolak'){
+            if($data['keterangan'] ==  'diterima' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
+            // if($data['keterangan'] ==  'ditolak' && $statusDB == 'diterima'){
+            //     echo "<script>alert('Data sudah diverifikasi')</script>";
+            //     echo "<script>window.history.back();</script>";
+            //     exit();
+            // }
+            // if($data['keterangan'] ==  'diterima' && $statusDB == 'ditolak'){
+            //     echo "<script>alert('Data sudah diverifikasi')</script>";
+            //     echo "<script>window.history.back();</script>";
+            //     exit();
+            // }
             //update data
             if($data['keterangan'] == 'proses'){
                 if(isset($data['catatan']) || !empty($data['catatan'])){
@@ -620,19 +630,22 @@ class SenimanWebsite{
                 }
                 $redirect = '/pengajuan.php';
                 $status = 'proses';
-                $query = "UPDATE seniman SET status = ? WHERE id_seniman = ?";
+                $query = "UPDATE seniman SET kode_verifikasi = ?, status = ? WHERE id_seniman = ?";
                 $stmt[2] = self::$con->prepare($query);
-                $stmt[2]->bind_param("si", $status, $data['id_seniman']);
+                $code = '';
+                $stmt[2]->bind_param("ssi", $code, $status, $data['id_seniman']);
             }else if($data['keterangan'] == 'diterima'){
                 if(isset($data['catatan']) || !empty($data['catatan'])){
                     $data['catatan'] = '';
                 }
                 $redirect = '/pengajuan.php';
                 $status = 'diterima';
-                $query = "UPDATE seniman SET nomor_induk = ?, status = ? WHERE id_seniman = ?";
+                $query = "UPDATE seniman SET nomor_induk = ?, kode_verifikasi = ?, status = ?, catatan = ? WHERE id_seniman = ?";
                 $nomorInduk = $this->generateNIS(['id_kategori'=>$idKategori],'diterima');
                 $stmt[2] = self::$con->prepare($query);
-                $stmt[2]->bind_param("ssi", $nomorInduk['nis'], $status, $data['id_seniman']);
+                $code = mt_rand(0,9999999999);
+                $catatan = '';
+                $stmt[2]->bind_param("ssssi", $nomorInduk['nis'], $code, $status, $catatan, $data['id_seniman']);
             }else if($data['keterangan'] == 'ditolak'){
                 if(!isset($data['catatan']) || empty($data['catatan'])){
                     echo "<script>alert('Catatan harus di isi !')</script>";
@@ -641,9 +654,10 @@ class SenimanWebsite{
                 }
                 $redirect = '/pengajuan.php';
                 $status = 'ditolak';
-                $query = "UPDATE seniman SET status = ?, catatan = ? WHERE id_seniman = ?";
+                $query = "UPDATE seniman SET kode_verifikasi = ?, status = ?, catatan = ? WHERE id_seniman = ?";
                 $stmt[2] = self::$con->prepare($query);
-                $stmt[2]->bind_param("ssi", $status, $data['catatan'], $data['id_seniman']);
+                $code = '';
+                $stmt[2]->bind_param("ssi", $code, $status, $data['catatan'], $data['id_seniman']);
             }
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
@@ -746,7 +760,7 @@ class SenimanWebsite{
             $stmt[1]->close();
             //check status seniman
             if($statusDB == 'diajukan'){
-                echo "<script>alert('Data Seniman sedan diajukan')</script>";
+                echo "<script>alert('Data Seniman sedang diajukan')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -784,16 +798,26 @@ class SenimanWebsite{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if($data['keterangan'] ==  'ditolak' && $statusPDB == 'diterima'){
+            if($data['keterangan'] ==  'ditolak' && ($statusPDB == 'diterima' || $statusPDB == 'ditolak')){
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if($data['keterangan'] ==  'diterima' && $statusPDB == 'ditolak'){
+            if($data['keterangan'] ==  'diterima' && ($statusPDB == 'diterima' || $statusPDB == 'ditolak')){
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
+            // if($data['keterangan'] ==  'ditolak' && $statusPDB == 'diterima'){
+            //     echo "<script>alert('Data sudah diverifikasi')</script>";
+            //     echo "<script>window.history.back();</script>";
+            //     exit();
+            // }
+            // if($data['keterangan'] ==  'diterima' && $statusPDB == 'ditolak'){
+            //     echo "<script>alert('Data sudah diverifikasi')</script>";
+            //     echo "<script>window.history.back();</script>";
+            //     exit();
+            // }
             //update data
             $redirect = '/perpanjangan.php';
             if($data['keterangan'] == 'proses'){
@@ -801,9 +825,10 @@ class SenimanWebsite{
                     $data['catatan'] = '';
                 }
                 $status = 'proses';
-                $query = "UPDATE perpanjangan SET status = ? WHERE id_seniman = ?";
+                $query = "UPDATE perpanjangan SET kode_verifikasi = ?, status = ?, catatan = ? WHERE id_seniman = ?";
                 $stmt[2] = self::$con->prepare($query);
-                $stmt[2]->bind_param("si", $status, $data['id_seniman']);
+                $code = '';
+                $stmt[2]->bind_param("sssi", $code, $status, $data['catatan'], $data['id_seniman']);
             }else if($data['keterangan'] == 'ditolak'){
                 if(!isset($data['catatan']) || empty($data['catatan'])){
                     echo "<script>alert('Catatan harus di isi !')</script>";
@@ -811,9 +836,10 @@ class SenimanWebsite{
                     exit();
                 }
                 $status = 'ditolak';
-                $query = "UPDATE perpanjangan SET status = ?, catatan = ? WHERE id_seniman = ?";
+                $query = "UPDATE perpanjangan SET kode_verifikasi = ?, status = ?, catatan = ? WHERE id_seniman = ?";
                 $stmt[2] = self::$con->prepare($query);
-                $stmt[2]->bind_param("ssi", $status, $data['catatan'], $data['id_seniman']);
+                $code = '';
+                $stmt[2]->bind_param("sssi", $code, $status, $data['catatan'], $data['id_seniman']);
             }else{
                 $stmt[2]->execute();
                 if ($stmt[2]->affected_rows > 0) {
@@ -857,10 +883,11 @@ class SenimanWebsite{
                 }
                 $stmt[3]->close();
                 //update nis 
-                $query = "UPDATE seniman SET nomor_induk = ? WHERE id_seniman = ?";
+                $query = "UPDATE seniman SET nomor_induk = ?, kode_verifikasi = ? WHERE id_seniman = ?";
                 $nomorInduk = $this->generateNIS(['kategori'=>$idKategori],'perpanjangan');
                 $stmt[4] = self::$con->prepare($query);
-                $stmt[4]->bind_param("ssi", $nomorInduk['nis'], $status, $data['id_seniman']);
+                $code = substr(uniqid(), 0 ,10);
+                $stmt[4]->bind_param("ssi", $nomorInduk['nis'], $code, $data['id_seniman']);
                 $stmt[4]->execute();
                 if (!$stmt[4]->affected_rows > 0) {
                     $stmt[4]->close();

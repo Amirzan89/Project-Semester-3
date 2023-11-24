@@ -81,7 +81,7 @@ if($userAuth['status'] == 'error'){
 
     <ul class="sidebar-nav" id="sidebar-nav">
         <?php
-        $nav = 'seniman';
+        $nav = 'pentas';
         include(__DIR__.'/../sidebar.php');
         ?>
     </ul>
@@ -159,13 +159,6 @@ if($userAuth['status'] == 'error'){
                   <div class="col-sm-10">
                     <input type="text" class="form-control" name="tempatL" readonly value="<?php echo $pentas['tempat_advis'] ?>">
                   </div>
-                </div>
-                <div class="row mb-3">
-                    <label for="inputNumber" class="col-sm-2 col-form-label">Surat Keterangan</label>
-                    <div class="col-sm-10">
-                    <button class="btn btn-info" type="button" onclick="preview('surat')"> Lihat surat keterangan </button>
-                    <button class="btn btn-info" type="button" onclick="download('surat')"> Download surat keterangan </button>
-                    </div>
                 </div>
                 <div class="row mb-3 justify-content-end">
                   <div class="col-sm-10 text-end">

@@ -288,12 +288,6 @@ class PentasMobile{
             if (!isset($data['tempat_advis']) || empty($data['tempat_advis'])) {
                 throw new Exception(' Tempat pentas harus di isi !');
             }
-            if (!isset($_FILES['surat_keterangan']) || empty($_FILES['surat_keterangan'])) {
-                throw new Exception('Surat keterangan harus di isi');
-            }
-            if ($_FILES['surat_keterangan']['error'] !== UPLOAD_ERR_OK) {
-                throw new Exception('gagal upload pdf file');
-            }
             date_default_timezone_set('Asia/Jakarta');
             $tanggal_awal = strtotime($data['tanggal_awal']);
             $tanggal_akhir = strtotime($data['tanggal_akhir']);

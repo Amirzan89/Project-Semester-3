@@ -219,103 +219,103 @@ class Download{
             exit();
         }
     }
-    public function downloadPentas($data){
-        try{
-            if(!isset($data['email']) || empty($data['email'])){
-                echo "<script>alert('Email harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            if(!isset($data['id_pentas']) || empty($data['id_pentas'])){
-                echo "<script>alert('ID Pentas harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            if(!isset($data['deskripsi']) || empty($data['deskripsi'])){
-                echo "<script>alert('Deskripsi harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            //check email
-            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
-            $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['email']);
-            $stmt[0]->execute();
-            $role = '';
-            $stmt[0]->bind_result($role);
-            if (!$stmt[0]->fetch()) {
-                $stmt[0]->close();
-                echo "<script>alert('User tidak ditemukan !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            $stmt[0]->close();
-            if($role == 'masyarakat'){
-                echo "<script>alert('Anda bukan admin !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            //check id_pentas
-            if($data['deskripsi'] == 'surat'){
-                $query = "SELECT surat_keterangan FROM surat_advis WHERE id_advis = ? LIMIT 1";
-                $file = self::$folderPentas;
-            }else{
-                echo "<script>alert('Deskripsi invalid !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_pentas']);
-            $stmt[0]->execute();
-            $path = '';
-            $stmt[0]->bind_result($path);
-            if (!$stmt[0]->fetch()) {
-                $stmt[0]->close();
-                echo "<script>alert('Data Pentas tidak ditemukan !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }
-            $stmt[0]->close();
-            $file = $file.$path;
-            //download file
-            if (file_exists($file)) {
-                header('Content-Description: File Transfer');
-                header('Content-Type: application/octet-stream');
-                header('Content-Disposition: attachment; filename="' . basename($file) . '"');
-                header('Content-Transfer-Encoding: binary');
-                header('Expires: 0');
-                header('Cache-Control: must-revalidate');
-                header('Pragma: public');
-                header('Content-Length: ' . filesize($file));
-                // Output the file contents
-                readfile($file);
-                exit();
-            } else {
-                echo "<script>alert('File tidak ditemukan !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
-            }            
-        }catch(Exception $e){
-            echo $e->getTraceAsString();
-            $error = $e->getMessage();
-            $errorJson = json_decode($error, true);
-            if ($errorJson === null) {
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $error,
-                );
-            }else{
-                $responseData = array(
-                    'status' => 'error',
-                    'message' => $errorJson['message'],
-                );
-            }
-            header('Content-Type: application/json');
-            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
-            echo json_encode($responseData);
-            exit();
-        }
-    }
+    // public function downloadPentas($data){
+    //     try{
+    //         if(!isset($data['email']) || empty($data['email'])){
+    //             echo "<script>alert('Email harus di isi !')</script>";
+    //             echo "<script>window.history.back();</script>";
+    //             exit();
+    //         }
+    //         if(!isset($data['id_pentas']) || empty($data['id_pentas'])){
+    //             echo "<script>alert('ID Pentas harus di isi !')</script>";
+    //             echo "<script>window.history.back();</script>";
+    //             exit();
+    //         }
+    //         if(!isset($data['deskripsi']) || empty($data['deskripsi'])){
+    //             echo "<script>alert('Deskripsi harus di isi !')</script>";
+    //             echo "<script>window.history.back();</script>";
+    //             exit();
+    //         }
+    //         //check email
+    //         $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
+    //         $stmt[0] = self::$con->prepare($query);
+    //         $stmt[0]->bind_param('s', $data['email']);
+    //         $stmt[0]->execute();
+    //         $role = '';
+    //         $stmt[0]->bind_result($role);
+    //         if (!$stmt[0]->fetch()) {
+    //             $stmt[0]->close();
+    //             echo "<script>alert('User tidak ditemukan !')</script>";
+    //             echo "<script>window.history.back();</script>";
+    //             exit();
+    //         }
+    //         $stmt[0]->close();
+    //         if($role == 'masyarakat'){
+    //             echo "<script>alert('Anda bukan admin !')</script>";
+    //             echo "<script>window.history.back();</script>";
+    //             exit();
+    //         }
+    //         //check id_pentas
+    //         if($data['deskripsi'] == 'surat'){
+    //             $query = "SELECT surat_keterangan FROM surat_advis WHERE id_advis = ? LIMIT 1";
+    //             $file = self::$folderPentas;
+    //         }else{
+    //             echo "<script>alert('Deskripsi invalid !')</script>";
+    //             echo "<script>window.history.back();</script>";
+    //             exit();
+    //         }
+    //         $stmt[0] = self::$con->prepare($query);
+    //         $stmt[0]->bind_param('s', $data['id_pentas']);
+    //         $stmt[0]->execute();
+    //         $path = '';
+    //         $stmt[0]->bind_result($path);
+    //         if (!$stmt[0]->fetch()) {
+    //             $stmt[0]->close();
+    //             echo "<script>alert('Data Pentas tidak ditemukan !')</script>";
+    //             echo "<script>window.history.back();</script>";
+    //             exit();
+    //         }
+    //         $stmt[0]->close();
+    //         $file = $file.$path;
+    //         //download file
+    //         if (file_exists($file)) {
+    //             header('Content-Description: File Transfer');
+    //             header('Content-Type: application/octet-stream');
+    //             header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+    //             header('Content-Transfer-Encoding: binary');
+    //             header('Expires: 0');
+    //             header('Cache-Control: must-revalidate');
+    //             header('Pragma: public');
+    //             header('Content-Length: ' . filesize($file));
+    //             // Output the file contents
+    //             readfile($file);
+    //             exit();
+    //         } else {
+    //             echo "<script>alert('File tidak ditemukan !')</script>";
+    //             echo "<script>window.history.back();</script>";
+    //             exit();
+    //         }            
+    //     }catch(Exception $e){
+    //         echo $e->getTraceAsString();
+    //         $error = $e->getMessage();
+    //         $errorJson = json_decode($error, true);
+    //         if ($errorJson === null) {
+    //             $responseData = array(
+    //                 'status' => 'error',
+    //                 'message' => $error,
+    //             );
+    //         }else{
+    //             $responseData = array(
+    //                 'status' => 'error',
+    //                 'message' => $errorJson['message'],
+    //             );
+    //         }
+    //         header('Content-Type: application/json');
+    //         isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+    //         echo json_encode($responseData);
+    //         exit();
+    //     }
+    // }
     public function downloadSewa($data){
         try{
             if(!isset($data['email']) || empty($data['email'])){
