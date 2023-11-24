@@ -365,45 +365,14 @@ class PentasMobile{
             //         throw new Exception('Permintaan anda tidak boleh lebih dari jam 5 sore');
             //     }
             // }
-            //get last id advis
-            $query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '".$_SERVER['DB_DATABASE']."' AND TABLE_NAME = 'surat_advis' ";
-            $stmt[1] = self::$con->prepare($query);
-            $stmt[1]->execute();
-            $idAdvis = 1;
-            $stmt[1]->bind_result($idAdvis);
-            $stmt[1]->fetch();
-            $stmt[1]->close();
-            //create folder
-            if (!is_dir(self::$folderPath)) {
-                mkdir(self::$folderPath, 0777, true);
-            }
-            //proses file
-            $fileSurat = $_FILES['surat_keterangan'];
-            $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileSurat['tmp_name']);
-            if ($extension === 'pdf') {
-                if ($size >= self::$sizeFile) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeFile / (1024 * 1024)).'MB','code'=>500]));
-                }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus pdf','code'=>500]));
-            }
-            //simpan file
-            $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get', ['col'=>'surat']);
-            $fileSuratPath = self::$folderPath.$nameFile;
-            $fileSuratDB = $nameFile;
-            if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
-            }
             //save data
-            $query = "INSERT INTO surat_advis (nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_awal, tgl_selesai, tempat_advis, surat_keterangan, status, created_at, updated_at, id_user, id_seniman) VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?)";
+            $query = "INSERT INTO surat_advis (nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_awal, tgl_selesai, tempat_advis, status, created_at, updated_at, id_user, id_seniman) VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
             $status = 'diajukan';
-            $stmt[2]->bind_param("sssssssssssii", $data['nomor_induk'], $data['nama_advis'], $data['alamat_advis'], $data['deskripsi_advis'], $tanggalAwalDB, $tanggalAkhirDB, $data['tempat_advis'], $fileSuratDB, $status, $tanggal_sekarangDB, $tanggal_sekarangDB, $data['id_user'], $data['id_seniman']);
+            $stmt[2]->bind_param("ssssssssssii", $data['nomor_induk'], $data['nama_advis'], $data['alamat_advis'], $data['deskripsi_advis'], $tanggalAwalDB, $tanggalAkhirDB, $data['tempat_advis'], $status, $tanggal_sekarangDB, $tanggal_sekarangDB, $data['id_user'], $data['id_seniman']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
-                self::manageFile(['id_advis'=>self::$con->insert_id, 'surat_keterangan'=>$fileSuratDB],'tambah');
                 header('Content-Type: application/json');
                 echo json_encode(['status'=>'success','message'=>'Data Pentas berhasil ditambahkan']);
                 exit();
@@ -523,34 +492,10 @@ class PentasMobile{
             }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
                 throw new Exception('Data sudah diverifikasi');
             }
-            //check if user upload file
-            $updateSurat = false;
-            if(isset($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']['name']) && $_FILES['surat_keterangan']['error'] !== 4){
-                //proses file
-                $fileSurat = $_FILES['surat_keterangan'];
-                $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
-                $size = filesize($fileSurat['tmp_name']);
-                if ($extension === 'pdf') {
-                    if ($size >= self::$sizeFile) {
-                        throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeFile / (1024 * 1024)).'MB','code'=>500]));
-                    }
-                } else {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus pdf','code'=>500]));
-                }
-                //replace file
-                $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get', ['col'=>'surat']);
-                $fileSuratPath = self::$folderPath.$nameFile;
-                $fileSuratDB = $nameFile;
-                if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
-                }
-                unlink(self::$folderPath.$suratDB);
-                $updateSurat = true;
-            }
             //update data
-            $query = "UPDATE surat_advis SET nama_advis = ?, alamat_advis = ?, deskripsi_advis = ?, tgl_advis = ?, tempat_advis = ?, surat_keterangan = ?, updated_at = ?, WHERE id_advis = ?";
+            $query = "UPDATE surat_advis SET nama_advis = ?, alamat_advis = ?, deskripsi_advis = ?, tgl_advis = ?, tempat_advis = ?, updated_at = ?, WHERE id_advis = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param("sssssssi", $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalDB, $data['tempat_pentas'], $fileSuratDB, $tanggal_sekarangDB, $data['id_advis']);
+            $stmt[2]->bind_param("ssssssi", $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalDB, $data['tempat_pentas'], $tanggal_sekarangDB, $data['id_advis']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -559,11 +504,6 @@ class PentasMobile{
                 exit();
             } else {
                 $stmt[2]->close();
-                if($updateSurat == true){
-                    header('Content-Type: application/json');
-                    echo json_encode(['status'=>'success','message'=>'Data pentas berhasil diubah']);
-                    exit();
-                }
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Pentas gagal diubah','code'=>500]));
             }
         }catch(Exception $e){
