@@ -123,10 +123,10 @@ function authenticate($request,$data,$con = null){
                                     return ['status'=>'error','message'=>'update token error','code'=>500];
                                 }else{
                                     setcookie('token2', $updated['data'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']), '/');
-                                    // foreach($updated['data'] as $key => $value){
-                                    //     $request[$key] = $value;
-                                    // }
-                                    // return ['status'=>'success','data'=>$updated['data']];
+                                    foreach($updated['data'] as $key => $value){
+                                        $request[$key] = $value;
+                                    }
+                                    return ['status'=>'success','data'=>$request];
                                 }
                             }
                         }

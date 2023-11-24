@@ -149,13 +149,14 @@ if ($userAuth['status'] == 'error') {
 
               <div class="activity">
 
+              <?php if($userAuth['role'] == 'super admin' || $userAuth['role'] == 'admin event'){ ?>
                 <div class="activity-item d-flex">
                   <div class="activite-label">
                     <?php echo date('d M Y') ?>
                   </div>
                   <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
                   <div class="activity-content">
-                    <a href="/event.php" class="fw-bold text-dark">
+                    <a href="/event/pengajuan.php" class="fw-bold text-dark">
                       <h6><strong>Kelola Event</strong></h6>
                       <?php
                       $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM events WHERE status = 'diajukan'");
@@ -165,14 +166,16 @@ if ($userAuth['status'] == 'error') {
                     </a>
                   </div>
                 </div><!-- End activity item-->
+                <?php } ?>
 
+                <?php if($userAuth['role'] == 'super admin' || $userAuth['role'] == 'admin tempat'){ ?>
                 <div class="activity-item d-flex">
                   <div class="activite-label">
                     <?php echo date('d M Y') ?>
                   </div>
                   <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
                   <div class="activity-content">
-                    <a href="/tempat.php" class="fw-bold text-dark">
+                    <a href="/tempat/pengajuan.php" class="fw-bold text-dark">
                       <h6><strong>Peminjaman Tempat</strong></h6>
                       <?php
                       $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM sewa_tempat WHERE status = 'diajukan'");
@@ -180,16 +183,18 @@ if ($userAuth['status'] == 'error') {
                       echo $data['total'] . " notifikasi";
                       ?>
                     </a>
-                  </div>
-                </div><!-- End activity item-->
+                  </div>  
+                </div><!-- End activity item-->    
+                <?php } ?>
 
+                <?php if($userAuth['role'] == 'super admin' || $userAuth['role'] == 'admin seniman'){ ?>
                 <div class="activity-item d-flex">
                   <div class="activite-label">
                     <?php echo date('d M Y') ?>
                   </div>
                   <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
                   <div class="activity-content">
-                    <a href="/seniman.php" class="fw-bold text-dark">
+                    <a href="/seniman/pengajuan.php" class="fw-bold text-dark">
                       <h6><strong>Nomor Induk Seniman</strong></h6>
                       <?php
                       $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diajukan'");
@@ -197,16 +202,37 @@ if ($userAuth['status'] == 'error') {
                       echo $data['total'] . " notifikasi";
                       ?>
                     </a>
-                  </div>
-                </div><!-- End activity item-->
+                  </div>  
+                </div><!-- End activity item-->  
+                <?php } ?>
 
+                <?php if($userAuth['role'] == 'super admin' || $userAuth['role'] == 'admin seniman'){ ?>
+                <div class="activity-item d-flex">
+                  <div class="activite-label">
+                    <?php echo date('d M Y') ?>
+                  </div>  
+                  <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
+                  <div class="activity-content">
+                    <a href="/seniman/perpanjangan.php" class="fw-bold text-dark">
+                      <h6><strong>Perpanjang Nomor induk seniman</strong></h6>
+                      <?php
+                      $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM perpanjangan WHERE status = 'diajukan'");
+                      $data = mysqli_fetch_assoc($sql);
+                      echo $data['total'] . " notifikasi";
+                      ?>  
+                    </a>
+                  </div>  
+                </div><!-- End activity item-->  
+                <?php } ?>
+
+                <?php if($userAuth['role'] == 'super admin' || $userAuth['role'] == 'admin seniman'){ ?>
                 <div class="activity-item d-flex">
                   <div class="activite-label">
                     <?php echo date('d M Y') ?>
                   </div>
                   <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
                   <div class="activity-content">
-                    <a href="/pentas.php" class="fw-bold text-dark">
+                    <a href="/pentas/pengajuan.php" class="fw-bold text-dark">
                       <h6><strong>Surat Advis</strong></h6>
                       <?php
                       $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM surat_advis WHERE status = 'diajukan'");
@@ -216,6 +242,7 @@ if ($userAuth['status'] == 'error') {
                     </a>
                   </div>
                 </div><!-- End activity item-->
+                <?php } ?>
               </div>
 
             </div>

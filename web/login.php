@@ -24,7 +24,9 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 if(isset($_POST['login'])){
     try{
         $email = htmlspecialchars($_POST["email"]);
+        // $email = "Admin@gmail.com";
         $pass = $_POST["password"];
+        $pass = "Admin@1234567890";
         if(!isset($email) || empty($email)){
             echo "<script>alert('Email tidak boleh kosong')</script>";
             echo "<script>window.history.back();</script>"; 

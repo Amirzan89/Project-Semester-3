@@ -92,10 +92,6 @@ class Preview{
                 if (copy($file, $des)) {
                     header('Content-Type: application/json');
                     echo json_encode(['status'=>'success','data'=>"$previewURL"]);  
-                    // exit();
-                    // header("Location: $previewURL");
-                    // flush();
-                    // exit();
                     $startTime = time();
                     $timeout = 5;
                     while (true) {

@@ -321,10 +321,10 @@ if ($userAuth['status'] == 'error') {
                       <label for="Role" class="col-md-4 col-lg-3 col-form-label">Role</label>
                       <div class="col-md-8 col-lg-9">
                       <select class="form-select" name="role" aria-label="Default select example">
-                        <option value="admin event" <?php echo ($users['role'] == 'admin event') ? 'selected' : ''; ?>>Admin Event</option>
-                        <option value="admin tempat" <?php echo ($users['role'] == 'admin tempat') ? 'selected' : ''; ?>>Admin Tempat</option>
-                        <option value="admin seniman" <?php echo ($users['role'] == 'admin seniman') ? 'selected' : ''; ?>>Admin Seniman</option>
-                      </select>
+                        <option value="admin event" <?php echo ($userAuth['role'] == 'admin event') ? 'selected' : ''; ?>>Admin Event</option>
+                        <option value="admin tempat" <?php echo ($userAuth['role'] == 'admin tempat') ? 'selected' : ''; ?>>Admin Tempat</option>
+                        <option value="admin seniman" <?php echo ($userAuth['role'] == 'admin seniman') ? 'selected' : ''; ?>>Admin Seniman</option>
+                      </select> 
                     </div>
                     </div>
                     <?php } ?>
