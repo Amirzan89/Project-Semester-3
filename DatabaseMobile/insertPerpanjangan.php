@@ -1,8 +1,8 @@
 <?php
-require_once(__DIR__ . '/../mobile/event/event.php');
+require_once(__DIR__ . '/../mobile/seniman/seniman.php');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = EventMobile::handle();
-    $updatePasswordProfile($data);
+    $data = SenimanMobile::handle();
+    $tambahPerpanjangan($data);
 }
 //protection
 if($_SERVER['REQUEST_METHOD'] == 'GET'){

@@ -134,16 +134,18 @@ class PentasMobile{
     }
     public function getPentas($data){
         try{
-            if(!isset($data['email']) || empty($data['email'])){
+            if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('Email harus di isi !');
             }
-            if(!isset($data['id_pentas']) || empty($data['id_pentas'])){
-                throw new Exception('ID Pentas harus di isi !');
+            if(!isset($data['desc'])){
+                if(!isset($data['id_advis']) || empty($data['id_advis'])){
+                    throw new Exception('ID Pentas harus di isi !');
+                }
             }
-            //check email
-            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
+            //check id_user
+            $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['email']);
+            $stmt[0]->bind_param('s', $data['id_user']);
             $stmt[0]->execute();
             $role = '';
             $stmt[0]->bind_result($role);
@@ -155,23 +157,52 @@ class PentasMobile{
             if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
                 throw new Exception('Harus masyarakat');
             }
-            //check id_pentas and get data
-            $query = "SELECT nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_awal, tgl_selesai, tempat_advis FROM surat_advis WHERE id_advis = ?";
-            $stmt[1] = self::$con->prepare($query);
-            $stmt[1]->bind_param('s', $data['id_pentas']);
-            if ($stmt[1]->execute()) {
-                $result = $stmt[1]->get_result();
-                $pentasData = $result->fetch_assoc();
-                $stmt[1]->close();
-                if ($pentasData === null) {
+            //check id_advis and get data
+            if(isset($data['desc'])){
+                if($data['desc'] == 'diajukan'){
+                    $status = 'diajukan';
+                }else if($data['desc'] == 'proses'){
+                    $status = 'proses';
+                }else if($data['desc'] == 'ditolak'){
+                    $status = 'ditolak';
+                }else if($data['desc'] == 'diterima'){
+                    $status = 'diterima';
+                }
+                $query = "SELECT nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_awal, tgl_selesai, tempat_advis FROM surat_advis WHERE id_user = ? AND status = '$status' ORDER BY created_at DESC ";
+                $stmt[1] = self::$con->prepare($query);
+                $stmt[1]->bind_param('s', $data['id_user']);
+                if ($stmt[1]->execute()) {
+                    $result = $stmt[1]->get_result();
+                    $pentasData = $result->fetch_assoc();
+                    $stmt[1]->close();
+                    if ($pentasData === null) {
+                        throw new Exception('Data pentas tidak ditemukan');
+                    }
+                    header('Content-Type: application/json');
+                    echo json_encode(['status' => 'success', 'message' => 'Data pentas berhasil didapatkan', 'data' => $pentasData]);
+                    exit();
+                }else{
+                    $stmt[1]->close();
                     throw new Exception('Data pentas tidak ditemukan');
                 }
-                header('Content-Type: application/json');
-                echo json_encode(['status' => 'success', 'message' => 'Data pentas berhasil didapatkan', 'data' => $pentasData]);
-                exit();
             }else{
-                $stmt[1]->close();
-                throw new Exception('Data pentas tidak ditemukan');
+                $query = "SELECT nomor_induk, nama_advis, alamat_advis, deskripsi_advis, tgl_awal, tgl_selesai, tempat_advis FROM surat_advis WHERE id_advis = ?";
+                $stmt[1] = self::$con->prepare($query);
+                $stmt[1]->bind_param('s', $data['id_advis']);
+                if ($stmt[1]->execute()) {
+                    $result = $stmt[1]->get_result();
+                    $pentasData = $result->fetch_assoc();
+                    $stmt[1]->close();
+                    if ($pentasData === null) {
+                        throw new Exception('Data pentas tidak ditemukan');
+                    }
+                    header('Content-Type: application/json');
+                    echo json_encode(['status' => 'success', 'message' => 'Data pentas berhasil didapatkan', 'data' => $pentasData]);
+                    exit();
+                }else{
+                    $stmt[1]->close();
+                    throw new Exception('Data pentas tidak ditemukan');
+                }
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -396,9 +427,9 @@ class PentasMobile{
     }
     public function editPentas($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                throw new Exception('ID User harus di isi !');
-            }
+            // if(!isset($data['id_user']) || empty($data['id_user'])){
+            //     throw new Exception('ID User harus di isi !');
+            // }
             if(!isset($data['id_advis']) || empty($data['id_advis'])){
                 throw new Exception('ID Advis harus di isi !');
             }
@@ -411,10 +442,10 @@ class PentasMobile{
             if (strlen($data['alamat']) > 25) {
                 throw new Exception(' Alamat maksimal 25 angka !');
             }
-            if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
+            if (!isset($data['deskripsi_advis']) || empty($data['deskripsi_advis'])) {
                 throw new Exception(' Deskripsi harus di isi !');
             }
-            if (strlen($data['deskripsi']) > 25) {
+            if (strlen($data['deskripsi_advis']) > 25) {
                 throw new Exception(' Deskripsi maksimal 25 angka !');
             }
             if(!isset($data['nama_pentas']) || empty($data['nama_pentas'])){
@@ -481,24 +512,27 @@ class PentasMobile{
                 throw new Exception('Data Pentas tidak ditemukan');
             }
             $stmt[1]->close();
-            if($statusDB == 'proses'){
-                throw new Exception('Data sedang diproses');
-            }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
-                throw new Exception('Data sudah diverifikasi');
+            //check status
+            if(!isset($data['desc']) && $data['desc'] != 'ditolak'){
+                if($statusDB == 'proses'){
+                    throw new Exception('Data sedang diproses');
+                }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
+                    throw new Exception('Data sudah diverifikasi');
+                }
             }
             //update data
             $query = "UPDATE surat_advis SET nama_advis = ?, alamat_advis = ?, deskripsi_advis = ?, tgl_advis = ?, tempat_advis = ?, updated_at = ?, WHERE id_advis = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param("ssssssi", $data['nama'], $data['alamat'], $data['deskripsi'], $tanggalDB, $data['tempat_pentas'], $tanggal_sekarangDB, $data['id_advis']);
+            $stmt[2]->bind_param("ssssssi", $data['nama'], $data['alamat'], $data['deskripsi_advis'], $tanggalDB, $data['tempat_pentas'], $tanggal_sekarangDB, $data['id_advis']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
                 header('Content-Type: application/json');
-                echo json_encode(['status'=>'success','message'=>'Data Pentas berhasil diubah']);
+                echo json_encode(['status'=>'success','pesan'=>'Data Pentas berhasil diubah','kode'=>1]);
                 exit();
             } else {
                 $stmt[2]->close();
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Pentas gagal diubah','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'pesan' => 'Data Pentas gagal diubah','kode'=>2]));
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -506,12 +540,12 @@ class PentasMobile{
             if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $error,
+                    'pesan' => $error,
                 );
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $errorJson['message'],
+                    'pesan' => $errorJson['pesan'],
                 );
             }
             isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
@@ -521,27 +555,27 @@ class PentasMobile{
     }
     public function hapusPentas($data){
         try{
-            if(!isset($data['id_user']) || empty($data['id_user'])){
-                throw new Exception('ID User harus di isi !');
-            }
+            // if(!isset($data['id_user']) || empty($data['id_user'])){
+            //     throw new Exception('ID User harus di isi !');
+            // }
             if(!isset($data['id_advis']) || empty($data['id_advis'])){
                 throw new Exception('ID pentas harus di isi !');
             }
-            //check id_user
-            $query = "SELECT role FROM users WHERE id_user = ? LIMIT 1";
-            $stmt[0] = self::$con->prepare($query);
-            $stmt[0]->bind_param('s', $data['id_user']);
-            $stmt[0]->execute();
-            $role = '';
-            $stmt[0]->bind_result($role);
-            if (!$stmt[0]->fetch()) {
-                $stmt[0]->close();
-                throw new Exception('User tidak ditemukan');
-            }
-            $stmt[0]->close();
-            if($role != 'masyarakat'){
-                throw new Exception('invalid role');
-            }
+            // //check id_user
+            // $query = "SELECT role FROM users WHERE id_user = ? LIMIT 1";
+            // $stmt[0] = self::$con->prepare($query);
+            // $stmt[0]->bind_param('s', $data['id_user']);
+            // $stmt[0]->execute();
+            // $role = '';
+            // $stmt[0]->bind_result($role);
+            // if (!$stmt[0]->fetch()) {
+            //     $stmt[0]->close();
+            //     throw new Exception('User tidak ditemukan');
+            // }
+            // $stmt[0]->close();
+            // if($role != 'masyarakat'){
+            //     throw new Exception('invalid role');
+            // }
             //check id_advis
             $query = "SELECT status FROM surat_advis WHERE id_advis = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);
@@ -660,10 +694,16 @@ if($_SERVER['APP_TESTING']){
         $pentasMobile->hapusPentas(PentasMobile::handle());
     }
 }
+$getPentas = function ($data) use ($pentasMobile){
+    $pentasMobile->getPentas($data);
+};
 $tambahPentas = function ($data) use ($pentasMobile){
     $pentasMobile->tambahPentas($data);
 };
 $updatePentas = function ($data) use ($pentasMobile){
     $pentasMobile->editPentas($data);
+};
+$deletePentas = function ($data) use ($pentasMobile){
+    $pentasMobile->hapusPentas($data);
 };
 ?>

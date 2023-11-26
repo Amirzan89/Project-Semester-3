@@ -559,6 +559,5 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             exit();
         }
     }
-    $EventMobile->tambahEventMasyarakat(EventMobile::handle());
 }
 ?>
