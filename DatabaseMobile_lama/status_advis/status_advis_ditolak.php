@@ -5,7 +5,7 @@ $id_user = $_POST['id_user'];
 
 $response = array(); 
 
-$sql = "SELECT * FROM surat_advis WHERE status = 'ditolak' AND id_user = '$id_user' ORDER BY tgl_advis desc;";
+$sql = "SELECT * FROM surat_advis WHERE status = 'ditolak' AND id_user = '$id_user' ORDER BY created_at desc;";
 $result = $konek->query($sql);
 
 if ($result->num_rows > 0) {

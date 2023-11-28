@@ -137,7 +137,7 @@ class PentasMobile{
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('Email harus di isi !');
             }
-            if(!isset($data['desc'])){
+            if(!isset($data['desc']) || !in_array($data['desc'],['getPentas','diajukan','proses','ditolak','diterima'])){
                 if(!isset($data['id_advis']) || empty($data['id_advis'])){
                     throw new Exception('ID Pentas harus di isi !');
                 }
@@ -154,7 +154,7 @@ class PentasMobile{
                 throw new Exception('User tidak ditemukan');
             }
             $stmt[0]->close();
-            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admin seniman'])){
                 throw new Exception('Harus masyarakat');
             }
             //check id_advis and get data
@@ -179,7 +179,7 @@ class PentasMobile{
                         throw new Exception('Data pentas tidak ditemukan');
                     }
                     header('Content-Type: application/json');
-                    echo json_encode(['status' => 'success', 'message' => 'Data pentas berhasil didapatkan', 'data' => $pentasData]);
+                    echo json_encode(['status' => 'success', 'pesan' => 'Data pentas berhasil didapatkan', 'data' => $pentasData,'kode'=>1]);
                     exit();
                 }else{
                     $stmt[1]->close();
@@ -197,7 +197,7 @@ class PentasMobile{
                         throw new Exception('Data pentas tidak ditemukan');
                     }
                     header('Content-Type: application/json');
-                    echo json_encode(['status' => 'success', 'message' => 'Data pentas berhasil didapatkan', 'data' => $pentasData]);
+                    echo json_encode(['status' => 'success', 'pesan' => 'Data pentas berhasil didapatkan', 'data' => $pentasData,'kode'=>1]);
                     exit();
                 }else{
                     $stmt[1]->close();
@@ -210,16 +210,18 @@ class PentasMobile{
             if ($errorJson === null) {
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $error,
+                    'pesan' => $error,
+                    'kode'=>2,
                 );
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $errorJson['message'],
+                    'pesan' => $errorJson['pesan'],
+                    'kode'=>2,
                 );
             }
             header('Content-Type: application/json');
-            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            // isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
             echo json_encode($responseData);
             exit();
         }
@@ -637,16 +639,16 @@ class PentasMobile{
                 exit();
             }
             return $requestData;
-        // } elseif ($contentType === "application/x-www-form-urlencoded") {
-        //     $requestData = $_POST;
-        //     return $requestData;
+        } elseif ($contentType === "application/x-www-form-urlencoded") {
+            $requestData = $_POST;
+            return $requestData;
         } elseif (strpos($contentType, 'multipart/form-data') !== false) {
             $requestData = $_POST;
             return $requestData;
-        } else {
-            http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
-            exit();
+        // } else {
+        //     // http_response_code(400);
+        //     // echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
+        //     // exit();
         }
     }
 }
@@ -670,7 +672,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
     include(__DIR__.'/../../notfound.php');
 }
 $pentasMobile = new PentasMobile();
-if($_SERVER['APP_TESTING']){
+if(isset($_SERVER['APP_TESTING']) && $_SERVER['APP_TESTING'] == 'true'){
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $data = PentasMobile::handle();
         if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan']) && $data['keterangan'] == 'get'){

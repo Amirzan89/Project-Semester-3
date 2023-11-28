@@ -2,7 +2,7 @@
 require_once(__DIR__ . '/../mobile/user.php');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = UserMobile::handle();
-    $updatePasswordProfile($data);
+    $cekEmail($data);
 }
 //protection
 if($_SERVER['REQUEST_METHOD'] == 'GET'){

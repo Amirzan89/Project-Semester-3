@@ -277,14 +277,10 @@ class SenimanMobile{
             }else if($desc == 'get all'){
                 $jsonFile = file_get_contents(self::$jsonPath);
                 $jsonData = json_decode($jsonFile, true);
-                $result = null;
-                // foreach($jsonData as $key => $item){
-                //     unset($jsonData[$key]['singkatan_kategori']);
-                // }
-                if($result === null){
+                if($jsonData === null){
                     throw new Exception('Data kategori tidak ditemukan');
                 }
-                return $result;
+                return $jsonData;
             }else if($desc == 'getINI'){
                 if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                     throw new Exception('Kategori harus di isi');
@@ -445,7 +441,7 @@ class SenimanMobile{
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('ID User harus di isi !');
             }
-            if(!isset($data['desc'])){
+            if(!isset($data['desc']) || !in_array($data['desc'],['getSeniman','diajukan','proses','ditolak','diterima'])){
                 if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
                     throw new Exception('ID seniman harus di isi !');
                 }
@@ -462,13 +458,19 @@ class SenimanMobile{
                 throw new Exception('User tidak ditemukan');
             }
             $stmt[0]->close();
-            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admn seniman'])){
+            if(in_array($role,['super admin','admin tempat','admin event', 'admin pentas', 'admin seniman'])){
                 throw new Exception('Harus masyarakat');
             }
-            //check id_seniman
-            $query = "SELECT id_kategori_seniman FROM seniman WHERE id_seniman = ? LIMIT 1";
-            $stmt[1] = self::$con->prepare($query);
-            $stmt[1]->bind_param('s', $data['id_seniman']);
+            //check seniman
+            if(isset($data['desc']) || in_array($data['desc'],['getSeniman','diajukan','proses','ditolak','diterima'])){
+                $query = "SELECT id_kategori_seniman FROM seniman WHERE id_user = ? LIMIT 1";
+                $stmt[1] = self::$con->prepare($query);
+                $stmt[1]->bind_param('s', $data['id_user']);
+            }else{
+                $query = "SELECT id_kategori_seniman FROM seniman WHERE id_seniman = ? LIMIT 1";
+                $stmt[1] = self::$con->prepare($query);
+                $stmt[1]->bind_param('s', $data['id_seniman']);
+            }
             $stmt[1]->execute();
             $idKategori = '';
             $stmt[1]->bind_result($idKategori);
@@ -478,7 +480,7 @@ class SenimanMobile{
             }
             $stmt[1]->close();
             //get data
-            if(isset($data['desc'])){
+            if(!isset($data['desc'])){
                 if($data['desc'] == 'diajukan'){
                     $status = 'diajukan';
                 }else if($data['desc'] == 'proses'){
@@ -513,7 +515,7 @@ class SenimanMobile{
                         $senimanData['kategori'] = $this->kategori(['id_kategori'=>$idKategori],'get');
                         $stmt[2]->close();
                         header('Content-Type: application/json');
-                        echo json_encode(['status' => 'success', 'pesan' => 'Data Seniman berhasil didapatkan', 'data' => $senimanData,'kode'=>1]);
+                        echo json_encode(['status' => 'success', 'pesan' => 'Data Seniman berhasil didapatkan', 'data' => $senimanData,'kode'=>1]); 
                         exit();
                     }else{
                         $stmt[2]->close();
@@ -555,7 +557,7 @@ class SenimanMobile{
                 );
             }
             header('Content-Type: application/json');
-            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            // isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
             echo json_encode($responseData);
             exit();
         }
@@ -1561,7 +1563,7 @@ class SenimanMobile{
         }
     }
     public static function handle(){
-        $contentType = $_SERVER["CONTENT_TYPE"];
+        $contentType = isset($_SERVER["HTTP_CONTENT_TYPE"]) ? $_SERVER["HTTP_CONTENT_TYPE"] : null;
         if ($contentType === "application/json") {
             $rawData = file_get_contents("php://input");
             $requestData = json_decode($rawData, true);
@@ -1577,14 +1579,14 @@ class SenimanMobile{
         } elseif (strpos($contentType, 'multipart/form-data') !== false) {
             $requestData = $_POST;
             return $requestData;
-        } else {
-            http_response_code(400);
-            echo json_encode(['status' => 'error', 'pesan' => 'Unsupported content type']);
-            exit();
+        // } else {
+        //     http_response_code(400);
+        //     echo json_encode(['status' => 'error', 'pesan' => 'Unsupported content type']);
+        //     exit();
         }
     }
 }
-function loadEnv($path = null){
+function loadEnvSeniman($path = null){
     if($path == null){
         $path = __DIR__."/../../.env";
     }
@@ -1599,12 +1601,12 @@ function loadEnv($path = null){
         }
     }
 }
-loadEnv();
-if($_SERVER['REQUEST_METHOD'] == 'GET'){
-    include(__DIR__.'/../../notfound.php');
-}
+loadEnvSeniman();
+// if($_SERVER['REQUEST_METHOD'] == 'GET'){
+//     include(__DIR__.'/../../notfound.php');
+// }
 $senimanMobile = new SenimanMobile;
-if($_SERVER['APP_TESTING']){
+if(isset($_SERVER['APP_TESTING']) && $_SERVER['APP_TESTING'] == 'true'){
     if($_SERVER['REQUEST_METHOD'] == 'PUT'){
         $data = SenimanMobile::handle();
             if($data['keterangan'] == 'perpanjang'){
@@ -1653,7 +1655,8 @@ $getKategori = function ($data) use ($senimanMobile){
     }
     header("Content-Type: application/json");
     foreach($kategori as $key => $item){
-        unset($kategori[$key]['singkatan_kategori']);
+        unset($kategori[$key]['singkatan']);
+        $kategori[$key]['id_kategori_seniman'] = (string) $kategori[$key]['id_kategori_seniman'];
     }
     echo json_encode($kategori);
     exit();

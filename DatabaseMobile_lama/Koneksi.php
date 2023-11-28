@@ -2,7 +2,7 @@
 $host = "localhost"; 
 $username = "root"; 
 $password = ""; 
-$database = "hufflepuff"; 
+$database = "hufflepuff_testing"; 
 
 // Membuat koneksi
 $konek = new mysqli($host, $username, $password, $database);

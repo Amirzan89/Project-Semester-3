@@ -732,10 +732,10 @@ class TempatMobile{
         } elseif (strpos($contentType, 'multipart/form-data') !== false) {
             $requestData = $_POST;
             return $requestData;
-        } else {
-            http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
-            exit();
+        // } else {
+        //     http_response_code(400);
+        //     echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
+        //     exit();
         }
     }
 }
@@ -759,7 +759,7 @@ function loadEnv($path = null){
 };
 loadEnv();
 $tempatMobile = new TempatMobile();
-if($_SERVER['APP_TESTING']){
+if(isset($_SERVER['APP_TESTING']) && $_SERVER['APP_TESTING'] == 'true'){
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $data = TempatMobile::handle();
         if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan'])){

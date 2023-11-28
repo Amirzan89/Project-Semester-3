@@ -50,7 +50,7 @@ function Login($data){
             unset($usersData['foto']);
             header('Content-Type: application/json');
             echo json_encode(['status'=>'success','message'=>'Data Tersedia', 'kode'=>1, 'data'=>$usersData]);
-            exit();
+            // exit();
         }else if($data['desc'] == 'login'){
             if(!isset($data['password']) || empty($data['password'])){
                 throw new Exception('Password harus di isi !');

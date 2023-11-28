@@ -763,11 +763,11 @@ class EventMobile{
         } elseif ($contentType === "application/x-www-form-urlencoded") {
             $requestData = $_POST;
             return $requestData;
-        } else {
-            http_response_code(400);
-            header('Content-Type: application/json');
-            echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
-            exit();
+        // } else {
+        //     http_response_code(400);
+        //     header('Content-Type: application/json');
+        //     echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
+        //     exit();
         }
     }
 }
@@ -791,7 +791,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
     include(__DIR__.'/../../notfound.php');
 }
 $eventMobile = new EventMobile();
-if($_SERVER['APP_TESTING']){
+if(isset($_SERVER['APP_TESTING']) && $_SERVER['APP_TESTING'] == 'true'){
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $data = eventMobile::handle();
         if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan'])){

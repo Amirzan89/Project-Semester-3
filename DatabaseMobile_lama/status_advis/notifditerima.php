@@ -4,7 +4,7 @@ require('../Koneksi.php');
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id_user = $_POST['id_user'];
 
-    $sql = "SELECT * FROM surat_advis WHERE id_user = '$id_user' AND status = 'diterima'  order by tgl_advis desc;";
+    $sql = "SELECT * FROM surat_advis WHERE id_user = '$id_user' AND status = 'diterima'  order by created_at desc;";
     $result = $konek->query($sql);
 
     if ($result->num_rows > 0) {
