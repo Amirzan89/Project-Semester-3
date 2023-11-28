@@ -9,6 +9,9 @@ $tanggal_awal = $_POST['tanggal_awal'];
 $tanggal_akhir= $_POST['tanggal_akhir'];
 $link_pendaftaran= $_POST['link_pendaftaran'];
 $poster_event = $_POST['poster_event'];
+
+
+
 $sql = "INSERT INTO detail_events
         (nama_event, deskripsi, tempat_event, tanggal_awal, tanggal_akhir, link_pendaftaran, poster_event) 
         VALUES

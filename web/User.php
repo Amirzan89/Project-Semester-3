@@ -14,94 +14,56 @@ class User{
     public function tambahAdmin($data){
         try{
             if (!isset($data['id_user']) || empty($data['id_user'])) {
-                echo "<script>alert('ID User harus di isi !');</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('ID User harus di isi !');
             }else if (!isset($data['email']) || empty($data['email'])) {
-                echo "<script>alert('Email harus di isi !');</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Email harus di isi !');
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                echo "<script>alert('Email invalid !');</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Email invalid !');
             }
             if (!isset($data['pass']) || empty($data['pass'])) {
-                echo "<script>alert('Password harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Password harus di isi !');
             } elseif (strlen($data['pass']) < 8) {
-                echo "<script>alert('Password minimal 8 angka !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Password minimal 8 karakter !');
             } elseif (strlen($data['pass']) > 15) {
-                echo "<script>alert('Password maksimal 15 angka !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Password maksimal 15 karakter !');
             } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
-                echo "<script>alert('Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !');
             }
             if (!isset($data['nama']) || empty($data['nama'])) {
-                echo "<script>alert('Nama lengkap harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nama lengkap harus di isi !');
             }
             if (!isset($data['phone']) || empty($data['phone'])) {
-                echo "<script>alert('nomer telepon harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon harus di isi !');
             }
             if (!is_numeric($data['phone'])) {
-                echo "<script>alert('Nomer telepon harus berisi hanya angka.')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon harus berisi hanya angka !');
             }
             if (strlen($data['phone']) < 8) {
-                echo "<script>alert('Nomer telpon minimal 8 karakter !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon minimal 8 angka !');
             }
             if (strlen($data['phone']) > 15) {
-                echo "<script>alert('Nomer telpon maksimal 15 karakter !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon maksimal 15 angka !');
             }
             if (substr($data['phone'], 0, 2) !== '08') {
-                echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon harus dimulai dengan 08 ');
             }
             if (!isset($data['jenisK']) || empty($data['jenisK'])) {
-                echo "<script>alert('Jenis kelamin harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Jenis kelamin harus di isi !');
             }
             if(!in_array($data['jenisK'], ['laki-laki','perempuan'])){
-                echo "<script>alert('Invalid jenis kelamin !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Jenis kelamin invalid !');
             }
             if (!isset($data['tempatL']) || empty($data['tempatL'])) {
-                echo "<script>alert('Tempat lahir harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Tempat lahir harus di isi !');
             }
             if (!isset($data['tanggalL']) || empty($data['tanggalL'])) {
-                echo "<script>alert('Tanggal lahir harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Tanggal lahir harus di isi !');
             }
             if (!isset($data['role']) || empty($data['role'])) {
-                echo "<script>alert('Role harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Role harus di isi !');
             }
             if(!in_array($data['role'], ['super admin','admin event','admin pentas', 'admin tempat', 'admin seniman'])){
-                echo "<script>alert('Invalid role !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Role invalid !');
             }
             //check tanggal
             date_default_timezone_set('Asia/Jakarta');
@@ -109,15 +71,11 @@ class User{
             $tanggal_sekarang = date('Y-m-d H:i:s');
             $tanggal_sekarang = strtotime($tanggal_sekarang);
             if (!$tanggal_lahir) {
-                echo "<script>alert('Format tanggal lahir tidak valid !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Format tanggal lahir tidak valid !');
             }
             // Compare the dates
             if ($tanggal_lahir > $tanggal_sekarang){
-                echo "<script>alert('Tanggal lahir tidak boleh kurang dari sekarang !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Tanggal lahir tidak boleh kurang dari sekarang !');
             }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
@@ -128,15 +86,11 @@ class User{
             $stmt[0]->bind_result($role);
             if(!$stmt[0]->fetch()){
                 $stmt[0]->close();
-                echo "<script>alert('Pengguna tidak ditemukan !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Pengguna tidak ditemukan !');
             }
             $stmt[0]->close();
             if($role != 'super admin'){
-                echo "<script>alert('Anda bukan super admin !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Anda bukan super admin !');
             }
             //check email input
             $query = "SELECT id_user FROM users WHERE BINARY email = ? LIMIT 1";
@@ -145,9 +99,7 @@ class User{
             $stmt[1]->execute();
             if ($stmt[1]->fetch()) {
                 $stmt[1]->close();
-                echo "<script>alert('Email sudah digunakan !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Email sudah digunakan !');
             }
             $stmt[1]->close();
             //get last id user
@@ -166,25 +118,19 @@ class User{
             //proses file
             $fileFoto = $_FILES['foto'];
             $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileFoto['size']);
+            $size = filesize($fileFoto['tmp_name']);
             if (in_array($extension,['png','jpeg','jpg'])) {
                 if ($size >= self::$sizeImg) {
-                    echo "<script>alert('Ukuran File maksimal '".(self::$sizeImg/1000000)."MB' !')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Ukuran File maksimal '.(self::$sizeImg / (1024 * 1024)).'MB !');
                 }
             } else {
-                echo "<script>alert('File harus jpg, jpeg, png !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('File harus jpg, jpeg, png !');
             }
             //simpan file
             $nameFile = '/'.$idUser.'.'.$extension;  
             $fileFotoPath = self::$folderPath.$folderAdmin.$nameFile;
             if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
-                echo "<script>alert('Gagal menyimpan file')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Gagal menyimpan file');
             }
             //insert to database 
             $hashedPassword = password_hash($data['pass'], PASSWORD_DEFAULT);
@@ -195,14 +141,12 @@ class User{
             $stmt[3]->execute();
             if ($stmt[3]->affected_rows > 0) {
                 $stmt[3]->close();
-                echo "<script>alert('akun berhasil dibuat');</script>";
-                echo "<script>window.location.href = '/admin.php';</script>";
+                header('Content-Type: application/json');
+                echo json_encode(['status'=>'success','message'=>'Akun admin berhasil dibuat']);
                 exit();
             } else {
                 $stmt[3]->close();
-                echo "<script>alert('Akun gagal dibuat');</script>";
-                echo "<script>window.location.href = '/admin.php';</script>";
-                exit();
+                throw new Exception('Akun gagal dibuat');
             }
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -218,108 +162,71 @@ class User{
                     'message' => $errorJson['message'],
                 );
             }
-            echo "<script> alert('$responseData');</script>";
-            echo "<script>window.history.back();</script>";
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
             exit();
         }
     }
     public function editAdmin($data){
         try{
             if (!isset($data['id_admin']) || empty($data['id_admin'])) {
-                echo "<script>alert('ID Admin harus di isi !');</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('ID Admin harus di isi !');
             }
             if (!isset($data['id_user']) || empty($data['id_user'])) {
-                echo "<script>alert('ID User harus di isi !');</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('ID User harus di isi !');
             }
             if (!isset($data['email']) || empty($data['email'])) {
-                echo "<script>alert('Email harus di isi !');</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Email harus di isi !');
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                echo "<script>alert('Email invalid !');</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Email invalid !');
             }
             if (isset($data['pass']) && !empty($data['pass'])){
                 if (strlen($data['pass']) < 8) {
-                    echo "<script>alert('Password minimal 8 karakter !');</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Password minimal 8 karakter !');
                 }
                 if (strlen($data['pass']) > 15) {
-                    echo "<script>alert('Password maksimal 15 karakter !');</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Password maksimal 15 karakter !');
                 }
                 if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $data['pass'])) {
-                    echo "<script>alert('Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !');</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Password harus berisi setidaknya satu huruf kecil, satu huruf besar, dan satu angka !');
                 }
             }
             if (!isset($data['nama']) || empty($data['nama'])) {
-                echo "<script>alert('Nama lengkap harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nama lengkap harus di isi !');
             }
             if (!isset($data['phone']) || empty($data['phone'])) {
-                echo "<script>alert('Nomer telepon harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon harus di isi !');
             }
             if (!is_numeric($data['phone'])) {
-                echo "<script>alert('Nomer telepon harus berisi hanya angka.')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon harus berisi hanya angka !');
             }
             if (strlen($data['phone']) < 8) {
-                echo "<script>alert('Nomer telpon minimal 8 angka !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon minimal 8 angka !');
             }
             if (strlen($data['phone']) > 15) {
-                echo "<script>alert('Nomer telpon maksimal 15 angka !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon maksimal 15 angka !');
             }
             if (substr($data['phone'], 0, 2) !== '08') {
-                echo "<script>alert('Nomer telepon harus dimulai dengan 08.')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Nomor telepon harus dimulai dengan 08 !');
             }
             if (!isset($data['jenisK']) || empty($data['jenisK'])) {
-                echo "<script>alert('Jenis kelamin harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Jenis kelamin harus di isi !');
             }
             if(!in_array($data['jenisK'], ['laki-laki','perempuan'])){
-                echo "<script>alert('Invalid jenis kelamin !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Jenis kelamin invalid !');
             }
             if (!isset($data['tempatL']) || empty($data['tempatL'])) {
-                echo "<script>alert('Tempat lahir harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Jenis kelamin harus di isi !');
             }
             if (!isset($data['tanggalL']) || empty($data['tanggalL'])) {
-                echo "<script>alert('Tanggal lahir harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Tanggal lahir harus di isi !');
             }
             if (!isset($data['role']) || empty($data['role'])) {
-                echo "<script>alert('Role harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Role harus di isi !');
             }
             if(!in_array($data['role'], ['super admin','admin event','admin pentas', 'admin tempat', 'admin seniman'])){
-                echo "<script>alert('Invalid role !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Role invalid !');
             }
             //check tanggal
             date_default_timezone_set('Asia/Jakarta');
@@ -327,15 +234,11 @@ class User{
             $tanggal_sekarang = date('Y-m-d');
             $tanggal_sekarang = strtotime($tanggal_sekarang);
             if (!$tanggal_lahir) {
-                echo "<script>alert('Format tanggal lahir tidak valid !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Format tanggal lahir invalid !');
             }
             // Compare the dates
             if ($tanggal_lahir > $tanggal_sekarang){
-                echo "<script>alert('Tanggal lahir tidak boleh kurang dari tanggal sekarang !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Tanggal lahir tidak boleh kurang dari tanggal sekarang !');
             }
             //check Admin
             $query = "SELECT role FROM users WHERE id_user = ? LIMIT 1";
@@ -346,28 +249,30 @@ class User{
             $stmt[0]->bind_result($role);
             if(!$stmt[0]->fetch()){
                 $stmt[0]->close();
-                echo "<script>alert('Pengguna tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Pengguna tidak ditemukan !');
             }
             $stmt[0]->close();
-            if($role != 'super admin'){
-                echo "<script>alert('Anda bukan super admin')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+            if(isset($data['desc'])){
+                if($data['desc'] !== 'profile'){
+                    if($role != 'super admin' || isset($data['desc'])){
+                        throw new Exception('Anda bukan super admin !');
+                    }
+                }
+            }else{
+                if($role != 'super admin'){
+                    throw new Exception('Anda bukan super admin !');
+                }
             }
             //check data user
             $query = "SELECT foto FROM users WHERE BINARY id_user = ? LIMIT 1";
             $stmt[1] = self::$con->prepare($query);
             $stmt[1]->bind_param('s', $data['id_user']);
             $stmt[1]->execute();
-            $idUser = 1;
-            $stmt[1]->bind_result($idUser);
+            $fotoDB = 1;
+            $stmt[1]->bind_result($fotoDB);
             if(!$stmt[1]->fetch()){
                 $stmt[1]->close();
-                echo "<script>alert('Data Admin tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Data Admin tidak ditemukan !');
             }
             $stmt[1]->close();
             //check email input
@@ -377,74 +282,115 @@ class User{
             $stmt[2]->execute();
             if ($stmt[2]->fetch()) {
                 $stmt[2]->close();
-                echo "<script>alert('Email sudah digunakan !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Email sudah digunakan !');
             }
             $stmt[2]->close();
             //if upload file then update file
-            if (isset($_FILES['foto']) & !empty($_FILES['foto']) && !is_null($_FILES['foto']) && $_FILES['foto']['error'] !== 4) {
-                // echo 'file  ';
-                // echo json_encode($_FILES['foto']);
-                // exit();
+            $updateGambar = false;
+            if (isset($_FILES['foto']) && !empty($_FILES['foto']) && !is_null($_FILES['foto']) && $_FILES['foto']['error'] !== 4) {
                 $folderAdmin = '/admin';
                 //proses file
                 $fileFoto = $_FILES['foto'];
                 $extension = pathinfo($fileFoto['name'], PATHINFO_EXTENSION);
-                $size = filesize($fileFoto['name']);
+                $size = filesize($fileFoto['tmp_name']);
                 if (in_array($extension,['png','jpeg','jpg'])) {
                     if ($size >= self::$sizeImg) {
-                        echo "<script>alert('Ukuran File maksimal '".(self::$sizeImg/1000000)."MB' !')</script>";
-                        echo "<script>window.history.back();</script>";
-                        exit();
+                        throw new Exception('Ukuran File maksimal '.(self::$sizeImg / (1024 * 1024)).'MB !');
                     }
                 } else {
-                    echo "<script>alert('File harus jpg, jpeg, png !')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('File harus jpg, jpeg, png !');
                 }
                 //simpan file
-                $nameFile = '/'.$idUser.'.'.$extension;  
+                $nameFile = '/'.$data['id_user'].'.'.$extension;
                 $fileFotoPath = self::$folderPath.$folderAdmin.$nameFile;
                 if (!move_uploaded_file($fileFoto['tmp_name'], $fileFotoPath)) {
-                    echo "<script>alert('Gagal menyimpan File !')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Gagal menyimpan file !');
                 }
+                //check extension
+                if($extension != pathinfo($fotoDB, PATHINFO_EXTENSION)){
+                    unlink(self::$folderPath.$folderAdmin.$fotoDB);
+                }
+                $updateGambar = true;
+            }
+            if(!isset($jwt) || empty($jwt) || is_null($jwt)){
+                require_once(__DIR__.'/Jwt.php');
+                $jwt = new Jwt();
             }
             //jika admin mengubah password
             if(isset($data['pass']) && !empty($data['pass'])){
                 $hashedPassword = password_hash($data['pass'], PASSWORD_DEFAULT);
-                $query = "UPDATE users SET email = ?, password = ?, nama_lengkap = ?, no_telpon = ?, jenis_kelamin = ?, tempat_lahir = ?, tanggal_lahir = ?, role = ? WHERE id_user = ?";
+                $query = "UPDATE users SET email = ?, password = ?, nama_lengkap = ?, no_telpon = ?, jenis_kelamin = ?, tempat_lahir = ?, tanggal_lahir = ?, role = ?, foto = ? WHERE id_user = ?";
                 $stmt = self::$con->prepare($query);
-                $stmt->bind_param("ssssssssi", $data['email'], $hashedPassword, $data['nama'], $data['phone'], $data['jenisK'], $data['tempatL'], $data['tanggalL'], $data['role'], $data['id_user']);
+                $stmt->bind_param("sssssssssi", $data['email'], $hashedPassword, $data['nama'], $data['phone'], $data['jenisK'], $data['tempatL'], $data['tanggalL'], $data['role'], $nameFile, $data['id_user']);
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
                     $stmt->close();
-                    echo "<script>alert('akun berhasil diubah')</script>";
-                    echo "<script>window.location.href = '/admin.php';</script>";
+                    if(isset($data['desc']) && $data['desc'] == 'profile'){
+                        //update cookie
+                        $result = $jwt->createToken(['email'=>$data['email']]);
+                        if(is_null($result)){
+                            throw new Exception('Update token error');
+                        }else{
+                            if($result['status'] == 'error'){
+                                throw new Exception($result);
+                            }else{
+                                //delete old cookie
+                                setcookie('token2', '', time() - 3600, '/');
+                                setcookie('token3', '', time() - 3600, '/');
+                                //create new cookie
+                                setcookie('token2', $result['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
+                                setcookie('token3', $result['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
+                            }
+                        }
+                    }
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','message'=>'Akun admin berhasil diubah']);
                     exit();
                 } else {
                     $stmt->close();
-                    echo "<script>alert('akun gagal diubah')</script>";
-                    echo "<script>window.location.href = '/admin.php';</script>";
-                    exit();
+                    if($updateGambar == true){
+                        header('Content-Type: application/json');
+                        echo json_encode(['status'=>'success','message'=>'Data admin berhasil diubah']);
+                        exit();
+                    }
+                    throw new Exception('Akun admin gagal diubah !');
                 }
             }else{
-                $query = "UPDATE users SET email = ?, nama_lengkap = ?, no_telpon = ?, jenis_kelamin = ?, tempat_lahir = ?, tanggal_lahir = ?, role = ? WHERE id_user = ?";
+                $query = "UPDATE users SET email = ?, nama_lengkap = ?, no_telpon = ?, jenis_kelamin = ?, tempat_lahir = ?, tanggal_lahir = ?, role = ?, foto = ? WHERE id_user = ?";
                 $stmt = self::$con->prepare($query);
-                $stmt->bind_param("sssssssi", $data['email'], $data['nama'], $data['phone'], $data['jenisK'], $data['tempatL'], $data['tanggalL'], $data['role'], $data['id_user']);
+                $stmt->bind_param("ssssssssi", $data['email'], $data['nama'], $data['phone'], $data['jenisK'], $data['tempatL'], $data['tanggalL'], $data['role'], $nameFile, $data['id_user']);
                 $stmt->execute();
                 if ($stmt->affected_rows > 0) {
                     $stmt->close();
-                    echo "<script>alert('akun berhasil diubah')</script>";
-                    echo "<script>window.location.href = '/admin.php';</script>";
+                    if(isset($data['desc']) && $data['desc'] == 'profile'){
+                        //update cookie
+                        $result = $jwt->createToken(['email'=>$data['email']]);
+                        if(is_null($result)){
+                            throw new Exception('Update token error');
+                        }else{
+                            if($result['status'] == 'error'){
+                                throw new Exception($result);
+                            }else{
+                                //delete old cookie
+                                setcookie('token2', '', time() - 3600, '/');
+                                setcookie('token3', '', time() - 3600, '/');
+                                //create new cookie
+                                setcookie('token2', $result['data']['token'], time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED']),'/');
+                                setcookie('token3', $result['data']['refresh'], time() + intval($_SERVER['JWT_REFRESH_TOKEN_EXPIRED']),'/');
+                            }
+                        }
+                    }
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','message'=>'Akun admin berhasil diubah']);
                     exit();
                 } else {
                     $stmt->close();
-                    echo "<script>alert('akun gagal diubah')</script>";
-                    echo "<script>window.location.href = '/admin.php';</script>";
-                    exit();
+                    if($updateGambar == true){
+                        header('Content-Type: application/json');
+                        echo json_encode(['status'=>'success','message'=>'Data admin berhasil diubah']);
+                        exit();
+                    }
+                    throw new Exception('Akun admin gagal diubah !');
                 }
             }
         }catch(Exception $e){
@@ -461,7 +407,9 @@ class User{
                     'message' => $errorJson['message'],
                 );
             }
-            echo "<script> alert('$responseData')</script>";
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
             exit();
         }
     }

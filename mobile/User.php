@@ -313,47 +313,6 @@ class UserMobile{
     public function changePassEmail($data, $uri){
         try{
             $jwtController = new JwtController();
-            // $validator = Validator::make($data, [
-            //     'email'=>'required|email',
-            //     'nama'=>'nullable',
-            //     'password' => [
-            //         'required',
-            //         'string',
-            //         'min:8',
-            //         'max:25',
-            //         'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/'
-            //     ],
-            //     'password_confirm' => [
-            //         'required',
-            //         'string',
-            //         'min:8',
-            //         'max:25',
-            //         'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/'
-            //     ],
-            //     'code' => 'nullable',
-            //     'link' => 'nullable',
-            //     'description'=>'required'
-            // ],[
-            //     'email.required'=>'Email wreajib di isi',
-            //     'email.email'=>'Email yang anda masukkan invalid',
-            //     'password.required'=>'Password harus di isi',
-            //     'password.min'=>'Password minimal 8 karakter',
-            //     'password.max'=>'Password maksimal 25 karakter',
-            //     'password.regex'=>'Password baru harus terdiri dari 1 huruf besar, huruf kecil, angka dan karakter unik',
-            //     'password_confirm.required'=>'Password konfirmasi konfirmasi harus di isi',
-            //     'password_confirm.min'=>'Password konfirmasi minimal 8 karakter',
-            //     'password_confirm.max'=>'Password konfirmasi maksimal 25 karakter',
-            //     'password_confirm.regex'=>'Password konfirmasi terdiri dari 1 huruf besar, huruf kecil, angka dan karakter unik',
-            //     'description.required'=>'Deskripsi harus di isi',
-            // ]);
-            // if ($validator->fails()) {
-            //     $errors = [];
-            //     foreach ($validator->errors()->toArray() as $field => $errorMessages) {
-            //         $errors = $errorMessages[0];
-            //     }
-            //     return ['status' => 'error', 'message' => $errors];
-            // }
-            // var_dump($data);
             $email = $data['email'];
             $password = $data["password"];
             $pass1 = $data["password_confirm"];

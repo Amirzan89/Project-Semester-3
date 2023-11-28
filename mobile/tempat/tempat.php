@@ -1,7 +1,7 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
 class TempatMobile{
-    private static $sizeFile = 5 * 1024 * 1024;
+    private static $sizeFile = 10 * 1024 * 1024;
     private static $database;
     private static $con;
     private static $folderPath;
@@ -396,10 +396,10 @@ class TempatMobile{
             //proses file
             $fileSurat = $_FILES['surat_keterangan'];
             $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileSurat['name']);
+            $size = filesize($fileSurat['tmp_name']);
             if (in_array($extension,['pdf'])) {
                 if ($size >= self::$sizeFile) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeFile / (1024 * 1024)).'MB','code'=>500]));
                 }
             } else {
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
@@ -576,24 +576,29 @@ class TempatMobile{
             }else if($statusDB == 'diterima' || $statusDB == 'ditolak'){
                 throw new Exception('Data sudah diverifikasi');
             }
-            //proses file
-            $fileSurat = $_FILES['surat_keterangan'];
-            $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
-            $size = filesize($fileSurat['tmp_name']);
-            if (in_array($extension,['pdf'])) {
-                if ($size >= self::$sizeFile) {
-                    throw new Exception(json_encode(['status' => 'error', 'message' => 'file terlalu besar','code'=>500]));
+            //check if user upload file
+            $updateSurat = false;
+            if(isset($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']) && !empty($_FILES['surat_keterangan']['name']) && $_FILES['surat_keterangan']['error'] !== 4){
+                //proses file
+                $fileSurat = $_FILES['surat_keterangan'];
+                $extension = pathinfo($fileSurat['name'], PATHINFO_EXTENSION);
+                $size = filesize($fileSurat['tmp_name']);
+                if (in_array($extension,['pdf'])) {
+                    if ($size >= self::$sizeFile) {
+                        throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeFile / (1024 * 1024)).'MB','code'=>500]));
+                    }
+                } else {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
                 }
-            } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
-            }
-            //replace file
-            $nameFile = '/'.$data['id_sewa'].'.'.$extension;
-            $fileSuratPath = self::$folderPath.$nameFile;
-            $fileSuratDB = $nameFile;
-            unlink(self::$folderPath.$suratDB);
-            if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                //replace file
+                $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get', ['col'=>'surat']);
+                $fileSuratPath = self::$folderPath.$nameFile;
+                $fileSuratDB = $nameFile;
+                if (!move_uploaded_file($fileSurat['tmp_name'], $fileSuratPath)) {
+                    throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
+                }
+                unlink(self::$folderPath.$suratDB);
+                $updateSurat = true;
             }
             //update data
             $query = "UPDATE sewa_tempat SET nik_sewa = ?, nama_tempat = ?, nama_peminjam = ?, deskripsi_sewa_tempat = ?, nama_kegiatan_sewa = ?, jumlah_peserta = ?, instansi = ?, surat_ket_sewa = ?, tgl_awal_peminjaman = ?, tgl_akhir_peminjaman = ?, updated_at = ? WHERE id_sewa = ?";
@@ -607,6 +612,11 @@ class TempatMobile{
                 exit();
             } else {
                 $stmt[3]->close();
+                if($updateSurat == true){
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','message'=>'Data sewa tempat berhasil diubah']);
+                    exit();
+                }
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Data sewa tempat gagal diubah','code'=>500]));
             }
         }catch(Exception $e){
@@ -722,10 +732,10 @@ class TempatMobile{
         } elseif (strpos($contentType, 'multipart/form-data') !== false) {
             $requestData = $_POST;
             return $requestData;
-        } else {
-            http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
-            exit();
+        // } else {
+        //     http_response_code(400);
+        //     echo json_encode(['status' => 'error', 'message' => 'Unsupported content type']);
+        //     exit();
         }
     }
 }
@@ -749,7 +759,7 @@ function loadEnv($path = null){
 };
 loadEnv();
 $tempatMobile = new TempatMobile();
-if($_SERVER['APP_TESTING']){
+if(isset($_SERVER['APP_TESTING']) && $_SERVER['APP_TESTING'] == 'true'){
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $data = TempatMobile::handle();
         if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan'])){

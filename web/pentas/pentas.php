@@ -165,18 +165,28 @@ class PentasWebsite{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if($data['keterangan'] ==  'ditolak' && $statusDB == 'diterima'){
+            if($data['keterangan'] ==  'ditolak' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
-            if($data['keterangan'] ==  'diterima' && $statusDB == 'ditolak'){
+            if($data['keterangan'] ==  'diterima' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
                 echo "<script>alert('Data sudah diverifikasi')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
+            // if($data['keterangan'] ==  'ditolak' && $statusDB == 'diterima'){
+            //     echo "<script>alert('Data sudah diverifikasi')</script>";
+            //     echo "<script>window.history.back();</script>";
+            //     exit();
+            // }
+            // if($data['keterangan'] ==  'diterima' && $statusDB == 'ditolak'){
+            //     echo "<script>alert('Data sudah diverifikasi')</script>";
+            //     echo "<script>window.history.back();</script>";
+            //     exit();
+            // }
             //update data
-            $query = "UPDATE surat_advis SET status = ?, catatan = ? WHERE id_advis = ?";
+            $query = "UPDATE surat_advis SET kode_verifikasi = ?, status = ?, catatan = ? WHERE id_advis = ?";
             $stmt[2] = self::$con->prepare($query);
             if($data['keterangan'] == 'proses'){
                 $status = 'proses';
@@ -184,12 +194,14 @@ class PentasWebsite{
                 if(isset($data['catatan']) || !empty($data['catatan'])){
                     $data['catatan'] = '';
                 }
+                $code = '';
             }else if($data['keterangan'] == 'diterima'){
                 $status = 'diterima';
                 $redirect = '/pengajuan.php';
                 if(isset($data['catatan']) || !empty($data['catatan'])){
                     $data['catatan'] = '';
                 }
+                $code = substr(uniqid(), 0 ,10);
             }else if($data['keterangan'] == 'ditolak'){
                 if(!isset($data['catatan']) || empty($data['catatan'])){
                     echo "<script>alert('Catatan harus di isi !')</script>";
@@ -198,8 +210,9 @@ class PentasWebsite{
                 }
                 $redirect = '/pengajuan.php';
                 $status = 'ditolak';
+                $code = '';
             }
-            $stmt[2]->bind_param("ssi", $status, $data['catatan'], $data['id_pentas']);
+            $stmt[2]->bind_param("sssi", $code, $status, $data['catatan'], $data['id_pentas']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
