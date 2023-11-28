@@ -70,7 +70,6 @@ if ($userAuth['status'] == 'error') {
   </aside><!-- End Sidebar-->
 
   <main id="main" class="main">
-
     <div class="pagetitle">
       <h1>Formulir Pendaftaran</h1>
       <nav>
@@ -199,7 +198,6 @@ if ($userAuth['status'] == 'error') {
                 </div>
               </form>
               <br><br>
-
               <div class="col-lg-12 col-md-4">
                 <div class="card success-card revenue-card">
                   <div class="card-body">
@@ -208,7 +206,8 @@ if ($userAuth['status'] == 'error') {
                     <h6>
                       <ol start="1">
                         <li>Dokumen yang disertakan sudah sesuai dengan persyaratan yang ada. </li>
-                        <li>Nomor Induk Seniman hanya berlaku per 31 Desember tiap tahunnya, silahkan lakukan perpanjangan setelahnya.</li>
+                        <li>Nomor Induk Seniman hanya berlaku per 31 Desember tiap tahunnya, 
+                          silahkan lakukan perpanjangan setelahnya.</li>
                         <li>Apabila data tidak setujui silahkan lakukan pengajuan ulang.</li>
                       </ol>
                     </h6>
@@ -221,7 +220,7 @@ if ($userAuth['status'] == 'error') {
                   <a href="../seniman.php" class="btn btn-secondary">Kembali</a>
                 </div>
               </div>
-    </section>
+    </section> 
 
   </main><!-- End #main -->
 
