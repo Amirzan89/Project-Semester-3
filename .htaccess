@@ -15,11 +15,8 @@
     RewriteRule ^ %1 [L,R=301]
 
     # Send Requests To Front Controller...
-    # RewriteCond %{REQUEST_FILENAME} !-d
-    # RewriteCond %{REQUEST_FILENAME} !-f
-    # RewriteRule ^ index.php [L]
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
 
-    # Rewrite to "project" folder
-    RewriteCond %{REQUEST_URI} !^/project/
-    RewriteRule ^(.*)$ project/$1 [L]
 </IfModule>
