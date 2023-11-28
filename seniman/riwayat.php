@@ -152,7 +152,7 @@ if($userAuth['status'] == 'error'){
                     <th scope="col">Nama Seniman</th>
                     <th scope="col">Tanggal Pengajuan</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Keterangan</th>
+                    <th scope="col">Kode Surat</th>
                     <th scope="col">Aksi</th>
                   </tr>
                 </thead>
@@ -169,12 +169,12 @@ if($userAuth['status'] == 'error'){
                       <td><?php echo $seniman['tanggal']?></td>
                       <td>
                         <?php if($seniman['status'] == 'diterima'){ ?>
-                          <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i>  Disetujui</span>
+                          <span class="badge bg-terima">Diterima</span>
                         <?php }else if($seniman['status'] == 'ditolak'){ ?>
-                          <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i>   Ditolak </span>
+                          <span class="badge bg-tolak">Ditolak </span>
                         <?php } ?>
                       </td>
-                      <td><?php echo $seniman['catatan']?></td>
+                      <td></td>
                       <td>
                         <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                       </td>
@@ -183,7 +183,12 @@ if($userAuth['status'] == 'error'){
                   } ?>
                 </tbody>
               </table>
-
+              <br>
+              <div class="row mb-3 justify-content-end">
+                <div class="col-sm-10 text-end">
+                  <a href="../seniman.php" class="btn btn-secondary">Kembali</a>
+                </div>
+              </div>
             </div>
           </div>
 

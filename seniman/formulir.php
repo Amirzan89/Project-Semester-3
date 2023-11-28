@@ -1,7 +1,7 @@
 <?php
-require_once(__DIR__.'/../web/koneksi.php');
-require_once(__DIR__.'/../web/authenticate.php');
-require_once(__DIR__.'/../env.php');
+require_once(__DIR__ . '/../web/koneksi.php');
+require_once(__DIR__ . '/../web/authenticate.php');
+require_once(__DIR__ . '/../env.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -13,7 +13,7 @@ if ($userAuth['status'] == 'error') {
   header('Location: /login.php');
 } else {
   $userAuth = $userAuth['data'];
-  if(!in_array($userAuth['role'],['super admin','admin seniman'])){
+  if (!in_array($userAuth['role'], ['super admin', 'admin seniman'])) {
     echo "<script>alert('Anda bukan admin seniman !')</script>";
     echo "<script>window.location.href = '/dashboard.php';</script>";
     exit();
@@ -55,7 +55,7 @@ if ($userAuth['status'] == 'error') {
 
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/../header.php');
+    <?php include(__DIR__ . '/../header.php');
     ?>
   </header><!-- End Header -->
 
@@ -64,7 +64,7 @@ if ($userAuth['status'] == 'error') {
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php
       $nav = 'seniman';
-      include(__DIR__.'/../sidebar.php');
+      include(__DIR__ . '/../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
@@ -117,12 +117,30 @@ if ($userAuth['status'] == 'error') {
                   <input type="date" class="form-control" id="tanggal_lahir" readonly>
                 </div>
                 <div class="col-md-6 mt-0">
-                <label for="jenis_kelamin" class="col-md-12 pt-3 col-form-label">Kecamatan</label>
-                <select class="form-select" aria-label="Default select example">
-                      <option selected>Pilih Kecamatan</option>
-                      <option value="laki-laki">Laki-laki</option>
-                      <option value="perempuan">Perempuan</option>
-                    </select>
+                  <label for="kecamatan" class="col-md-12 pt-3 col-form-label">Kecamatan</label>
+                  <select class="form-select" aria-label="Default select example">
+                    <option selected>Pilih Kecamatan</option>
+                    <option value="laki-laki">Nganjuk</option>
+                    <option value="ngetos">Ngetos</option>
+                    <option value="berbek">Berbek</option>
+                    <option value="loceret">Loceret</option>
+                    <option value="pace">Pace</option>
+                    <option value="prambon">Prambon</option>
+                    <option value="ngronggot">Ngronggot</option>
+                    <option value="kertosono">Kertosono</option>
+                    <option value="patianrowo">Patianrowo</option>
+                    <option value="ngetos">Ngetos</option>
+                    <option value="baron">Baron</option>
+                    <option value="tanjunganom">Tanjunganom</option>
+                    <option value="sukomoro">Sukomoro</option>
+                    <option value="bagor">Bagor</option>
+                    <option value="wilangan">Wilangan</option>
+                    <option value="rejoso">Rejoso</option>
+                    <option value="gondang">Gondang</option>
+                    <option value="ngluyu">Ngluyu</option>
+                    <option value="lengkong">Lengkong</option>
+                    <option value="katikalen">Jatikalen</option>
+                  </select>
                 </div>
                 <div class="col-md-12 ">
                   <label for="alamat_seniman" class="form-label">Alamat</label>
@@ -133,12 +151,29 @@ if ($userAuth['status'] == 'error') {
                   <input type="text" class="form-control" id="no_telpon" readonly>
                 </div>
                 <div class="col-mb-3 mt-0">
-                  <label for="jenis_kelamin" class="col-md-12 pt-3 col-form-label">Kategori Seni</label>
+                  <label for="kategori_seniman " class="col-md-12 pt-3 col-form-label">Kategori Seniman</label>
                   <div class="col-md-6">
                     <select class="form-select" aria-label="Default select example">
-                      <option selected>Pilih Kategori Seni</option>
-                      <option value="laki-laki">Laki-laki</option>
-                      <option value="perempuan">Perempuan</option>
+                      <option selected>Pilih Kategori Seniman</option>
+                      <option value="1">Campursari</option>
+                      <option value="2">Dalang</option>
+                      <option value="3">Jaranan</option>
+                      <option value="4">Karawitan</option>
+                      <option value="5">MC</option>
+                      <option value="6">Ludruk</option>
+                      <option value="7">Organisasi Kesenian Musik</option>
+                      <option value="8">Organisasi</option>
+                      <option value="9">Pramugari Tayup</option>
+                      <option value="10">Sanggar</option>
+                      <option value="11">Sinden</option>
+                      <option value="12">Vocalis</option>
+                      <option value="13">Wiranggono</option>
+                      <option value="14">Barongsai</option>
+                      <option value="15">Ketoprak</option>
+                      <option value="16">Pataji</option>
+                      <option value="17">Reog</option>
+                      <option value="18">Taman Hiburan Rakyat</option>
+                      <option value="19">Pelawak</option>
                     </select>
                   </div>
                 </div>
@@ -162,32 +197,37 @@ if ($userAuth['status'] == 'error') {
                   <label for="pass_foto" class="form-label">Pas Foto 3x4</label>
                   <input type="file" class="form-file-input form-control" id="pass_foto" disabled>
                 </div>
-            </form>
-            <br><br>
+              </form>
+              <br><br>
 
-            <div class="col-lg-12 col-md-4">
-              <div class="card success-card revenue-card">
-                <div class="card-body">
-                  <h6><strong>DENGAN PENGAJUAN FORMULIR INI, ANDA MENYETUJUI HAL- HAL BERIKUT :</strong></h6>
-                  <br>
-                  <h6>
-                    <ol start="1">
-                      <li>Dokumen yang disertakan sudah sesuai dengan persyaratan yang ada. </li>
-                      <li>Nomor Induk Seniman hanya berlaku per 31 Desember tiap tahunnya, silahkan lakukan perpanjangan setelahnya.</li>
-                      <li>Apabila data tidak setujui silahkan lakukan pengajuan ulang.</li>
-                    </ol>
-                  </h6>
+              <div class="col-lg-12 col-md-4">
+                <div class="card success-card revenue-card">
+                  <div class="card-body">
+                    <h6><strong>DENGAN PENGAJUAN FORMULIR INI, ANDA MENYETUJUI HAL- HAL BERIKUT :</strong></h6>
+                    <br>
+                    <h6>
+                      <ol start="1">
+                        <li>Dokumen yang disertakan sudah sesuai dengan persyaratan yang ada. </li>
+                        <li>Nomor Induk Seniman hanya berlaku per 31 Desember tiap tahunnya, silahkan lakukan perpanjangan setelahnya.</li>
+                        <li>Apabila data tidak setujui silahkan lakukan pengajuan ulang.</li>
+                      </ol>
+                    </h6>
+                  </div>
                 </div>
               </div>
-            </div>
-
+              <br>
+              <div class="row mb-3 justify-content-end">
+                <div class="col-sm-10 text-end">
+                  <a href="../seniman.php" class="btn btn-secondary">Kembali</a>
+                </div>
+              </div>
     </section>
 
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/../footer.php');
+    <?php include(__DIR__ . '/../footer.php');
     ?>
   </footer>
 

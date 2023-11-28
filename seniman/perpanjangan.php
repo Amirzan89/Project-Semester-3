@@ -169,9 +169,9 @@ if($userAuth['status'] == 'error'){
                       </td>
                       <td>
                       <?php if($seniman['status'] == 'diajukan'){ ?>
-                          <button class="btn btn-lihat" onclick="proses(<?php echo $seniman['id_seniman'] ?>)"><i class="bi bi-eye-fill">Lihat</i></button>
+                          <button class="btn btn-lihat" onclick="proses(<?php echo $seniman['id_seniman'] ?>)"><i class="bi bi-eye-fill"></i>   Lihat</button>
                         <?php }else if($seniman['status'] == 'proses'){ ?>
-                          <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill">Lihat</i></a>
+                          <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
                         <?php } ?>
                       </td>
                     </tr>
@@ -179,6 +179,12 @@ if($userAuth['status'] == 'error'){
                   } ?>
                </tbody>
               </table>
+              <br>
+              <div class="row mb-3 justify-content-end">
+                <div class="col-sm-10 text-end">
+                  <a href="../seniman.php" class="btn btn-secondary">Kembali</a>
+                </div>
+              </div>
             </div>
           </div>
 

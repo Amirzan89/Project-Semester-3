@@ -94,8 +94,8 @@ if($userAuth['status'] == 'error'){
                         <div class="card-body">
                           <h4 class="card-title">Data Tempat</h4>
                           <a href="/tempat/tambah_tempat.php">
-                            <button type="button" class="btn btn-success">
-                                <i class="bi bi-person-plus-fill"></i> Tambah Tempat
+                            <button type="button" class="btn btn-primary">
+                                <i class="bi bi-file-earmark-plus" style='font-size: 20px; font-weight: bold;'></i>   Tambah Tempat
                             </button>
                           </a>
                             <table class="table datatable">
@@ -118,15 +118,20 @@ if($userAuth['status'] == 'error'){
                                         <td><?php echo $tempat['nama_tempat'] ?></td>
                                         <td><?php echo $tempat['alamat_tempat'] ?></td>
                                         <td>
-                                          <a href="/tempat/detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill">Lihat</i></a>
-                                          <a href="/tempat/edit_detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
-                                          <button type="button" class="btn btn-danger" onclick="openDelete(<?php echo $tempat['id_tempat']?>)"> <i class="bi bi-trash-fill">Hapus</i></button>
+                                          <a href="/tempat/detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
+                                          <a href="/tempat/edit_detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-edit"><i class="bi bi-pencil-fill"></i>   Edit</a>
+                                          <button type="button" class="btn btn-tolak" onclick="openDelete(<?php echo $tempat['id_tempat']?>)"> <i class="bi bi-trash-fill"></i>   Hapus</button>
                                         </td>
                                       </tr>
                                     <?php $no++;
                                   } ?>
                                 </tbody>
                             </table>
+                            <div class="row mb-3 justify-content-end">
+                                <div class="col-sm-10 text-end">
+                                    <a href="../tempat.php" class="btn btn-secondary">Kembali</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -140,11 +145,11 @@ if($userAuth['status'] == 'error'){
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Konfirmasi hapus tempat</h5>
+          <h5 class="modal-title">Konfirmasi hapus data tempat</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          Apakah Anda yakin ingin menghapus tempat ?  
+          Apakah anda yakin ingin menghapus data tempat?  
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -152,7 +157,7 @@ if($userAuth['status'] == 'error'){
             <input type="hidden" name="_method" value="DELETE">
             <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
             <input type="hidden" name="id_tempat" id="inpTempat">
-            <button type="submit" class="btn btn-success" name="hapusAdmin">Hapus</button>
+            <button type="submit" class="btn btn-tolak" name="hapusAdmin">Hapus</button>
           </form>
         </div>
       </div>

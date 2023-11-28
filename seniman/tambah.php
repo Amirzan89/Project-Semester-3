@@ -100,11 +100,13 @@ if($userAuth['status'] == 'error'){
                   <input type="text" class="form-control" id="nik"
                     placeholder="Masukkan Nomor Induk Kependudukan">
                 </div>
+                <br>
                 <div class="col-md-12">
                   <label for="nama_seniman" class="form-label">Nama Lengkap</label>
                   <input type="text" class="form-control" id="nama_seniman"
                     placeholder="Masukkan Nama Lengkap sesuai KTP">
                 </div>
+                <br>
                 <div class="col-mb-3 mt-0">
                   <label for="jenis_kelamin" class="col-md-12 pt-3 col-form-label">Jenis Kelamin</label>
                   <div class="col-md-6">
@@ -114,6 +116,7 @@ if($userAuth['status'] == 'error'){
                     </select>
                   </div>
                 </div>
+                <br>
                 <div class="col-md-8">
                   <label for="tempat_lahir" class="form-label">Tempat lahir</label>
                   <input type="text" class="form-control" id="tempat_lahir" placeholder="Masukkan Tempat Lahir">
@@ -122,43 +125,76 @@ if($userAuth['status'] == 'error'){
                   <label for="tanggal_lahir" class="form-label">Tanggal lahir</label>
                   <input type="date" class="form-control" id="tanggal_lahir">
                 </div>
+                <br>
                 <div class="col-md-12 ">
                   <label for="alamat_seniman" class="form-label">Alamat</label>
                   <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat"
                     style="height: 100px;"></textarea>
                 </div>
+                <br>
                 <div class="col-md-12">
                   <label for="no_telpon" class="form-label">Nomor Telepon</label>
                   <input type="text" class="form-control" id="no_telpon" placeholder="Masukkan Nomor Telepon Aktif">
                 </div>
+                <br>
                 <div class="col-md-8">
                   <label for="nama_organisasi" class="form-label">Nama Organisasi</label>
                   <input type="text" class="form-control" id="nama_organisasi" placeholder="Masukkan Nama Organisasi">
                 </div>
+                <br>
                 <div class="col-md-4">
                   <label for="jumlah_anggota" class="form-label">Jumlah Anggota</label>
                   <input type="number" class="form-control" id="jumlah_anggota" placeholder="Masukkan Jumlah Anggota">
                 </div>
+                <br>
                 <div class="col-12">
                   <label for="surat_keterangan" class="form-label">Surat Keterangan Desa</label>
                   <input type="file" class="form-file-input form-control" id="surat_keterangan" ">
                 </div>
+                <br>
                 <div class=" col-12">
                   <label for="ktp_seniman" class="form-label">Foto Kartu Tanda Penduduk</label>
                   <input type="file" class="form-file-input form-control" id="ktp_seniman">
                 </div>
+                <br>
                 <div class="col-12">
                   <label for="pass_foto" class="form-label">Pass Foto 3x4</label>
                   <input type="file" class="form-file-input form-control" id="pass_foto">
                 </div>
-                <div class="text-center">
-                  <button type="submit" class="btn btn-tambah">Tambah</button>
-                  <button type="reset" class="btn btn-reset">Bersih</button>
+                <div class="row mb-3 justify-content-end">
+                <div class="col-sm-10 text-end"><br>
+                  <a href="/seniman/data_seniman.php" class="btn btn-secondary" style="margin-right: 5px;">Kembali</a>
+                  <button type="submit" class="btn btn-tambah" onclick="openTambah(<?php echo $seniman['id_seniman']?>)">Tambah</button>
                 </div>
+              </div>
+
               </form>
     </section>
 
   </main><!-- End #main -->
+      <!-- start modal tambah -->
+      <div class="modal fade" id="modalTambah" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Konfirmasi tambah data seniman</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Apakah anda yakin ingin menambahkan data seniman?
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <form action="/web/seniman/seniman.php" id="deleteForm" method="POST">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+            <input type="hidden" name="id_tempat" id="inpTempat">
+            <button type="submit" class="btn btn-tambah" name="hapusAdmin">Tambah</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end modal tambah -->
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">

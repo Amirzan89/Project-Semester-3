@@ -155,7 +155,12 @@ if ($userAuth['status'] == 'error') {
                     </div>
                   </div>
                 </div>
-
+                <br>
+                <div class="row mb-3 justify-content-end">
+                  <div class="col-sm-10 text-end">
+                        <a href="../pentas.php" class="btn btn-secondary">Kembali</a>
+                  </div>
+                </div>
             </div>
           </div>
         </div>

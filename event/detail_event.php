@@ -1,7 +1,7 @@
 <?php
-require_once(__DIR__.'/../web/koneksi.php');
-require_once(__DIR__.'/../web/authenticate.php');
-require_once(__DIR__.'/../env.php');
+require_once(__DIR__ . '/../web/koneksi.php');
+require_once(__DIR__ . '/../web/authenticate.php');
+require_once(__DIR__ . '/../env.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -13,7 +13,7 @@ if ($userAuth['status'] == 'error') {
   header('Location: /login.php');
 } else {
   $userAuth = $userAuth['data'];
-  if(!in_array($userAuth['role'],['super admin','admin event'])){
+  if (!in_array($userAuth['role'], ['super admin', 'admin event'])) {
     echo "<script>alert('Anda bukan admin event !')</script>";
     echo "<script>window.location.href = '/dashboard.php';</script>";
     exit();
@@ -45,9 +45,7 @@ if ($userAuth['status'] == 'error') {
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
-  <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <!-- Vendor CSS Files -->
   <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -71,7 +69,7 @@ if ($userAuth['status'] == 'error') {
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/../header.php');
+    <?php include(__DIR__ . '/../header.php');
     ?>
   </header><!-- End Header -->
 
@@ -80,7 +78,7 @@ if ($userAuth['status'] == 'error') {
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php
       $nav = 'event';
-      include(__DIR__.'/../sidebar.php');
+      include(__DIR__ . '/../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
@@ -89,15 +87,15 @@ if ($userAuth['status'] == 'error') {
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Formulir Pengajuan</h1>
+      <h1>Detail Data Event</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
           <li class="breadcrumb-item"><a href="/event.php">Kelola Event</a></li>
           <?php if ($events['status'] == 'diajukan' || $events['status'] == 'proses') { ?>
-            <li class="breadcrumb-item"><a href="/event/pengajuan.php">Pengajuan event</a></li>
+            <li class="breadcrumb-item"><a href="/event/pengajuan.php">Verifikasi Pengajuan</a></li>
           <?php } else if ($events['status'] == 'diterima' || $events['status'] == 'ditolak') { ?>
-              <li class="breadcrumb-item"><a href="/event/riwayat.php">Riwayat Pengajuan event</a></li>
+            <li class="breadcrumb-item"><a href="/event/riwayat.php">Riwayat Pengajuan</a></li>
           <?php } ?>
           <li class="breadcrumb-item active">Detail event</li>
         </ol>
@@ -107,83 +105,81 @@ if ($userAuth['status'] == 'error') {
     <section class="section">
       <div class="row">
         <div class="col-lg-12">
-
+          <div class="row mb-3 d-flex justify-content-center align-items-center">
+            <?php if ($events['status'] == 'diterima') { ?>
+              <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i> Diterima</span>
+            <?php } else if ($events['status'] == 'ditolak') { ?>
+              <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i> Ditolak</span>
+              </li>
+            <?php } ?>
+          </div>
           <div class="card">
             <div class="card-body">
               <?php if ($events['status'] == 'diajukan' || $events['status'] == 'proses') { ?>
                 <h5 class="card-title"> Pengajuan event</h5>
               <?php } else if ($events['status'] == 'diterima' || $events['status'] == 'ditolak') { ?>
-                  <h5 class="card-title"> Riwayat event</h5>
+                <h5 class="card-title"> Riwayat event</h5>
               <?php } ?>
               <form class="row g-3">
                 <div class="col-md-12">
-                  <label for="inputText" class="form-label">Nama Pengirim :</label>
-                  <input type="text" class="form-control" id="inputText" readonly
-                    value="<?php echo $events['nama_pengirim'] ?>">
+                  <label for="inputText" class="form-label">Nama Pengirim</label>
+                  <input type="text" class="form-control" id="inputText" readonly value="<?php echo $events['nama_pengirim'] ?>">
                 </div>
                 <div class="col-md-12">
-                  <label for="inputText" class="form-label">Nama Event : </label>
-                  <input type="text" class="form-control" id="inputText" readonly
-                    value="<?php echo $events['nama_event'] ?>">
+                  <label for="inputText" class="form-label">Nama Event</label>
+                  <input type="text" class="form-control" id="inputText" readonly value="<?php echo $events['nama_event'] ?>">
                 </div>
                 <div class="col-md-4">
-                  <label for="inputDate" class="form-label">Tanggal awal :</label>
-                  <input type="text" class="form-control" id="inputDate" readonly
-                    value="<?php echo $events['tanggal_awal'] ?>">
+                  <label for="inputDate" class="form-label">Tanggal awal</label>
+                  <input type="text" class="form-control" id="inputDate" readonly value="<?php echo $events['tanggal_awal'] ?>">
                 </div>
                 <div class="col-md-4">
-                  <label for="inputDate" class="form-label">Tanggal akhir :</label>
-                  <input type="text" class="form-control" id="inputDate" readonly
-                    value="<?php echo $events['tanggal_akhir'] ?>">
+                  <label for="inputDate" class="form-label">Tanggal akhir</label>
+                  <input type="text" class="form-control" id="inputDate" readonly value="<?php echo $events['tanggal_akhir'] ?>">
                 </div>
                 <div class="col-md-8">
-                  <label for="inputText" class="form-label">Tempat :</label>
-                  <input type="text" class="form-control" id="inputText" readonly
-                    value="<?php echo $events['tempat_event'] ?>">
+                  <label for="inputText" class="form-label">Tempat</label>
+                  <input type="text" class="form-control" id="inputText" readonly value="<?php echo $events['tempat_event'] ?>">
                 </div>
                 <div class="col-12">
-                  <label for="inputText" class="form-label">Deskripsi Event :</label>
-                  <textarea class="form-control" id="inputTextarea" style="height: 100px;"
-                    readonly><?php echo $events['deskripsi'] ?></textarea>
+                  <label for="inputText" class="form-label">Deskripsi Event</label>
+                  <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $events['deskripsi'] ?></textarea>
                 </div>
                 <div class="col-12">
-                  <label for="inputLink" class="form-label">Link Pendaftaran :</label>
-                  <input type="link" class="form-control" id="inputLink" readonly
-                    value="<?php echo $events['link_pendaftaran'] ?>">
+                  <label for="inputLink" class="form-label">Link Pendaftaran</label>
+                  <input type="link" class="form-control" id="inputLink" readonly value="<?php echo $events['link_pendaftaran'] ?>">
                 </div>
+
                 <div class="col-12">
-                  <label for="inputFile" class="form-label">Poster Event :</label>
-                  <button class="btn btn-info" type="button" onclick="preview('foto')"> Lihat poster </button>
-                  <button class="btn btn-info" type="button" onclick="download('foto')"> Download poster </button>
+                  <label for="inputFile" class="form-label">Poster Event</label>
+                  <div class="col-sm-10">
+                    <button class="btn btn-info" type="button" onclick="preview('foto')"> Lihat poster </button>
+                    <button class="btn btn-info" type="button" onclick="download('foto')"> Download poster </button>
+                  </div>
+
                 </div>
                 <?php if (isset($events['catatan']) && !is_null($events['catatan']) && !empty($events['catatan'])) { ?>
                   <div class="col-12">
-                    <label for="inputText" class="form-label">Catatan :</label>
-                    <textarea class="form-control" id="inputTextarea" style="height: 100px;"
-                      readonly><?php echo $events['catatan'] ?></textarea>
+                    <label for="inputText" class="form-label">Alasan Penolakan</label>
+                    <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $events['catatan'] ?></textarea>
                   </div>
                 <?php } ?>
                 <div class="row mb-3 justify-content-end">
-                  <div class="col-sm-10 text-end">
+                  <div class="col-sm-10 text-end"><br>
+
                     <?php if ($events['status'] == 'diajukan' || $events['status'] == 'proses') { ?>
-                        <a href="/event/pengajuan.php" class="btn btn-info"><i>kembali</i></a>
+                      <a href="/event/pengajuan.php" class="btn btn-secondary" style="margin-right: 5px;">Kembali</a>
                     <?php } else if ($events['status'] == 'diterima' || $events['status'] == 'ditolak') { ?>
-                            <a href="/event/riwayat.php" class="btn btn-info"><i>kembali</i></a>
+                      <a href="/event/riwayat.php" class="btn btn-secondary" style="margin-right: 5px;">Kembali</a>
                     <?php } ?>
                     <?php if ($events['status'] == 'diajukan') { ?>
-                        <button type="button" class="btn btn-success"
-                            onclick="openProses(<?php echo $events['id_event'] ?>)">
-                            <i class="bi bi-edit-fill">Proses</i>
-                        </button>
+                      <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses(<?php echo $events['id_event'] ?>)"> Proses
+                      </button>
                     <?php } else if ($events['status'] == 'proses') { ?>
-                        <button type="button" class="btn btn-success"
-                            onclick="openSetuju(<?php echo $events['id_event'] ?>)">
-                            <i class="bi bi-check-circle">Setuju</i>
-                        </button>
-                        <button type="button" class="btn btn-danger"
-                            onclick="openTolak(<?php echo $events['id_event'] ?>)">
-                            <i class="bi bi-x-circle">Tolak</i>
-                        </button>
+                      <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju(<?php echo $events['id_event'] ?>)">Terima
+                      </button>
+                      <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak(<?php echo $events['id_event'] ?>)">Tolak
+                      </button>
                     <?php } ?>
                   </div>
                 </div>
@@ -199,85 +195,86 @@ if ($userAuth['status'] == 'error') {
   </main><!-- End #main -->
   <!-- start modal proses -->
   <div class="modal fade" id="modalProses" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Konfirmasi proses event</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin memproses data event ?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form action="/web/event/event.php" id="prosesForm" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
-                        <input type="hidden" name="id_event" id="inpEventP">
-                        <input type="hidden" name="keterangan" value="proses">
-                        <button type="submit" class="btn btn-success">Proses</button>
-                    </form>
-                </div>
-            </div>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Konfirmasi Proses Pengajuan Event</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <div class="modal-body">
+          Apakah anda yakin ingin memproses pengajuan event?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <form action="/web/event/event.php" id="prosesForm" method="POST">
+            <input type="hidden" name="_method" value="PUT">
+            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+            <input type="hidden" name="id_event" id="inpEventP">
+            <input type="hidden" name="keterangan" value="proses">
+            <button type="submit" class="btn btn-tambah">Proses</button>
+          </form>
+        </div>
+      </div>
     </div>
-    <!-- end modal proses -->
+  </div>
+  <!-- end modal proses -->
 
-    <!-- start modal setuju -->
-    <div class="modal fade" id="modalSetuju" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Konfirmasi setuju event</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menyetujui event ?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form action="/web/event/event.php" id="prosesForm" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
-                        <input type="hidden" name="id_event" id="inpEventS">
-                        <input type="hidden" name="keterangan" value="diterima">
-                        <button type="submit" class="btn btn-success">Setuju</button>
-                    </form>
-                </div>
-            </div>
+  <!-- start modal setuju -->
+  <div class="modal fade" id="modalSetuju" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Terima Pengajuan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <div class="modal-body">
+          Apakah anda yakin ingin menerima pengajuan ini?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <form action="/web/event/event.php" id="prosesForm" method="POST">
+            <input type="hidden" name="_method" value="PUT">
+            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+            <input type="hidden" name="id_event" id="inpEventS">
+            <input type="hidden" name="keterangan" value="diterima">
+            <button type="submit" class="btn btn-tambah">Terima</button>
+          </form>
+        </div>
+      </div>
     </div>
-    <!-- end modal setuju -->
+  </div>
+  <!-- end modal setuju -->
 
-    <!-- start modal tolak -->
-    <div class="modal fade" id="modalTolak" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Konfirmasi tolak event</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menolak event ?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form action="/web/event/event.php" id="prosesForm" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
-                        <input type="hidden" name="id_event" id="inpEventT">
-                        <input type="hidden" name="catatan" value="terserah">
-                        <input type="hidden" name="keterangan" value="ditolak">
-                        <button type="submit" class="btn btn-success">Tolak</button>
-                    </form>
-                </div>
-            </div>
+  <!-- start modal tolak -->
+  <div class="modal fade" id="modalTolak" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tolak Pengajuan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <div class="modal-body" style="text-align: left;">
+          <label for="catatan" class="form-label">Alasan penolakan</label>
+          <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alasan Penolakan" style="height: 100px;"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <form action="/web/event/event.php" id="prosesForm" method="POST">
+            <input type="hidden" name="_method" value="PUT">
+            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+            <input type="hidden" name="id_event" id="inpEventT">
+            <input type="hidden" name="catatan" value="terserah">
+            <input type="hidden" name="keterangan" value="ditolak">
+            <button type="submit" class="btn btn-tolak">Tolak</button>
+          </form>
+        </div>
+      </div>
     </div>
-    <!-- end modal tolak -->
+  </div>
+  <!-- end modal tolak -->
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/../footer.php');
+    <?php include(__DIR__ . '/../footer.php');
     ?>
   </footer>
 
@@ -288,20 +285,23 @@ if ($userAuth['status'] == 'error') {
     var inpEventP = document.getElementById('inpEventP');
     var inpEventS = document.getElementById('inpEventS');
     var inpEventT = document.getElementById('inpEventT');
-    function openProses(dataU,) {
-        inpEventP.value = dataU;
-        var myModal = new bootstrap.Modal(modalProses);
-        myModal.show();
+
+    function openProses(dataU, ) {
+      inpEventP.value = dataU;
+      var myModal = new bootstrap.Modal(modalProses);
+      myModal.show();
     }
+
     function openSetuju(dataU) {
-        inpEventS.value = dataU;
-        var myModal = new bootstrap.Modal(modalSetuju);
-        myModal.show();
+      inpEventS.value = dataU;
+      var myModal = new bootstrap.Modal(modalSetuju);
+      myModal.show();
     }
+
     function openTolak(dataU) {
-        inpEventT.value = dataU;
-        var myModal = new bootstrap.Modal(modalTolak);
-        myModal.show();
+      inpEventT.value = dataU;
+      var myModal = new bootstrap.Modal(modalTolak);
+      myModal.show();
     }
     //preview data
     function preview(desc) {
@@ -322,7 +322,7 @@ if ($userAuth['status'] == 'error') {
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data
       xhr.send(JSON.stringify(requestBody));
-      xhr.onreadystatechange = function () {
+      xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200 || xhr.status === 300 || xhr.status === 302) {
             var response = JSON.parse(xhr.responseText);
@@ -354,24 +354,24 @@ if ($userAuth['status'] == 'error') {
       xhr.responseType = 'blob';
       // send the form data
       xhr.send(JSON.stringify(requestBody));
-      xhr.onreadystatechange = function () {
+      xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
-              var blob = xhr.response;
-              var contentDisposition = xhr.getResponseHeader('Content-Disposition');
-              var match = contentDisposition.match(/filename="(.+\..+?)"/);
-              if (match) {
-                  var filename = match[1];
-                  var link = document.createElement('a');
-                  link.href = window.URL.createObjectURL(blob);
-                  link.download = filename;
-                  link.click();
-              } else {
-                  console.log('Invalid content-disposition header');
-              }
+            var blob = xhr.response;
+            var contentDisposition = xhr.getResponseHeader('Content-Disposition');
+            var match = contentDisposition.match(/filename="(.+\..+?)"/);
+            if (match) {
+              var filename = match[1];
+              var link = document.createElement('a');
+              link.href = window.URL.createObjectURL(blob);
+              link.download = filename;
+              link.click();
+            } else {
+              console.log('Invalid content-disposition header');
+            }
           } else {
-              var response = xhr.responseText;
-              console.log('errorrr ' + response);
+            var response = xhr.responseText;
+            console.log('errorrr ' + response);
           }
         };
       }

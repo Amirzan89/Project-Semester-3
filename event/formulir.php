@@ -1,19 +1,19 @@
 <?php
-require_once(__DIR__.'/../web/koneksi.php');
-require_once(__DIR__.'/../web/authenticate.php');
-require_once(__DIR__.'/../env.php');
+require_once(__DIR__ . '/../web/koneksi.php');
+require_once(__DIR__ . '/../web/authenticate.php');
+require_once(__DIR__ . '/../env.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
-$userAuth = authenticate($_POST,[
-  'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD']
-],$conn);
-if($userAuth['status'] == 'error'){
-	header('Location: /login.php');
-}else{
-	$userAuth = $userAuth['data'];
-  if(!in_array($userAuth['role'],['super admin','admin event'])){
+$userAuth = authenticate($_POST, [
+  'uri' => $_SERVER['REQUEST_URI'],
+  'method' => $_SERVER['REQUEST_METHOD']
+], $conn);
+if ($userAuth['status'] == 'error') {
+  header('Location: /login.php');
+} else {
+  $userAuth = $userAuth['data'];
+  if (!in_array($userAuth['role'], ['super admin', 'admin event'])) {
     echo "<script>alert('Anda bukan admin event !')</script>";
     echo "<script>window.location.href = '/dashboard.php';</script>";
     exit();
@@ -24,6 +24,7 @@ if($userAuth['status'] == 'error'){
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -34,13 +35,11 @@ if($userAuth['status'] == 'error'){
 
   <!-- Favicons -->
   <link href="<?php echo $tPath; ?>/public/assets/img/landing-page/favicon.png" rel="icon">
-    <link href="<?php echo $tPath; ?>/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?php echo $tPath; ?>/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
-  <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <!-- Vendor CSS Files -->
   <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -54,15 +53,15 @@ if($userAuth['status'] == 'error'){
 
 <body>
   <script>
-		var csrfToken = "<?php echo $csrf ?>";
+    var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
     var number = "<?php echo $userAuth['number'] ?>";
     var role = "<?php echo $userAuth['role'] ?>";
-	</script>
+  </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/../header.php');
+    <?php include(__DIR__ . '/../header.php');
     ?>
   </header><!-- End Header -->
 
@@ -70,8 +69,8 @@ if($userAuth['status'] == 'error'){
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php
-      $nav = 'event'; 
-      include(__DIR__.'/../sidebar.php');
+      $nav = 'event';
+      include(__DIR__ . '/../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
@@ -101,35 +100,35 @@ if($userAuth['status'] == 'error'){
               <form class="row g-3">
                 <div class="col-md-12">
                   <label for="inputText" class="form-label">Nama Pengirim</label>
-                  <input type="text" class="form-control" id="inputText">
+                  <input type="text" class="form-control" id="inputText" readonly>
                 </div>
                 <div class="col-md-12">
                   <label for="inputText" class="form-label">Nama Event</label>
-                  <input type="text" class="form-control" id="inputText">
+                  <input type="text" class="form-control" id="inputText" readonly>
                 </div>
                 <div class="col-md-6">
                   <label for="tanggal_awal" class="form-label">Tanggal Awal</label>
-                  <input type="date" class="form-control" id="tanggal_awal">
+                  <input type="date" class="form-control" id="tanggal_awal" readonly>
                 </div>
                 <div class="col-md-6">
                   <label for="tanggal_akhir" class="form-label">Tanggal Akhir</label>
-                  <input type="date" class="form-control" id="tanggal_akhir">
+                  <input type="date" class="form-control" id="tanggal_akhir" readonly>
                 </div>
                 <div class="col-md-12">
                   <label for="inputText" class="form-label">Tempat</label>
-                  <input type="text" class="form-control" id="inputText">
+                  <input type="text" class="form-control" id="inputText" readonly>
                 </div>
                 <div class="col-12">
                   <label for="inputText" class="form-label">Deskripsi Event</label>
-                  <textarea class="form-control" id="inputTextarea" style="height: 100px;"></textarea>
+                  <textarea class="form-control" id="inputTextarea" readonly style="height: 100px;"></textarea>
                 </div>
                 <div class="col-12">
                   <label for="inputLink" class="form-label">Link Pendaftaran</label>
-                  <input type="link" class="form-control" id="inputLink">
+                  <input type="link" class="form-control" id="inputLink" readonly>
                 </div>
                 <div class="col-12">
                   <label for="inputFile" class="form-label">Poster Event</label>
-                  <input type="file" class="form-file-input form-control" id="inputFile">
+                  <input type="file" class="form-file-input form-control" id="inputFile" readonly>
                 </div>
               </form>
               <br><br>
@@ -148,12 +147,14 @@ if($userAuth['status'] == 'error'){
                   </div>
                 </div>
               </div>
-              
+              <div class="row mb-3 justify-content-end">
+                <div class="col-sm-10 text-end">
+                  <a href="../event.php" class="btn btn-secondary">Kembali</a>
+                </div>
+              </div>
               <!-- End General Form Elements -->
-
             </div>
           </div>
-
         </div>
       </div>
     </section>
@@ -162,12 +163,11 @@ if($userAuth['status'] == 'error'){
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/../footer.php');
+    <?php include(__DIR__ . '/../footer.php');
     ?>
   </footer>
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
   <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

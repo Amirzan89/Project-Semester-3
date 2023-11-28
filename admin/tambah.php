@@ -163,21 +163,17 @@ if($userAuth['status'] == 'error'){
                   </div>
                 </div>
                 <div class="row mb-3">
-                  <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
+                  <label for="inputPassword" class="col-sm-2 col-form-label">Kata Sandi</label>
                   <div class="col-sm-10">
                     <input type="password" class="form-control" name='pass' placeholder="Password">
                   </div>
                 </div>
-                <div class="row mb-3">
-                  <label for="inputPassword" class="col-sm-2 col-form-label">Foto</label>
-                  <div class="col-sm-10">
-                    <input type="file" class="form-control" name='foto' placeholder="Password">
+                <div class="row mb-3 justify-content-end">
+                  <div class="col-sm-10 text-end"><br>
+                    <a href="/admin.php" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-tambah" onclick="openEdit(<?php echo $seniman['id_seniman'] ?>)">Tambah</button>
                   </div>
                 </div>
-                <div class="row mb-3">
-                <button type="submit" name="tambahAdmin" class="btn btn-success">Daftarkan</button>
-                </div>
-
               </form><!-- End General Form Elements -->
 
             </div>
@@ -189,6 +185,30 @@ if($userAuth['status'] == 'error'){
 
   </main>
   <!-- End #main -->
+    <!-- start modal tambah -->
+    <div class="modal fade" id="modalTambah" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi tambah data admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah anda yakin ingin menambah data admin?
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <form action="/web/seniman/seniman.php" id="deleteForm" method="POST">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                            <input type="hidden" name="id_tempat" id="inpTempat">
+                            <button type="submit" class="btn btn-tambah" name="hapusAdmin">Tambah</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end modal tambah -->
+
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">

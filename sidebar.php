@@ -29,7 +29,7 @@
 <li class="nav-item <?php echo $nav == 'seniman' ? 'active' : ''; ?>">
   <a class="nav-link " href="/seniman.php">
     <i class="bi bi-people"></i>
-    <span>Nomor Induk Seniman</span>
+    <span>Kelola Seniman</span>
   </a>
 </li>
 <?php }?>

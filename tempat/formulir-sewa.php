@@ -1,20 +1,19 @@
 <?php
-require_once(__DIR__.'/../web/koneksi.php');
-require_once(__DIR__.'/../web/authenticate.php');
-require_once(__DIR__.'/../env.php');
+require_once(__DIR__ . '/../web/koneksi.php');
+require_once(__DIR__ . '/../web/authenticate.php');
+require_once(__DIR__ . '/../env.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
 $userAuth = authenticate($_POST, [
     'uri' => $_SERVER['REQUEST_URI'],
-    'method' => $_SERVER['REQUEST_METHOD'
-    ]
+    'method' => $_SERVER['REQUEST_METHOD']
 ], $conn);
 if ($userAuth['status'] == 'error') {
     header('Location: /login.php');
 } else {
     $userAuth = $userAuth['data'];
-    if(!in_array($userAuth['role'],['super admin','admin tempat'])){
+    if (!in_array($userAuth['role'], ['super admin', 'admin tempat'])) {
         echo "<script>alert('Anda bukan admin tempat !')</script>";
         echo "<script>window.location.href = '/dashboard.php';</script>";
         exit();
@@ -40,9 +39,7 @@ if ($userAuth['status'] == 'error') {
 
     <!-- Google Fonts -->
     <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
     <!-- Vendor CSS Files -->
     <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -63,7 +60,7 @@ if ($userAuth['status'] == 'error') {
     </script>
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
-        <?php include(__DIR__.'/../header.php');
+        <?php include(__DIR__ . '/../header.php');
         ?>
     </header><!-- End Header -->
 
@@ -72,7 +69,7 @@ if ($userAuth['status'] == 'error') {
         <ul class="sidebar-nav" id="sidebar-nav">
             <?php
             $nav = 'tempat';
-            include(__DIR__.'/../sidebar.php');
+            include(__DIR__ . '/../sidebar.php');
             ?>
         </ul>
     </aside><!-- End Sidebar-->
@@ -101,48 +98,47 @@ if ($userAuth['status'] == 'error') {
                             <form class="row g-3" method="POST" action="proses-tambah-tempat.php">
                                 <div class="col-md-12">
                                     <label for="nama_peminjam" class="form-label">Nama Lengkap</label>
-                                    <input type="text" class="form-control" id="nama_peminjam">
+                                    <input type="text" class="form-control" readonly value="">
                                 </div>
                                 <div class="col-md-12">
                                     <label for="nik_sewa" class="form-label">Nomor Induk Kependudukan</label>
-                                    <input type="text" class="form-control" id="nik_sewa">
+                                    <input type="text" class="form-control" readonly value="">
                                 </div>
                                 <div class="col-md-12">
                                     <label for="instansi" class="form-label">Instansi</label>
-                                    <input type="text" class="form-control" id="instansi">
+                                    <input type="text" class="form-control" readonly value="">
                                 </div>
                                 <div class="col-md-12">
                                     <label for="nama_kegiatan_sewa" class="form-label">Nama Kegiatan</label>
-                                    <input type="text" class="form-control" id="nama_kegiatan_sewa">
+                                    <input type="text" class="form-control" readonly value="">
                                 </div>
                                 <div class="col-md-9">
                                     <label for="nama_organisasi" class="form-label">Nama Tempat</label>
-                                    <input type="text" class="form-control" id="nama_organisasi">
+                                    <input type="text" class="form-control" readonly value="">
                                 </div>
                                 <div class="col-md-3">
                                     <label for="jumlah_peserta" class="form-label">Jumlah Peserta</label>
-                                    <input type="number" class="form-control" id="jumlah_peserta">
+                                    <input type="number" class="form-control" readonly value="">
                                 </div>
                                 <div class="col-md-6">
                                     <label for="tgl_awal_peminjaman" class="form-label">Tanggal Awal</label>
-                                    <input type="date" class="form-control" id="tgl_awal_peminjaman">
+                                    <input type="date" class="form-control" readonly value="">
                                 </div>
                                 <div class="col-md-6">
                                     <label for="tgl_akhir_peminjaman" class="form-label">Tanggal Akhir</label>
-                                    <input type="date" class="form-control" id="tgl_akhir_peminjaman">
+                                    <input type="date" class="form-control" readonly value="">
                                 </div>
                                 <div class="col-md-6">
                                     <label for="waktu_awal_peminjaman" class="form-label">Waktu Awal</label>
-                                    <input type="time" class="form-control" id="waktu_awal_peminjaman">
+                                    <input type="time" class="form-control" readonly value="">
                                 </div>
                                 <div class="col-md-6">
                                     <label for="waktu_akhir_peminjaman" class="form-label">Waktu Akhir</label>
-                                    <input type="time" class="form-control" id="waktu_akhir_peminjaman">
+                                    <input type="time" class="form-control" readonly value="">
                                 </div>
                                 <div class="col-md-12 ">
                                     <label for="deskripsi_sewa_tempat" class="form-label">Deskripsi Kegiatan</label>
-                                    <textarea class="form-control" id="deskripsi_sewa_tempat"
-                                        style="height: 100px;"></textarea>
+                                    <textarea class="form-control" readonly value="" style="height: 100px;"></textarea>
                                 </div>
                                 <div class="col-12">
                                     <label for="surat_keterangan" class="form-label">Surat Keterangan</label>
@@ -180,19 +176,22 @@ if ($userAuth['status'] == 'error') {
                                     </div>
                                 </div>
                             </div>
-
+                            <div class="row mb-3 justify-content-end">
+                                <div class="col-sm-10 text-end">
+                                    <a href="../tempat.php" class="btn btn-secondary">Kembali</a>
+                                </div>
+                            </div>
         </section>
 
 
     </main><!-- End #main -->
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
-        <?php include(__DIR__.'/../footer.php');
+        <?php include(__DIR__ . '/../footer.php');
         ?>
     </footer>
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-            class="bi bi-arrow-up-short"></i></a>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
     <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

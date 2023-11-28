@@ -73,7 +73,7 @@ if ($userAuth['status'] == 'error') {
 
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php
-      $nav = 'admin';
+      $nav = 'dashboard';
       include(__DIR__.'/sidebar.php');
       ?>
     </ul>
@@ -113,7 +113,7 @@ if ($userAuth['status'] == 'error') {
 
                 <li class="nav-item">
                   <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Ubah
-                    Password</button>
+                    Kata Sandi</button>
                 </li>
 
               </ul>
@@ -123,9 +123,9 @@ if ($userAuth['status'] == 'error') {
 
                   <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
                   <?php if(isset($userAuth['foto']) && !empty($userAuth['foto']) && !is_null($userAuth['foto'])){?>
-                    <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" class="rounded-circle">
+                    <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" >
                     <?php }else{?>
-                    <img src="/private/profile/admin/default.jpg" alt="Profile" class="rounded-circle">
+                    <img src="/private/profile/admin/default.jpg" alt="Profile" >
                   <?php }?>
                     <!-- <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" class="rounded-circle"> -->
                     <h2>
@@ -198,17 +198,12 @@ if ($userAuth['status'] == 'error') {
                       <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Foto Profil</label>
                       <div class="col-md-8 col-lg-9">
                       <?php if(isset($userAuth['foto']) && !empty($userAuth['foto']) && !is_null($userAuth['foto'])){?>
-                        <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" class="rounded-circle">
+                        <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" >
                         <?php }else{?>
-                        <img src="/private/profile/admin/default.jpg" alt="Profile" class="rounded-circle">
+                        <img src="/private/profile/admin/default.jpg" alt="Profile" >
                       <?php }?>
                         <!-- <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile"> -->
-                        <div class="pt-2">
-                          <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image"><i
-                              class="bi bi-upload"></i></a>
-                          <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i
-                              class="bi bi-trash"></i></a>
-                        </div>
+                        
                       </div>
                     </div>
                     <div class="row mb-3">
@@ -227,19 +222,15 @@ if ($userAuth['status'] == 'error') {
                       </div>
                     </div>
                     <div class="row mb-3">
-                      <legend class="col-form-label col-sm-2 pt-0">Jenis Kelamin</legend>
-                      <div class="col-sm-10">
+                      <label class="col-form-label col-md-4 col-lg-3">Jenis Kelamin</label>
+                      <div class="col-md-8 col-lg-9">
                         <div class="form-check">
                           <input class="form-check-input" type="radio" name="jenisK" value="laki-laki" <?php echo ($userAuth['jenis_kelamin'] == 'laki-laki') ? 'checked' : ''; ?>>
-                          <label class="form-check-label" for="gridRadios1">
-                            Laki-Laki
-                          </label>
+                          Laki-Laki
                         </div>
                         <div class="form-check">
                           <input class="form-check-input" type="radio" name="jenisK" value="perempuan" <?php echo ($userAuth['jenis_kelamin'] == 'perempuan') ? 'checked' : ''; ?>>
-                          <label class="form-check-label" for="gridRadios2">
-                            Perempuan
-                          </label>
+                          Perempuan
                         </div>
                       </div>
                     </div>
@@ -296,21 +287,21 @@ if ($userAuth['status'] == 'error') {
                     <input type="hidden" name="_method" value="PUT">
                     <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
                     <div class="row mb-3">
-                      <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Password Lama</label>
+                      <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Kata Sandi Lama</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="pass_old" type="password" class="form-control" id="currentPassword">
                       </div>
                     </div>
 
                     <div class="row mb-3">
-                      <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">Password Baru</label>
+                      <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">Kata Sandi Baru</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="pass_new" type="password" class="form-control" id="newPassword">
                       </div>
                     </div>
 
                     <div class="row mb-3">
-                      <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Masukkan Kembali Password
+                      <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Masukkan Kembali Kata Sandi
                         Baru</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="password_new" type="password" class="form-control" id="renewPassword">
@@ -318,7 +309,7 @@ if ($userAuth['status'] == 'error') {
                     </div>
 
                     <div class="text-center">
-                      <button type="submit" class="btn btn-primary" name="changePass">Ubah Password</button>
+                      <button type="submit" class="btn btn-primary" name="changePass">Ubah Kata Sandi</button>
                     </div>
                   </form><!-- End Change Password Form -->
 

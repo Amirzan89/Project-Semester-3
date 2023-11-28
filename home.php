@@ -82,7 +82,7 @@ if($userAuth['status'] == 'success'){
           <br>
           <h2>Selamat datang di situs web DISPORABUDPAR Kabupaten Nganjuk!
             Di sini, Anda dapat mengakses informasi agenda kegiatan dan berbagai layanan yang kami sediakan.
-            Kami telah mengembangkan aplikasi SmartCity untuk meningkatkan efisiensi dan kecepatan pelayanan kepada
+            Kami telah mengembangkan Aplikasi Nganjuk Elok untuk meningkatkan efisiensi dan kecepatan pelayanan kepada
             masyarakat,
             sehingga masyarakat dapat dengan lebih mudah menikmati layanan kami.</h2>
           <div class="d-flex justify-content-center justify-content-lg-start">
@@ -111,10 +111,10 @@ if($userAuth['status'] == 'success'){
         <div class="col-lg-6 pt-4 pt-lg-0 content" data-aos="fade-left" data-aos-delay="100">
           <br>
           <br>
-          <h3><strong>APA ITU smartCity?</strong></h3>
+          <h3><strong>APA ITU Nganjuk Elok?</strong></h3>
           <br>
           <p class="fst-italic">
-            smartCity merupakan sebuah platform aplikasi berbasis mobile yang terintegrasi dengan website, berfungsi
+            Nganjuk Elok merupakan sebuah platform aplikasi berbasis mobile yang terintegrasi dengan website, berfungsi
             sebagai
             platform untuk mengakses dan memanfaatkan layanan yang dikelola oleh Dinas Kepemudaan, Olahraga,
             Kebudayaan, dan Pariwisata Kabupaten Nganjuk dengan lebih efisien.

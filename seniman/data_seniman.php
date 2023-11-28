@@ -149,11 +149,8 @@ if ($userAuth['status'] == 'error') {
           <div class="card">
             <div class="card-body">
               <h5 class="card-title"></h5>
-              <div class="kategori">
-                  <div class="col-lg-12">
-                    <div class="row">
-                      <div class="col-lg-8">
-                        <select id="inpKategori" onchange="tampilkanKategori()" class="inp">
+              <div class="col-md-3">
+                  <select id="inpKategori" onchange="tampilkanKategori()" class="inp">
                           <option value="semua">semua</option>
                           <?php
                             foreach($kategoriSeniman as $n){
@@ -161,21 +158,20 @@ if ($userAuth['status'] == 'error') {
                             }
                           ?>
                         </select>
-                      </div>
-                    </div>
                   </div>
-              </div>
+                
               <a href="tambah.php" class="btn btn-primary">
                 <i class="bi bi-person-plus-fill"></i> Tambah Seniman
               </a>
-              <div class="srcDate">
+              
+                <div class="srcDate">
                   <div class="col-lg-12">
                     <div class="row">
                       <div class="col-lg-3">
                         <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
                       </div>
                       <div class="col-lg-5">
-                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp">
+                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="<?php echo date('M')  ?>">
                           <option value="semua">semua</option>
                           <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
                           <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
@@ -219,15 +215,21 @@ if ($userAuth['status'] == 'error') {
                       <td><?php echo $seniman['nama_seniman'] ?></td>
                       <td><?php echo $seniman['no_telpon'] ?></td>
                       <td>
-                        <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
-                        <button type="button" class="btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit </button>
-                        <button type="button" class="btn btn-hapus"><i class="bi bi-trash-fill"></i> Hapus</button>
+                        <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
+                        <a href="/seniman/edit_detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-edit"><i class="bi bi-pencil-fill"></i>   Edit</a>
+                        <button type="button" class="btn btn-tolak" onclick="openDelete(<?php echo $seniman['id_seniman']?>)"> <i class="bi bi-trash-fill"></i>   Hapus</button>
                       </td>
                     </tr>
                   <?php $no++;
                   } ?>
                 </tbody>
               </table>
+              <br>
+              <div class="row mb-3 justify-content-end">
+                <div class="col-sm-10 text-end">
+                  <a href="../seniman.php" class="btn btn-secondary">Kembali</a>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -235,6 +237,30 @@ if ($userAuth['status'] == 'error') {
       </div>
     </section>
   </main><!-- End #main -->
+      <!-- start modal delete -->
+      <div class="modal fade" id="modalDelete" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Konfirmasi hapus data seniman</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Apakah anda yakin ingin menghapus data seniman?  
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <form action="/web/seniman/seniman.php" id="deleteForm" method="POST">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+            <input type="hidden" name="id_tempat" id="inpTempat">
+            <button type="submit" class="btn btn-tolak" name="hapusAdmin">Hapus</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end modal delete -->
   <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">

@@ -172,9 +172,9 @@ if($userAuth['status'] == 'error'){
                                         </td>
                                         <td>
                                           <?php if($sewa['status'] == 'diajukan'){ ?>
-                                            <button class="btn btn-lihat" onclick="proses(<?php echo $sewa['id_sewa'] ?>)"><i class="bi bi-eye-fill">Lihat</i></button>
+                                            <button class="btn btn-lihat" onclick="proses(<?php echo $sewa['id_sewa'] ?>)"><i class="bi bi-eye-fill"></i>   Lihat</button>
                                           <?php }else if($sewa['status'] == 'proses'){ ?>
-                                            <a href="/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill">Lihat</i></a>
+                                            <a href="/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
                                           <?php } ?>
                                         </td>
                                     </tr>
@@ -182,6 +182,11 @@ if($userAuth['status'] == 'error'){
                                   } ?>
                                 </tbody>
                             </table>
+                            <div class="row mb-3 justify-content-end">
+                                <div class="col-sm-10 text-end">
+                                    <a href="../tempat.php" class="btn btn-secondary">Kembali</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

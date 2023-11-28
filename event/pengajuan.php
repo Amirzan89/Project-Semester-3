@@ -1,19 +1,19 @@
 <?php
-require_once(__DIR__.'/../web/koneksi.php');
-require_once(__DIR__.'/../web/authenticate.php');
-require_once(__DIR__.'/../env.php');
+require_once(__DIR__ . '/../web/koneksi.php');
+require_once(__DIR__ . '/../web/authenticate.php');
+require_once(__DIR__ . '/../env.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
-$userAuth = authenticate($_POST,[
-  'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD']
-],$conn);
-if($userAuth['status'] == 'error'){
-	header('Location: /login.php');
-}else{
-	$userAuth = $userAuth['data'];
-  if(!in_array($userAuth['role'],['super admin','admin event'])){
+$userAuth = authenticate($_POST, [
+  'uri' => $_SERVER['REQUEST_URI'],
+  'method' => $_SERVER['REQUEST_METHOD']
+], $conn);
+if ($userAuth['status'] == 'error') {
+  header('Location: /login.php');
+} else {
+  $userAuth = $userAuth['data'];
+  if (!in_array($userAuth['role'], ['super admin', 'admin event'])) {
     echo "<script>alert('Anda bukan admin event !')</script>";
     echo "<script>window.location.href = '/dashboard.php';</script>";
     exit();
@@ -24,6 +24,7 @@ if($userAuth['status'] == 'error'){
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -34,13 +35,11 @@ if($userAuth['status'] == 'error'){
 
   <!-- Favicons -->
   <link href="<?php echo $tPath; ?>/public/assets/img/landing-page/favicon.png" rel="icon">
-    <link href="<?php echo $tPath; ?>/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="<?php echo $tPath; ?>/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
-  <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <!-- Vendor CSS Files -->
   <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -54,7 +53,7 @@ if($userAuth['status'] == 'error'){
     .ui-datepicker-calendar {
       display: none;
     }
-    
+
     .srcDate {
       float: right;
       padding: 10px;
@@ -67,31 +66,30 @@ if($userAuth['status'] == 'error'){
       font-size: 16px;
       width: 100%;
     }
-
   </style>
 </head>
 
 <body>
   <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-		var csrfToken = "<?php echo $csrf ?>";
+    var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
     var number = "<?php echo $userAuth['number'] ?>";
     var role = "<?php echo $userAuth['role'] ?>";
-	</script>
+  </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/../header.php');
+    <?php include(__DIR__ . '/../header.php');
     ?>
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php 
-        $nav = 'event';
-        include(__DIR__.'/../sidebar.php');
+      <?php
+      $nav = 'event';
+      include(__DIR__ . '/../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
@@ -117,30 +115,30 @@ if($userAuth['status'] == 'error'){
             <div class="card-body">
               <h5 class="card-title"></h5>
               <div class="srcDate">
-                  <div class="col-lg-12">
-                    <div class="row">
-                      <div class="col-lg-3">
-                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
-                      </div>
-                      <div class="col-lg-5">
-                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="<?php echo date('M')  ?>">
-                          <option value="semua">semua</option>
-                          <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
-                          <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
-                          <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?> >Maret</option>
-                          <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?> >April</option>
-                          <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?> >Mei</option>
-                          <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?> >Juni</option>
-                          <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?> >Juli</option>
-                          <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?> >Agustus</option>
-                          <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?> >September</option>
-                          <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?> >Oktober</option>
-                          <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?> >November</option>
-                          <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?> >Desember</option>
-                        </select>
-                      </div>
+                <div class="col-lg-12">
+                  <div class="row">
+                    <div class="col-lg-3">
+                      <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
+                    </div>
+                    <div class="col-lg-5">
+                      <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="<?php echo date('M')  ?>">
+                        <option value="semua">semua</option>
+                        <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?>>Januari</option>
+                        <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?>>Februari</option>
+                        <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?>>Maret</option>
+                        <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?>>April</option>
+                        <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?>>Mei</option>
+                        <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?>>Juni</option>
+                        <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?>>Juli</option>
+                        <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?>>Agustus</option>
+                        <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?>>September</option>
+                        <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?>>Oktober</option>
+                        <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?>>November</option>
+                        <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?>>Desember</option>
+                      </select>
                     </div>
                   </div>
+                </div>
               </div>
               <table class="table datatable">
                 <thead>
@@ -155,47 +153,53 @@ if($userAuth['status'] == 'error'){
                 </thead>
                 <tbody id="tableEvent">
                   <?php
-                    // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_event DESC");
-                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC");
-                    $no = 1;
-                    while ($event = mysqli_fetch_array($query)) {
+                  // $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_event DESC");
+                  $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC");
+                  $no = 1;
+                  while ($event = mysqli_fetch_array($query)) {
                   ?>
-                      <tr>  
-                          <td><?php echo $no; ?></td>
-                          <td><?php echo $event['nama_pengirim']?></td>
-                          <td><?php echo $event['nama_event']?></td>
-                          <td><?php echo $event['tanggal']?></td>
-                          <td>
-                            <?php if($event['status'] == 'diajukan'){ ?>
-                              <span class="badge bg-proses">Diajukan</span>
-                            <?php }else if($event['status'] == 'proses'){ ?>
-                              <span class="badge bg-terima">Diproses</span>
+                    <tr>
+                      <td><?php echo $no; ?></td>
+                      <td><?php echo $event['nama_pengirim'] ?></td>
+                      <td><?php echo $event['nama_event'] ?></td>
+                      <td><?php echo $event['tanggal'] ?></td>
+                      <td>
+                        <?php if ($event['status'] == 'diajukan') { ?>
+                          <span class="badge bg-proses">Diajukan</span>
+                        <?php } else if ($event['status'] == 'proses') { ?>
+                          <span class="badge bg-terima">Diproses</span>
 
-                            <?php } ?>
-                          </td>
-                          <td>
-                          <?php if($event['status'] == 'diajukan'){ ?>
-                              <button class="btn btn-lihat" onclick="proses(<?php echo $event['id_event'] ?>)"><i class="bi bi-eye-fill">Lihat</i></button>
-                            <?php }else if($event['status'] == 'proses'){ ?>
-                              <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill">Lihat</i></a>
-                            <?php } ?>
-                          </td>
-                      </tr>
+                        <?php } ?>
+                      </td>
+                      <td>
+                        <?php if ($event['status'] == 'diajukan') { ?>
+                          <button class="btn btn-lihat" onclick="proses(<?php echo $event['id_event'] ?>)"><i class="bi bi-eye-fill"></i> Lihat</button>
+                        <?php } else if ($event['status'] == 'proses') { ?>
+                          <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
+                        <?php } ?>
+                      </td>
+                    </tr>
                   <?php $no++;
                   } ?>
                 </tbody>
               </table>
+              <div class="row mb-3 justify-content-end">
+                <div class="col-sm-10 text-end">
+                  <a href="../event.php" class="btn btn-secondary">Kembali</a>
+                </div>
+              </div>
             </div>
           </div>
-
         </div>
+
+      </div>
       </div>
     </section>
   </main><!-- End #main -->
   <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/../footer.php');
+    <?php include(__DIR__ . '/../footer.php');
     ?>
   </footer>
 
@@ -206,13 +210,14 @@ if($userAuth['status'] == 'error'){
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
-    function updateTable(dataT = ''){
+
+    function updateTable(dataT = '') {
       while (tableEvent.firstChild) {
         tableEvent.removeChild(tableEvent.firstChild);
       }
       var num = 1;
-      if(dataT != ''){
-        dataT.forEach(function (item){
+      if (dataT != '') {
+        dataT.forEach(function(item) {
           var row = document.createElement('tr');
           var td = document.createElement('td');
           //data
@@ -229,38 +234,38 @@ if($userAuth['status'] == 'error'){
           row.appendChild(td);
           //status
           var span = document.createElement('span');
-          if(item['status'] == 'diajukan'){
-            span.classList.add('badge','bg-proses');
+          if (item['status'] == 'diajukan') {
+            span.classList.add('badge', 'bg-proses');
             span.innerText = 'Diajukan';
-          }else if(item['status'] == 'proses'){
-            span.classList.add('badge','bg-terima');
+          } else if (item['status'] == 'proses') {
+            span.classList.add('badge', 'bg-terima');
             span.innerText = 'Diproses';
           }
           var td = document.createElement('td');
           td.appendChild(span);
           row.appendChild(td);
           //btn
-          if(item['status'] == 'diajukan'){
+          if (item['status'] == 'diajukan') {
             var btn = document.createElement('button');
             var icon = document.createElement('i');
-            icon.classList.add('bi','bi-eye-fill');
+            icon.classList.add('bi', 'bi-eye-fill');
             icon.innerText = 'Lihat';
             btn.appendChild(icon);
-            btn.classList.add('btn','btn-lihat');
-            btn.onclick = function (){
+            btn.classList.add('btn', 'btn-lihat');
+            btn.onclick = function() {
               proses(`${item['id_event']}`);
             }
             var td = document.createElement('td');
             td.appendChild(btn);
             row.appendChild(td);
-          }else if(item['status'] == 'proses'){
+          } else if (item['status'] == 'proses') {
             var link = document.createElement('a');
             var icon = document.createElement('i');
-            icon.classList.add('bi','bi-eye-fill');
+            icon.classList.add('bi', 'bi-eye-fill');
             icon.innerText = 'Lihat';
             link.appendChild(icon);
-            link.classList.add('btn','btn-lihat');
-            link.setAttribute('href',`/event/detail_event.php?id_event=${item['id_event']}`);
+            link.classList.add('btn', 'btn-lihat');
+            link.setAttribute('href', `/event/detail_event.php?id_event=${item['id_event']}`);
             var td = document.createElement('td');
             td.appendChild(link);
             row.appendChild(td);
@@ -270,20 +275,21 @@ if($userAuth['status'] == 'error'){
         });
       }
     }
-    function getData(con = null){
+
+    function getData(con = null) {
       var xhr = new XMLHttpRequest();
-      if(con == 'semua'){
+      if (con == 'semua') {
         var requestBody = {
           email: email,
-          tanggal:'semua',
-          desc:'pengajuan'
+          tanggal: 'semua',
+          desc: 'pengajuan'
         };
-      }else if(con == null){
-        var tanggal = bulanInput.value +'-'+tahunInput.value;
+      } else if (con == null) {
+        var tanggal = bulanInput.value + '-' + tahunInput.value;
         var requestBody = {
           email: email,
-          tanggal:tanggal,
-          desc:'pengajuan'
+          tanggal: tanggal,
+          desc: 'pengajuan'
         };
       }
       //open the request
@@ -292,7 +298,7 @@ if($userAuth['status'] == 'error'){
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data
       xhr.send(JSON.stringify(requestBody));
-      xhr.onreadystatechange = function () {
+      xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
             var response = xhr.responseText;
@@ -306,16 +312,17 @@ if($userAuth['status'] == 'error'){
         }
       }
     }
-    function tampilkanBulan(){
-      if(bulanInput.value == 'semua'){
+
+    function tampilkanBulan() {
+      if (bulanInput.value == 'semua') {
         tahun = tahunInput.value;
         tahunInput.disabled = true;
         tahunInput.value = '';
         setTimeout(() => {
           getData('semua');
         }, 250);
-      }else{
-        if(tahunInput.disabled == true){
+      } else {
+        if (tahunInput.disabled == true) {
           tahunInput.disabled = false;
           tahunInput.value = tahun;
         }
@@ -324,7 +331,8 @@ if($userAuth['status'] == 'error'){
         }, 250);
       }
     }
-    function tampilkanTahun(){
+
+    function tampilkanTahun() {
       setTimeout(() => {
         var tahun = tahunInput.value;
         tahun = tahun.replace(/\s/g, '');
@@ -337,6 +345,7 @@ if($userAuth['status'] == 'error'){
         }, 250);
       }, 50);
     }
+
     function proses(Id) {
       var xhr = new XMLHttpRequest();
       var requestBody = {
@@ -351,15 +360,15 @@ if($userAuth['status'] == 'error'){
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data
       xhr.send(JSON.stringify(requestBody));
-      xhr.onreadystatechange = function () {
+      xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
-            window.location.href = "/event/detail_event.php?id_event="+Id;
+            window.location.href = "/event/detail_event.php?id_event=" + Id;
           } else {
             try {
-                eval(xhr.responseText);
+              eval(xhr.responseText);
             } catch (error) {
-                console.error('Error evaluating JavaScript:', error);
+              console.error('Error evaluating JavaScript:', error);
             }
           }
         }
@@ -371,7 +380,7 @@ if($userAuth['status'] == 'error'){
   <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
-  <!-- Template Main JS File --> 
+  <!-- Template Main JS File -->
   <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
 
 </body>

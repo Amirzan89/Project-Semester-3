@@ -90,8 +90,7 @@ if($userAuth['status'] == 'error'){
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
                     <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat/data_tempat.php">Data tempat</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat/detail_tempat.php?id_tempat=<?php $id;?>">Detail tempat</a></li>
+                    <li class="breadcrumb-item"><a href="/tempat/data_tempat.php?id_tempat=<?php $id;?>">Data tempat</a></li>
                     <li class="breadcrumb-item active">Edit Data Tempat</li>
                 </ol>
             </nav>
@@ -110,40 +109,46 @@ if($userAuth['status'] == 'error'){
                                 <input type="hidden" name="_method" value="PUT">
                                 <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user']; ?>">
                                 <input type="hidden" name="id_tempat" value="<?php echo $id; ?>">
-                                <div class="row mb-3">
+                                <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Nama Tempat</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-md-12">
                                         <input type="text" class="form-control" name="nama_tempat" value="<?php echo $tempat['nama_tempat']?>">
                                     </div>
                                 </div>
-                                <div class="row mb-3">
+                                <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Alamat Tempat</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-md-12">
                                         <input type="text" class="form-control" name="alamat" value="<?php echo $tempat['alamat_tempat']?>">
                                     </div>
                                 </div>
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">Contact person</label>
-                                    <div class="col-sm-10">
+                                <div class="col mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Nama Pengelola</label>
+                                    <div class="col-md-12">
+                                        <input type="text" class="form-control" name="phone" value="<?php echo $tempat['pengelola']?>">
+                                    </div>
+                                </div>
+                                <div class="col mb-3">
+                                    <label for="inputText" class="col-md-12 col-form-label">No. Telpon Pengelola</label>
+                                    <div class="col-md-12">
                                         <input type="text" class="form-control" name="phone" value="<?php echo $tempat['contact_person']?>">
                                     </div>
                                 </div>
-                                <div class="row mb-3">
+                                <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Deskripsi Kegiatan</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-md-12">
                                         <textarea class="form-control" name="deskripsi" style="height: 100px"><?php echo $tempat['deskripsi_tempat']?></textarea>
                                     </div>
                                 </div>
-                                <div class="row mb-3">
+                                <div class="col mb-3">
                                     <label for="inputNumber" class="col-sm-2 col-form-label">Gambar tempat</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-md-12">
                                         <input class="form-control" name="foto" type="file" id="formFile">
                                     </div>
                                 </div>
                                 <div class="row mb-3 justify-content-end">
                                     <div class="col-sm-10 text-end">
-                                        <button class="btn btn-primary">Edit</button>
-                                        <a href="/tempat/detail_tempat.php?id_tempat=<?= $id ?>" class="btn btn-danger">Batal</a>
+                                    <a href="/tempat/data_tempat.php" class="btn btn-secondary">Kembali</a>
+                                    <button type="submit" class="btn btn-tambah" onclick="openEdit(<?php echo $tempat['id_tempat'] ?>)">Edit</button>
                                     </div>
                                 </div>
                             </form>
@@ -154,6 +159,30 @@ if($userAuth['status'] == 'error'){
         </section>
 
     </main><!-- End #main -->
+        <!-- start modal edit -->
+        <div class="modal fade" id="modalEdit" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi edit data tempat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah anda yakin ingin mengedit data tempat?
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <form action="/web/tempat/tempat.php" id="deleteForm" method="POST">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                            <input type="hidden" name="id_tempat" id="inpTempat">
+                            <button type="submit" class="btn btn-tambah" name="hapusAdmin">Edit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end modal edit -->
+
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <?php include(__DIR__.'/../footer.php');

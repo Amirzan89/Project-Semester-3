@@ -151,7 +151,6 @@ if($userAuth['status'] == 'error'){
                     <th scope="col">Nama Event</th>
                     <th scope="col">Tanggal Pengajuan</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Keterangan</th>
                     <th scope="col">Aksi</th>
                   </tr>
                 </thead>
@@ -169,12 +168,11 @@ if($userAuth['status'] == 'error'){
                       <td><?php echo $event['tanggal']?></td>
                       <td>
                         <?php if($event['status'] == 'diterima'){ ?>
-                          <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i>  Disetujui</span>
+                          <span class="badge bg-terima">Disetujui</span>
                         <?php }else if($event['status'] == 'ditolak'){ ?>
-                          <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i>   Ditolak </span>
+                          <span class="badge bg-tolak">Ditolak </span>
                         <?php } ?>
                       </td>
-                      <td><?php echo $event['catatan']?></td>
                       <td>
                         <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                       </td>
@@ -183,7 +181,11 @@ if($userAuth['status'] == 'error'){
                   } ?>
                 </tbody>
               </table>
-
+              <div class="row mb-3 justify-content-end">
+                <div class="col-sm-10 text-end">
+                  <a href="../event.php" class="btn btn-secondary">Kembali</a>
+                </div>
+              </div>
             </div>
           </div>
 
