@@ -157,45 +157,6 @@ if($userAuth['status'] == 'success'){
               </div>
             </div>
           <?php } ?>
-            <!-- <div class="col">
-              <div class="card">
-                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event1.png" class="card-img-top" alt="Hollywood Sign on The Hill" />
-                <div class="card-body">
-                  <h5 class="card-title">FESTIVAL PULANG KAMPUNG</h5>
-                  <p class="card-text">
-                    Tanggal Pelaksanaan : 19 September 2023
-                    <br>
-                    Tempat : Alun - Alun Kota Nganjuk
-                  </p>
-                </div>
-              </div>
-            </div> -->
-            <!-- <div class="col">
-              <div class="card">
-                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event2.png" class="card-img-top" alt="Los Angeles Skyscrapers" />
-                <div class="card-body">
-                  <h5 class="card-title">SIRAMAN SEDUDO</h5>
-                  <p class="card-text">
-                    Tanggal Pelaksanaan : 20 September 2023
-                    <br>
-                    Tempat : Air Terjun Sedudo Sawahan
-                  </p>
-                </div>
-              </div>
-            </div> -->
-            <!-- <div class="col">
-              <div class="card">
-                <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/event3.png" class="card-img-top" alt="Skyscrapers" />
-                <div class="card-body">
-                  <h5 class="card-title">PAWAI BUDAYA</h5>
-                  <p class="card-text">
-                    Tanggal Pelaksanaan : 22 September 2023
-                    <br>
-                    Tempat : Jalan A Yani
-                  </p>
-                </div>
-              </div>
-            </div> -->
           </div>
           <a href="/home1.php" class="btn-learn-more">Lainnya</a>
         </div>
@@ -343,11 +304,11 @@ if($userAuth['status'] == 'success'){
           <div class="col-lg-4 col-md-6 footer-links">
             <h4>Kontak</h4>
             <div class="social-links mt-3">
-              <a href="#" class="twitter"><i class="bx bi-envelope"></i></a>
-              <strong>diporabudpar@gmail.com</strong> <br><br>
-              <a href="#" class="facebook"><i class="bx bi-phone"></i></a>
-              <strong>+62 8729166615</strong> <br><br>
-              <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=disporabudpar@nganjukkab.co.id" class="twitter"><i class="bx bi-envelope"></i></a>
+              <strong>disporabudpar@nganjukkab.co.id</strong> <br><br>
+              <a href="https://wa.me/628113319289" class="facebook"><i class="bx bi-phone"></i></a>
+              <strong>+62 8113319289</strong> <br><br>
+              <a href="http://disporabudpar.nganjukkab.co.id" class="instagram"><i class="bx bxl-instagram"></i></a>
               <strong>@disporabudpar.nganjuk </strong>
             </div>
           </div>
@@ -361,11 +322,7 @@ if($userAuth['status'] == 'success'){
         &copy; Copyright <strong><span>HufflePuff</span></strong>. All Rights Reserved
       </div>
       <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/arsha-free-bootstrap-html-template-corporate/ -->
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+        Designed by <a href="https://www.instagram.com/hufflepuff.ie">HufflePuff</a>
       </div>
     </div>
   </footer>

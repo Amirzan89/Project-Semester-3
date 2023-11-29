@@ -48,12 +48,6 @@ $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
   <!-- Template Main CSS File -->
   <link href="<?php echo $tPath; ?>/public/assets/css/LandingPage.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: Arsha - v4.7.1
-  * Template URL: https://bootstrapmade.com/arsha-free-bootstrap-html-template-corporate/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
 </head>
 
 <body>
@@ -283,11 +277,11 @@ $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
           <div class="col-lg-4 col-md-6 footer-links">
             <h4>Kontak</h4>
             <div class="social-links mt-3">
-              <a href="#" class="twitter"><i class="bx bi-envelope"></i></a>
-              <strong>diporabudpar@gmail.com</strong> <br><br>
-              <a href="#" class="facebook"><i class="bx bi-phone"></i></a>
-              <strong>+62 8729166615</strong> <br><br>
-              <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=disporabudpar@nganjukkab.co.id" class="twitter"><i class="bx bi-envelope"></i></a>
+              <strong>disporabudpar@nganjukkab.co.id</strong> <br><br>
+              <a href="https://wa.me/628113319289" class="facebook"><i class="bx bi-phone"></i></a>
+              <strong>+62 8113319289</strong> <br><br>
+              <a href="http://disporabudpar.nganjukkab.co.id" class="instagram"><i class="bx bxl-instagram"></i></a>
               <strong>@disporabudpar.nganjuk </strong>
             </div>
           </div>
@@ -300,11 +294,7 @@ $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
         &copy; Copyright <strong><span>HufflePuff</span></strong>. All Rights Reserved
       </div>
       <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/arsha-free-bootstrap-html-template-corporate/ -->
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+        Designed by <a href="https://www.instagram.com/hufflepuff.ie">HufflePuff</a>
       </div>
     </div>
   </footer>
