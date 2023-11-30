@@ -345,7 +345,8 @@ if($userAuth['status'] == 'error'){
         _method: 'PUT',
         id_user: idUser,
         id_seniman: Id,
-        keterangan: 'proses'
+        keterangan: 'proses',
+        desc:'seniman'
       };
       //open the request
       xhr.open('POST', domain + "/web/seniman/seniman.php")

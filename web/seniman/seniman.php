@@ -657,7 +657,7 @@ class SenimanWebsite{
                 $query = "UPDATE seniman SET kode_verifikasi = ?, status = ?, catatan = ? WHERE id_seniman = ?";
                 $stmt[2] = self::$con->prepare($query);
                 $code = '';
-                $stmt[2]->bind_param("ssi", $code, $status, $data['catatan'], $data['id_seniman']);
+                $stmt[2]->bind_param("sssi", $code, $status, $data['catatan'], $data['id_seniman']);
             }
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
@@ -960,17 +960,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 if($data['desc'] == 'kategori'){
                     $senimanWeb->ubahKategori($data);
                 }
-                if($data['desc'] == 'perpanjangan'){
-                    $senimanWeb->prosesPerpanjangan($data);
-                }
             }
             if(isset($data['keterangan'])){
-                $senimanWeb->prosesSeniman($data);
+                if(isset($data['desc'])){
+                    if($data['desc'] == 'perpanjangan'){
+                        $senimanWeb->prosesPerpanjangan($data);
+                    }else if($data['desc'] == 'seniman'){
+                        $senimanWeb->prosesSeniman($data);
+                    }
+                }else{
+                    http_response_code(400);
+                    echo json_encode(['status' => 'error', 'message' => 'Desc harus diisi']);
+                    exit();
+                }
             }
         }else if($data['_method'] == 'DELETE'){
-            if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc']) && $data['desc'] == 'kategori'){
-                $senimanWeb->hapusKategori($data);
-            }
+            // if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc']) && $data['desc'] == 'kategori'){
+            //     $senimanWeb->hapusKategori($data);
+            // }
         }
     }
     if(isset($data['desc']) && !empty($data['desc']) && !is_null($data['desc'])){

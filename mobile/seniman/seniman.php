@@ -1634,7 +1634,7 @@ if(isset($_SERVER['APP_TESTING']) && $_SERVER['APP_TESTING'] == 'true'){
                 $senimanMobile->hapusSeniman($data);
             }
         }else{
-            if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan']) && $data['keterangan'] == 'perpanjang'){
+            if(isset($data['keterangan']) && !empty($data['keterangan']) && !is_null($data['keterangan']) && $data['keterangan'] == 'perpanjangan'){
                 $senimanMobile->buatPerpanjangan($data);
             }else{
                 $senimanMobile->registrasiSeniman($data);

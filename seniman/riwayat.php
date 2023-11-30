@@ -159,7 +159,7 @@ if($userAuth['status'] == 'error'){
                 <tbody id="tableSeniman">
                   <?php
                       // $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE (status = 'diterima' OR status = 'ditolak') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_seniman DESC");
-                      $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM seniman WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_seniman DESC");
+                      $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_verifikasi FROM seniman WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_seniman DESC");
                       $no = 1;
                       while ($seniman = mysqli_fetch_array($query)) {
                   ?>
@@ -170,11 +170,11 @@ if($userAuth['status'] == 'error'){
                       <td>
                         <?php if($seniman['status'] == 'diterima'){ ?>
                           <span class="badge bg-terima">Diterima</span>
-                        <?php }else if($seniman['status'] == 'ditolak'){ ?>
-                          <span class="badge bg-tolak">Ditolak </span>
-                        <?php } ?>
+                          <?php }else if($seniman['status'] == 'ditolak'){ ?>
+                            <span class="badge bg-tolak">Ditolak </span>
+                            <?php } ?>
                       </td>
-                      <td></td>
+                      <td><?php echo $seniman['kode_verifikasi']?></td>
                       <td>
                         <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                       </td>

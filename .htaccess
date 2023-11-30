@@ -13,6 +13,12 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
+    
+    # Restrict direct access to the "seniman" folder inside "private"
+    RewriteCond %{REQUEST_URI} ^/private/seniman/
+    RewriteCond %{REQUEST_FILENAME} -d [OR]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [F]
 
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d

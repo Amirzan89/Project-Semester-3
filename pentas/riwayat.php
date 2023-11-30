@@ -155,8 +155,7 @@ if ($userAuth['status'] == 'error') {
                 </thead>
                 <tbody id="tablePentas">
                   <?php
-                  // $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_selesai, status, catatan FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_advis DESC");
-                  $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_selesai, status, catatan FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
+                  $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_selesai, status, catatan, kode_verifikasi FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
                   $no = 1;
                   while ($pentas = mysqli_fetch_array($query)) {
                   ?>
@@ -168,11 +167,11 @@ if ($userAuth['status'] == 'error') {
                       <td>
                         <?php if ($pentas['status'] == 'diterima') { ?>
                           <span class="badge bg-terima"> Disetujui</span>
-                        <?php } else if ($pentas['status'] == 'ditolak') { ?>
-                          <span class="badge bg-tolak"> Ditolak </span>
-                        <?php } ?>
+                          <?php } else if ($pentas['status'] == 'ditolak') { ?>
+                            <span class="badge bg-tolak"> Ditolak </span>
+                            <?php } ?>
                       </td>
-                      <td></td>
+                      <td><?php echo $pentas['kode_verifikasi'] ?></td>
                       <td>
                         <a href="/pentas/detail_pentas.php?id_pentas=<?= $pentas['id_advis'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
                       </td>

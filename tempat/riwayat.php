@@ -151,8 +151,7 @@ if ($userAuth['status'] == 'error') {
                 </thead>
                 <tbody id="tableSewa">
                   <?php
-                  // $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, tgl_akhir_peminjaman, status, catatan FROM sewa_tempat WHERE (status = 'diterima' OR status = 'ditolak') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_sewa DESC");
-                  $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_sewa DESC");
+                  $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_verifikasi FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_sewa DESC");
                   $no = 1;
                   while ($sewa = mysqli_fetch_array($query)) {
                   ?>
@@ -164,11 +163,11 @@ if ($userAuth['status'] == 'error') {
                       <td>
                         <?php if ($sewa['status'] == 'diterima') { ?>
                           <span class="badge bg-terima">Disetujui</span>
-                        <?php } else if ($sewa['status'] == 'ditolak') { ?>
-                          <span class="badge bg-tolak">Ditolak </span>
-                        <?php } ?>
+                          <?php } else if ($sewa['status'] == 'ditolak') { ?>
+                            <span class="badge bg-tolak">Ditolak </span>
+                            <?php } ?>
                       </td>
-                      <td></td>
+                      <td><?php echo $sewa['kode_verifikasi']; ?></td>
                       <td>
                         <a href="/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
                       </td>

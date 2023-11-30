@@ -264,21 +264,20 @@ if ($userAuth['status'] == 'error') {
           <h5 class="modal-title">Tolak Pengajuan</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" style="text-align: left;">
-          <label for="catatan" class="form-label">Alasan penolakan</label>
-          <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alasan Penolakan" style="height: 100px;"></textarea>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <form action="/web/pentas/pentas.php" id="prosesForm" method="POST">
+        <form action="/web/pentas/pentas.php" id="prosesForm" method="POST">
+          <div class="modal-body" style="text-align: left;">
+            <label for="catatan" class="form-label">Alasan penolakan</label>
+            <textarea class="form-control" id="catatan" name="catatan" placeholder="Masukkan Alasan Penolakan" style="height: 100px;"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
             <input type="hidden" name="_method" value="PUT">
             <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
             <input type="hidden" name="id_pentas" id="inpPentasT">
-            <input type="hidden" name="catatan" value="terserah">
             <input type="hidden" name="keterangan" value="ditolak">
             <button type="submit" class="btn btn-tolak">Tolak</button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   </div>
