@@ -169,7 +169,7 @@ if($userAuth['status'] == 'error'){
                                 <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Nama Pengelola</label>
                                     <div class="col-md-12">
-                                        <input type="text" class="form-control" name="phone" value="<?php echo $tempat['pengelola']?>">
+                                        <input type="text" class="form-control" name="nama_pengelola" value="<?php echo $tempat['pengelola']?>">
                                     </div>
                                 </div>
                                 <div class="col mb-3">

@@ -248,9 +248,9 @@ if ($userAuth['status'] == 'error') {
           var td = document.createElement('td');
           td.appendChild(span);
           row.appendChild(td);
-          //catatan
+          //kode surat
           var td = document.createElement('td');
-          td.innerText = item['catatan'];
+          td.innerText = item['kode_verifikasi'];
           row.appendChild(td);
           //btn
           var link = document.createElement('a');

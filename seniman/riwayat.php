@@ -152,7 +152,6 @@ if($userAuth['status'] == 'error'){
                     <th scope="col">Nama Seniman</th>
                     <th scope="col">Tanggal Pengajuan</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Kode Surat</th>
                     <th scope="col">Aksi</th>
                   </tr>
                 </thead>
@@ -174,7 +173,6 @@ if($userAuth['status'] == 'error'){
                             <span class="badge bg-tolak">Ditolak </span>
                             <?php } ?>
                       </td>
-                      <td><?php echo $seniman['kode_verifikasi']?></td>
                       <td>
                         <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                       </td>
@@ -247,10 +245,6 @@ if($userAuth['status'] == 'error'){
           var td = document.createElement('td');
           td.appendChild(span);
           row.appendChild(td);
-          //catatan
-          var td = document.createElement('td');
-          td.innerText = item['catatan'];
-          row.appendChild(td);
           //btn
           var link = document.createElement('a');
           var icon = document.createElement('i');
@@ -273,14 +267,16 @@ if($userAuth['status'] == 'error'){
         var requestBody = {
           email: email,
           tanggal:'semua',
-          desc:'riwayat'
+          desc:'riwayat',
+          table:"seniman"
         };
       }else if(con == null){
         var tanggal = bulanInput.value +'-'+tahunInput.value;
         var requestBody = {
           email: email,
           tanggal:tanggal,
-          desc:'riwayat'
+          desc:'riwayat',
+          table:"seniman"
         };
       }
       //open the request
@@ -296,7 +292,6 @@ if($userAuth['status'] == 'error'){
             updateTable(JSON.parse(response)['data']);
           } else {
             var response = xhr.responseText;
-            // console.log(response);
             updateTable();
             return;
           }

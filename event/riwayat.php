@@ -247,10 +247,6 @@ if($userAuth['status'] == 'error'){
           var td = document.createElement('td');
           td.appendChild(span);
           row.appendChild(td);
-          //catatan
-          var td = document.createElement('td');
-          td.innerText = item['catatan'];
-          row.appendChild(td);
           //btn
           var link = document.createElement('a');
           var icon = document.createElement('i');

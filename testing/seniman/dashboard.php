@@ -2,7 +2,7 @@
 if(!defined('APP')){
     $rootDir = dirname(dirname(__DIR__));
     http_response_code(404);
-    include($rootDir.'/view/page/PageNotFound.php');
+    // include($rootDir.'/view/page/PageNotFound.php');
     exit();
 }
 $tPath = '';

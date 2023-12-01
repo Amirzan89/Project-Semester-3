@@ -71,11 +71,9 @@ $csrf = $GLOBALS['csrf'];
         const inputs = document.querySelectorAll(".input");
         function addcl(){
         	let parent = this.parentNode.parentNode;
-            console.log('tambah focus');
         	parent.classList.add("focus");
         }
         function remcl(){
-            console.log('tambah blur');
         	let parent = this.parentNode.parentNode;
         	if(this.value == ""){
         		parent.classList.remove("focus");

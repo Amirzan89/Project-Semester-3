@@ -1165,6 +1165,11 @@ class SenimanMobile{
                 throw new Exception('Data seniman tidak ditemukan');
             }
             $stmt[0]->close();
+            if($statusDB == 'proses'){
+                throw new Exception('Data sedang diproses');
+            }else if($statusDB == 'ditolak'){
+                throw new Exception('Data anda ditolak silahkan ajukan ulang ');
+            }
             if(trim($data['nama_lengkap']) !== trim($namaDB)){
                 throw new Exception('Nama lengkap tidak cocok !');
             }
@@ -1255,10 +1260,10 @@ class SenimanMobile{
                 unlink($fileFotoPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
-            $query = "INSERT INTO perpanjangan (nik, ktp_seniman, pass_foto, surat_keterangan, status, id_seniman) VALUES (?, ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO perpanjangan (nik, ktp_seniman, pass_foto, surat_keterangan, status, id_seniman, id_user) VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
             $status = 'diajukan';
-            $stmt[2]->bind_param("ssssss", $data['nik'], $fileKtpDB, $fileFotoDB, $fileSuratDB, $status, $data['id_seniman']);
+            $stmt[2]->bind_param("sssssss", $data['nik'], $fileKtpDB, $fileFotoDB, $fileSuratDB, $status, $data['id_seniman'], $data['id_user']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
@@ -1274,6 +1279,11 @@ class SenimanMobile{
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Perpanjangan Seniman gagal ditambahkan','code'=>500]));
             }
         }catch(Exception $e){
+            echo $e->getTraceAsString();
+            echo "\n";
+            unlink($fileKtpPath);
+            unlink($fileFotoPath);
+            unlink($fileSuratPath);
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {

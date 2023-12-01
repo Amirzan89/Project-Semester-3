@@ -278,17 +278,21 @@ if($userAuth['status'] == 'error'){
         var requestBody = {
           email: email,
           tanggal:'semua',
-          desc:'pengajuan'
+          desc:'pengajuan',
+          table:'seniman'
         };
       }else if(con == null){
         var tanggal = bulanInput.value +'-'+tahunInput.value;
         var requestBody = {
           email: email,
           tanggal:tanggal,
-          desc:'pengajuan'
+          desc:'pengajuan',
+          table:'seniman'
         };
       }
       //open the request
+      // console.log(requestBody);
+      // return;
       xhr.open('POST', domain + "/web/seniman/seniman.php")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
@@ -301,9 +305,9 @@ if($userAuth['status'] == 'error'){
             updateTable(JSON.parse(response)['data']);
           } else {
             var response = xhr.responseText;
-            // console.log(response);
-            updateTable();
+            console.log(response);
             return;
+            updateTable();
           }
         }
       }

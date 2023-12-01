@@ -35,6 +35,7 @@ if($userAuth['status'] == 'error'){
   <meta content="" name="keywords">
 
   <!-- Favicons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
 
   <!-- Google Fonts -->
@@ -48,11 +49,54 @@ if($userAuth['status'] == 'error'){
 
   <!-- Template Main CSS File -->
   <link href="<?php echo $tPath; ?>/public/assets/css/style.css" rel="stylesheet">
-
+  <link href="<?php echo $tPath; ?>/public/css/popup.css" rel="stylesheet">
+  <style>
+    div.drag#divImg{
+      border:4px solid black;
+    }
+    #divImg{
+      position: relative;
+      left:0;
+      max-width: 300px;
+      width:100%;
+      max-height: 200px;
+      height: 200px;
+      border:4px dashed gray;
+      cursor:pointer;
+    }
+    #divText{
+      position: relative;
+      left:50%;
+      top:50%;
+      translate: -50% -50%;
+      font-size:22px;
+      text-align: center;
+      display:flex;
+      flex-direction: column;
+    }
+    #divText i{
+      font-size:65px;
+    }
+    #inpImg {
+      display: block;
+      margin: auto;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+    }
+    @media (max-width: 480px) {
+    }
+    @media (min-width: 481px) and (max-width: 767px) {
+    }
+    @media (min-width: 768px) {
+    }
+  </style>
 </head>
 
 <body>
   <script>
+    var tPath = "<?php echo $tPath ?>";
 	  var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
@@ -163,17 +207,28 @@ if($userAuth['status'] == 'error'){
                   </div>
                 </div>
                 <div class="row mb-3">
-                  <label for="inputPassword" class="col-sm-2 col-form-label">Kata Sandi</label>
+                  <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
                   <div class="col-sm-10">
                     <input type="password" class="form-control" name='pass' placeholder="Password">
                   </div>
                 </div>
-                <div class="row mb-3 justify-content-end">
-                  <div class="col-sm-10 text-end"><br>
-                    <a href="/admin.php" class="btn btn-secondary">Kembali</a>
-                    <button type="submit" class="btn btn-tambah" onclick="openEdit(<?php echo $seniman['id_seniman'] ?>)">Tambah</button>
+                <div class="row mb-3">
+                  <label for="inputPassword" class="col-sm-2 col-form-label">Foto</label>
+                  <div class="col-sm-10">
+                    <div id="divImg" ondrop="dropHandler(event)" ondragover="dragHandler(event,'over')" ondragleave="dragHandler(event,'leave')">
+                      <div id="divText">
+                        <i class="fa-solid fa-images"></i>
+                        <span id="imgText">Pilih atau jatuhkan file gambar tempat </span>
+                      </div>
+                      <input class="form-control" type="file" multiple="false" id="inpFile" name="foto" style="display:none">
+                      <img src="" id="inpImg" class="d-block" alt="">
+                    </div>
                   </div>
                 </div>
+                <div class="row mb-3">
+                <button type="button" name="tambahAdmin" class="btn btn-success" onclick="upload()">Daftarkan</button>
+                </div>
+
               </form><!-- End General Form Elements -->
 
             </div>
@@ -185,30 +240,6 @@ if($userAuth['status'] == 'error'){
 
   </main>
   <!-- End #main -->
-    <!-- start modal tambah -->
-    <div class="modal fade" id="modalTambah" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Konfirmasi tambah data admin</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah anda yakin ingin menambah data admin?
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <form action="/web/seniman/seniman.php" id="deleteForm" method="POST">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
-                            <input type="hidden" name="id_tempat" id="inpTempat">
-                            <button type="submit" class="btn btn-tambah" name="hapusAdmin">Tambah</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- end modal tambah -->
-
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
@@ -217,15 +248,128 @@ if($userAuth['status'] == 'error'){
     </div>
   </footer>
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-        class="bi bi-arrow-up-short"></i></a>
-
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <div id="greenPopup" style="display:none"></div>
+    <div id="redPopup" style="display:none"></div>
     <!-- Vendor JS Files -->
     <script src="<?php echo $tPath; ?>/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
     <!-- Template Main JS File -->
     <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
+    <script src="<?php  echo $tPath ?>/public/js/popup.js"></script>
+    <script>
+    const maxSizeInBytes = 4 * 1024 * 1024; //max file 4MB
+    var divText = document.getElementById('divText');
+    var divImg = document.getElementById('divImg');
+    var inpFile = document.getElementById('inpFile');
+    var imgText = document.getElementById('imgText');
+    var fileImg = '';
+    var uploadStat = false;
+    divImg.addEventListener("click", function(){
+      inpFile.click();
+    });
+    function upload(){
+      if(uploadStat){
+        return;
+      }
+      //check file 
+      if(fileImg == ''){
+        showRedPopup('Foto Profile harus di isi !');
+        return;
+      }
+      var uploadStat = true;
+      const formData = new FormData();
+      formData.append('tambahAdmin','');
+      formData.append('id_user',idUser);
+      formData.append('nama', document.querySelector('input[name="nama"]').value);
+      formData.append('phone', document.querySelector('input[name="phone"]').value);
+      formData.append('jenisK', document.querySelector('input[name="jenisK"]:checked').value);
+      formData.append('tempatL', document.querySelector('input[name="tempatL"]').value);
+      formData.append('tanggalL', document.querySelector('input[name="tanggalL"]').value);
+      formData.append('role', document.querySelector('select[name="role"]').value);
+      formData.append('email', document.querySelector('input[name="email"]').value);
+      formData.append('pass', document.querySelector('input[name="pass"]').value);
+      formData.append('foto', fileImg, fileImg.name);
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/web/User.php', true);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          showGreenPopup(JSON.parse(xhr.responseText));
+          setTimeout(() => {
+                window.location.href = '/admin.php';
+            }, 1000);
+          return;
+        } else {
+          uploadStat = false;
+          showRedPopup(JSON.parse(xhr.responseText));
+          return;
+        }
+      };
+      xhr.onerror = function () {
+        uploadStat = false;
+        showRedPopup('Request gagal');
+        return;
+      };
+      xhr.send(formData);
+    }
+    inpFile.addEventListener('change',function(e){
+      if (e.target.files.length === 1) {
+        const file = e.target.files[0];
+        if (file.type.startsWith('image/')) {
+          if (file.size <= maxSizeInBytes) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+            document.getElementById('inpImg').src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+          fileImg = file;
+          //delete inside box
+          divText.innerHTML = "";
+          divImg.style.borderStyle = "none";
+          divImg.style.borderWidth = "0px";
+          divImg.style.borderColor = "transparent";
+          } else {
+            showRedPopup('Ukuran maksimal gambar 4MB !');
+          }
+        } else {
+          showRedPopup('File harus Gambar !');
+        }
+      }
+    });
+    function dropHandler(event) {
+      event.preventDefault();
+      if (event.dataTransfer.items) {
+        const file = event.dataTransfer.items[0].getAsFile();
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            document.getElementById('inpImg').src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+          fileImg = file;
+          //delete inside box
+          divText.innerHTML = "";
+          divImg.style.borderStyle = "none";
+          divImg.style.borderWidth = "0px";
+          divImg.style.borderColor = "transparent";
+        } else {
+          showRedPopup('File harus Gambar !');
+        }
+      }
+    }
+    function dragHandler(event, con){
+      event.preventDefault();
+      if(con == 'over'){
+        imgText.innerText = 'Jatuhkan file';
+        divImg.classList.add('drag');
+      }else if(con == 'leave'){
+        imgText.innerText = 'Pilih atau jatuhkan file gambar tempat';
+        divImg.classList.remove('drag');
+      }
+    }
+    </script>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         var currentPageURL = window.location.href;

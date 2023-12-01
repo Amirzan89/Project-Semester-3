@@ -40,7 +40,7 @@ class PentasWebsite{
                 if($data['desc'] == 'pengajuan'){
                     $query = "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM surat_advis WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_advis DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM surat_advis WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_advis DESC";
+                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_verifikasi FROM surat_advis WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_advis DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
@@ -49,7 +49,7 @@ class PentasWebsite{
                 if($data['desc'] == 'pengajuan'){
                     $query = "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM surat_advis WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_advis DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM surat_advis WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_advis DESC";
+                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_verifikasi FROM surat_advis WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_advis DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }

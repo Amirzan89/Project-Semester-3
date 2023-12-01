@@ -183,7 +183,12 @@ if($userAuth['status'] == 'error'){
                         <textarea class="form-control" name="deskripsi" style="height: 80px" placeholder="Masukkan Deskripsi Tempat"></textarea>
                       </div>
                       <br>
-                      <button type="button" class="btn btn-primary" onclick="upload()">Tambah</button>
+                      <div class="row mb-3 justify-content-end">
+                        <div class="col-sm-10 text-end">
+                          <a href="/tempat/data_tempat.php" class="btn btn-secondary">Kembali</a>
+                          <button type="button" class="btn btn-tambah" onclick="upload()">Tambah</button>
+                        </div>
+                      </div>
                     </div>
                   </form>
                 </div>
@@ -222,7 +227,7 @@ if($userAuth['status'] == 'error'){
         return;
       }
       //check file 
-      if(fileImg == null){
+      if(fileImg == ''){
         showRedPopup('Gambar harus di isi !');
         return;
       }

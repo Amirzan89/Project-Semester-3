@@ -153,8 +153,8 @@ if($userAuth['status'] == 'error'){
                   </thead>
                   <tbody>
                   <?php
-                      $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(tgl_pembuatan, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC");
-                      // $query = mysqli_query($conn, "SELECT seniman.id_seniman, nama_seniman, DATE_FORMAT(tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'diajukan' OR perpanjangan.status = 'proses' ORDER BY id_seniman DESC");
+                      // $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(tgl_pembuatan, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC");
+                      $query = mysqli_query($conn, "SELECT seniman.id_seniman, nama_seniman, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'diajukan' OR perpanjangan.status = 'proses' ORDER BY id_seniman DESC");
                       $no = 1;
                       while ($seniman = mysqli_fetch_array($query)) {
                   ?>
@@ -278,14 +278,16 @@ if($userAuth['status'] == 'error'){
         var requestBody = {
           email: email,
           tanggal:'semua',
-          desc:'pengajuan'
+          desc:'pengajuan',
+          table:'perpanjangan'
         };
       }else if(con == null){
         var tanggal = bulanInput.value +'-'+tahunInput.value;
         var requestBody = {
           email: email,
           tanggal:tanggal,
-          desc:'pengajuan'
+          desc:'pengajuan',
+          table:'perpanjangan'
         };
       }
       //open the request
@@ -301,7 +303,6 @@ if($userAuth['status'] == 'error'){
             updateTable(JSON.parse(response)['data']);
           } else {
             var response = xhr.responseText;
-            // console.log(response);
             updateTable();
             return;
           }

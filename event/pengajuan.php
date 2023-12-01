@@ -210,7 +210,6 @@ if ($userAuth['status'] == 'error') {
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
-
     function updateTable(dataT = '') {
       while (tableEvent.firstChild) {
         tableEvent.removeChild(tableEvent.firstChild);
