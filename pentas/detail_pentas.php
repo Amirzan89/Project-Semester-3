@@ -22,7 +22,7 @@ if ($userAuth['status'] == 'error') {
   $csrf = $GLOBALS['csrf'];
   if (isset($_GET['id_pentas']) && !empty($_GET['id_pentas'])) {
     $id  = $_GET['id_pentas'];
-    $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, DATE_FORMAT(tgl_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_selesai, tempat_advis, status, catatan FROM surat_advis WHERE id_advis = '$id' LIMIT 1");
+    $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, kode_verifikasi, DATE_FORMAT(tgl_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_selesai, tempat_advis, status, catatan FROM surat_advis WHERE id_advis = '$id' LIMIT 1");
     $pentas = mysqli_fetch_assoc($sql);
   } else {
     header('Location: /pentas.php');
@@ -125,12 +125,6 @@ if ($userAuth['status'] == 'error') {
               </h5>
 
               <form method="POST" action="../users/proses-tambah-user.php">
-                <!-- <div class="row mb-3">
-                  <label class="col-sm-2 col-form-label">ID USER</label>
-                  <div class="col-sm-10">
-                    <input type="text" class="form-control" value="Read only / Disabled" disabled>
-                  </div>
-                </div> -->
                 <div class="col-md-12">
                   <label for="nama_seniman" class="form-label">Nomor Induk Seniman</label>
                   <input type="text" class="form-control" name="nik" value="<?php echo $pentas['nomor_induk'] ?>" readonly>
@@ -153,7 +147,7 @@ if ($userAuth['status'] == 'error') {
                 <br>
                 <div class="col-md-12">
                   <label for="tgl_awal_peminjaman" class="form-label">Tanggal</label>
-                  <input type="date" class="form-control" readonly value="<?php echo $sewa['tgl_awal_peminjaman'] ?>">
+                  <input type="text" class="form-control" readonly value="<?php echo $pentas['tanggal_awal'] ?>">
                 </div>
                 <br>
                 <div class="col-md-12">
@@ -170,7 +164,7 @@ if ($userAuth['status'] == 'error') {
                 <?php } ?>
                 <div class="col-md-12">
                   <label for="nik" class="form-label">Kode Surat</label>
-                  <input type="text" class="form-control" id="nik" readonly value="<?php echo $seniman['nomor_induk'] ?>">
+                  <input type="text" class="form-control" id="nik" readonly value="<?php echo $pentas['kode_verifikasi'] ?>">
                 </div>
                 <br>
                 <div class="row mb-3 justify-content-end">
