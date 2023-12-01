@@ -92,14 +92,15 @@ class Preview{
                 if (copy($file, $des)) {
                     header('Content-Type: application/json');
                     echo json_encode(['status'=>'success','data'=>"$previewURL"]);  
-                    $startTime = time();
-                    $timeout = 5;
-                    while (true) {
-                        if (time() - $startTime >= $timeout) {
-                            unlink($des);
-                            exit();
-                        }
-                    }
+                    exit();
+                    // $startTime = time();
+                    // $timeout = 5;
+                    // while (true) {
+                    //     if (time() - $startTime >= $timeout) {
+                    //         unlink($des);
+                    //         exit();
+                    //     }
+                    // }
                 } else {
                     echo "<script>alert('Sistem error')</script>";
                     echo "<script>window.history.back();</script>";
@@ -209,14 +210,6 @@ class Preview{
                     header('Content-Type: application/json');
                     echo json_encode(['status'=>'success','data'=>"$previewURL"]);
                     exit();
-                    // $startTime = time();
-                    // $timeout = 5;
-                    // while (true) {
-                    //     if (time() - $startTime >= $timeout) {
-                            // unlink($des);
-                            // exit();
-                    //     }
-                    // }
                 } else {
                     echo "<script>alert('Sistem error')</script>";
                     echo "<script>window.history.back();</script>";

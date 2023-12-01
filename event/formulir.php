@@ -128,7 +128,7 @@ if ($userAuth['status'] == 'error') {
                 </div>
                 <div class="col-12">
                   <label for="inputFile" class="form-label">Poster Event</label>
-                  <input type="file" class="form-file-input form-control" id="inputFile" readonly>
+                  <input type="file" class="form-file-input form-control" id="inputFile" readonly disabled>
                 </div>
               </form>
               <br><br>

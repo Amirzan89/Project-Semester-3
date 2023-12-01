@@ -162,7 +162,7 @@ if ($userAuth['status'] == 'error') {
                       <td><?php echo $sewa['tanggal']; ?></td>
                       <td>
                         <?php if ($sewa['status'] == 'diterima') { ?>
-                          <span class="badge bg-terima">Disetujui</span>
+                          <span class="badge bg-terima">Diterima</span>
                           <?php } else if ($sewa['status'] == 'ditolak') { ?>
                             <span class="badge bg-tolak">Ditolak </span>
                             <?php } ?>
@@ -236,7 +236,7 @@ if ($userAuth['status'] == 'error') {
             span.appendChild(icon);
             span.classList.add('badge', 'bg-tolak');
           } else if (item['status'] == 'diterima') {
-            icon.innerText = 'Disetujui';
+            icon.innerText = 'Diterima';
             icon.classList.add('bi', 'bi-check-circle-fill');
             span.appendChild(icon);
             span.classList.add('badge', 'bg-terima');
