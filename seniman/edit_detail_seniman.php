@@ -103,7 +103,9 @@ if ($userAuth['status'] == 'error') {
                             <div class="card-body">
                                 <h5 class="card-title"></h5>
                                 <!-- Multi Columns Form -->
-                                <form class="row g-3">
+                                <form class="row g-3" action="/web/seniman/seniman.php" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                                    <input type="hidden" name="keterangan" value="edit">
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Seniman</label>
                                         <input type="text" class="form-control" id="nik" readonly value="<?php echo $seniman['nomor_induk'] ?>">

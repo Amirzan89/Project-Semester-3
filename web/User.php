@@ -32,6 +32,10 @@ class User{
             if (!isset($data['nama']) || empty($data['nama'])) {
                 throw new Exception('Nama lengkap harus di isi !');
             }
+            $pattern = '/^[a-zA-Z \p{L}\p{M}]+$/u';
+            if (!preg_match($pattern, $data['nama'])) {
+                throw new Exception('Nama lengkap hanya boleh mengandung huruf dan karakter khusus!');
+            }
             if (!isset($data['phone']) || empty($data['phone'])) {
                 throw new Exception('Nomor telepon harus di isi !');
             }
@@ -194,6 +198,10 @@ class User{
             }
             if (!isset($data['nama']) || empty($data['nama'])) {
                 throw new Exception('Nama lengkap harus di isi !');
+            }
+            $pattern = '/^[a-zA-Z \p{L}\p{M}]+$/u';
+            if (!preg_match($pattern, $data['nama'])) {
+                throw new Exception('Nama lengkap hanya boleh mengandung huruf dan karakter khusus!');
             }
             if (!isset($data['phone']) || empty($data['phone'])) {
                 throw new Exception('Nomor telepon harus di isi !');

@@ -20,6 +20,52 @@ if($userAuth['status'] == 'error'){
   }
   $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
   $csrf = $GLOBALS['csrf'];
+  $pathFile = __DIR__."/../kategori_seniman.json";
+  $fileExist = file_exists($pathFile);
+  if (!$fileExist) {
+    $query = "SELECT nama_kategori, singkatan FROM kategori_seniman";
+    $stmt = $conn->prepare($query);
+    if(!$stmt->execute()){
+      $stmt->close();
+      throw new Exception('Data kategori seniman tidak ditemukan');
+    }
+    $result = $stmt->get_result();
+    $kategoriData = [];
+    while ($row = $result->fetch_assoc()) {
+      $kategoriData[] = $row;
+    }
+    $stmt->close();
+    if ($kategoriData === null) {
+      throw new Exception('Data kategori seniman tidak ditemukan');
+    }
+    $kategoriDB = json_encode($kategoriData, JSON_PRETTY_PRINT);
+  }else{
+    $jsonFile = file_get_contents($pathFile);
+    $kategoriDB = json_decode($jsonFile, true);
+    if($kategoriDB === null){
+      $query = "SELECT nama_kategori, singkatan FROM kategori_seniman";
+      $stmt = $conn->prepare($query);
+      if(!$stmt->execute()){
+        $stmt->close();
+        throw new Exception('Data kategori seniman tidak ditemukan');
+      }
+      $result = $stmt->get_result();
+      $kategoriData = [];
+      while ($row = $result->fetch_assoc()) {
+        $kategoriData[] = $row;
+      }
+      $stmt->close();
+      if ($kategoriData === null) {
+        throw new Exception('Data kategori seniman tidak ditemukan');
+      }
+      $kategoriDB = json_encode($kategoriData, JSON_PRETTY_PRINT);
+    }else{
+      $kategoriDB = array_map(function($kategori) {
+        unset($kategori['id_kategori_seniman']);
+        return $kategori;
+    }, $kategoriDB);
+    }
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -94,23 +140,23 @@ if($userAuth['status'] == 'error'){
             <div class="card-body">
               <h5 class="card-title"></h5>
 
-              <form class="row g-3" action="data-seniman.php" method="post">
+              <form class="row g-3" action="/web/seniman/seniman.php" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                <input type="hidden" name="keterangan" value="tambah">
                 <div class="col-md-12">
                   <label for="nik" class="form-label">Nomor Induk Kependudukan</label>
-                  <input type="text" class="form-control" id="nik"
-                    placeholder="Masukkan Nomor Induk Kependudukan">
+                  <input type="text" class="form-control" id="nik" name="nik" placeholder="Masukkan Nomor Induk Kependudukan">
                 </div>
                 <br>
                 <div class="col-md-12">
                   <label for="nama_seniman" class="form-label">Nama Lengkap</label>
-                  <input type="text" class="form-control" id="nama_seniman"
-                    placeholder="Masukkan Nama Lengkap sesuai KTP">
+                  <input type="text" class="form-control" id="nama_seniman" name="nama_seniman" placeholder="Masukkan Nama Lengkap sesuai KTP">
                 </div>
                 <br>
                 <div class="col-mb-3 mt-0">
                   <label for="jenis_kelamin" class="col-md-12 pt-3 col-form-label">Jenis Kelamin</label>
                   <div class="col-md-6">
-                    <select class="form-select" aria-label="Default select example">
+                    <select class="form-select" name="jenis_kelamin" aria-label="Default select example">
                       <option value="laki-laki">Laki-laki</option>
                       <option value="perempuan">Perempuan</option>
                     </select>
@@ -119,47 +165,58 @@ if($userAuth['status'] == 'error'){
                 <br>
                 <div class="col-md-8">
                   <label for="tempat_lahir" class="form-label">Tempat lahir</label>
-                  <input type="text" class="form-control" id="tempat_lahir" placeholder="Masukkan Tempat Lahir">
+                  <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" placeholder="Masukkan Tempat Lahir">
                 </div>
                 <div class="col-md-4">
                   <label for="tanggal_lahir" class="form-label">Tanggal lahir</label>
-                  <input type="date" class="form-control" id="tanggal_lahir">
+                  <input type="date" name="tanggal_lahir" class="form-control" id="tanggal_lahir">
                 </div>
                 <br>
                 <div class="col-md-12 ">
                   <label for="alamat_seniman" class="form-label">Alamat</label>
-                  <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat"
-                    style="height: 100px;"></textarea>
+                  <textarea class="form-control" id="alamat_seniman" name="alamat_seniman" placeholder="Masukkan Alamat" style="height: 100px;"></textarea>
                 </div>
                 <br>
                 <div class="col-md-12">
                   <label for="no_telpon" class="form-label">Nomor Telepon</label>
-                  <input type="text" class="form-control" id="no_telpon" placeholder="Masukkan Nomor Telepon Aktif">
+                  <input type="text" name="no_telpon" class="form-control" id="no_telpon" placeholder="Masukkan Nomor Telepon Aktif">
+                </div>
+                <br>
+                <div class="col-mb-3 mt-0">
+                  <label for="kategori_seniman" class="col-md-12 pt-3 col-form-label">Kategori Seniman</label>
+                  <div class="col-md-6">
+                    <select class="form-select" aria-label="Default select example">
+                      <option value="">Pilih kategori</option>
+                      <?php foreach($kategoriDB as $kategori){ ?>
+                      <option value="<?php echo $kategori['singkatan'] ?>"><?php echo ucfirst($kategori['nama_kategori'])?></option>
+                      <?php }?>
+                    </select>
+                  </div>
                 </div>
                 <br>
                 <div class="col-md-8">
                   <label for="nama_organisasi" class="form-label">Nama Organisasi</label>
-                  <input type="text" class="form-control" id="nama_organisasi" placeholder="Masukkan Nama Organisasi">
+                  <input type="text" name="nama_organisasi" class="form-control" id="nama_organisasi" placeholder="Masukkan Nama Organisasi">
                 </div>
                 <br>
                 <div class="col-md-4">
                   <label for="jumlah_anggota" class="form-label">Jumlah Anggota</label>
-                  <input type="number" class="form-control" id="jumlah_anggota" placeholder="Masukkan Jumlah Anggota">
+                  <input type="number" name="jumlah_anggota" class="form-control" id="jumlah_anggota" placeholder="Masukkan Jumlah Anggota">
                 </div>
                 <br>
                 <div class="col-12">
                   <label for="surat_keterangan" class="form-label">Surat Keterangan Desa</label>
-                  <input type="file" class="form-file-input form-control" id="surat_keterangan" ">
+                  <input type="file" name="surat_keterangan" class="form-file-input form-control" id="surat_keterangan" ">
                 </div>
                 <br>
                 <div class=" col-12">
-                  <label for="ktp_seniman" class="form-label">Foto Kartu Tanda Penduduk</label>
+                  <label for="ktp_seniman" name="ktp_seniman" class="form-label">Foto Kartu Tanda Penduduk</label>
                   <input type="file" class="form-file-input form-control" id="ktp_seniman">
                 </div>
                 <br>
                 <div class="col-12">
                   <label for="pass_foto" class="form-label">Pass Foto 3x4</label>
-                  <input type="file" class="form-file-input form-control" id="pass_foto">
+                  <input type="file" name="pass_foto" class="form-file-input form-control" id="pass_foto">
                 </div>
                 <div class="row mb-3 justify-content-end">
                 <div class="col-sm-10 text-end"><br>

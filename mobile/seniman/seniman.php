@@ -570,6 +570,10 @@ class SenimanMobile{
             if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
                 throw new Exception('Nama seniman harus di isi');
             }
+            $pattern = '/^[a-zA-Z \p{L}\p{M}]+$/u';
+            if (!preg_match($pattern, $data['nama_seniman'])) {
+                throw new Exception('Nama lengkap hanya boleh mengandung huruf dan karakter khusus!');
+            }
             if (!isset($data['nik']) || empty($data['nik'])) {
                 throw new Exception('nik seniman harus di isi');
             }
@@ -787,6 +791,10 @@ class SenimanMobile{
             }
             if (!isset($data['nama_seniman']) || empty($data['nama_seniman'])) {
                 throw new Exception('Nama seniman harus di isi');
+            }
+            $pattern = '/^[a-zA-Z \p{L}\p{M}]+$/u';
+            if (!preg_match($pattern, $data['nama_seniman'])) {
+                throw new Exception('Nama lengkap hanya boleh mengandung huruf dan karakter khusus!');
             }
             if (!isset($data['jenis_kelamin']) || empty($data['jenis_kelamin'])) {
                 throw new Exception('Jenis kelamin harus di isi');
@@ -1106,6 +1114,10 @@ class SenimanMobile{
             }
             if(!isset($data['nama_lengkap']) || empty($data['nama_lengkap'])){
                 throw new Exception('Nama Lengkap harus di isi');
+            }
+            $pattern = '/^[a-zA-Z \p{L}\p{M}]+$/u';
+            if (!preg_match($pattern, $data['nama_lengkap'])) {
+                throw new Exception('Nama lengkap hanya boleh mengandung huruf dan karakter khusus!');
             }
             if(!isset($data['nik']) || empty($data['nik'])){
                 throw new Exception('NIK harus di isi');

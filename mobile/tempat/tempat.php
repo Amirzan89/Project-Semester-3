@@ -307,6 +307,10 @@ class TempatMobile{
             if (!isset($data['nama_peminjam']) || empty($data['nama_peminjam'])) {
                 throw new Exception('Nama peminjam harus di isi !');
             }
+            $pattern = '/^[a-zA-Z \p{L}\p{M}]+$/u';
+            if (!preg_match($pattern, $data['nama_peminjam'])) {
+                throw new Exception('Nama lengkap hanya boleh mengandung huruf dan karakter khusus!');
+            }
             if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
                 throw new Exception('Deskripsi sewa tempat harus di isi !');
             }
@@ -484,6 +488,10 @@ class TempatMobile{
             }
             if (!isset($data['nama_peminjam']) || empty($data['nama_peminjam'])) {
                 throw new Exception('Nama peminjam harus di isi !');
+            }
+            $pattern = '/^[a-zA-Z \p{L}\p{M}]+$/u';
+            if (!preg_match($pattern, $data['nama_peminjam'])) {
+                throw new Exception('Nama lengkap hanya boleh mengandung huruf dan karakter khusus!');
             }
             if (!isset($data['deskripsi']) || empty($data['deskripsi'])) {
                 throw new Exception('Deskripsi sewa tempat harus di isi !');

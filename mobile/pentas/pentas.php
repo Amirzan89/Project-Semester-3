@@ -297,6 +297,10 @@ class PentasMobile{
             if(!isset($data['nama_advis']) || empty($data['nama_advis'])){
                 throw new Exception('Nama advis harus di isi !');
             }
+            $pattern = '/^[a-zA-Z \p{L}\p{M}]+$/u';
+            if (!preg_match($pattern, $data['nama_advis'])) {
+                throw new Exception('Nama lengkap hanya boleh mengandung huruf dan karakter khusus!');
+            }
             if (!isset($data['alamat_advis']) || empty($data['alamat_advis'])) {
                 throw new Exception(' Alamat harus di isi !');
             }
@@ -437,6 +441,10 @@ class PentasMobile{
             }
             if(!isset($data['nama']) || empty($data['nama'])){
                 throw new Exception('Nama pengirim harus di isi !');
+            }
+            $pattern = '/^[a-zA-Z \p{L}\p{M}]+$/u';
+            if (!preg_match($pattern, $data['nama'])) {
+                throw new Exception('Nama lengkap hanya boleh mengandung huruf dan karakter khusus!');
             }
             if (!isset($data['alamat']) || empty($data['alamat'])) {
                 throw new Exception(' Alamat harus di isi !');
