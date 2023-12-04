@@ -155,7 +155,7 @@ if ($userAuth['status'] == 'error') {
                 </thead>
                 <tbody id="tablePentas">
                   <?php
-                  $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_selesai, status, catatan, kode_verifikasi FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
+                  $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_verifikasi FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
                   $no = 1;
                   while ($pentas = mysqli_fetch_array($query)) {
                   ?>

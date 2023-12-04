@@ -22,7 +22,7 @@ if ($userAuth['status'] == 'error') {
   $csrf = $GLOBALS['csrf'];
   if (isset($_GET['id_pentas']) && !empty($_GET['id_pentas'])) {
     $id  = $_GET['id_pentas'];
-    $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, kode_verifikasi, DATE_FORMAT(tgl_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tgl_selesai, '%d %M %Y') AS tanggal_selesai, tempat_advis, status, catatan FROM surat_advis WHERE id_advis = '$id' LIMIT 1");
+    $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, kode_verifikasi, DATE_FORMAT(tgl_advis, '%d %M %Y') AS tgl_advis, tempat_advis, status, catatan FROM surat_advis WHERE id_advis = '$id' LIMIT 1");
     $pentas = mysqli_fetch_assoc($sql);
   } else {
     header('Location: /pentas.php');
@@ -147,7 +147,7 @@ if ($userAuth['status'] == 'error') {
                 <br>
                 <div class="col-md-12">
                   <label for="tgl_awal_peminjaman" class="form-label">Tanggal</label>
-                  <input type="text" class="form-control" readonly value="<?php echo $pentas['tanggal_awal'] ?>">
+                  <input type="text" class="form-control" readonly value="<?php echo $pentas['tgl_advis'] ?>">
                 </div>
                 <br>
                 <div class="col-md-12">
@@ -161,11 +161,13 @@ if ($userAuth['status'] == 'error') {
                     <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $pentas['catatan'] ?></textarea>
                   </div>
                   <br>
-                <?php } ?>
+                  <?php } ?>
+                <?php if (isset($pentas['kode_verifikasi']) && !is_null($pentas['kode_verifikasi']) && !empty($pentas['kode_verifikasi'])) { ?>
                 <div class="col-md-12">
                   <label for="nik" class="form-label">Kode Surat</label>
                   <input type="text" class="form-control" id="nik" readonly value="<?php echo $pentas['kode_verifikasi'] ?>">
                 </div>
+                <?php } ?>
                 <br>
                 <div class="row mb-3 justify-content-end">
                   <div class="col-sm-10 text-end">
