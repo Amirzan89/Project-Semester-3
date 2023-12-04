@@ -54,29 +54,20 @@ if ($result->num_rows == 1) {
         exit();
     }
 }
-$pathFile = __DIR__.'/../private/perpanjangan';
-$jsonPath = __DIR__."/../kategori_seniman.json";
-$uploadDirKTP = $pathFile . '/ktp/';
-$uploadDirSurat = $pathFile . '/surat_keterangan/';
-$uploadDirPassFoto = $pathFile . '/pass_foto/';
 // Direktori penyimpanan file
-// $uploadDirKTP = 'uploads/Perpanjangan/ktp_seniman/';
-// $uploadDirSurat = 'uploads/Perpanjangan/surat_keterangan/';
-// $uploadDirPassFoto = 'uploads/Perpanjangan/pass_foto/';
+$uploadDirKTP = 'uploads/Perpanjangan/ktp_seniman/';
+$uploadDirSurat = 'uploads/Perpanjangan/surat_keterangan/';
+$uploadDirPassFoto = 'uploads/Perpanjangan/pass_foto/';
 
-// Mengunggah dokumen PDF foto ktp
-$newKtp = generateUniqueFileName($ktpSeniman['name'], $uploadDirKTP);
-$ktpSenimanFileName = $uploadDirKTP . $newKtp;
+$ktpSenimanFileName = $uploadDirKTP . generateUniqueFileName($ktpSeniman['name'], $uploadDirKTP);
 move_uploaded_file($ktpSeniman['tmp_name'], $ktpSenimanFileName);
 
 // Mengunggah dokumen PDF Surat Keterangan
-$newSurat = generateUniqueFileName2($suratKeterangan['name'], $uploadDirSurat);
-$suratKeteranganFileName = $uploadDirSurat . $newSurat;
+$suratKeteranganFileName = $uploadDirSurat . generateUniqueFileName2($suratKeterangan['name'], $uploadDirSurat);
 move_uploaded_file($suratKeterangan['tmp_name'], $suratKeteranganFileName);
 
 // Mengunggah gambar Pass Foto
-$newFoto = generateUniqueFileName3($passFoto['name'], $uploadDirPassFoto);
-$passFotoFileName = $uploadDirPassFoto . $newFoto;
+$passFotoFileName = $uploadDirPassFoto . generateUniqueFileName3($passFoto['name'], $uploadDirPassFoto);
 move_uploaded_file($passFoto['tmp_name'], $passFotoFileName);
 
 // Fungsi untuk menghasilkan nama file unik
@@ -132,7 +123,7 @@ function generateUniqueFileName3($originalName, $uploadDirPassFoto) {
 
 // Menggunakan prepared statement dengan menyebutkan nama kolom
 $query = "INSERT INTO perpanjangan (id_seniman, status, ktp_seniman, surat_keterangan,pass_foto)
-                          VALUES ('$id_seniman', '$status','$newKtp','$newSurat','$passFotoFileName')";
+                          VALUES ('$id_seniman', '$status','$ktpSenimanFileName','$suratKeteranganFileName','$passFotoFileName')";
 
 // Menggunakan bind_param dengan variabel
 // $query->bind_param("is", $id_seniman, $status);

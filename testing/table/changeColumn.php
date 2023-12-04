@@ -5,14 +5,14 @@ $database = koneksi::getInstance();
 $conn = $database->getConnection();
 
 // Drop the 'tgl_selesai' column
-$queryDropColumn = "ALTER TABLE surat_advis DROP COLUMN tgl_selesai";
+$queryDropColumn = "ALTER TABLE detail_events DROP COLUMN kategori";
 $stmtDropColumn = $conn->prepare($queryDropColumn);
 $stmtDropColumn->execute();
 
-// Rename 'tgl_awal' column to 'tgl_advis'
-$queryRenameColumn = "ALTER TABLE surat_advis CHANGE COLUMN tgl_awal tgl_advis DATE NOT NULL";
-$stmtRenameColumn = $conn->prepare($queryRenameColumn);
-$stmtRenameColumn->execute();
+// // Rename 'tgl_awal' column to 'tgl_advis'
+// $queryRenameColumn = "ALTER TABLE kategori_seniman CHANGE COLUMN `singkatan` `singkatan_kategori` VARCHAR(45) NOT NULL";
+// $stmtRenameColumn = $conn->prepare($queryRenameColumn);
+// $stmtRenameColumn->execute();
 
 $response = [];
 
@@ -25,7 +25,7 @@ if ($stmtDropColumn->affected_rows > 0 || $stmtRenameColumn->affected_rows > 0) 
 }
 
 $stmtDropColumn->close();
-$stmtRenameColumn->close();
+// $stmtRenameColumn->close();
 
 echo json_encode($response);
 ?>

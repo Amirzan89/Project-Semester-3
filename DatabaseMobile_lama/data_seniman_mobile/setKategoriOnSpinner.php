@@ -4,7 +4,7 @@ require('../Koneksi.php');
 $idseniman = $_POST['id_seniman'];
     
     $sql = "SELECT kategori_seniman.nama_kategori  
-    FROM seniman 
+    FROM seniman
     join kategori_seniman
     on kategori_seniman.singkatan_kategori = seniman.singkatan_kategori
     WHERE seniman.id_seniman = '$idseniman';";

@@ -4,11 +4,17 @@ class Download{
     private static $sizeFile = 5 * 1024 * 1024;
     private static $database;
     private static $con;
-    private static $folderEvent = __DIR__.'/public/img/event';
-    private static $folderSeniman = __DIR__.'/private/seniman';
-    private static $folderSewa = __DIR__.'/private/tempat';
+    private static $folderEvent = __DIR__.'/DatabaseMobile/uploads/events';
+    private static $folderSeniman = __DIR__.'/DatabaseMobile/uploads/seniman';
+    private static $folderPerpanjangan = __DIR__.'/DatabaseMobile/uploads/Perpanjangan';
+    private static $folderSewa = __DIR__.'/DatabaseMobile/uploads/pinjam';
     private static $folderTempat = __DIR__.'/public/img/tempat';
-    private static $folderPentas = __DIR__.'/private/pentas';
+    private static $folderPentas = __DIR__.'/DatabaseMobile/uploads/pentas';
+    // private static $folderEvent = __DIR__.'/public/img/event';
+    // private static $folderSeniman = __DIR__.'/private/seniman';
+    // private static $folderSewa = __DIR__.'/private/tempat';
+    // private static $folderTempat = __DIR__.'/public/img/tempat';
+    // private static $folderPentas = __DIR__.'/private/pentas';
     public function __construct(){
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();

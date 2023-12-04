@@ -18,8 +18,7 @@ $posterFileName = $posterDir . basename($poster_event['name']);
 move_uploaded_file($poster_event['tmp_name'], $posterFileName);
 
 
-$sql = "INSERT INTO detail_events
-        (nama_event, deskripsi, tempat_event, tanggal_awal, tanggal_akhir, link_pendaftaran, poster_event)  VALUES ($nama_event, $deskripsi, $tempat_event, $tanggal_awal, $tanggal_akhir, $link_pendaftaran, '$posterFileName')";
+$sql = "INSERT INTO detail_events (nama_event, deskripsi, tempat_event, tanggal_awal, tanggal_akhir, link_pendaftaran, poster_event)  VALUES ($nama_event, $deskripsi, $tempat_event, $tanggal_awal, $tanggal_akhir, $link_pendaftaran, '$posterFileName')";
 
 $response = array();
 if ($konek->query($sql) === TRUE) {
