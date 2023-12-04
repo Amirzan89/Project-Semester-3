@@ -6,7 +6,7 @@ $idseniman = $_POST['id_seniman'];
     $sql = "SELECT kategori_seniman.nama_kategori  
     FROM seniman
     join kategori_seniman
-    on kategori_seniman.singkatan_kategori = seniman.singkatan_kategori
+    on kategori_seniman.id_kategori_seniman = seniman.id_kategori_seniman
     WHERE seniman.id_seniman = '$idseniman';";
     $result = $konek->query($sql);
  

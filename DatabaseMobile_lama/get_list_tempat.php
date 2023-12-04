@@ -5,13 +5,13 @@ header("Content-Type: application/json");
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
-    $sql = "SELECT * FROM list_tempat";
+    $sql = "SELECT * FROM   ";
     $result = $konek->query($sql);
  
     if ($result->num_rows >= 1) {
         $data = array();
         while ($row = $result->fetch_assoc()) {
-            $row['foto_tempat'] = 'uploads/tempat/' . $row['foto_tempat'];
+            $row['foto_tempat'] = '/public/img/tempat' . $row['foto_tempat'];
             $data[] = $row;
         }
         $response = array("status"=>"success", "message"=>"data berhasil didapatkan", "data"=>$data);

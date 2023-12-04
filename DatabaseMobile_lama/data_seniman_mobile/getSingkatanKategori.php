@@ -5,7 +5,7 @@ $NamaKategori = $_POST['NamaKategori'];
     
     $sql = "SELECT singkatan_kategori FROM kategori_seniman WHERE nama_kategori = '$NamaKategori' LIMIT 1;";
     $result = $konek->query($sql);
- 
+
     if ($result->num_rows == 1) {
         $TabelKategori = $result->fetch_assoc();
 

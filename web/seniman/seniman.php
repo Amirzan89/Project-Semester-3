@@ -235,7 +235,7 @@ class SenimanWebsite{
                 $jsonData = json_decode($jsonFile, true);
                 $result = null;
                 foreach($jsonData as $key => $item){
-                    if (isset($item['singkatan']) && $item['singkatan'] == $data['kategori']) {
+                    if (isset($item['singkatan_kategori']) && $item['singkatan_kategori'] == $data['kategori']) {
                         $result = $jsonData[$key]['id_kategori_seniman'];
                     }
                 }
@@ -291,7 +291,7 @@ class SenimanWebsite{
                 $result = null;
                 foreach($jsonData as $key => $item){
                     if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
-                        $result = $jsonData[$key]['singkatan'];
+                        $result = $jsonData[$key]['singkatan_kategori'];
                     }
                 }
                 if($result === null){
