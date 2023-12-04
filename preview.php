@@ -10,7 +10,8 @@ class Preview{
     private static $folderPentasDes = '/pentas/preview';
 
     private static $folderEvent = __DIR__.'/DatabaseMobile/img/event';
-    private static $folderSeniman = __DIR__.'/DatabaseMobile/uploads/seniman';
+    private static $folderSeniman = __DIR__.'/DatabaseMobile/data_seniman_mobile/uploads/seniman';
+    private static $folderPerpanjangan = __DIR__.'/DatabaseMobile/data_seniman_mobile/uploads/perpanjangan';
     private static $folderSewa = __DIR__.'/DatabaseMobile/uploads/pinjam';
     private static $folderTempat = __DIR__.'/public/img/tempat';
     private static $folderPentas = __DIR__.'/private/pentas';
@@ -179,7 +180,7 @@ class Preview{
                 $file = self::$folderSeniman.'/pass_foto';
             }else if($data['deskripsi'] == 'ktp'){
                 $query = "SELECT ktp_seniman FROM seniman WHERE id_seniman = ? LIMIT 1";
-                $file = self::$folderSeniman.'/ktp';
+                $file = self::$folderSeniman.'/ktp_seniman';
             }else if($data['deskripsi'] == 'surat'){
                 $query = "SELECT surat_keterangan FROM seniman WHERE id_seniman = ? LIMIT 1";
                 $file = self::$folderSeniman.'/surat_keterangan';
@@ -196,6 +197,115 @@ class Preview{
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
                 echo "<script>alert('Data seniman tidak ditemukan')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $stmt[0]->close();
+            $file = $file.$path;
+            //download file
+            if (file_exists($file)) {
+                $randomString = bin2hex(random_bytes(16));
+                //buat folder
+                if (!is_dir(__DIR__.self::$folderSenimanDes)) {
+                    mkdir(__DIR__.self::$folderSenimanDes, 0777, true);
+                }
+                $extension = pathinfo($file, PATHINFO_EXTENSION);
+                $des = __DIR__ . self::$folderSenimanDes .'/'. $randomString . '.'. $extension;
+                $previewURL = self::$folderSenimanDes .'/'. $randomString . '.'. $extension;
+                if (copy($file, $des)) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['status'=>'success','data'=>"$previewURL"]);
+                    exit();
+                } else {
+                    echo "<script>alert('Sistem error')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
+            } else {
+                echo "<script>alert('File tidak ditemukan')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+        }catch(Exception $e){
+            echo $e->getTraceAsString();
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
+    }
+    public function previewPerpanjangan($data){
+        try{
+            if(!isset($data['email']) || empty($data['email'])){
+                echo "<script>alert('Email harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
+                echo "<script>alert('ID Seniman harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            if(!isset($data['deskripsi']) || empty($data['deskripsi'])){
+                echo "<script>alert('Deskripsi harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check email
+            $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['email']);
+            $stmt[0]->execute();
+            $role = '';
+            $stmt[0]->bind_result($role);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                echo "<script>alert('User tidak ditemukan')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $stmt[0]->close();
+            if($role == 'masyarakat'){
+                echo "<script>alert('Anda bukan admin !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            //check id_seniman
+            if($data['deskripsi'] == 'foto'){
+                $query = "SELECT pass_foto FROM perpanjangan WHERE id_seniman = ? LIMIT 1";
+                $file = self::$folderSeniman.'/pass_foto';
+            }else if($data['deskripsi'] == 'ktp'){
+                $query = "SELECT ktp_seniman FROM perpanjangan WHERE id_seniman = ? LIMIT 1";
+                $file = self::$folderSeniman.'/ktp_seniman';
+            }else if($data['deskripsi'] == 'surat'){
+                $query = "SELECT surat_keterangan FROM perpanjangan WHERE id_seniman = ? LIMIT 1";
+                $file = self::$folderSeniman.'/surat_keterangan';
+            }else{
+                echo "<script>alert('Deskripsi invalid !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
+            $stmt[0] = self::$con->prepare($query);
+            $stmt[0]->bind_param('s', $data['id_seniman']);
+            $stmt[0]->execute();
+            $path = '';
+            $stmt[0]->bind_result($path);
+            if (!$stmt[0]->fetch()) {
+                $stmt[0]->close();
+                echo "<script>alert('Data perpanjangan tidak ditemukan')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }
@@ -612,6 +722,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }else{
         if($data['item'] == 'seniman'){
             $download->previewSeniman($data);
+        }else if($data['item'] == 'perpanjangan'){
+            $download->previewPerpanjangan($data);
         }else if($data['item'] == 'sewa'){
             $download->previewSewa($data);
         }else if($data['item'] == 'tempat'){
