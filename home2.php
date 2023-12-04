@@ -97,8 +97,8 @@ if($userAuth['status'] == 'success'){
               <div class="swiper-wrapper align-items-center">
 
                 <div class="swiper-slide">
-                  <img src="<?php echo $tPath; ?>/public/img/tempat<?php echo $tempat['foto_tempat']?>" alt="">
-                  <!-- <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/gedung5.png" alt=""> -->
+                  <img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/tempat<?php echo $tempat['foto_tempat']?>" alt="">
+                  <!-- <img src="<?php echo $tPath; ?>/public/img/tempat<?php echo $tempat['foto_tempat']?>" alt=""> -->
                 </div>
               </div>
               <div class="swiper-pagination"></div>

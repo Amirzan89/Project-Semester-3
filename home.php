@@ -181,11 +181,13 @@ if($userAuth['status'] == 'success'){
           while ($tempat = mysqli_fetch_array($query)) {
           ?>
             <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-              <div class="portfolio-img"><img src="<?php echo $tPath; ?>/public/img/tempat<?php echo $tempat['foto_tempat']?>" class="img-fluid" alt=""></div>
+              <!-- <div class="portfolio-img"><img src="<?php echo $tPath; ?>/public/img/tempat<?php echo $tempat['foto_tempat']?>" class="img-fluid" alt=""></div> -->
+              <div class="portfolio-img"><img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/tempat<?php echo $tempat['foto_tempat']?>" class="img-fluid" alt=""></div>
               <div class="portfolio-info">
                 <h4><?php echo $tempat['nama_tempat']?></h4>
                 <!-- <p>Gedung</p> -->
-                <a href="<?php echo $tPath; ?>/public/img/tempat<?php echo $tempat['foto_tempat']?>" data-gallery="portfolioGallery"
+                <!-- <a href="<?php echo $tPath; ?>/public/img/tempat<?php echo $tempat['foto_tempat']?>" data-gallery="portfolioGallery" -->
+                <a href="<?php echo $tPath; ?>/DatabaseMobile/uploads/tempat<?php echo $tempat['foto_tempat']?>" data-gallery="portfolioGallery"
                   class="portfolio-lightbox preview-link" title="Balai Budaya"><i class="bx bx-plus"></i></a>
                 <a href="/home2.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
               </div>

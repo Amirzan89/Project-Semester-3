@@ -1,12 +1,13 @@
 <?php
 require('../Koneksi.php');
-function kategori($data, $desc){
+$pathFile = __DIR__."/../../kategori_seniman.json";
+function kategori($data, $desc, $pathFile, $konek){
     try{
-        $fileExist = file_exists(self::$jsonPath);
+        $fileExist = file_exists($pathFile);
         if (!$fileExist) {
             //if file is delete will make new json file
             $query = "SELECT * FROM kategori_seniman";
-            $stmt[0] = self::$con->prepare($query);
+            $stmt[0] = $konek->prepare($query);
             if(!$stmt[0]->execute()){
                 $stmt[0]->close();
                 throw new Exception('Data kategori seniman tidak ditemukan');
@@ -21,7 +22,7 @@ function kategori($data, $desc){
                 throw new Exception('Data kategori seniman tidak ditemukan');
             }
             $jsonData = json_encode($kategoriData, JSON_PRETTY_PRINT);
-            if (!file_put_contents(self::$jsonPath, $jsonData)) {
+            if (!file_put_contents($pathFile, $jsonData)) {
                 throw new Exception('Gagal menyimpan file sistem');
             }
         }
@@ -29,7 +30,7 @@ function kategori($data, $desc){
             if(!isset($data['kategori']) || empty($data['kategori'])){
                 throw new Exception('Kategori harus di isi');
             }
-            $jsonFile = file_get_contents(self::$jsonPath);
+            $jsonFile = file_get_contents($pathFile);
             $jsonData = json_decode($jsonFile, true);
             $result = null;
             foreach($jsonData as $key => $item){
@@ -45,7 +46,7 @@ function kategori($data, $desc){
             if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                 throw new Exception('Kategori harus di isi');
             }
-            $jsonFile = file_get_contents(self::$jsonPath);
+            $jsonFile = file_get_contents($pathFile);
             $jsonData = json_decode($jsonFile, true);
             $result = null;
             foreach($jsonData as $key => $item){
@@ -61,7 +62,7 @@ function kategori($data, $desc){
             if(!isset($data['NamaKategori']) || empty($data['NamaKategori'])){
                 throw new Exception('Kategori harus di isi');
             }
-            $jsonFile = file_get_contents(self::$jsonPath);
+            $jsonFile = file_get_contents($pathFile);
             $jsonData = json_decode($jsonFile, true);
             $result = null;
             foreach($jsonData as $key => $item){
@@ -74,7 +75,7 @@ function kategori($data, $desc){
             }
             return $result;
         }else if($desc == 'get all'){
-            $jsonFile = file_get_contents(self::$jsonPath);
+            $jsonFile = file_get_contents($pathFile);
             $jsonData = json_decode($jsonFile, true);
             if($jsonData === null){
                 throw new Exception('Data kategori tidak ditemukan');
@@ -84,7 +85,7 @@ function kategori($data, $desc){
             if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                 throw new Exception('Kategori harus di isi');
             }
-            $jsonFile = file_get_contents(self::$jsonPath);
+            $jsonFile = file_get_contents($pathFile);
             $jsonData = json_decode($jsonFile, true);
             $result = null;
             foreach($jsonData as $key => $item){
@@ -128,7 +129,7 @@ $noHandphone = $_POST['no_telpon'];
 $namaOrganisasi = $_POST['nama_organisasi'];
 $jumlahAnggota = $_POST['jumlah_anggota'];
 $status = $_POST['status'];
-$kategori = kategori(['kategori'=>$_POST['singkatan_kategori']],'check');
+$kategori = kategori(['kategori'=>str_replace(['"', "'"], '', $_POST['singkatan_kategori'])],'check',$pathFile,$konek);
 $kecamatan = $_POST['kecamatan'];
 $id_user = $_POST['id_user'];
 $id_seniman = $_POST['id_seniman'];

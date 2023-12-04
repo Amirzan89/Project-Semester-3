@@ -1,12 +1,13 @@
 <?php
 require('../Koneksi.php');
-function kategori($data, $desc){
+$pathFile = __DIR__."/../../kategori_seniman.json";
+function kategori($data, $desc, $pathFile, $konek){
     try{
         $fileExist = file_exists(self::$jsonPath);
         if (!$fileExist) {
             //if file is delete will make new json file
             $query = "SELECT * FROM kategori_seniman";
-            $stmt[0] = self::$con->prepare($query);
+            $stmt[0] = $konek->prepare($query);
             if(!$stmt[0]->execute()){
                 $stmt[0]->close();
                 throw new Exception('Data kategori seniman tidak ditemukan');
@@ -127,7 +128,7 @@ $alamat = $_POST['alamat_seniman'];
 $noHandphone = $_POST['no_telpon'];
 $namaOrganisasi = $_POST['nama_organisasi'];
 $jumlahAnggota = $_POST['jumlah_anggota'];
-$kategori = kategori(['kategori'=>$_POST['singkatan_kategori']],'check');
+$kategori = kategori(['kategori'=>str_replace(['"', "'"], '', $_POST['singkatan_kategori'])],'check',$pathFile,$konek);
 $kecamatan = $_POST['kecamatan'];
 $id_seniman = $_POST['id_seniman'];
 

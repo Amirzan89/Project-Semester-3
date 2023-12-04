@@ -8,7 +8,7 @@ class TempatWebsite{
     public function __construct(){
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();
-        self::$folderPath = __DIR__.'/../../public/img/tempat';
+        self::$folderPath = __DIR__.'/../../DatabaseMobile/uploads/tempat';
     }
     public static function getSewa($data){
         try{

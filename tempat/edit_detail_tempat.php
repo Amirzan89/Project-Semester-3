@@ -56,6 +56,7 @@ if($userAuth['status'] == 'error'){
 
   <!-- Template Main CSS File -->
   <link href="<?php echo $tPath; ?>/public/assets/css/tempat.css" rel="stylesheet">
+  <link href="<?php echo $tPath; ?>/public/css/popup.css" rel="stylesheet">
   <style>
         div.drag#divImg {
             border: 4px solid black;
@@ -109,8 +110,10 @@ if($userAuth['status'] == 'error'){
         var csrfToken = "<?php echo $csrf ?>";
         var email = "<?php echo $userAuth['email'] ?>";
         var idUser = "<?php echo $userAuth['id_user'] ?>";
+        var idTempat = <?php echo $id ?>;
         var number = "<?php echo $userAuth['number'] ?>";
         var role = "<?php echo $userAuth['role'] ?>";
+        var tempats = <?php echo json_encode($tempat) ?>;
 	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -195,7 +198,7 @@ if($userAuth['status'] == 'error'){
                                 <div class="row mb-3 justify-content-end">
                                     <div class="col-sm-10 text-end">
                                     <a href="/tempat/data_tempat.php" class="btn btn-secondary">Kembali</a>
-                                    <button type="submit" class="btn btn-tambah" onclick="openEdit(<?php echo $tempat['id_tempat'] ?>)">Edit</button>
+                                    <button type="button" class="btn btn-tambah" onclick="upload()">Edit</button>
                                     </div>
                                 </div>
                             </form>
@@ -238,11 +241,11 @@ if($userAuth['status'] == 'error'){
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
     <div id="greenPopup" style="display:none"></div>
-    <div id="redPopup" style="display:none"></div>
+  <div id="redPopup" style="display:none"></div>
   <!-- Vendor JS Files -->
   <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script> 
 
   <!-- Template Main JS File -->
   <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
@@ -258,6 +261,9 @@ if($userAuth['status'] == 'error'){
         divImg.addEventListener("click", function () {
             inpFile.click();
         });
+        if(fileImg == ''){
+            showRedPopup('Gambar harus di isi !');
+        }
         function upload() {
             if(uploadStat){
                 return;
@@ -270,6 +276,12 @@ if($userAuth['status'] == 'error'){
             //check data if edit or not
             if((fileImg === null || fileImg === '') && inpNamaTempat === tempats.nama_tempat && inpAlamatTempat === tempats.alamat_tempat && inpDeskripsiTempat === tempats.deskripsi_tempat && inpNamaPengelola === tempats.pengelola && inpTLP === tempats.contact_person){
                 showRedPopup('Data belum diubah');
+            }
+            if((fileImg === null || fileImg === '') && (inpNamaTempat === '' || inpNamaTempat === null) && (inpAlamatTempat === '' || inpAlamatTempat === null) && (inpDeskripsiTempat === "" || inpDeskripsiTempat === null) && (inpNamaPengelola === '' || inpNamaPengelola === null) && ( inpTLP === '' || inpTLP === null)){
+                showRedPopup('Data tidak boleh kosong');
+            }
+            if(inpNamaTempat == '' || inpNamaTempat == null){
+                showRedPopup('Nama tempat harus di isi');
             }
             uploadStat = true;
             const formData = new FormData();
@@ -294,6 +306,10 @@ if($userAuth['status'] == 'error'){
                     }, 1000);
                     return;
                 } else {
+                    console.log(xhr.responseText);
+                    showRedPopup('Request gagal');
+                    // showRedPopup(xhr.responseText);
+                    return;
                     uploadStat = false;
                     showRedPopup(JSON.parse(xhr.responseText));
                     return;
