@@ -15,6 +15,7 @@
         <div id="calendar"></div>
     </body>
     <script>
+      const dataKalender = <?php echo json_encode($dataKalender) ?>;
         $(document).ready(function() {
             $('#calendar').fullCalendar({
             defaultView: 'month',

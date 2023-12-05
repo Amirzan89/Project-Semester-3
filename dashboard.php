@@ -120,7 +120,7 @@ if ($userAuth['status'] == 'error') {
                       </div>
                       <div class="ps-3">
                         <?php
-                        $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role = 'masyarakat'");
+                        $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role = '  '");
                         $data = mysqli_fetch_assoc($sql);
                         echo "<h4>" . $data['total'] . "</h4>";
                         ?>
@@ -138,7 +138,19 @@ if ($userAuth['status'] == 'error') {
           <div class="card">
             <div class="card-body mt-2 mb-5">
               <h5 class="card-title mt-3 "><strong>Kalender Peminjaman Tempat</strong></h5>
-              <?php include(__DIR__.'/kalender.php'); ?>
+              <?php
+              $dataKalender = ''; 
+              $sql = "SELECT nama_kegiatan_sewa, tgl_awal_peminjaman, tgl_akhir_peminjaman FROM sewa_tempat WHERE status = 'diterima'"; 
+              $result = $conn->query($sql);
+              if ($result->num_rows >= 1) {
+                  $data = array();
+                  while ($row = mysqli_fetch_assoc($result)) {
+                      $data[] = $row;
+                  }
+                  $dataKalender = $data;
+              }
+              include(__DIR__.'/kalender.php'); 
+              ?>
             </div>
           </div>
         </div>

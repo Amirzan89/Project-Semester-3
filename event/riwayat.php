@@ -156,7 +156,7 @@ if($userAuth['status'] == 'error'){
                 </thead>
                 <tbody id="tableEvent">
                   <?php
-                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, kategori, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_event DESC");
+                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_event DESC");
                     $no = 1;
                     while ($event = mysqli_fetch_array($query)) {
                   ?>

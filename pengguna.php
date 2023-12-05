@@ -102,11 +102,11 @@ if ($userAuth['status'] == 'error') {
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Daftar Pengguna</h5>
-              <a href="/pengguna/tambah.php">
+              <!-- <a href="/pengguna/tambah.php">
                 <button type="button" class="btn btn-primary">
                     <i class="bi bi-person-plus-fill"></i> Tambah Pengguna
                 </button>
-              </a>
+              </a> -->
               <div class="col-lg-12">
                 <table class="table datatable">
                   <thead>
