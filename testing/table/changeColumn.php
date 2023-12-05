@@ -10,7 +10,7 @@ $conn = $database->getConnection();
 // $stmtDropColumn->execute();
 
 // // Rename 'tgl_awal' column to 'tgl_advis'
-$queryRenameColumn = "ALTER TABLE sewa_tempat CHANGE COLUMN `singkatan` `singkatan_kategori` VARCHAR(45) NOT NULL";
+$queryRenameColumn = "ALTER TABLE sewa_tempat CHANGE COLUMN `kode_verifikasi` `kode_pinjam` VARCHAR(45) NOT NULL";
 $stmtRenameColumn = $conn->prepare($queryRenameColumn);
 $stmtRenameColumn->execute();
 

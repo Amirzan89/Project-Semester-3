@@ -151,7 +151,7 @@ if ($userAuth['status'] == 'error') {
                 </thead>
                 <tbody id="tableSewa">
                   <?php
-                  $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_verifikasi FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_sewa DESC");
+                  $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_pinjam FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_sewa DESC");
                   $no = 1;
                   while ($sewa = mysqli_fetch_array($query)) {
                   ?>
@@ -167,7 +167,7 @@ if ($userAuth['status'] == 'error') {
                             <span class="badge bg-tolak">Ditolak </span>
                             <?php } ?>
                       </td>
-                      <td><?php echo $sewa['kode_verifikasi']; ?></td>
+                      <td><?php echo $sewa['kode_pinjam']; ?></td>
                       <td>
                         <a href="/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
                       </td>

@@ -41,7 +41,7 @@ class TempatWebsite{
                 if($data['desc'] == 'pengajuan'){
                     $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_sewa DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_verifikasi FROM sewa_tempat WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_sewa DESC";
+                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_pinjam FROM sewa_tempat WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_sewa DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
@@ -50,7 +50,7 @@ class TempatWebsite{
                 if($data['desc'] == 'pengajuan'){
                     $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM sewa_tempat WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_sewa DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_verifikasi FROM sewa_tempat WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_sewa DESC";
+                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_pinjam FROM sewa_tempat WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_sewa DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
@@ -934,7 +934,7 @@ class TempatWebsite{
             //     exit();
             // }
             //update data
-            $query = "UPDATE sewa_tempat SET kode_verifikasi = ?, status = ?, catatan = ? WHERE id_sewa = ?";
+            $query = "UPDATE sewa_tempat SET kode_pinjam = ?, status = ?, catatan = ? WHERE id_sewa = ?";
             $stmt[2] = self::$con->prepare($query);
             if($data['keterangan'] == 'proses'){
                 $status = 'proses';
