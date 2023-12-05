@@ -22,8 +22,11 @@ if ($userAuth['status'] == 'error') {
     $csrf = $GLOBALS['csrf'];
     if (isset($_GET['id_seniman']) && !empty($_GET['id_seniman'])) {
         $id = $_GET['id_seniman'];
-        $sql = mysqli_query($conn, "SELECT id_seniman, nik, nomor_induk, nama_seniman, jenis_kelamin, tempat_lahir, nama_kategori AS kategori, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota, kecamatan, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE id_seniman = '$id'");
-        $seniman = mysqli_fetch_assoc($sql);
+        // $sql = mysqli_query($conn, "SELECT id_perpanjangan, nik, nomor_induk, nama_seniman, jenis_kelamin, tempat_lahir, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota, status, catatan FROM perpanjangan WHERE id_perpanjangan = '$id'");
+        $sql = mysqli_query($conn, "SELECT id_perpanjangan, perpanjangan.nik AS nik, nama_seniman, nomor_induk, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE seniman.id_seniman = '$id'");
+        $perpanjangan = mysqli_fetch_assoc($sql);
+        // echo json_encode($perpanjangan);
+        // exit();
     } else {
         header('Location: /seniman.php');
     }
@@ -91,13 +94,13 @@ if ($userAuth['status'] == 'error') {
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
                     <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
-                    <?php if ($seniman['status'] == 'diajukan' || $seniman['status'] == 'proses') { ?>
-                        <li class="breadcrumb-item"><a href="/seniman/pengajuan.php">Verifikasi Pengajuan</a></li>
-                    <?php } else if ($seniman['status'] == 'diterima' || $seniman['status'] == 'ditolak') { ?>
-                        <li class="breadcrumb-item"><a href="/seniman/riwayat.php">Riwayat Nomer Induk Seniman</a>
-                        </li>
+                    <?php if ($perpanjangan['status'] == 'diajukan' || $perpanjangan['status'] == 'proses') { ?>
+                        <li class="breadcrumb-item"><a href="/seniman/perpanjangan.php">Verifikasi Perpanjangan</a></li>
+                    <?php // } else if ($perpanjangan['status'] == 'diterima' || $perpanjangan['status'] == 'ditolak') { ?>
+                        <!-- <li class="breadcrumb-item"><a href="/seniman/riwayat.php">Riwayat Nomer Induk Seniman</a>
+                        </li> -->
                     <?php } ?>
-                    <li class="breadcrumb-item active">Detail Data Seniman</li>
+                    <li class="breadcrumb-item active">Detail Data perpanjangan Seniman</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -105,9 +108,9 @@ if ($userAuth['status'] == 'error') {
             <div class="row">
                 <div class="col-lg-12">
                     <div class="row mb-3 d-flex justify-content-center align-items-center">
-                        <?php if ($seniman['status'] == 'diterima') { ?>
+                        <?php if ($perpanjangan['status'] == 'diterima') { ?>
                             <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i> Diterima</span>
-                        <?php } else if ($seniman['status'] == 'ditolak') { ?>
+                        <?php } else if ($perpanjangan['status'] == 'ditolak') { ?>
                             <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i> Ditolak</span>
                             </li>
                         <?php } ?>
@@ -119,84 +122,22 @@ if ($userAuth['status'] == 'error') {
                                 <!-- Multi Columns Form -->
                                 <form class="row g-3">
                                     <div class="col-md-12">
-                                        <label for="nik" class="form-label">Nomor Induk Seniman</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo $seniman['nomor_induk'] ?>">
-                                    </div>
-                                    <br>
-                                    <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Kependudukan</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo $seniman['nik'] ?>">
+                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo $perpanjangan['nik'] ?>">
                                     </div>
                                     <br>
                                     <div class="col-md-12">
                                         <label for="nama_seniman" class="form-label">Nama Lengkap</label>
-                                        <input type="text" class="form-control" id="nama_seniman" readonly value="<?php echo $seniman['nama_seniman'] ?>">
-                                    </div>
-                                    <br>
-                                    <div class="col-mb-3 mt-0">
-                                        <label for="jenis_kelamin" class="col-md-12 pt-3 col-form-label">Jenis
-                                            Kelamin</label>
-                                        <div class="col-md-6">
-                                            <select class="form-select" aria-label="Default select example" disabled>
-                                                <?php if ($seniman['jenis_kelamin'] == 'laki-laki') { ?>
-                                                    <option value="laki-laki" selected="selected">Laki-laki</option>
-                                                <?php } else if ($seniman['jenis_kelamin'] === 'perempuan') { ?>
-                                                    <option value="perempuan" selected="selected">Perempuan</option>
-                                                <?php } ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <br>
-                                    <div class="col-md-8">
-                                        <label for="tempat_lahir" class="form-label">Tempat lahir</label>
-                                        <input type="text" class="form-control" id="tempat_lahir" readonly value="<?php echo $seniman['tempat_lahir'] ?>">
-                                    </div>
-                                    <br>
-                                    <div class="col-md-4">
-                                        <label for="tanggal_lahir" class="form-label">Tanggal lahir</label>
-                                        <input type="text" class="form-control" id="tanggal_lahir" readonly value="<?php echo $seniman['tanggal_lahir'] ?>">
-                                    </div>
-                                    <br>
-                                    <div class="col-mb-3 mt-0">
-                                        <label for="kecamatan" class="col-md-12 pt-3 col-form-label">Kecamatan</label>
-                                        <div class="col-md-6">
-                                            <select class="form-select" aria-label="Default select example" disabled>
-                                                <option value="<?php echo $seniman['kecamatan'] ?>" selected="selected"><?php echo ucfirst($seniman['kecamatan'])?></option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <br>
-                                    <div class="col-md-12 ">
-                                        <label for="alamat_seniman" class="form-label">Alamat</label>
-                                        <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat" style="height: 100px;" readonly><?php echo $seniman['alamat_seniman'] ?></textarea>
+                                        <input type="text" class="form-control" id="nama_seniman" readonly value="<?php echo $perpanjangan['nama_seniman'] ?>">
                                     </div>
                                     <br>
                                     <div class="col-md-12">
-                                        <label for="no_telpon" class="form-label">Nomor Telepon</label>
-                                        <input type="text" class="form-control" id="no_telpon" readonly value="<?php echo $seniman['no_telpon'] ?>">
-                                    </div>
-                                    <br>
-                                    <div class="col-mb-3 mt-0">
-                                        <label for="kategori_seniman" class="col-md-12 pt-3 col-form-label">Kategori Seniman</label>
-                                        <div class="col-md-6">
-                                            <select class="form-select" aria-label="Default select example" disabled>
-                                            <option value="<?php echo $seniman['kategori'] ?>" selected="selected"><?php echo ucfirst($seniman['kategori'])?></option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <br>
-                                    <div class="col-md-8">
-                                        <label for="nama_organisasi" class="form-label">Nama Organisasi</label>
-                                        <input type="text" class="form-control" id="nama_organisasi" readonly value="<?php echo $seniman['nama_organisasi'] ?>">
-                                    </div>
-                                    <br>
-                                    <div class="col-md-4">
-                                        <label for="jumlah_anggota" class="form-label">Jumlah Anggota</label>
-                                        <input type="number" class="form-control" id="jumlah_anggota" readonly value="<?php echo $seniman['jumlah_anggota'] ?>">
+                                        <label for="nik" class="form-label">Nomor Induk Seniman</label>
+                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo $perpanjangan['nomor_induk'] ?>">
                                     </div>
                                     <br>
                                     <div class="col-12">
-                                        <label for="surat_keterangan" class="form-label">Surat Keterangan Desa</label>
+                                        <label for="surat_keterangan" class="form-label">Surat Keterangan</label>
                                         <div class="col-sm-10">
                                             <button class="btn btn-info" type="button" onclick="preview('surat') "> Lihat surat
                                                 keterangan </button>
@@ -216,7 +157,7 @@ if ($userAuth['status'] == 'error') {
                                     </div>
                                     <br>
                                     <div class="col-12">
-                                        <label for="pass_foto" class="form-label">Pass Foto 3x4</label>
+                                        <label for="pass_foto" class="form-label">Pas Foto 3x4</label>
                                         <div class="col-sm-10">
                                             <button class="btn btn-info" type="button" onclick="preview('foto')"> Lihat pass
                                                 foto </button>
@@ -225,27 +166,27 @@ if ($userAuth['status'] == 'error') {
                                         </div>
                                     </div>
                                     <br>
-                                    <?php if (isset($seniman['catatan']) && !is_null($seniman['catatan']) && !empty($seniman['catatan'])) { ?>
+                                    <?php if (isset($perpanjangan['catatan']) && !is_null($perpanjangan['catatan']) && !empty($perpanjangan['catatan'])) { ?>
                                         <div class="col-12">
                                             <label for="inputText" class="form-label">Alasan Penolakan</label>
-                                            <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $seniman['catatan'] ?></textarea>
+                                            <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $perpanjangan['catatan'] ?></textarea>
                                         </div>
                                     <?php } ?>
                                     <div class="row mb-3 justify-content-end">
                                         <div class="col-sm-10 text-end">
                                             <br>
-                                            <?php if ($seniman['status'] == 'diajukan' || $seniman['status'] == 'proses') { ?>
-                                                <a href="/seniman/pengajuan.php" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a>
-                                            <?php } else if ($seniman['status'] == 'diterima' || $seniman['status'] == 'ditolak') { ?>
-                                                <a href="/seniman/riwayat.php" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a>
+                                            <?php if ($perpanjangan['status'] == 'diajukan' || $perpanjangan['status'] == 'proses') { ?>
+                                                <a href="/seniman/perpanjangan.php" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a>
+                                            <?php // } else if ($perpanjangan['status'] == 'diterima' || $perpanjangan['status'] == 'ditolak') { ?>
+                                                <!-- <a href="/seniman/riwayat.php" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a> -->
                                             <?php } ?>
-                                            <?php if ($seniman['status'] == 'diajukan') { ?>
-                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses(<?php echo $seniman['id_seniman'] ?>)">Proses
+                                            <?php if ($perpanjangan['status'] == 'diajukan') { ?>
+                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses(<?php echo $perpanjangan['id_perpanjangan'] ?>)">Proses
                                                 </button>
-                                            <?php } else if ($seniman['status'] == 'proses') { ?>
-                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju(<?php echo $seniman['id_seniman'] ?>)">Terima
+                                            <?php } else if ($perpanjangan['status'] == 'proses') { ?>
+                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju(<?php echo $perpanjangan['id_perpanjangan'] ?>)">Terima
                                                 </button>
-                                                <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak(<?php echo $seniman['id_seniman'] ?>)">Tolak
+                                                <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak(<?php echo $perpanjangan['id_perpanjangan'] ?>)">Tolak
                                                 </button>
                                             <?php } ?>
                                         </div>
@@ -273,7 +214,7 @@ if ($userAuth['status'] == 'error') {
                     <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
                         <input type="hidden" name="_method" value="PUT">
                         <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
-                        <input type="hidden" name="id_seniman" id="inpSenimanP">
+                        <input type="hidden" name="id_perpanjangan" id="inpSenimanP">
                         <input type="hidden" name="keterangan" value="proses">
                         <button type="submit" class="btn btn-tambah">Proses</button>
                     </form>
@@ -317,20 +258,21 @@ if ($userAuth['status'] == 'error') {
                     <h5 class="modal-title">Tolak Pengajuan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
-                    <div class="modal-body" style="text-align: left;">
-                        <label for="catatan" class="form-label">Alasan penolakan</label>
-                        <textarea class="form-control" id="catatan" name="catatan" placeholder="Masukkan Alasan Penolakan" style="height: 100px;"></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <div class="modal-body" style="text-align: left;">
+                    <label for="catatan" class="form-label">Alasan penolakan</label>
+                    <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alasan Penolakan" style="height: 100px;"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
                         <input type="hidden" name="_method" value="PUT">
                         <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
                         <input type="hidden" name="id_seniman" id="inpSenimanT">
+                        <input type="hidden" name="catatan" value="terserah">
                         <input type="hidden" name="keterangan" value="ditolak">
                         <button type="submit" class="btn btn-tolak">Tolak</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -379,7 +321,7 @@ if ($userAuth['status'] == 'error') {
             var requestBody = {
                 email: email,
                 id_seniman: idSeniman,
-                item: 'seniman',
+                item: 'perpanjangan',
                 deskripsi: desc
             };
             //open the request
@@ -409,7 +351,7 @@ if ($userAuth['status'] == 'error') {
             var requestBody = {
                 email: email,
                 id_seniman: idSeniman,
-                item: 'seniman',
+                item: 'perpanjangan',
                 deskripsi: desc
             };
             //open the request

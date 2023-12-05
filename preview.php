@@ -30,19 +30,13 @@ class Preview{
     public function previewEvent($data){
         try{
             if(!isset($data['email']) || empty($data['email'])){
-                echo "<script>alert('Email harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Email harus di isi !');
             }
             if(!isset($data['id_event']) || empty($data['id_event'])){
-                echo "<script>alert('ID Seniman harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('ID Seniman harus di isi !');
             }
             if(!isset($data['deskripsi']) || empty($data['deskripsi'])){
-                echo "<script>alert('Deskripsi harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Deskripsi harus di isi !');
             }
             //check email
             $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
@@ -53,24 +47,18 @@ class Preview{
             $stmt[0]->bind_result($role);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                echo "<script>alert('User tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('User tidak ditemukan !');
             }
             $stmt[0]->close();
             if($role == 'masyarakat'){
-                echo "<script>alert('Anda bukan admin !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Anda bukan admin !');
             }
             //check id_event
             if($data['deskripsi'] == 'foto'){
                 $query = "SELECT poster_event FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = ? LIMIT 1";
                 $file = self::$folderEvent;
             }else{
-                echo "<script>alert('Deskripsi invalid !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Deskripsi invalid !');
             }
             $stmt[0] = self::$con->prepare($query);
             $stmt[0]->bind_param('s', $data['id_event']);
@@ -79,9 +67,7 @@ class Preview{
             $stmt[0]->bind_result($path);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                echo "<script>alert('Data event tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Data event tidak ditemukan !');
             }
             $stmt[0]->close();
             $file = $file.$path;
@@ -102,23 +88,18 @@ class Preview{
                     // $startTime = time();
                     // $timeout = 5;
                     // while (true) {
-                    //     if (time() - $startTime >= $timeout) {
+                        //     if (time() - $startTime >= $timeout) {
                     //         unlink($des);
                     //         exit();
                     //     }
                     // }
                 } else {
-                    echo "<script>alert('Sistem error')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Sistem error !');
                 }
             } else {
-                echo "<script>alert('File tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('File tidak ditemukan !');
             }
         }catch(Exception $e){
-            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -141,19 +122,13 @@ class Preview{
     public function previewSeniman($data){
         try{
             if(!isset($data['email']) || empty($data['email'])){
-                echo "<script>alert('Email harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Email harus diisi !');
             }
             if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
-                echo "<script>alert('ID Seniman harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('ID Seniman harus diisi !');
             }
             if(!isset($data['deskripsi']) || empty($data['deskripsi'])){
-                echo "<script>alert('Deskripsi harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Deskripsi harus diisi !');
             }
             //check email
             $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
@@ -164,15 +139,11 @@ class Preview{
             $stmt[0]->bind_result($role);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                echo "<script>alert('User tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('User tidak ditemukan !');
             }
             $stmt[0]->close();
             if($role == 'masyarakat'){
-                echo "<script>alert('Anda bukan admin !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Anda bukan admin !');
             }
             //check id_seniman
             if($data['deskripsi'] == 'foto'){
@@ -185,9 +156,7 @@ class Preview{
                 $query = "SELECT surat_keterangan FROM seniman WHERE id_seniman = ? LIMIT 1";
                 $file = self::$folderSeniman.'/surat_keterangan';
             }else{
-                echo "<script>alert('Deskripsi invalid !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Deskripsi invalid !');
             }
             $stmt[0] = self::$con->prepare($query);
             $stmt[0]->bind_param('s', $data['id_seniman']);
@@ -196,9 +165,7 @@ class Preview{
             $stmt[0]->bind_result($path);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                echo "<script>alert('Data seniman tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Data seniman tidak ditemukan !');
             }
             $stmt[0]->close();
             $file = $file.$path;
@@ -217,17 +184,12 @@ class Preview{
                     echo json_encode(['status'=>'success','data'=>"$previewURL"]);
                     exit();
                 } else {
-                    echo "<script>alert('Sistem error')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Sistem error !');
                 }
             } else {
-                echo "<script>alert('File tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('File tidak ditemukan !');
             }
         }catch(Exception $e){
-            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -250,19 +212,13 @@ class Preview{
     public function previewPerpanjangan($data){
         try{
             if(!isset($data['email']) || empty($data['email'])){
-                echo "<script>alert('Email harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Email harus di isi !');
             }
             if(!isset($data['id_seniman']) || empty($data['id_seniman'])){
-                echo "<script>alert('ID Seniman harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('ID Seniman harus di isi !');
             }
             if(!isset($data['deskripsi']) || empty($data['deskripsi'])){
-                echo "<script>alert('Deskripsi harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Deskripsi harus di isi !');
             }
             //check email
             $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
@@ -273,15 +229,11 @@ class Preview{
             $stmt[0]->bind_result($role);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                echo "<script>alert('User tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('User tidak ditemukan !');
             }
             $stmt[0]->close();
             if($role == 'masyarakat'){
-                echo "<script>alert('Anda bukan admin !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Anda bukan admin !');
             }
             //check id_seniman
             if($data['deskripsi'] == 'foto'){
@@ -294,9 +246,7 @@ class Preview{
                 $query = "SELECT surat_keterangan FROM perpanjangan WHERE id_seniman = ? LIMIT 1";
                 $file = self::$folderSeniman.'/surat_keterangan';
             }else{
-                echo "<script>alert('Deskripsi invalid !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Deskripsi invalid !');
             }
             $stmt[0] = self::$con->prepare($query);
             $stmt[0]->bind_param('s', $data['id_seniman']);
@@ -305,9 +255,7 @@ class Preview{
             $stmt[0]->bind_result($path);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                echo "<script>alert('Data perpanjangan tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Data perpanjangan tidak ditemukan !');
             }
             $stmt[0]->close();
             $file = $file.$path;
@@ -326,17 +274,12 @@ class Preview{
                     echo json_encode(['status'=>'success','data'=>"$previewURL"]);
                     exit();
                 } else {
-                    echo "<script>alert('Sistem error')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Sistem error !');
                 }
             } else {
-                echo "<script>alert('File tidak ditemukan')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('File tidak ditemukan !');
             }
         }catch(Exception $e){
-            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -359,19 +302,13 @@ class Preview{
     // public function previewPentas($data){
     //     try{
     //         if(!isset($data['email']) || empty($data['email'])){
-    //             echo "<script>alert('Email harus di isi !')</script>";
-    //             echo "<script>window.history.back();</script>";
-    //             exit();
+    //             throw new Exception('Email harus di isi !');
     //         }
     //         if(!isset($data['id_pentas']) || empty($data['id_pentas'])){
-    //             echo "<script>alert('ID Pentas harus di isi !')</script>";
-    //             echo "<script>window.history.back();</script>";
-    //             exit();
+    //             throw new Exception('ID Pentas harus di isi !');
     //         }
     //         if(!isset($data['deskripsi']) || empty($data['deskripsi'])){
-    //             echo "<script>alert('Deskripsi harus di isi !')</script>";
-    //             echo "<script>window.history.back();</script>";
-    //             exit();
+    //             throw new Exception('Deskripsi harus di isi !');
     //         }
     //         //check email
     //         $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
@@ -382,24 +319,18 @@ class Preview{
     //         $stmt[0]->bind_result($role);
     //         if (!$stmt[0]->fetch()) {
     //             $stmt[0]->close();
-    //             echo "<script>alert('User tidak ditemukan !')</script>";
-    //             echo "<script>window.history.back();</script>";
-    //             exit();
+    //             throw new Exception('User tidak ditemukan !');
     //         }
     //         $stmt[0]->close();
     //         if($role == 'masyarakat'){
-    //             echo "<script>alert('Anda bukan admin !')</script>";
-    //             echo "<script>window.history.back();</script>";
-    //             exit();
+    //             throw new Exception('Anda bukan admin !');
     //         }
     //         //check id_advis
     //         if($data['deskripsi'] == 'surat'){
     //             $query = "SELECT surat_keterangan FROM surat_advis WHERE id_advis = ? LIMIT 1";
     //             $file = self::$folderPentas;
     //         }else{
-    //             echo "<script>alert('Deskripsi invalid !')</script>";
-    //             echo "<script>window.history.back();</script>";
-    //             exit();
+    //             throw new Exception('Deskripsi invalid !');
     //         }
     //         $stmt[0] = self::$con->prepare($query);
     //         $stmt[0]->bind_param('s', $data['id_pentas']);
@@ -408,9 +339,7 @@ class Preview{
     //         $stmt[0]->bind_result($path);
     //         if (!$stmt[0]->fetch()) {
     //             $stmt[0]->close();
-    //             echo "<script>alert('Data Pentas tidak ditemukan !')</script>";
-    //             echo "<script>window.history.back();</script>";
-    //             exit();
+    //             throw new Exception('Data pentas tidak ditemukan !');
     //         }
     //         $stmt[0]->close();
     //         $file = $file.$path;
@@ -437,17 +366,12 @@ class Preview{
     //                 //     }
     //                 // }
     //             } else {
-    //                 echo "<script>alert('Sistem error')</script>";
-    //                 echo "<script>window.history.back();</script>";
-    //                 exit();
+    //                 throw new Exception('Sistem error !');
     //             }
     //         } else {
-    //             echo "<script>alert('File tidak ditemukan !')</script>";
-    //             echo "<script>window.history.back();</script>";
-    //             exit();
+    //             throw new Exception('File tidak ditemukan !');
     //         }
     //     }catch(Exception $e){
-    //         echo $e->getTraceAsString();
     //         $error = $e->getMessage();
     //         $errorJson = json_decode($error, true);
     //         if ($errorJson === null) {
@@ -470,19 +394,13 @@ class Preview{
     public function previewSewa($data){
         try{
             if(!isset($data['email']) || empty($data['email'])){
-                echo "<script>alert('Email harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Email harus di isi !');
             }
             if(!isset($data['id_sewa']) || empty($data['id_sewa'])){
-                echo "<script>alert('ID Sewa harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('ID sewa tempat harus di isi !');
             }
             if(!isset($data['deskripsi']) || empty($data['deskripsi'])){
-                echo "<script>alert('Deskripsi harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Deskripsi harus di isi !');
             }
             //check email
             $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
@@ -493,24 +411,18 @@ class Preview{
             $stmt[0]->bind_result($role);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                echo "<script>alert('User tidak ditemukan !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('User tidak ditemukan !');
             }
             $stmt[0]->close();
             if($role == 'masyarakat'){
-                echo "<script>alert('Anda bukan admin !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Anda bukan admin !');
             }
             //check id_sewa
             if($data['deskripsi'] == 'surat'){
                 $query = "SELECT surat_ket_sewa FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
                 $file = self::$folderSewa.'/surat_keterangan';
             }else{
-                echo "<script>alert('Deskripsi invalid !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Deskripsi invalid !');
             }
             $stmt[0] = self::$con->prepare($query);
             $stmt[0]->bind_param('s', $data['id_sewa']);
@@ -519,9 +431,7 @@ class Preview{
             $stmt[0]->bind_result($path);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                echo "<script>alert('Data Sewa Tempat tidak ditemukan ')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Data sewa tempat tidak ditemukan !');
             }
             $stmt[0]->close();
             $file = $file.$path;
@@ -548,17 +458,12 @@ class Preview{
                     //     }
                     // }
                 } else {
-                    echo "<script>alert('Sistem error')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Sistem error !');
                 }
             } else {
-                echo "<script>alert('File tidak ditemukan !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('File tidak ditemukan !');
             }
         }catch(Exception $e){
-            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -581,19 +486,13 @@ class Preview{
     public function previewTempat($data){
         try{
             if(!isset($data['email']) || empty($data['email'])){
-                echo "<script>alert('Email harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Email harus di isi !');
             }
             if(!isset($data['id_tempat']) || empty($data['id_tempat'])){
-                echo "<script>alert('ID Tempat harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('ID Tempat harus di isi !');
             }
             if(!isset($data['deskripsi']) || empty($data['deskripsi'])){
-                echo "<script>alert('Deskripsi harus di isi !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Deskripsi harus di isi !');
             }
             //check email
             $query = "SELECT role FROM users WHERE BINARY email = ? LIMIT 1";
@@ -604,24 +503,18 @@ class Preview{
             $stmt[0]->bind_result($role);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                echo "<script>alert('User tidak ditemukan !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('User tidak ditemukan !');
             }
             $stmt[0]->close();
             if($role == 'masyarakat'){
-                echo "<script>alert('Anda bukan admin !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Anda bukan admin !');
             }
             //check id_tempat
             if($data['deskripsi'] == 'foto'){
                 $query = "SELECT foto_tempat FROM list_tempat WHERE id_tempat = ? LIMIT 1";
                 $file = self::$folderTempat;
             }else{
-                echo "<script>alert('Deskripsi invalid !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Deskripsi invalid !');
             }
             $stmt[0] = self::$con->prepare($query);
             $stmt[0]->bind_param('s', $data['id_tempat']);
@@ -630,9 +523,7 @@ class Preview{
             $stmt[0]->bind_result($path);
             if (!$stmt[0]->fetch()) {
                 $stmt[0]->close();
-                echo "<script>alert('Data List tempat tidak ditemukan ')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('Data List tempat tidak ditemukan !');
             }
             $stmt[0]->close();
             $file = $file.$path;
@@ -659,17 +550,12 @@ class Preview{
                     //     }
                     // }
                 } else {
-                    echo "<script>alert('Sistem error')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
+                    throw new Exception('Sistem error !');
                 }
             } else {
-                echo "<script>alert('File tidak ditemukan !')</script>";
-                echo "<script>window.history.back();</script>";
-                exit();
+                throw new Exception('File tidak ditemukan !');
             }
         }catch(Exception $e){
-            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -716,8 +602,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $download = new Preview();
     $data = Preview::handle();
     if(!isset($data['item']) || empty($data['item'])){
-        echo "<script>alert('Item harus di isi !')</script>";
-        echo "<script>window.history.back();</script>";
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Item harus di isi']);
         exit();
     }else{
         if($data['item'] == 'seniman'){
@@ -733,8 +620,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }else if($data['item'] == 'event'){
             $download->previewEvent($data);
         }else{
-            echo "<script>alert('Invalid item')</script>";
-            echo "<script>window.history.back();</script>";
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'error', 'message' => 'Item invalid']);
             exit();
         }
     }

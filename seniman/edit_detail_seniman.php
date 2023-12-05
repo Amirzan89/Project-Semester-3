@@ -54,6 +54,7 @@ if ($userAuth['status'] == 'error') {
 
     <!-- Template Main CSS File -->
     <link href="<?php echo $tPath; ?>/public/assets/css/nomor-induk.css" rel="stylesheet">
+    <link href="<?php echo $tPath; ?>/public/css/popup.css" rel="stylesheet">
 
 </head>
 
@@ -256,6 +257,9 @@ if ($userAuth['status'] == 'error') {
             ?>
         </footer>
         <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+        <div id="greenPopup" style="display:none"></div>
+        <div id="redPopup" style="display:none"></div>
+        <script src="<?php  echo $tPath ?>/public/js/popup.js"></script>
         <script>
             var modalProses = document.getElementById('modalProses');
             var modalSetuju = document.getElementById('modalSetuju');
@@ -306,8 +310,7 @@ if ($userAuth['status'] == 'error') {
                             var response = JSON.parse(xhr.responseText);
                             window.location.href = response.data;
                         } else {
-                            var response = xhr.responseText;
-                            console.log('errorrr ' + response);
+                            showRedPopup(JSON.parse(xhr.responseText));
                         }
                     }
                 }
@@ -332,24 +335,31 @@ if ($userAuth['status'] == 'error') {
                 xhr.responseType = 'blob';
                 // send the form data
                 xhr.send(JSON.stringify(requestBody));
-                xhr.onreadystatechange = function() {
+                xhr.onreadystatechange = function () {
                     if (xhr.readyState == XMLHttpRequest.DONE) {
                         if (xhr.status === 200) {
-                            var blob = xhr.response;
-                            var contentDisposition = xhr.getResponseHeader('Content-Disposition');
-                            var match = contentDisposition.match(/filename="(.+\..+?)"/);
-                            if (match) {
-                                var filename = match[1];
-                                var link = document.createElement('a');
-                                link.href = window.URL.createObjectURL(blob);
-                                link.download = filename;
-                                link.click();
+                            if (xhr.responseType === 'blob') {
+                                var blob = xhr.response;
+                                var contentDisposition = xhr.getResponseHeader('Content-Disposition');
+                                var match = contentDisposition.match(/filename="(.+\..+?)"/);
+                                if (match) {
+                                    var filename = match[1];
+                                    var link = document.createElement('a');
+                                    link.href = window.URL.createObjectURL(blob);
+                                    link.download = filename;
+                                    link.click();
+                                } else {
+                                    console.log('Invalid content-disposition header');
+                                }
                             } else {
-                                console.log('Invalid content-disposition header');
+                                // Assuming JSON response
+                                var jsonResponse = JSON.parse(xhr.responseText);
+                                console.log(jsonResponse);
                             }
                         } else {
-                            var response = xhr.responseText;
-                            console.log('errorrr ' + response);
+                            xhr.response.text().then(function (jsonText) {
+                                showRedPopup(JSON.parse(jsonText));
+                            });
                         }
                     }
                 };
