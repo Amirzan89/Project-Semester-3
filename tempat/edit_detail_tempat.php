@@ -107,6 +107,7 @@ if($userAuth['status'] == 'error'){
 
 <body>
     <script>
+        var tPath = "<?php echo $tPath ?>";
         var csrfToken = "<?php echo $csrf ?>";
         var email = "<?php echo $userAuth['email'] ?>";
         var idUser = "<?php echo $userAuth['id_user'] ?>";
@@ -191,7 +192,8 @@ if($userAuth['status'] == 'error'){
                                     <label for="inputNumber" class="col-sm-2 col-form-label">Gambar tempat</label>
                                     <div class="col-md-12" id="divImg" ondrop="dropHandler(event)" ondragover="dragHandler(event,'over')" ondragleave="dragHandler(event,'leave')">
                                         <input class="form-control" type="file" multiple="false" id="inpFile" name="foto" style="display:none">
-                                        <img src="<?php echo $tPath ?>/public/img/tempat<?php echo $tempat['foto_tempat'] ?>" id="inpImg" class="d-block" alt="">
+                                        <img src="<?php echo $tPath ?>/DatabaseMobile/uploads/tempat<?php echo $tempat['foto_tempat'] ?>" id="inpImg" class="d-block" alt="">
+                                        <!-- <img src="<?php echo $tPath ?>/public/img/tempat<?php echo $tempat['foto_tempat'] ?>" id="inpImg" class="d-block" alt=""> -->
                                         <!-- <input class="form-control" name="foto" type="file" id="formFile"> -->
                                     </div>
                                 </div>
@@ -199,8 +201,8 @@ if($userAuth['status'] == 'error'){
                                     <div class="col-sm-10 text-end">
                                     <a href="/tempat/data_tempat.php" class="btn btn-secondary">Kembali</a>
                                     <button type="button" class="btn btn-tambah" onclick="upload()">Edit</button>
-                                    </div>
                                 </div>
+                            </div>
                             </form>
                         </div>
                     </div>
@@ -210,27 +212,6 @@ if($userAuth['status'] == 'error'){
 
     </main><!-- End #main -->
         <!-- start modal edit -->
-        <div class="modal fade" id="modalEdit" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Konfirmasi edit data tempat</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah anda yakin ingin mengedit data tempat?
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <form action="/web/tempat/tempat.php" id="deleteForm" method="POST">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
-                            <input type="hidden" name="id_tempat" id="inpTempat">
-                            <button type="submit" class="btn btn-tambah" name="hapusAdmin">Edit</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
         <!-- end modal edit -->
 
   <!-- ======= Footer ======= -->
@@ -238,10 +219,10 @@ if($userAuth['status'] == 'error'){
     <?php include(__DIR__.'/../footer.php');
     ?>
   </footer>
+  <div id="greenPopup" style="display:none"></div>
+  <div id="redPopup" style="display:none"></div>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-    <div id="greenPopup" style="display:none"></div>
-  <div id="redPopup" style="display:none"></div>
   <!-- Vendor JS Files -->
   <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
@@ -261,9 +242,6 @@ if($userAuth['status'] == 'error'){
         divImg.addEventListener("click", function () {
             inpFile.click();
         });
-        if(fileImg == ''){
-            showRedPopup('Gambar harus di isi !');
-        }
         function upload() {
             if(uploadStat){
                 return;
@@ -274,14 +252,11 @@ if($userAuth['status'] == 'error'){
             var inpNamaPengelola = document.querySelector("input[name='nama_pengelola']").value;
             var inpTLP = document.querySelector("input[name='phone']").value;
             //check data if edit or not
-            if((fileImg === null || fileImg === '') && inpNamaTempat === tempats.nama_tempat && inpAlamatTempat === tempats.alamat_tempat && inpDeskripsiTempat === tempats.deskripsi_tempat && inpNamaPengelola === tempats.pengelola && inpTLP === tempats.contact_person){
+            if (!fileImg && inpNamaTempat === tempats.nama_tempat && inpAlamatTempat === tempats.alamat_tempat && inpDeskripsiTempat === tempats.deskripsi_tempat && inpNamaPengelola === tempats.pengelola && inpTLP === tempats.contact_person) {
                 showRedPopup('Data belum diubah');
             }
             if((fileImg === null || fileImg === '') && (inpNamaTempat === '' || inpNamaTempat === null) && (inpAlamatTempat === '' || inpAlamatTempat === null) && (inpDeskripsiTempat === "" || inpDeskripsiTempat === null) && (inpNamaPengelola === '' || inpNamaPengelola === null) && ( inpTLP === '' || inpTLP === null)){
                 showRedPopup('Data tidak boleh kosong');
-            }
-            if(inpNamaTempat == '' || inpNamaTempat == null){
-                showRedPopup('Nama tempat harus di isi');
             }
             uploadStat = true;
             const formData = new FormData();
@@ -306,10 +281,6 @@ if($userAuth['status'] == 'error'){
                     }, 1000);
                     return;
                 } else {
-                    console.log(xhr.responseText);
-                    showRedPopup('Request gagal');
-                    // showRedPopup(xhr.responseText);
-                    return;
                     uploadStat = false;
                     showRedPopup(JSON.parse(xhr.responseText));
                     return;

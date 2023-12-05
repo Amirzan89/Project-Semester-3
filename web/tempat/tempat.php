@@ -261,12 +261,6 @@ class TempatWebsite{
             if (substr($data['phone'], 0, 2) !== '08') {
                 throw new Exception('Nomor telepon harus dimulai dengan 08');
             }
-            if (!isset($_FILES['foto']) || empty($_FILES['foto'])) {
-                throw new Exception('Foto tempat harus di isi !');
-            }
-            if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
-                throw new Exception('Gagal upload foto');
-            }
             //check user
             $query = "SELECT role FROM users WHERE BINARY id_user = ? LIMIT 1";
             $stmt[0] = self::$con->prepare($query);

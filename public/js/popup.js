@@ -34,7 +34,6 @@ function showGreenPopup(data, div = null){
     }
 }
 function showRedPopup(data, div){
-    console.log('kenkek');
     if(div == 'otp' && !isPopupVisible){
         redPopup.innerHTML = `
             <div class="bg" onclick="closePopup('red',true)"></div>

@@ -1,7 +1,7 @@
 #greenPopup, #redPopup{
     width: 400px; 
     height: 80px; 
-    position: absolute;
+    position: fixed;
     right:1%;
     bottom: 1%;
 }
