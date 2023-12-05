@@ -153,8 +153,7 @@ if($userAuth['status'] == 'error'){
                   </thead>
                   <tbody>
                   <?php
-                      // $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE_FORMAT(tgl_pembuatan, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC");
-                      $query = mysqli_query($conn, "SELECT seniman.id_seniman, nama_seniman, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'diajukan' OR perpanjangan.status = 'proses' ORDER BY id_seniman DESC");
+                      $query = mysqli_query($conn, "SELECT seniman.id_seniman AS id_seniman, id_perpanjangan, nama_seniman, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'diajukan' OR perpanjangan.status = 'proses' ORDER BY id_perpanjangan DESC");
                       $no = 1;
                       while ($seniman = mysqli_fetch_array($query)) {
                   ?>
@@ -173,7 +172,7 @@ if($userAuth['status'] == 'error'){
                       <?php if($seniman['status'] == 'diajukan'){ ?>
                           <button class="btn btn-lihat" onclick="proses(<?php echo $seniman['id_seniman'] ?>)"><i class="bi bi-eye-fill"></i>   Lihat</button>
                         <?php }else if($seniman['status'] == 'proses'){ ?>
-                          <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
+                          <a href="/seniman/detail_perpanjang.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
                         <?php } ?>
                       </td>
                     </tr>
@@ -262,7 +261,7 @@ if($userAuth['status'] == 'error'){
             icon.innerText = 'Lihat';
             link.appendChild(icon);
             link.classList.add('btn','btn-lihat');
-            link.setAttribute('href',`/seniman/detail_seniman.php?id_seniman=${item['id_seniman']}`);
+            link.setAttribute('href',`/seniman/detail_perpanjang.php?id_seniman=${item['id_seniman']}`);
             var td = document.createElement('td');
             td.appendChild(link);
             row.appendChild(td);
@@ -346,8 +345,8 @@ if($userAuth['status'] == 'error'){
         _method: 'PUT',
         id_user: idUser,
         id_seniman: Id,
-        keterangan: 'proses',
         desc:'perpanjangan',
+        keterangan: 'proses',
       };
       //open the request
       xhr.open('POST', domain + "/web/seniman/seniman.php")
@@ -358,7 +357,9 @@ if($userAuth['status'] == 'error'){
       xhr.onreadystatechange = function () {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
-            window.location.href = "/seniman/detail_seniman.php?id_seniman="+Id;
+// console.log(requestBody);
+            // console.log(xhr.responseText);
+            // window.location.href = "/seniman/detail_perpanjang.php?id_seniman="+Id;
           } else {
             console.log(xhr.responseText);
             try {
