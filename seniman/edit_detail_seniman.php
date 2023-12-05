@@ -138,12 +138,12 @@ if ($userAuth['status'] == 'error') {
                                     <br>
                                     <div class="col-md-8">
                                         <label for="tempat_lahir" class="form-label">Tempat lahir</label>
-                                        <input type="text" class="form-control" id="tempat_lahir" value="<?php echo $seniman['tempat_lahir'] ?>">
+                                        <input type="text" class="form-control" id="tempat_lahir" readonly value="<?php echo $seniman['tempat_lahir'] ?>">
                                     </div>
                                     <br>
                                     <div class="col-md-4">
                                         <label for="tanggal_lahir" class="form-label">Tanggal lahir</label>
-                                        <input type="text" class="form-control" id="tanggal_lahir" value="<?php echo $seniman['tanggal_lahir'] ?>">
+                                        <input type="text" class="form-control" id="tanggal_lahir" readonly value="<?php echo $seniman['tanggal_lahir'] ?>">
                                     </div>
                                     <br>
                                     <div class="col-mb-3 mt-0">
@@ -215,7 +215,7 @@ if ($userAuth['status'] == 'error') {
                                     </div>
                                     <div class="row mb-3 justify-content-end">
                                         <div class="col-sm-10 text-end"><br>
-                                            <a href="/seniman/seniman.php" class="btn btn-secondary">Kembali</a>
+                                            <a href="/seniman/data_seniman.php" class="btn btn-secondary">Kembali</a>
                                             <button type="submit" class="btn btn-tambah" onclick="openEdit(<?php echo $seniman['id_seniman'] ?>)">Edit</button>
                                         </div>
                                     </div>

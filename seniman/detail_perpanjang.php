@@ -242,6 +242,7 @@ if ($userAuth['status'] == 'error') {
                         <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
                         <input type="hidden" name="id_seniman" id="inpSenimanS">
                         <input type="hidden" name="keterangan" value="diterima">
+                        <input type="hidden" name="desc" value="perpanjangan">
                         <button type="submit" class="btn btn-tambah">Terima</button>
                     </form>
                 </div>
@@ -270,6 +271,7 @@ if ($userAuth['status'] == 'error') {
                         <input type="hidden" name="id_seniman" id="inpSenimanT">
                         <input type="hidden" name="catatan" value="terserah">
                         <input type="hidden" name="keterangan" value="ditolak">
+                        <input type="hidden" name="desc" value="perpanjangan">
                         <button type="submit" class="btn btn-tolak">Tolak</button>
                     </form>
                 </div>

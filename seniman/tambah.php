@@ -103,7 +103,7 @@ if($userAuth['status'] == 'error'){
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
     var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
+    var role = "<?php echo $userAuth['role'] ?>"; 
 	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -182,13 +182,42 @@ if($userAuth['status'] == 'error'){
                   <input type="text" name="no_telpon" class="form-control" id="no_telpon" placeholder="Masukkan Nomor Telepon Aktif">
                 </div>
                 <br>
-                <div class="col-mb-3 mt-0">
+                <!-- <div class="col-mb-3 mt-0"> -->
+                <div class="col-md-6">
+                  <label for="jenis_kelamin" class="col-md-12 pt-3 col-form-label">Kecamatan</label>
+                  <div class="col-md-6">
+                    <select class="form-select" name="kecamatan" aria-label="Default select example">
+                      <option value="">Pilih kecamatan</option>
+                      <option value="bagor">Bagor</option>
+                      <option value="baron">Baron</option>
+                      <option value="berbek">Berbek</option>
+                      <option value="gondang">Gondang</option>
+                      <option value="jatikalen">Jatikalen</option>
+                      <option value="kertosono">Kertosono</option>
+                      <option value="lengkong">Lengkong</option>
+                      <option value="loceret">Loceret</option>
+                      <option value="nganjuk">Nganjuk</option>
+                      <option value="ngetos">Ngetos</option>
+                      <option value="ngluyu">Ngluyu</option>
+                      <option value="ngronggot">Ngronggot</option>
+                      <option value="pace">Pace</option>
+                      <option value="patianrowo">Patianrowo</option>
+                      <option value="prambon">Prambon</option>
+                      <option value="rejoso">Rejoso</option>
+                      <option value="sawahan">Sawahan</option>
+                      <option value="sukomoro">Sukomoro</option>
+                      <option value="tanjunganom">Tanjuangnom</option>
+                      <option value="wilangan">Wilangan</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
                   <label for="kategori_seniman" class="col-md-12 pt-3 col-form-label">Kategori Seniman</label>
                   <div class="col-md-6">
-                    <select class="form-select" aria-label="Default select example">
+                    <select class="form-select" aria-label="Default select example" name="singkatan_kategori">
                       <option value="">Pilih kategori</option>
                       <?php foreach($kategoriDB as $kategori){ ?>
-                      <option value="<?php echo $kategori['singkatan'] ?>"><?php echo ucfirst($kategori['nama_kategori'])?></option>
+                      <option value="<?php echo $kategori['singkatan_kategori'] ?>"><?php echo ucfirst($kategori['nama_kategori'])?></option>
                       <?php }?>
                     </select>
                   </div>
@@ -210,8 +239,8 @@ if($userAuth['status'] == 'error'){
                 </div>
                 <br>
                 <div class=" col-12">
-                  <label for="ktp_seniman" name="ktp_seniman" class="form-label">Foto Kartu Tanda Penduduk</label>
-                  <input type="file" class="form-file-input form-control" id="ktp_seniman">
+                  <label for="ktp_seniman" class="form-label">Foto Kartu Tanda Penduduk</label>
+                  <input type="file" class="form-file-input form-control" id="ktp_seniman" name="ktp_seniman">
                 </div>
                 <br>
                 <div class="col-12">

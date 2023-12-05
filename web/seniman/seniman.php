@@ -15,8 +15,9 @@ class SenimanWebsite{
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();
         self::$folderPath = __DIR__.'/../../private/seniman';
-        self::$folderPath = __DIR__.'/../../private/seniman';
         self::$perpanjanganPath = __DIR__.'/../../private/perpanjangan';
+        // self::$folderPath = __DIR__.'/../../DatabaseMobile/data_seniman_mobile/uploads/seniman';
+        // self::$perpanjanganPath = __DIR__.'/../../DatabaseMobile/data_seniman_mobile/uploads/perpanjangan';
     }
     private static function getBaseFileName($fileName) {
         preg_match('/^([^\(]+)(?:\((\d+)\))?(\.\w+)?$/', $fileName, $matches);
@@ -923,9 +924,9 @@ class SenimanWebsite{
             $stmt[0]->close();
             $total = str_pad($total, 3, '0', STR_PAD_LEFT);
             if($desc == 'diterima'){
-                $nis = $kategoriData['singkatan'].'/'.$total.'/'.self::$constID.'/'.date('Y');
+                $nis = $kategoriData['singkatan_kategori'].'/'.$total.'/'.self::$constID.'/'.date('Y');
             }else if($desc == 'perpanjangan'){
-                $nis = $kategoriData['singkatan'].'/'.$total.'/'.self::$constID.'/'.(date('Y')+1);
+                $nis = $kategoriData['singkatan_kategori'].'/'.$total.'/'.self::$constID.'/'.(date('Y')+1);
             }
             return ['nis'=>$nis,'kategori'=>$data['id_kategori']];
         }catch(Exception $e){
@@ -1089,6 +1090,7 @@ class SenimanWebsite{
                 exit();
             }
         }catch(Exception $e){
+            echo $e->getTraceAsString();
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
             if ($errorJson === null) {
@@ -1099,7 +1101,7 @@ class SenimanWebsite{
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $errorJson->message,
+                    'message' => $errorJson['message'],
                 );
             }
             http_response_code(400);
@@ -1133,12 +1135,15 @@ class SenimanWebsite{
                 throw new Exception('Nomor telpon harus di isi');
             }
             if (strlen($data['no_telpon']) > 16) {
-                throw new Exception('Nama event maksimal 16 karakter');
+                throw new Exception('Nomor telepon maksimal 16 karakter');
             }
             if (!isset($data['jenis_kelamin']) || empty($data['jenis_kelamin'])) {
                 throw new Exception('Jenis kelamin harus di isi');
             }else if(!in_array($data['jenis_kelamin'],['laki-laki','perempuan'])){
                 throw new Exception('Jenis kelamin salah');
+            }
+            if (!isset($data['singkatan_kategori']) || empty($data['singkatan_kategori'])) {
+                throw new Exception('Kategori harus di isi');
             }
             $kategori = $this->kategori(['kategori'=>$data['singkatan_kategori']],'check');
             if (!isset($data['kecamatan']) || empty($data['kecamatan'])) {
@@ -1153,10 +1158,10 @@ class SenimanWebsite{
                 throw new Exception('Tanggal lahir harus di isi');
             }
             if (!isset($data['nama_organisasi']) || empty($data['nama_organisasi'])) {
-                throw new Exception('Nama organisasi harus di isi');
+                $data['nama_organisasi'] = '';
             }
             if (!isset($data['jumlah_anggota']) || empty($data['jumlah_anggota'])) {
-                throw new Exception('Jumlah anggota harus di isi');
+                $data['jumlah_anggota'] = 1;
             }
             if(!is_numeric($data['jumlah_anggota'])){
                 throw new Exception('Jumlah anggota harus angka');
@@ -1231,7 +1236,7 @@ class SenimanWebsite{
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeImg / (1024 * 1024)).'MB','code'=>500]));
                 }
             } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus jpg, png, jpeg','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format foto ktp harus jpg, png, jpeg','code'=>500]));
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileKtp['name']],'get',['table'=>'seniman','col'=>'ktp']);
@@ -1250,7 +1255,7 @@ class SenimanWebsite{
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeImg / (1024 * 1024)).'MB','code'=>500]));
                 }
             } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus png, jpeg, jpg','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format pass foto harus png, jpeg, jpg','code'=>500]));
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileFoto['name']],'get',['table'=>'seniman','col'=>'foto']);
@@ -1270,7 +1275,7 @@ class SenimanWebsite{
                     throw new Exception(json_encode(['status' => 'error', 'message' => 'Ukuran file maksimal '.(self::$sizeFile / (1024 * 1024)). 'MB','code'=>500]));
                 }
             } else {
-                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format file harus pdf','code'=>500]));
+                throw new Exception(json_encode(['status' => 'error', 'message' => 'Format surat keterangan harus pdf','code'=>500]));
             }
             //simpan file
             $nameFile = self::manageFile(['nama_file'=>$fileSurat['name']],'get',['table'=>'seniman','col'=>'surat']);
@@ -1281,19 +1286,20 @@ class SenimanWebsite{
                 unlink($fileFotoPath);
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Gagal menyimpan file','code'=>500]));
             }
-            $query = "INSERT INTO seniman (nik, nama_seniman,jenis_kelamin,kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi,jumlah_anggota,ktp_seniman,pass_foto, surat_keterangan, tgl_pembuatan, tgl_berlaku, created_at, updated_at, status, id_kategori_seniman, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO seniman (nik, nomor_induk, nama_seniman,jenis_kelamin,kecamatan, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi,jumlah_anggota,ktp_seniman,pass_foto, surat_keterangan, tgl_pembuatan, tgl_berlaku, created_at, updated_at, status, id_kategori_seniman, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt[2] = self::$con->prepare($query);
-            $status = 'diajukan';
+            $status = 'diterima';
+            $nomorInduk = $this->generateNIS(['id_kategori'=>$kategori],'diterima');
             $now = date('Y-m-d');
             $end = date('Y-m-d',strtotime('12/31/' . date('Y')));
-            $stmt[2]->bind_param("ssssssssssssssssssss", $data['nik'], $data['nama_seniman'], $data['jenis_kelamin'], $data['kecamatan'], $data['tempat_lahir'], $data['tanggal_lahir'], $data['alamat_seniman'],$data['no_telpon'], $data['nama_organisasi'], $data['jumlah_anggota'],$fileKtpDB,$fileFotoDB, $fileSuratDB, $now, $end, $tanggal_sekarangDB, $tanggal_sekarangDB, $status, $kategori, $data['id_user']);
+            $stmt[2]->bind_param("sssssssssssssssssssss", $data['nik'], $nomorInduk['nis'], $data['nama_seniman'], $data['jenis_kelamin'], $data['kecamatan'], $data['tempat_lahir'], $data['tanggal_lahir'], $data['alamat_seniman'],$data['no_telpon'], $data['nama_organisasi'], $data['jumlah_anggota'],$fileKtpDB,$fileFotoDB, $fileSuratDB, $now, $end, $tanggal_sekarangDB, $tanggal_sekarangDB, $status, $kategori, $data['id_user']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();
                 //tambah data to file
                 self::manageFile(['id_seniman'=>self::$con->insert_id,'ktp_seniman'=>$fileKtpDB, 'pass_foto'=>$fileFotoDB, 'surat_keterangan'=>$fileSuratDB],'tambah',['table'=>'seniman']);
-                header('Content-Type: application/json');
-                echo json_encode(['status'=>'success','message'=>'Data Seniman berhasil ditambahkan']);
+                echo "<script>alert('Data Seniman berhasil ditambahkan')</script>";
+                echo "<script>window.location.href = '/seniman/data_seniman.php'; </script>";
                 exit();
             } else {
                 $stmt[2]->close();
@@ -1317,7 +1323,8 @@ class SenimanWebsite{
                 );
             }
             isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
-            echo json_encode($responseData);
+            echo "<script>alert('".$responseData['message']."')</script>";
+            echo "<script>window.history.back();</script>";
             exit();
         }
     }
@@ -1540,8 +1547,8 @@ class SenimanWebsite{
             } else {
                 $stmt[1]->close();
                 if($updateKTP == true ||$updateGambar == true ||$updateSurat == true){
-                    header('Content-Type: application/json');
-                    echo json_encode(['status'=>'success','message'=>'Data seniman berhasil diubah']);
+                    echo "<script>alert('Data Seniman berhasil diubah')</script>";
+                    echo "<script>window.location.href = '/seniman/data_seniman.php'; </script>";
                     exit();
                 }
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Data Seniman gagal diubah','code'=>500]));
@@ -1561,7 +1568,8 @@ class SenimanWebsite{
                 );
             }
             isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
-            echo json_encode($responseData);
+            echo "<script>alert('".$responseData['message']."')</script>";
+            echo "<script>window.history.back();</script>";
             exit();
         }
     }

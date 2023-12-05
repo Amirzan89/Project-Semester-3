@@ -211,10 +211,11 @@ $encryptedNik = base64_encode($nik);
 $today = date('Y-m-d'); // Mengambil tanggal hari ini
 $nextYear = date('Y') + 1; // Mengambil tahun berikutnya
 $tgl_pembuatan = $today;
+$created_at = $today;
 $tgl_berlaku = $nextYear . '-12-31';
 //check kategori
-$query = "INSERT INTO seniman (nik, nama_seniman, jenis_kelamin, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota, status, tgl_pembuatan, tgl_berlaku, id_user, id_kategori_seniman, kecamatan, ktp_seniman, surat_keterangan, pass_foto) 
-          VALUES ('$encryptedNik', '$namaLengkap', '$jenisKelamin', '$tempatLahir', '$tanggalLahir', '$alamat', '$noHandphone', '$namaOrganisasi', '$jumlahAnggota', '$status', '$tgl_pembuatan', '$tgl_berlaku', $id_user, '$kategori', '$kecamatan', '$ktpSenimanFileName','$suratKeteranganFileName', '$passFotoFileName')";
+$query = "INSERT INTO seniman (nik, nama_seniman, jenis_kelamin, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota, status, tgl_pembuatan, tgl_berlaku, created_at, updated_at, id_user, id_kategori_seniman, kecamatan, ktp_seniman, surat_keterangan, pass_foto) 
+          VALUES ('$encryptedNik', '$namaLengkap', '$jenisKelamin', '$tempatLahir', '$tanggalLahir', '$alamat', '$noHandphone', '$namaOrganisasi', '$jumlahAnggota', '$status', '$tgl_pembuatan', '$tgl_berlaku', '$created_at', '$created_at', $id_user, '$kategori', '$kecamatan', '$ktpSenimanFileName','$suratKeteranganFileName', '$passFotoFileName')";
 if ($konek->query($query) === TRUE) {
     $response['status'] = 'success';
     $response['message'] = 'Data berhasil disimpan';
