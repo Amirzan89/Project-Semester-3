@@ -375,6 +375,7 @@ if ($userAuth['status'] == 'error') {
     }
   </script>
   <!-- Vendor JS Files -->
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
   <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>

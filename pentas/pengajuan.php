@@ -67,6 +67,10 @@ if ($userAuth['status'] == 'error') {
       width: 100%;
     }
   </style>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
+  <!-- <script>
+    var $jq = jQuery.noConflict();
+</script> -->
 </head>
 
 <body>
@@ -140,7 +144,7 @@ if ($userAuth['status'] == 'error') {
                   </div>
                 </div>
               </div>
-              <table class="table datatable">
+              <table class="table datatable" id="tablePentas">
                 <thead>
                   <tr>
                     <th scope="col">No</th>
@@ -151,9 +155,8 @@ if ($userAuth['status'] == 'error') {
                     <th scope="col">Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="tablePentas">
+                <tbody>
                   <?php
-                  // $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM surat_advis WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y'). " ORDER BY id_advis DESC");
                   $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan FROM surat_advis WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_advis DESC");
                   $no = 1;
                   while ($advis = mysqli_fetch_array($query)) {
@@ -203,6 +206,10 @@ if ($userAuth['status'] == 'error') {
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <!-- Vendor JS Files -->
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="<?php echo $tPath; ?>/public/js/popup.js"></script>
   <script>
     var tablePentas = document.getElementById('tablePentas');
@@ -210,9 +217,10 @@ if ($userAuth['status'] == 'error') {
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
     function updateTable(dataT = '') {
-      while (tablePentas.firstChild) {
-        tablePentas.removeChild(tablePentas.firstChild);
-      }
+      // $jq('#tablePentas').dataTable().fnClearTable(); 
+      // $jq('#tablePentas').DataTable().clear().draw();
+      $('#tablePentas').DataTable().rows().remove().draw();
+      return;
       var num = 1;
       if (dataT != '') {
         dataT.forEach(function(item) {
@@ -275,6 +283,8 @@ if ($userAuth['status'] == 'error') {
     }
 
     function getData(con = null) {
+      updateTable();
+      return;
       var xhr = new XMLHttpRequest();
       if (con == 'semua') {
         var requestBody = {
@@ -373,10 +383,6 @@ if ($userAuth['status'] == 'error') {
       }
     }
   </script>
-  <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
   <!-- Template Main JS File -->
   <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>

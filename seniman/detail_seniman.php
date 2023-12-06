@@ -118,14 +118,16 @@ if ($userAuth['status'] == 'error') {
                                 <h5 class="card-title"></h5>
                                 <!-- Multi Columns Form -->
                                 <form class="row g-3">
+                                    <?php if (isset($seniman['nomor_induk']) && !is_null($seniman['nomor_induk']) && !empty($seniman['nomor_induk'])) { ?>
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Seniman</label>
                                         <input type="text" class="form-control" id="nik" readonly value="<?php echo $seniman['nomor_induk'] ?>">
                                     </div>
+                                    <?php } ?>
                                     <br>
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Kependudukan</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo $seniman['nik'] ?>">
+                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo base64_decode($seniman['nik']); ?>">
                                     </div>
                                     <br>
                                     <div class="col-md-12">

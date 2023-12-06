@@ -302,11 +302,11 @@ class EventMobile{
                 throw new Exception(json_encode(['status' => 'error', 'message' => 'Failed to save image','code'=>500]));
             }
             //tambah data
-            $query = "INSERT INTO detail_events (nama_event, deskripsi, kategori, tempat_event, tanggal_awal, tanggal_akhir, link_pendaftaran, poster_event) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO detail_events (nama_event, deskripsi, tempat_event, tanggal_awal, tanggal_akhir, link_pendaftaran, poster_event) VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt = self::$con->prepare($query);
             $data['kategori_event'] = strtoupper($data['kategori_event']);
             $fileDb = $fileTime.$nameFile;
-            $stmt->bind_param("ssssssss",$data['nama_event'], $data['deskripsi'], $data['kategori_event'], $data    ['tempat'], $tanggal_awalDB, $tanggal_akhirDB, $data['link'],$fileDb);
+            $stmt->bind_param("sssssss",$data['nama_event'], $data['deskripsi'], $data['tempat'], $tanggal_awalDB, $tanggal_akhirDB, $data['link'],$fileDb);
             $stmt->execute();
             if ($stmt->affected_rows > 0) {
                 $id = self::$con->insert_id;

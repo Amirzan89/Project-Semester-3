@@ -107,14 +107,16 @@ if ($userAuth['status'] == 'error') {
                                 <form class="row g-3" action="/web/seniman/seniman.php" method="POST" enctype="multipart/form-data">
                                     <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
                                     <input type="hidden" name="keterangan" value="edit">
+                                    <?php if (isset($seniman['nomor_induk']) && !is_null($seniman['nomor_induk']) && !empty($seniman['nomor_induk'])) { ?>
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Seniman</label>
                                         <input type="text" class="form-control" id="nik" readonly value="<?php echo $seniman['nomor_induk'] ?>">
                                     </div>
+                                    <?php } ?>
                                     <br>
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Kependudukan</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo $seniman['nik'] ?>">
+                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo base64_decode($seniman['nik']) ?>">
                                     </div>
                                     <br>
                                     <div class="col-md-12">

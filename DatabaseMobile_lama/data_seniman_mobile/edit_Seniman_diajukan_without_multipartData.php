@@ -3,7 +3,7 @@ require('../Koneksi.php');
 $pathFile = __DIR__."/../../kategori_seniman.json";
 function kategori($data, $desc, $pathFile, $konek){
     try{
-        $fileExist = file_exists(self::$jsonPath);
+        $fileExist = file_exists($pathFile);
         if (!$fileExist) {
             //if file is delete will make new json file
             $query = "SELECT * FROM kategori_seniman";
@@ -22,7 +22,7 @@ function kategori($data, $desc, $pathFile, $konek){
                 throw new Exception('Data kategori seniman tidak ditemukan');
             }
             $jsonData = json_encode($kategoriData, JSON_PRETTY_PRINT);
-            if (!file_put_contents(self::$jsonPath, $jsonData)) {
+            if (!file_put_contents($pathFile, $jsonData)) {
                 throw new Exception('Gagal menyimpan file sistem');
             }
         }
@@ -30,7 +30,7 @@ function kategori($data, $desc, $pathFile, $konek){
             if(!isset($data['kategori']) || empty($data['kategori'])){
                 throw new Exception('Kategori harus di isi');
             }
-            $jsonFile = file_get_contents(self::$jsonPath);
+            $jsonFile = file_get_contents($pathFile);
             $jsonData = json_decode($jsonFile, true);
             $result = null;
             foreach($jsonData as $key => $item){
@@ -46,7 +46,7 @@ function kategori($data, $desc, $pathFile, $konek){
             if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                 throw new Exception('Kategori harus di isi');
             }
-            $jsonFile = file_get_contents(self::$jsonPath);
+            $jsonFile = file_get_contents($pathFile);
             $jsonData = json_decode($jsonFile, true);
             $result = null;
             foreach($jsonData as $key => $item){
@@ -62,7 +62,7 @@ function kategori($data, $desc, $pathFile, $konek){
             if(!isset($data['NamaKategori']) || empty($data['NamaKategori'])){
                 throw new Exception('Kategori harus di isi');
             }
-            $jsonFile = file_get_contents(self::$jsonPath);
+            $jsonFile = file_get_contents($pathFile);
             $jsonData = json_decode($jsonFile, true);
             $result = null;
             foreach($jsonData as $key => $item){
@@ -75,7 +75,7 @@ function kategori($data, $desc, $pathFile, $konek){
             }
             return $result;
         }else if($desc == 'get all'){
-            $jsonFile = file_get_contents(self::$jsonPath);
+            $jsonFile = file_get_contents($pathFile);
             $jsonData = json_decode($jsonFile, true);
             if($jsonData === null){
                 throw new Exception('Data kategori tidak ditemukan');
@@ -85,7 +85,7 @@ function kategori($data, $desc, $pathFile, $konek){
             if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                 throw new Exception('Kategori harus di isi');
             }
-            $jsonFile = file_get_contents(self::$jsonPath);
+            $jsonFile = file_get_contents($pathFile);
             $jsonData = json_decode($jsonFile, true);
             $result = null;
             foreach($jsonData as $key => $item){
@@ -119,18 +119,18 @@ function kategori($data, $desc, $pathFile, $konek){
     }
 }
 // Menerima data dari aplikasi Android
-$nik = $_POST['nik'];
-$namaLengkap = $_POST['nama_seniman'];
-$jenisKelamin = $_POST['jenis_kelamin'];
-$tempatLahir = $_POST['tempat_lahir'];
-$tanggalLahir = $_POST['tanggal_lahir'];
-$alamat = $_POST['alamat_seniman'];
-$noHandphone = $_POST['no_telpon'];
-$namaOrganisasi = $_POST['nama_organisasi'];
-$jumlahAnggota = $_POST['jumlah_anggota'];
+$nik = str_replace(['"', "'"], '', $_POST['nik']);
+$namaLengkap = str_replace(['"', "'"], '', $_POST['nama_seniman']);
+$jenisKelamin = str_replace(['"', "'"], '', $_POST['jenis_kelamin']);
+$tempatLahir = str_replace(['"', "'"], '', $_POST['tempat_lahir']);
+$tanggalLahir = str_replace(['"', "'"], '', $_POST['tanggal_lahir']);
+$alamat = str_replace(['"', "'"], '', $_POST['alamat_seniman']);
+$noHandphone = str_replace(['"', "'"], '', $_POST['no_telpon']);
+$namaOrganisasi = str_replace(['"', "'"], '', $_POST['nama_organisasi']);
+$jumlahAnggota = str_replace(['"', "'"], '', $_POST['jumlah_anggota']);
 $kategori = kategori(['kategori'=>str_replace(['"', "'"], '', $_POST['singkatan_kategori'])],'check',$pathFile,$konek);
-$kecamatan = $_POST['kecamatan'];
-$id_seniman = $_POST['id_seniman'];
+$kecamatan = str_replace(['"', "'"], '', $_POST['kecamatan']);
+$id_seniman = str_replace(['"', "'"], '', $_POST['id_seniman']);
 
 // Enkripsi nilai $nik dengan Base64
 $encryptedNik = base64_encode($nik);

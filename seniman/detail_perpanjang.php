@@ -123,7 +123,7 @@ if ($userAuth['status'] == 'error') {
                                 <form class="row g-3">
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Kependudukan</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo $perpanjangan['nik'] ?>">
+                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo base64_decode($perpanjangan['nik']) ?>">
                                     </div>
                                     <br>
                                     <div class="col-md-12">

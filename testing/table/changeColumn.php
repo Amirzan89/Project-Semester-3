@@ -10,13 +10,16 @@ $conn = $database->getConnection();
 // $stmtDropColumn->execute();
 
 // // Rename 'tgl_awal' column to 'tgl_advis'
-$queryRenameColumn = "ALTER TABLE sewa_tempat CHANGE COLUMN `kode_verifikasi` `kode_pinjam` VARCHAR(45) NOT NULL";
+// $queryRenameColumn = "ALTER TABLE `seniman` CHANGE COLUMN `nik` `nik` VARCHAR(500) NOT NULL";
+$queryRenameColumn = "ALTER TABLE `seniman` CHANGE COLUMN `nik` `nik` VARCHAR(500) NOT NULL";
 $stmtRenameColumn = $conn->prepare($queryRenameColumn);
 $stmtRenameColumn->execute();
 
 $response = [];
 
-if ($stmtDropColumn->affected_rows > 0 || $stmtRenameColumn->affected_rows > 0) {
+// if ($stmtDropColumn->affected_rows > 0 || $stmtRenameColumn->affected_rows > 0) {
+// if ($stmtDropColumn->affected_rows > 0) {
+if ($stmtRenameColumn->affected_rows > 0) {
     $response["kode"] = 1;
     $response["pesan"] = "Table structure updated successfully";
 } else {
