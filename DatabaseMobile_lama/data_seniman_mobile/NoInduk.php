@@ -120,19 +120,19 @@ function kategori($data, $desc, $pathFile,$konek){
     }
 };
 // Menerima data dari aplikasi Android
-$nik = $_POST['nik'];
-$namaLengkap = $_POST['nama_seniman'];
-$jenisKelamin = $_POST['jenis_kelamin'];
-$tempatLahir = $_POST['tempat_lahir'];
-$tanggalLahir = $_POST['tanggal_lahir'];
-$alamat = $_POST['alamat_seniman'];
-$noHandphone = $_POST['no_telpon'];
-$namaOrganisasi = $_POST['nama_organisasi'];
-$jumlahAnggota = $_POST['jumlah_anggota'];
-$status = $_POST['status'];
+$nik = str_replace(['"', "'"], '', $_POST['nik']);
+$namaLengkap = str_replace(['"', "'"], '', $_POST['nama_seniman']);
+$jenisKelamin = str_replace(['"', "'"], '', $_POST['jenis_kelamin']);
+$tempatLahir = str_replace(['"', "'"], '', $_POST['tempat_lahir']);
+$tanggalLahir = str_replace(['"', "'"], '', $_POST['tanggal_lahir']);
+$alamat = str_replace(['"', "'"], '', $_POST['alamat_seniman']);
+$noHandphone = str_replace(['"', "'"], '', $_POST['no_telpon']);
+$namaOrganisasi = str_replace(['"', "'"], '', $_POST['nama_organisasi']);
+$jumlahAnggota = str_replace(['"', "'"], '', $_POST['jumlah_anggota']);
+$status = str_replace(['"', "'"], '', $_POST['status']);
 $kategori = kategori(['kategori'=>str_replace(['"', "'"], '', $_POST['singkatan_kategori'])],'check',$pathFile,$konek);
-$kecamatan = $_POST['kecamatan'];
-$id_user = $_POST['id_user'];
+$kecamatan = str_replace(['"', "'"], '', $_POST['kecamatan']);
+$id_user = str_replace(['"', "'"], '', $_POST['id_user']);
 // Menerima file gambar, dokumen PDF, dan gambar
 $ktpSeniman = $_FILES['ktp_seniman'];
 $suratKeterangan = $_FILES['surat_keterangan'];
@@ -211,8 +211,9 @@ $encryptedNik = base64_encode($nik);
 $today = date('Y-m-d'); // Mengambil tanggal hari ini
 $nextYear = date('Y') + 1; // Mengambil tahun berikutnya
 $tgl_pembuatan = $today;
-$created_at = $today;
-$tgl_berlaku = $nextYear . '-12-31';
+date_default_timezone_set('Asia/Jakarta');
+date_default_timezone_set('Asia/Jakarta');
+$created_at = date('Y-m-d H:i:s');
 //check kategori
 $query = "INSERT INTO seniman (nik, nama_seniman, jenis_kelamin, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota, status, tgl_pembuatan, tgl_berlaku, created_at, updated_at, id_user, id_kategori_seniman, kecamatan, ktp_seniman, surat_keterangan, pass_foto) 
           VALUES ('$encryptedNik', '$namaLengkap', '$jenisKelamin', '$tempatLahir', '$tanggalLahir', '$alamat', '$noHandphone', '$namaOrganisasi', '$jumlahAnggota', '$status', '$tgl_pembuatan', '$tgl_berlaku', '$created_at', '$created_at', $id_user, '$kategori', '$kecamatan', '$ktpSenimanFileName','$suratKeteranganFileName', '$passFotoFileName')";
