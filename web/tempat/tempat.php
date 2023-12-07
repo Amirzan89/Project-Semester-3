@@ -848,6 +848,8 @@ class TempatWebsite{
     //khusus admin Tempat dan super admin
     public static function prosesSewaTempat($data){
         try{
+            // echo json_encode($data);
+            // exit();
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 echo "<script>alert('ID User harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
@@ -960,7 +962,7 @@ class TempatWebsite{
                 $status = 'ditolak';
                 $code = '';
             }
-            $stmt[2]->bind_param("ssis", $code, $status, $data['catatan'], $data['id_sewa']);
+            $stmt[2]->bind_param("ssss", $code, $status, $data['catatan'], $data['id_sewa']);
             $stmt[2]->execute();
             if ($stmt[2]->affected_rows > 0) {
                 $stmt[2]->close();

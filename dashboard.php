@@ -149,7 +149,8 @@ if ($userAuth['status'] == 'error') {
                   }
                   $dataKalender = $data;
               }
-              include(__DIR__.'/kalender.php'); 
+              // include(__DIR__.'/kalender.php'); 
+              include(__DIR__.'/dynamic-full-calendar.php'); 
               ?>
             </div>
           </div>

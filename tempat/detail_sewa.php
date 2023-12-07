@@ -23,7 +23,7 @@ if ($userAuth['status'] == 'error') {
     $csrf = $GLOBALS['csrf'];
     if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
         $id  = $_GET['id_sewa'];
-        $sql = mysqli_query($conn, "SELECT id_sewa, nik_sewa, nama_peminjam, nama_tempat, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, DATE_FORMAT(tgl_awal_peminjaman, '%d %M %Y') AS tanggal_awal, kode_pinjam, DATE_FORMAT(tgl_akhir_peminjaman, '%d %M %Y') AS tanggal_akhir, status, catatan FROM sewa_tempat WHERE id_sewa = '$id'");
+        $sql = mysqli_query($conn, "SELECT id_sewa, nik_sewa, nama_peminjam, nama_tempat, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, DATE_FORMAT(tgl_awal_peminjaman, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tgl_awal_peminjaman, '%H:%i') AS waktu_awal, kode_pinjam, DATE_FORMAT(tgl_akhir_peminjaman, '%d %M %Y') AS tanggal_akhir, DATE_FORMAT(tgl_akhir_peminjaman, '%H:%i') AS waktu_akhir, status, catatan FROM sewa_tempat WHERE id_sewa = '$id'");
         $sewa = mysqli_fetch_assoc($sql);
     } else {
         header('Location: /tempat.php');
@@ -165,22 +165,22 @@ if ($userAuth['status'] == 'error') {
                                         <br>
                                         <div class="col-md-6">
                                             <label for="tgl_awal_peminjaman" class="form-label">Tanggal Awal</label>
-                                            <input type="date" class="form-control" readonly value="<?php echo $sewa['tgl_awal_peminjaman'] ?>">
+                                            <input type="text" class="form-control" readonly value="<?php echo $sewa['tanggal_awal'] ?>">
                                         </div>
                                         <br>
                                         <div class="col-md-6">
                                             <label for="tgl_akhir_peminjaman" class="form-label">Tanggal Akhir</label>
-                                            <input type="date" class="form-control" readonly value="<?php echo $sewa['tgl_akhir_peminjaman'] ?>">
+                                            <input type="text" class="form-control" readonly value="<?php echo $sewa['tanggal_akhir'] ?>">
                                         </div>
                                         <br>
                                         <div class="col-md-6">
                                             <label for="tgl_awal_peminjaman" class="form-label">Waktu Awal</label>
-                                            <input type="time" class="form-control" readonly value="<?php echo $sewa['tgl_awal_peminjaman'] ?>">
+                                            <input type="time-local" class="form-control" readonly value="<?php echo $sewa['waktu_awal'] ?>">
                                         </div>
                                         <br>
                                         <div class="col-md-6">
                                             <label for="tgl_akhir_peminjaman" class="form-label">Waktu Akhir</label>
-                                            <input type="time" class="form-control" readonly value="<?php echo $sewa['tgl_akhir_peminjaman'] ?>">
+                                            <input type="time-local" class="form-control" readonly value="<?php echo $sewa['waktu_akhir'] ?>">
                                         </div>
                                         <br>
                                         <div class="col-md-12">
