@@ -98,11 +98,11 @@ if ($userAuth['status'] == 'error') {
                       <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                         <i class="bi bi-people-fill"></i>
                       </div>
-                      <div class="ps-3">
+                      <div class="ps-3"> 
                         <?php
-                        $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role != 'super admin'");
+                        $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role != 'super admin' AND role != 'masyarakat'");
                         $data = mysqli_fetch_assoc($sql);
-                        echo "<h4>" . $data['total'] . "</46>";
+                        echo "<h4>" . $data['total'] . "</h4>";
                         ?>
                       </div>
                     </div>
