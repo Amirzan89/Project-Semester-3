@@ -112,7 +112,11 @@ if ($userAuth['status'] == 'error') {
                   <br>
                   <div class="col-md-12 ">
                     <label for="alamat_seniman" class="form-label">Alamat</label>
+<<<<<<< HEAD
                     <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat" style="height: 100px;" readonly></textarea>
+=======
+                    <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat" readonly style="height: 100px;"></textarea>
+>>>>>>> b5cf5289b030ab7a03d0ba8a356b1da0c7fe0519
                   </div>
                   <br>
                   <div class="col-md-12">
@@ -122,7 +126,11 @@ if ($userAuth['status'] == 'error') {
                   <br>
                   <div class="col-md-12">
                     <label for="tanggal" class="form-label">Tanggal </label>
+<<<<<<< HEAD
                     <input type="date" class="form-control" name="tanggalL" placeholder="Tanggal" disabled>
+=======
+                    <input type="date" class="form-control" name="tanggalL" placeholder="Tanggal"readonly>
+>>>>>>> b5cf5289b030ab7a03d0ba8a356b1da0c7fe0519
                   </div>
                   <br>
                   <div class="col-md-12">
