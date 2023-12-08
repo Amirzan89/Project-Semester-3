@@ -142,7 +142,7 @@ if ($userAuth['status'] == 'error') {
                                 </div>
                                 <div class="col-12">
                                     <label for="surat_keterangan" class="form-label">Surat Keterangan</label>
-                                    <input type="file" class="form-file-input form-control" id="surat_keterangan">
+                                    <input type="file" class="form-file-input form-control" id="surat_keterangan" readonly disabled>
                                 </div>
                             </form>
 
