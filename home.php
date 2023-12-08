@@ -145,7 +145,7 @@ if($userAuth['status'] == 'success'){
           ?>
             <div class="col">
               <div class="card">
-              <img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/event<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" />
+              <img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/events<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" />
                 <div class="card-body">
                   <h5 class="card-title"><?php echo $events['nama_event']?></h5>
                   <p class="card-text">
