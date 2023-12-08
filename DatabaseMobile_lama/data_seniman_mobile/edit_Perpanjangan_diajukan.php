@@ -12,9 +12,9 @@ $passFoto = isset($_FILES['pass_foto']) ? $_FILES['pass_foto'] : null;
 // Pastikan kunci yang diharapkan ada sebelum mengakses array
 if ($id_perpanjangan !== null || $ktpSeniman !== null || $suratKeterangan !== null || $passFoto !== null) {
     // Direktori penyimpanan file
-    $uploadDirKTP = 'uploads/perpanjangan/ktp_seniman/';
-    $uploadDirSurat = 'uploads/perpanjangan/surat_keterangan/';
-    $uploadDirPassFoto = 'uploads/perpanjangan/pass_foto/';
+    $uploadDirKTP = __DIR__.'/uploads/perpanjangan/ktp_seniman';
+    $uploadDirSurat = __DIR__.'/uploads/perpanjangan/surat_keterangan';
+    $uploadDirPassFoto = __DIR__.'/uploads/perpanjangan/pass_foto';
     $today = date('Y-m-d'); // Mengambil tanggal hari ini
     $tgl_pembuatan = $today;
 // Mendapatkan path file lama sebelum update
@@ -25,9 +25,9 @@ mysqli_stmt_execute($stmt_get_old_files);
 $result_old_files = mysqli_stmt_get_result($stmt_get_old_files);
 
 if ($row_old_files = mysqli_fetch_assoc($result_old_files)) {
-    $old_ktp_path = $row_old_files['ktp_seniman'];
-    $old_surat_path = $row_old_files['surat_keterangan'];
-    $old_pass_path = $row_old_files['pass_foto'];
+    $old_ktp_path = $uploadDirKTP.$row_old_files['ktp_seniman'];
+    $old_surat_path = $uploadDirSurat.$row_old_files['surat_keterangan'];
+    $old_pass_path = $uploadDirPassFoto.$row_old_files['pass_foto'];
 
     // Hapus file lama
     if (!empty($old_ktp_path) && file_exists($old_ktp_path) && !empty($ktpSeniman['tmp_name']) && $old_ktp_path !== $uploadDirKTP . generateUniqueFileName($ktpSeniman['name'], $uploadDirKTP)) {

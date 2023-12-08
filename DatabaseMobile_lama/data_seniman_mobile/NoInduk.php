@@ -138,19 +138,23 @@ $ktpSeniman = $_FILES['ktp_seniman'];
 $suratKeterangan = $_FILES['surat_keterangan'];
 $passFoto = $_FILES['pass_foto'];
 // Direktori penyimpanan file
-$uploadDirKTP = 'uploads/seniman/ktp_seniman/';
-$uploadDirSurat = 'uploads/seniman/surat_keterangan/';
-$uploadDirPassFoto = 'uploads/seniman/pass_foto/';
+$uploadDirKTP = __DIR__.'/uploads/seniman/ktp_seniman';
+$uploadDirSurat = __DIR__.'/uploads/seniman/surat_keterangan';
+$uploadDirPassFoto = __DIR__.'/uploads/seniman/pass_foto';
 
-$ktpSenimanFileName = $uploadDirKTP . generateUniqueFileName($ktpSeniman['name'], $uploadDirKTP);
+// Mengunggah Foto ktp
+$ktpName = generateUniqueFileName($ktpSeniman['name'], $uploadDirKTP);
+$ktpSenimanFileName = $uploadDirKTP . $ktpName;
 move_uploaded_file($ktpSeniman['tmp_name'], $ktpSenimanFileName);
 
 // Mengunggah dokumen PDF Surat Keterangan
-$suratKeteranganFileName = $uploadDirSurat . generateUniqueFileName2($suratKeterangan['name'], $uploadDirSurat);
+$suratName = generateUniqueFileName2($suratKeterangan['name'], $uploadDirSurat);
+$suratKeteranganFileName = $uploadDirSurat . $suratName;
 move_uploaded_file($suratKeterangan['tmp_name'], $suratKeteranganFileName);
 
 // Mengunggah gambar Pass Foto
-$passFotoFileName = $uploadDirPassFoto . generateUniqueFileName3($passFoto['name'], $uploadDirPassFoto);
+$fotoName = generateUniqueFileName3($passFoto['name'], $uploadDirPassFoto);
+$passFotoFileName = $uploadDirPassFoto . $fotoName;
 move_uploaded_file($passFoto['tmp_name'], $passFotoFileName);
 
 // Fungsi untuk menghasilkan nama file unik
@@ -159,49 +163,49 @@ function generateUniqueFileName($originalName, $uploadDirKTP) {
     $basename = pathinfo($originalName, PATHINFO_FILENAME);
 
     // Jika nama file belum ada, langsung gunakan nama asli
-    if (!file_exists($uploadDirKTP . $basename . '.' . $extension)) {
-        return $basename . '.' . $extension;
+    if (!file_exists($uploadDirKTP .'/'. $basename . '.' . $extension)) {
+        return '/'.$basename . '.' . $extension;
     }
 
     // Jika nama file sudah ada, tambahkan indeks
     $counter = 1;
-    while (file_exists($uploadDirKTP . $basename . '(' . $counter . ')' . '.' . $extension)) {
+    while (file_exists($uploadDirKTP .'/'. $basename . '(' . $counter . ')' . '.' . $extension)) {
         $counter++;
     }
 
-    return $basename . '(' . $counter . ')' . '.' . $extension;
+    return '/'.$basename . '(' . $counter . ')' . '.' . $extension;
 }
 
 function generateUniqueFileName2($originalName, $uploadDirSurat) {
     $extension = pathinfo($originalName, PATHINFO_EXTENSION);
     $basename = pathinfo($originalName, PATHINFO_FILENAME);
 
-    if (!file_exists($uploadDirSurat . $basename . '.' . $extension)) {
-        return $basename . '.' . $extension;
+    if (!file_exists($uploadDirSurat .'/'. $basename . '.' . $extension)) {
+        return '/'.$basename . '.' . $extension;
     }
 
     $counter = 1;
-    while (file_exists($uploadDirSurat . $basename . '(' . $counter . ')' . '.' . $extension)) {
+    while (file_exists($uploadDirSurat .'/'. $basename . '(' . $counter . ')' . '.' . $extension)) {
         $counter++;
     }
 
-    return $basename . '(' . $counter . ')' . '.' . $extension;
+    return '/'.$basename . '(' . $counter . ')' . '.' . $extension;
 }
 
 function generateUniqueFileName3($originalName, $uploadDirPassFoto) {
     $extension = pathinfo($originalName, PATHINFO_EXTENSION);
     $basename = pathinfo($originalName, PATHINFO_FILENAME);
 
-    if (!file_exists($uploadDirPassFoto . $basename . '.' . $extension)) {
-        return $basename . '.' . $extension;
+    if (!file_exists($uploadDirPassFoto .'/'. $basename . '.' . $extension)) {
+        return '/'.$basename . '.' . $extension;
     }
 
     $counter = 1;
-    while (file_exists($uploadDirPassFoto . $basename . '(' . $counter . ')' . '.' . $extension)) {
+    while (file_exists($uploadDirPassFoto .'/'. $basename . '(' . $counter . ')' . '.' . $extension)) {
         $counter++;
     }
 
-    return $basename . '(' . $counter . ')' . '.' . $extension;
+    return '/'.$basename . '(' . $counter . ')' . '.' . $extension;
 }
 
 // Enkripsi nilai $nik dengan Base64
@@ -216,7 +220,7 @@ date_default_timezone_set('Asia/Jakarta');
 $created_at = date('Y-m-d H:i:s');
 //check kategori
 $query = "INSERT INTO seniman (nik, nama_seniman, jenis_kelamin, tempat_lahir, tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota, status, tgl_pembuatan, tgl_berlaku, created_at, updated_at, id_user, id_kategori_seniman, kecamatan, ktp_seniman, surat_keterangan, pass_foto) 
-          VALUES ('$encryptedNik', '$namaLengkap', '$jenisKelamin', '$tempatLahir', '$tanggalLahir', '$alamat', '$noHandphone', '$namaOrganisasi', '$jumlahAnggota', '$status', '$tgl_pembuatan', '$tgl_berlaku', '$created_at', '$created_at', $id_user, '$kategori', '$kecamatan', '$ktpSenimanFileName','$suratKeteranganFileName', '$passFotoFileName')";
+          VALUES ('$encryptedNik', '$namaLengkap', '$jenisKelamin', '$tempatLahir', '$tanggalLahir', '$alamat', '$noHandphone', '$namaOrganisasi', '$jumlahAnggota', '$status', '$tgl_pembuatan', '$tgl_berlaku', '$created_at', '$created_at', $id_user, '$kategori', '$kecamatan', '$ktpName','$suratName', '$fotoName')";
 if ($konek->query($query) === TRUE) {
     $response['status'] = 'success';
     $response['message'] = 'Data berhasil disimpan';

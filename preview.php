@@ -9,7 +9,7 @@ class Preview{
     private static $folderSenimanDes = '/seniman/preview';
     private static $folderPentasDes = '/pentas/preview';
 
-    private static $folderEvent = __DIR__.'/DatabaseMobile/img/event';
+    private static $folderEvent = __DIR__.'/DatabaseMobile/uploads/events';
     private static $folderSeniman = __DIR__.'/DatabaseMobile/data_seniman_mobile/uploads/seniman';
     private static $folderPerpanjangan = __DIR__.'/DatabaseMobile/data_seniman_mobile/uploads/perpanjangan';
     private static $folderSewa = __DIR__.'/DatabaseMobile/uploads/pinjam';
@@ -420,7 +420,7 @@ class Preview{
             //check id_sewa
             if($data['deskripsi'] == 'surat'){
                 $query = "SELECT surat_ket_sewa FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
-                $file = self::$folderSewa.'/surat_keterangan';
+                $file = self::$folderSewa;
             }else{
                 throw new Exception('Deskripsi invalid !');
             }

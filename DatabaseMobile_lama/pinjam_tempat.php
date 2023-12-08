@@ -18,14 +18,12 @@ $catatan = $_POST['catatan'];
 $id_tempat = $_POST['id_tempat'];
 $id_user = $_POST['id_user']; 
 
-// echo json_encode($_POST);
-// exit();
-$uploadDirKTP = 'uploads/pinjam/';
+$uploadDirKTP = __DIR__.'/uploads/pinjam/';
 $ktpSenimanFileName = $uploadDirKTP . basename($surat_ket_sewa['name']);
 move_uploaded_file($surat_ket_sewa['tmp_name'], $ktpSenimanFileName);
 date_default_timezone_set('Asia/Jakarta');
 $created_at = date('Y-m-d H:i:s');
-$sql = "INSERT INTO sewa_tempat (nik_sewa, nama_peminjam, nama_tempat, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, surat_ket_sewa, tgl_awal_peminjaman, tgl_akhir_peminjaman, created_at, updated_at, status, catatan, id_tempat, id_user) VALUES ($nik_sewa, $nama_peminjam, $nama_tempat, $deskripsi_sewa_tempat, $nama_kegiatan_sewa, $jumlah_peserta, $instansi, '$ktpSenimanFileName', $tgl_awal_peminjaman, $tgl_akhir_peminjaman, '$created_at', '$created_at', 'diajukan ', $catatan, $id_tempat, $id_user )";
+$sql = "INSERT INTO sewa_tempat (nik_sewa, nama_peminjam, nama_tempat, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, surat_ket_sewa, tgl_awal_peminjaman, tgl_akhir_peminjaman, created_at, updated_at, status, catatan, id_tempat, id_user) VALUES ($nik_sewa, $nama_peminjam, $nama_tempat, $deskripsi_sewa_tempat, $nama_kegiatan_sewa, $jumlah_peserta, $instansi,'". '/'.basename($surat_ket_sewa['name'])."', $tgl_awal_peminjaman, $tgl_akhir_peminjaman, '$created_at', '$created_at', 'diajukan ', $catatan, $id_tempat, $id_user )";
 
 $response = array();
 if ($konek->query($sql) === TRUE) {

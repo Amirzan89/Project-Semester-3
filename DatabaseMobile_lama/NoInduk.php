@@ -139,9 +139,9 @@ $suratKeterangan = $_FILES['surat_keterangan'];
 $passFoto = $_FILES['pass_foto'];
 
 // Direktori penyimpanan file
-$uploadDirKTP = 'uploads/seniman/ktp_seniman/';
-$uploadDirSurat = 'uploads/seniman/surat_keterangan/';
-$uploadDirPassFoto = 'uploads/seniman/pass_foto/';
+$uploadDirKTP = __DIR__.'/uploads/seniman/ktp_seniman/';
+$uploadDirSurat = __DIR__.'/uploads/seniman/surat_keterangan/';
+$uploadDirPassFoto = __DIR__.'/uploads/seniman/pass_foto/';
 
 $ktpSenimanFileName = $uploadDirKTP . generateUniqueFileName($ktpSeniman['name'], $uploadDirKTP);
 move_uploaded_file($ktpSeniman['tmp_name'], $ktpSenimanFileName);

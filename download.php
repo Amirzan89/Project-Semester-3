@@ -387,7 +387,7 @@ class Download{
             //check id_sewa
             if($data['deskripsi'] == 'surat'){
                 $query = "SELECT surat_ket_sewa FROM sewa_tempat WHERE id_sewa = ? LIMIT 1";
-                $file = self::$folderSewa.'/surat_keterangan';
+                $file = self::$folderSewa;
             }else{
                 throw new Exception('Deskripsi invalid !');
             }

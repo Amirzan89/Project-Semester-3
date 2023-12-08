@@ -11,14 +11,14 @@ $link_pendaftaran= $_POST['link_pendaftaran'];
 $poster_event = $_FILES['poster_event'];
 
 
-$posterDir = 'uploads/events/';
+$posterDir = __DIR__.'/uploads/events/';
 
 // Mengunggah gambar KTP Seniman
 $posterFileName = $posterDir . basename($poster_event['name']);
 move_uploaded_file($poster_event['tmp_name'], $posterFileName);
 
 
-$sql = "INSERT INTO detail_events (nama_event, deskripsi, tempat_event, tanggal_awal, tanggal_akhir, link_pendaftaran, poster_event)  VALUES ($nama_event, $deskripsi, $tempat_event, $tanggal_awal, $tanggal_akhir, $link_pendaftaran, '$posterFileName')";
+$sql = "INSERT INTO detail_events (nama_event, deskripsi, tempat_event, tanggal_awal, tanggal_akhir, link_pendaftaran, poster_event)  VALUES ($nama_event, $deskripsi, $tempat_event, $tanggal_awal, $tanggal_akhir, $link_pendaftaran, '".'/'.basename($poster_event['name'])."')";
 
 $response = array();
 if ($konek->query($sql) === TRUE) {

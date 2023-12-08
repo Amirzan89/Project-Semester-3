@@ -55,9 +55,9 @@ if ($result->num_rows == 1) {
     }
 }
 // Direktori penyimpanan file
-$uploadDirKTP = 'uploads/Perpanjangan/ktp_seniman/';
-$uploadDirSurat = 'uploads/Perpanjangan/surat_keterangan/';
-$uploadDirPassFoto = 'uploads/Perpanjangan/pass_foto/';
+$uploadDirKTP = __DIR__.'/uploads/Perpanjangan/ktp_seniman/';
+$uploadDirSurat = __DIR__.'/uploads/Perpanjangan/surat_keterangan/';
+$uploadDirPassFoto = __DIR__.'/uploads/Perpanjangan/pass_foto/';
 
 $ktpSenimanFileName = $uploadDirKTP . generateUniqueFileName($ktpSeniman['name'], $uploadDirKTP);
 move_uploaded_file($ktpSeniman['tmp_name'], $ktpSenimanFileName);
