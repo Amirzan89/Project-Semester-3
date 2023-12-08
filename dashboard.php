@@ -140,12 +140,20 @@ if ($userAuth['status'] == 'error') {
               <h5 class="card-title mt-3 "><strong>Kalender Peminjaman Tempat</strong></h5>
               <?php
               $dataKalender = ''; 
-              $sql = "SELECT nama_kegiatan_sewa, tgl_awal_peminjaman, tgl_akhir_peminjaman FROM sewa_tempat WHERE status = 'diterima'"; 
+              $sql = "SELECT id_sewa, nama_peminjam, nama_tempat, nama_kegiatan_sewa, DATE(tgl_awal_peminjaman) AS start_date, DATE(tgl_akhir_peminjaman) AS end_date FROM sewa_tempat WHERE status = 'diterima'"; 
               $result = $conn->query($sql);
               if ($result->num_rows >= 1) {
                   $data = array();
                   while ($row = mysqli_fetch_assoc($result)) {
-                      $data[] = $row;
+                    $sewa = array(
+                      'id' => $row['id_sewa'],
+                      'title' => $row['nama_kegiatan_sewa'],
+                      'peminjam' => $row['nama_peminjam'],
+                      'nama_tempat' => $row['nama_tempat'],
+                      'start' => $row['start_date'],
+                      'end' => $row['end_date'],
+                  );
+                    $data[] = $sewa;
                   }
                   $dataKalender = $data;
               }

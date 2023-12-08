@@ -38,19 +38,19 @@
 						<div class="col-sm-12">  
 							<div class="form-group">
 							  <label for="nama_peminjam">Nama Peminjam</label>
-							  <input type="text" name="nama_peminjam" id="nama_peminjam" class="form-control">
+							  <input type="text" name="nama_peminjam" id="nama_peminjam" class="form-control" readonly>
 							</div>
 						</div>
 						<div class="col-sm-12">  
 							<div class="form-group">
 							  <label for="nama_tempat">Nama Tempat</label>
-							  <input type="text" name="nama_tempat" id="nama_tempat" class="form-control">
+							  <input type="text" name="nama_tempat" id="nama_tempat" class="form-control" readonly>
 							</div>
 						</div>
 						<div class="col-sm-12">  
 							<div class="form-group">
 							  <label for="nama_kegiatan">Nama Kegiatan</label>
-							  <input type="text" name="nama_kegiatan" id="nama_kegiatan" class="form-control">
+							  <input type="text" name="nama_kegiatan" id="nama_kegiatan" class="form-control" readonly>
 							</div>
 						</div>
 					</div>
@@ -58,13 +58,13 @@
 						<div class="col-sm-6">  
 							<div class="form-group">
 							  <label for="event_start_date">Tanggal Awal</label>
-							  <input type="date" name="event_start_date" id="event_start_date" class="form-control onlydatepicker" placeholder="Event start date">
+							  <input type="date" name="event_start_date" id="event_start_date" class="form-control onlydatepicker" placeholder="Event start date" disabled>
 							 </div>
 						</div>
 						<div class="col-sm-6">  
 							<div class="form-group">
 							  <label for="event_end_date">Tanggal Selesai</label>
-							  <input type="date" name="event_end_date" id="event_end_date" class="form-control" placeholder="Event end date">
+							  <input type="date" name="event_end_date" id="event_end_date" class="form-control" placeholder="Event end date" disabled>
 							</div>
 						</div>
 					</div>
@@ -83,59 +83,40 @@ $(document).ready(function() {
 	display_events();
 }); //end document.ready block
 
-function display_events() {
-	var events = new Array();
-$.ajax({
-    url: 'display_event.php',  
-    dataType: 'json',
-    success: function (response) {
-         
-    var result=response.data;
-    $.each(result, function (i, item) {
-    	events.push({
-            event_id: result[i].event_id,
-            title: result[i].title,
-            start: result[i].start,
-            end: result[i].end,
-            color: result[i].color,
-            url: result[i].url
-        }); 	
-    })
-	var calendar = $('#calendar').fullCalendar({
-		event: 'database_connection.php',
-	    defaultView: 'month',
-		 timeZone: 'local',
-	    editable: true,
+function display_events(dataCalender) {
+    var Calenders = []; // Initialize empty array for events
+    // Loop through each element in the dataCalender parameter
+    for (var i = 0; i < dataCalender.length; i++) {
+        var event = dataCalender[i];
+        Calenders.push({
+        	event_id: event.id, // Assuming you have these fields
+            title: event.title,
+			nama_tempat:event.nama_tempat,
+			peminjam:event.peminjam,
+            start: event.start,
+            end: event.end,
+            color: event.color,
+            url: ''
+        });
+    }
+
+    var calendar = $('#calendar').fullCalendar({
+        defaultView: 'month',
+        timeZone: 'local',
+        editable: true,
         selectable: true,
-		selectHelper: true,
-		eventClick: function(event) {
-            // Menetapkan nilai modal berdasarkan data dari event yang diklik
-            $('#event_name').val(event.name);
+        selectHelper: true,
+        eventClick: function(event) {
+            $('#nama_peminjam').val(event.peminjam);
+            $('#nama_tempat').val(event.nama_tempat);
+            $('#nama_kegiatan').val(event.title);
             $('#event_start_date').val(moment(event.start).format('YYYY-MM-DD'));
             $('#event_end_date').val(moment(event.end).format('YYYY-MM-DD'));
-
-            // Menampilkan modal
             $('#event_entry_modal').modal('show');
         },
-        //select: function(start, end) {
-				//alert(start);
-				//alert(end);
-				//$('#event_start_date').val(moment(start).format('YYYY-MM-DD'));
-				//$('#event_end_date').val(moment(end).format('YYYY-MM-DD'));
-				//$('#event_entry_modal').modal('show');
-			//},
-        events: events,
-		//eventRender: function(event, element, view) { 
-          //  element.bind('click', function() {
-			//		alert(event.event_id);
-			//	});
-    	//}
-		}); //end fullCalendar block	
-	  },//end success block
-	  error: function (xhr, status) {
-	  alert(response.msg);
-	  }
-	});//end ajax block	
+        events: Calenders,
+	});
 }
+display_events(<?php echo json_encode($dataKalender) ?>);
 </script>
 </html> 
