@@ -108,32 +108,32 @@ if ($userAuth['status'] == 'error') {
                 <form method="POST" action="">
                   <div class="col-md-12">
                     <label for="nik" class="form-label">Nomor Induk Seniman</label>
-                    <input type="text" class="form-control" id="nis" placeholder="Masukkan Nomor Induk Seniman">
+                    <input type="text" class="form-control" id="nis" placeholder="Masukkan Nomor Induk Seniman" readonly>
                   </div>
                   <br>
                   <div class="col-md-12">
                     <label for="nama_seniman" class="form-label">Nama Lengkap</label>
-                    <input type="text" class="form-control" name="nama" placeholder="Masukkan Nama Lengkap">
+                    <input type="text" class="form-control" name="nama" placeholder="Masukkan Nama Lengkap" readonly>
                   </div>
                   <br>
                   <div class="col-md-12 ">
                     <label for="alamat_seniman" class="form-label">Alamat</label>
-                    <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat" style="height: 100px;"></textarea>
+                    <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat" readonly style="height: 100px;"></textarea>
                   </div>
                   <br>
                   <div class="col-md-12">
                     <label for="no_telpon" class="form-label">Untuk Pentas</label>
-                    <input type="text" class="form-control" name="phone" placeholder="Contoh : Pentas Tari Tradisional">
+                    <input type="text" class="form-control" name="phone" placeholder="Contoh : Pentas Tari Tradisional" readonly>
                   </div>
                   <br>
                   <div class="col-md-12">
                     <label for="tanggal" class="form-label">Tanggal </label>
-                    <input type="date" class="form-control" name="tanggalL" placeholder="Tanggal">
+                    <input type="date" class="form-control" name="tanggalL" placeholder="Tanggal"readonly>
                   </div>
                   <br>
                   <div class="col-md-12">
                     <label for="nama_organisasi" class="form-label">Bertempat Di</label>
-                    <input type="text" class="form-control" name="tempatL" placeholder="contoh : Balai Budaya">
+                    <input type="text" class="form-control" name="tempatL" placeholder="contoh : Balai Budaya" readonly>
                   </div>
                 </form> <br><br>
 
