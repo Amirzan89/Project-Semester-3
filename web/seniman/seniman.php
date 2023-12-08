@@ -14,10 +14,10 @@ class SenimanWebsite{
     public function __construct(){
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();
-        self::$folderPath = __DIR__.'/../../private/seniman';
-        self::$perpanjanganPath = __DIR__.'/../../private/perpanjangan';
-        // self::$folderPath = __DIR__.'/../../DatabaseMobile/data_seniman_mobile/uploads/seniman';
-        // self::$perpanjanganPath = __DIR__.'/../../DatabaseMobile/data_seniman_mobile/uploads/perpanjangan';
+        // self::$folderPath = __DIR__.'/../../private/seniman';
+        // self::$perpanjanganPath = __DIR__.'/../../private/perpanjangan';
+        self::$folderPath = __DIR__.'/../../DatabaseMobile/data_seniman_mobile/uploads/seniman';
+        self::$perpanjanganPath = __DIR__.'/../../DatabaseMobile/data_seniman_mobile/uploads/perpanjangan';
     }
     private static function getBaseFileName($fileName) {
         preg_match('/^([^\(]+)(?:\((\d+)\))?(\.\w+)?$/', $fileName, $matches);
@@ -1128,6 +1128,7 @@ class SenimanWebsite{
             if(!is_numeric($data['nik'])){
                 throw new Exception('Nik seniman harus angka !');
             }
+            $data['nik'] = base64_encode($data['nik']);
             if (!isset($data['alamat_seniman']) || empty($data['alamat_seniman'])) {
                 throw new Exception('Alamat harus di isi');
             }
@@ -1159,12 +1160,17 @@ class SenimanWebsite{
             }
             if (!isset($data['nama_organisasi']) || empty($data['nama_organisasi'])) {
                 $data['nama_organisasi'] = '';
-            }
-            if (!isset($data['jumlah_anggota']) || empty($data['jumlah_anggota'])) {
-                $data['jumlah_anggota'] = 1;
-            }
-            if(!is_numeric($data['jumlah_anggota'])){
-                throw new Exception('Jumlah anggota harus angka');
+                $data['jumlah_anggota'] = 0;
+            }else{
+                if (!isset($data['jumlah_anggota']) || empty($data['jumlah_anggota'])) {
+                    throw new Exception('Jumlah anggota organisasi harus di isi');
+                }
+                if(!is_numeric($data['jumlah_anggota'])){
+                    throw new Exception('Jumlah anggota harus angka !');
+                }
+                if ($data['jumlah_anggota'] < 4){
+                    throw new Exception('Jumlah anggota organisasi minimal 4 orang !');
+                }
             }
             if (!isset($_FILES['ktp_seniman']) || empty($_FILES['ktp_seniman'])) {
                 throw new Exception('foto ktp harus di isi');
@@ -1214,7 +1220,7 @@ class SenimanWebsite{
             $stmt[1]->bind_result($idSeniman);
             $stmt[1]->fetch();
             $stmt[1]->close();
-            $folderKtp = '/ktp';
+            $folderKtp = '/ktp_seniman';
             $folderPassFoto = '/pass_foto';
             $folderSurat = '/surat_keterangan';
             //create folder
@@ -1331,8 +1337,6 @@ class SenimanWebsite{
     //khusus untuk data seniman yg sudah diterima
     public function editSeniman($data){
         try{
-            // echo json_encode($data);
-            // exit();
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 throw new Exception('ID User harus di isi');
             }
@@ -1470,23 +1474,44 @@ class SenimanWebsite{
             }
             $stmt[1]->close();
             //delete file
-            $fileKtpPath = self::$folderPath.'/ktp'.$pathKTP;
+            // $fileKtpPath = self::$folderPath.'/ktp'.$pathKTP;
+            // $fileFotoPath = self::$folderPath.'/pass_foto'.$pathFoto;
+            // $fileSuratPath = self::$folderPath.'/surat_keterangan'.$pathSurat;
+            $fileKtpPath = self::$folderPath.'/ktp_seniman'.$pathKTP;
             $fileFotoPath = self::$folderPath.'/pass_foto'.$pathFoto;
             $fileSuratPath = self::$folderPath.'/surat_keterangan'.$pathSurat;
             unlink($fileKtpPath);
             unlink($fileFotoPath);
             unlink($fileSuratPath);
-            //delete data
-            $query = "DELETE FROM seniman WHERE id_seniman = ?";
+            //delete data histori_nis
+            $query = "DELETE FROM histori_nis WHERE id_seniman = ?";
             $stmt[2] = self::$con->prepare($query);
             $stmt[2]->bind_param('s', $data['id_seniman']);
-            if ($stmt[2]->execute()) {
-                $stmt[2]->close();
+            $stmt[2]->execute();
+            $stmt[2]->close();
+            //delete data perpanjangan
+            $query = "DELETE FROM perpanjangan WHERE id_seniman = ?";
+            $stmt[3] = self::$con->prepare($query);
+            $stmt[3]->bind_param('s', $data['id_seniman']);
+            $stmt[3]->execute();
+            $stmt[3]->close();
+            //delete data perpanjangan
+            $query = "DELETE FROM surat_advis WHERE id_seniman = ?";
+            $stmt[4] = self::$con->prepare($query);
+            $stmt[4]->bind_param('s', $data['id_seniman']);
+            $stmt[4]->execute();
+            $stmt[4]->close();
+            //delete data seniman
+            $query = "DELETE FROM seniman WHERE id_seniman = ?";
+            $stmt[5] = self::$con->prepare($query);
+            $stmt[5]->bind_param('s', $data['id_seniman']);
+            if ($stmt[5]->execute()) {
+                $stmt[5]->close();
                 echo "<script>alert('Status berhasil dihapus')</script>";
                 echo "<script>window.location.href = '/seniman/data_seniman.php'; </script>";
                 exit();
             } else {
-                $stmt[2]->close();
+                $stmt[5]->close();
                 echo "<script>alert('Status gagal dihapus')</script>";
                 echo "<script>window.location.href = '/seniman/data_seniman.php'; </script>";
                 exit();

@@ -252,9 +252,10 @@ if ($userAuth['status'] == 'error') {
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
           <form action="/web/seniman/seniman.php" id="deleteForm" method="POST">
             <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="desc" value="hapus">
             <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
-            <input type="hidden" name="id_tempat" id="inpTempat">
-            <button type="submit" class="btn btn-tolak" name="hapusAdmin">Hapus</button>
+            <input type="hidden" name="id_seniman" id="inpSenimanDelete">
+            <button type="submit" class="btn btn-tolak">Hapus</button>
           </form>
         </div>
       </div>
@@ -275,6 +276,7 @@ if ($userAuth['status'] == 'error') {
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var kategoriInput = document.getElementById('inpKategori');
+    var inpSenimanDelete = document.getElementById('inpSenimanDelete');
     var tahun;
     function updateTable(dataT = ''){
       while (tableSeniman.firstChild) {
@@ -341,7 +343,7 @@ if ($userAuth['status'] == 'error') {
           kategori:kategoriInput.value,
           desc:'data'
         };
-      }else if(con == null){
+      }else if(con == null){ 
         var tanggal = bulanInput.value +'-'+tahunInput.value;
         var requestBody = {
           email: email,
@@ -403,6 +405,11 @@ if ($userAuth['status'] == 'error') {
     }
     function tampilkanKategori(){
       tampilkanBulan();
+    }
+    function openDelete(dataU) {
+      inpSenimanDelete.value = dataU;
+      var myModal = new bootstrap.Modal(modalDelete);
+      myModal.show();
     }
   </script>
   <!-- Vendor JS Files -->
