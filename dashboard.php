@@ -120,7 +120,7 @@ if ($userAuth['status'] == 'error') {
                       </div>
                       <div class="ps-3">
                         <?php
-                        $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role = '  '");
+                        $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role = 'masyarakat'");
                         $data = mysqli_fetch_assoc($sql);
                         echo "<h4>" . $data['total'] . "</h4>";
                         ?>
