@@ -13,7 +13,7 @@ class Preview{
     private static $folderSeniman = __DIR__.'/DatabaseMobile/data_seniman_mobile/uploads/seniman';
     private static $folderPerpanjangan = __DIR__.'/DatabaseMobile/data_seniman_mobile/uploads/perpanjangan';
     private static $folderSewa = __DIR__.'/DatabaseMobile/uploads/pinjam';
-    private static $folderTempat = __DIR__.'/public/img/tempat';
+    private static $folderTempat = __DIR__.'/DatabaseMobile/uploads/tempat';
     private static $folderPentas = __DIR__.'/private/pentas';
     // private static $folderSeniman = __DIR__.'/private/seniman';
     // private static $folderSewa = __DIR__.'/private/tempat';
