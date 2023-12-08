@@ -13,7 +13,11 @@ if ($result->num_rows == 1) {
     $id = $result->fetch_assoc();
     date_default_timezone_set('Asia/Jakarta');
     $created_at = date('Y-m-d H:i:s');
-    $sql = "INSERT INTO events (nama_pengirim, created_at, updated_at, status, id_user, id_detail)  VALUES ('$nama_pengirim', '$created_at', '$created_at','$status', '$id_user', '". $id['id_detail']."')";
+    if(isset($_POST['id_detail']) && !empty($_POST['id_detail'])){        
+        $sql = "INSERT INTO events (nama_pengirim, created_at, updated_at, status, id_user, id_detail)  VALUES ('$nama_pengirim', '$created_at', '$created_at','$status', '$id_user', '". $_POST['id_detail']."')";
+    }else{
+        $sql = "INSERT INTO events (nama_pengirim, created_at, updated_at, status, id_user, id_detail)  VALUES ('$nama_pengirim', '$created_at', '$created_at','$status', '$id_user', '". $id['id_detail']."')";
+    }
 
     if ($konek->query($sql) === TRUE) {
         $response["kode"] = 1;
