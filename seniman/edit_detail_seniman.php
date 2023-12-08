@@ -106,6 +106,7 @@ if ($userAuth['status'] == 'error') {
                                 <!-- Multi Columns Form -->
                                 <form class="row g-3" action="/web/seniman/seniman.php" method="POST" enctype="multipart/form-data">
                                     <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                                    <input type="hidden" name="id_seniman" value="<?php echo $id?>">
                                     <input type="hidden" name="keterangan" value="edit">
                                     <?php if (isset($seniman['nomor_induk']) && !is_null($seniman['nomor_induk']) && !empty($seniman['nomor_induk'])) { ?>
                                     <div class="col-md-12">
@@ -159,12 +160,12 @@ if ($userAuth['status'] == 'error') {
                                     <br>
                                     <div class="col-md-12 ">
                                         <label for="alamat_seniman" class="form-label">Alamat</label>
-                                        <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat" style="height: 100px;"><?php echo $seniman['alamat_seniman'] ?></textarea>
+                                        <textarea class="form-control" id="alamat_seniman" name="alamat_seniman" placeholder="Masukkan Alamat" style="height: 100px;"><?php echo $seniman['alamat_seniman'] ?></textarea>
                                     </div>
                                     <br>
                                     <div class="col-md-12">
                                         <label for="no_telpon" class="form-label">Nomor Telepon</label>
-                                        <input type="text" class="form-control" id="no_telpon" value="<?php echo $seniman['no_telpon'] ?>">
+                                        <input type="text" class="form-control" id="no_telpon" name="no_telpon" value="<?php echo $seniman['no_telpon'] ?>">
                                     </div>
                                     <br>
                                     <div class="col-mb-3 mt-0">
@@ -178,12 +179,12 @@ if ($userAuth['status'] == 'error') {
                                     <br>
                                     <div class="col-md-8">
                                         <label for="nama_organisasi" class="form-label">Nama Organisasi</label>
-                                        <input type="text" class="form-control" id="nama_organisasi" value="<?php echo $seniman['nama_organisasi'] ?>">
+                                        <input type="text" class="form-control" name="nama_organisasi" id="nama_organisasi" value="<?php echo $seniman['nama_organisasi'] ?>">
                                     </div>
                                     <br>
                                     <div class="col-md-4">
                                         <label for="jumlah_anggota" class="form-label">Jumlah Anggota</label>
-                                        <input type="number" class="form-control" id="jumlah_anggota" value="<?php echo $seniman['jumlah_anggota'] ?>">
+                                        <input type="number" class="form-control" name="jumlah_anggota" id="jumlah_anggota" value="<?php echo $seniman['jumlah_anggota'] ?>">
                                     </div>
                                     <br>
                                     <div class="col-12">
