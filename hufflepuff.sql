@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2023 at 05:49 AM
+-- Generation Time: Dec 10, 2023 at 12:54 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -159,7 +159,7 @@ INSERT INTO `list_tempat` (`id_tempat`, `nama_tempat`, `alamat_tempat`, `deskrip
 
 CREATE TABLE `perpanjangan` (
   `id_perpanjangan` int(11) NOT NULL,
-  `nik` varchar(45) NOT NULL,
+  `nik` varchar(500) NOT NULL,
   `ktp_seniman` text NOT NULL,
   `pass_foto` text NOT NULL,
   `surat_keterangan` text NOT NULL,
@@ -286,7 +286,7 @@ INSERT INTO `seniman` (`id_seniman`, `nik`, `nomor_induk`, `nama_seniman`, `jeni
 
 CREATE TABLE `sewa_tempat` (
   `id_sewa` int(5) NOT NULL,
-  `nik_sewa` int(16) NOT NULL,
+  `nik_sewa` varchar(500) NOT NULL,
   `nama_peminjam` varchar(30) NOT NULL,
   `nama_tempat` varchar(50) DEFAULT NULL,
   `deskripsi_sewa_tempat` varchar(100) DEFAULT NULL,
@@ -310,20 +310,20 @@ CREATE TABLE `sewa_tempat` (
 --
 
 INSERT INTO `sewa_tempat` (`id_sewa`, `nik_sewa`, `nama_peminjam`, `nama_tempat`, `deskripsi_sewa_tempat`, `nama_kegiatan_sewa`, `jumlah_peserta`, `instansi`, `surat_ket_sewa`, `tgl_awal_peminjaman`, `tgl_akhir_peminjaman`, `kode_pinjam`, `status`, `catatan`, `created_at`, `updated_at`, `id_tempat`, `id_user`) VALUES
-(20, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1.pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-16 22:04:35', '2023-11-16 22:04:35', 2, 2),
-(38, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:20', '2023-11-26 20:17:20', 2, 2),
-(39, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:23', '2023-11-26 20:17:23', 2, 2),
-(40, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:24', '2023-11-26 20:17:24', 2, 2),
-(41, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:25', '2023-11-26 20:17:25', 2, 2),
-(42, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:25', '2023-11-26 20:17:25', 2, 2),
-(43, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:29', '2023-11-26 20:17:29', 2, 2),
-(44, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:30', '2023-11-26 20:17:30', 2, 2),
-(45, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:20:18', '2023-11-26 20:20:18', 2, 2),
-(46, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:20:19', '2023-11-26 20:20:19', 2, 2),
-(47, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', '', 'ditolak', '0', '2023-11-26 20:20:20', '2023-11-26 20:20:20', 2, 2),
-(48, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', '656ee60ea4', 'diterima', NULL, '2023-11-26 20:20:22', '2023-11-26 20:20:22', 2, 2),
-(49, 2147483647, 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', '6566b6b8d8', 'diterima', NULL, '2023-11-26 20:20:23', '2023-11-26 20:20:23', 2, 2),
-(50, 2147483647, 'randododomm', 'Museum Anjuk Ladang ', 'kfjgjgifjfjgjgjjfififjfiffifjfjcjcjcjididifjfjfjfiififhcchcfufufuufuchchchvhchchucucucuc', 'hdhfhdjdjhfbccnc', 4, 'ggffghgff', 'uploads/pinjam/1000018257.jpg', '2023-12-15 01:30:00', '2023-12-30 06:00:00', '', 'proses', NULL, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 1, 32);
+(20, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1.pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-16 22:04:35', '2023-11-16 22:04:35', 2, 2),
+(38, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:20', '2023-11-26 20:17:20', 2, 2),
+(39, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:23', '2023-11-26 20:17:23', 2, 2),
+(40, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:24', '2023-11-26 20:17:24', 2, 2),
+(41, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:25', '2023-11-26 20:17:25', 2, 2),
+(42, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:25', '2023-11-26 20:17:25', 2, 2),
+(43, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:29', '2023-11-26 20:17:29', 2, 2),
+(44, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:17:30', '2023-11-26 20:17:30', 2, 2),
+(45, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:20:18', '2023-11-26 20:20:18', 2, 2),
+(46, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', NULL, 'diajukan', NULL, '2023-11-26 20:20:19', '2023-11-26 20:20:19', 2, 2),
+(47, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', '', 'ditolak', '0', '2023-11-26 20:20:20', '2023-11-26 20:20:20', 2, 2),
+(48, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', '656ee60ea4', 'diterima', NULL, '2023-11-26 20:20:22', '2023-11-26 20:20:22', 2, 2),
+(49, '2147483647', 'joshhh', 'amerika', 'menyewa tempat karepku lah', 'olahraga sepeda', 100, 'jerman', '/11. Recursive 1(1).pdf', '2023-12-14 06:01:01', '2023-12-30 12:10:11', '6566b6b8d8', 'diterima', NULL, '2023-11-26 20:20:23', '2023-11-26 20:20:23', 2, 2),
+(50, '2147483647', 'randododomm', 'Museum Anjuk Ladang ', 'kfjgjgifjfjgjgjjfififjfiffifjfjcjcjcjididifjfjfjfiififhcchcfufufuufuchchchvhchchucucucuc', 'hdhfhdjdjhfbccnc', 4, 'ggffghgff', 'uploads/pinjam/1000018257.jpg', '2023-12-15 01:30:00', '2023-12-30 06:00:00', '', 'proses', NULL, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 1, 32);
 
 -- --------------------------------------------------------
 
