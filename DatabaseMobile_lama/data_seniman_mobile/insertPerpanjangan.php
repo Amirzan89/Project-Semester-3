@@ -69,7 +69,7 @@ $nomor_induk = str_replace(['"', "'"], '', $nomor_induk);
 $namaLengkap = stripslashes($_POST['nama_lengkap']);
 $namaLengkap = str_replace(['"', "'"], '', $namaLengkap); 
 $nik = stripslashes($_POST['nik']);
-$nik = str_replace(['"', "'"], '', $nik); 
+$nik = str_replace(['"', "'"], '', $nik);   
 $id_seniman = stripslashes($_POST['id_seniman']);
 $id_seniman = str_replace(['"', "'"], '', $id_seniman); 
 $id_user = stripslashes($_POST['id_user']);
@@ -99,7 +99,7 @@ $sql = "SELECT * FROM users WHERE id_user = '$id_user' LIMIT 1";
 $result = $konek->query($sql);
 if ($result->num_rows < 1) {
     $response['status'] = 'error';
-    $response['message'] = 'Data Tidak Tersedia';
+    $response['message'] = 'User tidak ditemukan';
     echo json_encode($response);
     exit();
 }
@@ -109,19 +109,19 @@ if ($result->num_rows == 1) {
     $senimans = $result->fetch_assoc();
     if($namaLengkap !== $senimans['nama_seniman']){
         $response['status'] = 'error';
-        $response['message'] = 'Data Tidak Tersedia';
+        $response['message'] = 'Nama seniman tidak ditemukan';
         echo json_encode($response);
         exit();
     }
     if($nik !== base64_decode($senimans['nik'])){
         $response['status'] = 'error';
-        $response['message'] = 'Data Tidak Tersedia';
+        $response['message'] = 'NIK tidak ditemukan';
         echo json_encode($response);
         exit();
     }
     if($nomor_induk !== $senimans['nomor_induk']){
         $response['status'] = 'error';
-        $response['message'] = 'Data Tidak Tersedia';
+        $response['message'] = 'Nomor Induk Seniman tidak ditemukan';
         echo json_encode($response);
         exit();
     }

@@ -11,7 +11,7 @@ $conn = $database->getConnection();
 
 // // Rename 'tgl_awal' column to 'tgl_advis'
 // $queryRenameColumn = "ALTER TABLE `seniman` CHANGE COLUMN `nik` `nik` VARCHAR(500) NOT NULL";
-$queryRenameColumn = "ALTER TABLE `seniman` CHANGE COLUMN `nik` `nik` VARCHAR(500) NOT NULL";
+$queryRenameColumn = "ALTER TABLE `sewa_tempat` CHANGE COLUMN `nik_sewa` `nik_sewa` VARCHAR(500) NOT NULL";
 $stmtRenameColumn = $conn->prepare($queryRenameColumn);
 $stmtRenameColumn->execute();
 

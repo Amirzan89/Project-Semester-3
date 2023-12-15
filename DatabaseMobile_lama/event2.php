@@ -1,36 +1,29 @@
 <?php
 require('Koneksi.php');
+$nama_event = str_replace(['"', "'"], '', $_POST['nama_event']);
+$deskripsi = str_replace(['"', "'"], '', $_POST['deskripsi']);
+$tempat_event = str_replace(['"', "'"], '', $_POST['tempat_event']);
+$tanggal_awal = str_replace(['"', "'"], '', $_POST['tanggal_awal']);
+$tanggal_akhir = str_replace(['"', "'"], '', $_POST['tanggal_akhir']);
+$link_pendaftaran = str_replace(['"', "'"], '', $_POST['link_pendaftaran']);
+$poster_event = str_replace(['"', "'"], '', $_POST['poster_event']);
 
-$nama_pengirim = $_POST['nama_pengirim'];
-$status = $_POST['status'];
-// $id_detail = $_POST['id_detail'];
-$id_user = $_POST['id_user'];
+$poster_event = $_FILES['poster_event'];
+$posterDir = __DIR__.'/uploads/events/';
+// Mengunggah gambar poster
+$posterFileName = $posterDir . basename($poster_event['name']);
+move_uploaded_file($poster_event['tmp_name'], $posterFileName);
+
+$sql = "INSERT INTO detail_events (nama_event, deskripsi, tempat_event, tanggal_awal, tanggal_akhir, link_pendaftaran, poster_event)  VALUES ('$nama_event', '$deskripsi', '$tempat_event', '$tanggal_awal', '$tanggal_akhir', '$link_pendaftaran', '" . '/'.basename($poster_event['name']) . "')";
 
 $response = array();
-$sql = "SELECT id_detail FROM detail_events ORDER BY id_detail LIMIT 1";
-$result = $konek->query($sql);
-if ($result->num_rows == 1) {
-    $id = $result->fetch_assoc();
-    date_default_timezone_set('Asia/Jakarta');
-    $created_at = date('Y-m-d H:i:s');
-    if(isset($_POST['id_detail']) && !empty($_POST['id_detail'])){        
-        $sql = "INSERT INTO events (nama_pengirim, created_at, updated_at, status, id_user, id_detail)  VALUES ('$nama_pengirim', '$created_at', '$created_at','$status', '$id_user', '". $_POST['id_detail']."')";
-    }else{
-        $sql = "INSERT INTO events (nama_pengirim, created_at, updated_at, status, id_user, id_detail)  VALUES ('$nama_pengirim', '$created_at', '$created_at','$status', '$id_user', '". $id['id_detail']."')";
-    }
-
-    if ($konek->query($sql) === TRUE) {
-        $response["kode"] = 1;
-        $response["pesan"] = "Data telah berhasil dimasukkan.";
-
-
-    } else {
-        $response["kode"] = 2;
-        $response["pesan"] = "Error: " . $sql . "<br>" . $konek->error;
-    }
+if ($konek->query($sql) === TRUE) {
+    $response["kode"] = 1;
+    $response["pesan"] = "Data telah berhasil dimasukkan.";
+} else {
+    $response["kode"] = 2;
+    $response["pesan"] = "Error: " . $sql . "<br>" . $konek->error;
 }
-
 $konek->close();
-
 echo json_encode($response);
 ?>

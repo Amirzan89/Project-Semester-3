@@ -37,7 +37,7 @@ if ($result->num_rows == 1) {
     $senimans = $result->fetch_assoc();
     if($namaLengkap !== $senimans['nama_seniman']){
         $response['status'] = 'error';
-        $response['message'] = 'Data Tidak Tersedia';
+        $response['message'] = 'Nama seniman tidak ditemukan';
         echo json_encode($response);
         exit();
     }

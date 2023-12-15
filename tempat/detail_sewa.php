@@ -130,7 +130,7 @@ if ($userAuth['status'] == 'error') {
                                     <div class="col-md-12">
                                         <label for="nik_sewa" class="form-label">Nomor Induk Kependudukan</label>
                                         <div class="col-sm-12">
-                                            <input type="text" class="form-control" readonly value="<?php echo $sewa['nik_sewa'] ?>">
+                                            <input type="text" class="form-control" readonly value="<?php echo base64_decode($sewa['nik_sewa']) ?>">
                                         </div>
                                     </div>
                                     <br>
@@ -180,8 +180,8 @@ if ($userAuth['status'] == 'error') {
                                         <br>
                                         <div class="col-md-6">
                                             <label for="tgl_akhir_peminjaman" class="form-label">Waktu Akhir</label>
-                                            <input type="time-local" class="form-control" readonly value="<?php echo $sewa['waktu_akhir'] ?>">
-                                        </div>
+                                            <input type="time-loc   al" class="form-control" readonly value="<?php echo $sewa['waktu_akhir'] ?>">
+                                        </div>  
                                         <br>
                                         <div class="col-md-12">
                                             <label for="surat_keterangan" class="form-label">Surat Keterangan</label>
