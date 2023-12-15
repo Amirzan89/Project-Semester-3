@@ -7,7 +7,7 @@ $response = array();
 
 $id_user = $_GET["id_user"];
 
-$sql = "SELECT e.id_event, e.nama_pengirim, e.status, d.*
+$sql = "SELECT e.id_event, e.nama_pengirim, e.status, e.catatan, d.*
 FROM events AS e
 JOIN detail_events AS d 
 ON d.id_detail = e.id_detail 
