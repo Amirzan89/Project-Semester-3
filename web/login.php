@@ -24,7 +24,6 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 if(isset($_POST['login'])){
     try{
         $email = htmlspecialchars($_POST["email"]);
-        // $email = "Admin@gmail.com";
         $pass = $_POST["password"];
         $pass = "Admin@1234567890";
         if(!isset($email) || empty($email)){
@@ -42,13 +41,22 @@ if(isset($_POST['login'])){
         }else{
             $db = Koneksi::getInstance();
             $con = $db->getConnection();
-            $query = "SELECT password FROM users WHERE BINARY email = ? LIMIT 1";
+            $query = "SELECT role, password FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = $con->prepare($query);
             $stmt[0]->bind_param('s', $email);
             $stmt[0]->execute();
+            $roleDB = '';
             $passDb = '';
-            $stmt[0]->bind_result($passDb);
+            $stmt[0]->bind_result($roleDB, $passDb);
             if ($stmt[0]->fetch()) {
+                //check role user
+                if($roleDB === 'masyarakat'){
+                    $stmt[0]->close();
+                    echo "<script>alert('Anda bukan admin')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }
+                //check password
                 if(!password_verify($pass,$passDb)){
                     $stmt[0]->close();
                     echo "<script>alert('Password salah')</script>";
@@ -107,7 +115,7 @@ if(isset($_POST['login'])){
             }
         }
         echo "<script>alert('".json_encode($responseData)."')</script>";
-        echo "<script>window.history.back();</script>";
+        // echo "<script>window.history.back();</script>";
         exit();
     }
 }
