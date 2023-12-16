@@ -115,7 +115,6 @@ if(isset($_POST['login'])){
             }
         }
         echo "<script>alert('".json_encode($responseData)."')</script>";
-        // echo "<script>window.history.back();</script>";
         exit();
     }
 }
