@@ -24,7 +24,7 @@
             <?php 
               }else if(isset($userAuth['jenis_kelamin']) && $userAuth['jenis_kelamin'] === 'perempuan'){
             ?>
-                <img src="/private/profile/admin/default_girl.jpg" alt="Profile" class="rounded-circle">
+                <img src="/private/profile/admin/default_girl.png" alt="Profile" class="rounded-circle">
             <?php }
             } ?>
             <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $userAuth['nama_lengkap']?></span>

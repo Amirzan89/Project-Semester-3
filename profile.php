@@ -178,7 +178,7 @@ if ($userAuth['status'] == 'error') {
                     <?php 
                     }else if(isset($userAuth['jenis_kelamin']) && $userAuth['jenis_kelamin'] === 'perempuan'){
                     ?>
-                      <img src="/private/profile/admin/default_girl.jpg" alt="Profile" class="">
+                      <img src="/private/profile/admin/default_girl.png" alt="Profile" class="">
                   <?php } 
                   } ?>
                     <h2>
@@ -262,7 +262,7 @@ if ($userAuth['status'] == 'error') {
                             <?php 
                             }else if(isset($userAuth['jenis_kelamin']) && $userAuth['jenis_kelamin'] === 'perempuan'){
                             ?>
-                              <img src="/private/profile/admin/default_girl.jpg" alt="Profile" id="inpImg" class="">
+                              <img src="/private/profile/admin/default_girl.png" alt="Profile" id="inpImg" class="">
                           <?php }
                           } ?>
                         </div>
