@@ -160,6 +160,11 @@ class EventWebsite{
                     echo "<script>alert('Keterangan invalid !')</script>";
                     echo "<script>window.history.back();</script>";
                     exit();
+                }else if(!in_array($data['keterangan'],['proses','diterima','ditolak'])){
+                    http_response_code(400);
+                    echo "<script>alert('Keterangan invalid !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
                 }
             }
             //check user

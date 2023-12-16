@@ -128,9 +128,10 @@ if ($result->num_rows == 1) {
 }
 $today = date('Y-m-d'); // Mengambil tanggal hari ini
 $tgl_pembuatan = $today;
+$nik = base64_encode($nik);
 // Menggunakan prepared statement dengan menyebutkan nama kolom
-$query = "INSERT INTO perpanjangan (id_seniman, status, ktp_seniman, surat_keterangan,pass_foto, tgl_pembuatan, id_user)
-                          VALUES ('$id_seniman', '$status','$ktpName','$suratName','$fotoName','$tgl_pembuatan','$id_user')";
+$query = "INSERT INTO perpanjangan (id_seniman, nik, status, ktp_seniman, surat_keterangan,pass_foto, tgl_pembuatan, id_user)
+                          VALUES ('$id_seniman', '$nik','$status','$ktpName','$suratName','$fotoName','$tgl_pembuatan','$id_user')";
 
 // Menggunakan bind_param dengan variabel
 // $query->bind_param("is", $id_seniman, $status);

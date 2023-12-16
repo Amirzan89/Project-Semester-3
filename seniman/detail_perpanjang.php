@@ -20,13 +20,15 @@ if ($userAuth['status'] == 'error') {
     }
     $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
     $csrf = $GLOBALS['csrf'];
-    if (isset($_GET['id_seniman']) && !empty($_GET['id_seniman'])) {
-        $id = $_GET['id_seniman'];
-        // $sql = mysqli_query($conn, "SELECT id_perpanjangan, nik, nomor_induk, nama_seniman, jenis_kelamin, tempat_lahir, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota, status, catatan FROM perpanjangan WHERE id_perpanjangan = '$id'");
-        $sql = mysqli_query($conn, "SELECT id_perpanjangan, perpanjangan.nik AS nik, nama_seniman, nomor_induk, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE seniman.id_seniman = '$id'");
-        $perpanjangan = mysqli_fetch_assoc($sql);
-        // echo json_encode($perpanjangan);
-        // exit();
+    if (isset($_GET['id_perpanjangan']) && !empty($_GET['id_perpanjangan'])) {
+        $id = $_GET['id_perpanjangan'];
+        $sql = mysqli_query($conn, "SELECT seniman.id_seniman, perpanjangan.nik AS nik, nama_seniman, nomor_induk, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE id_perpanjangan = '$id'");
+        if (mysqli_num_rows($sql) > 0) {
+            $perpanjangan = mysqli_fetch_assoc($sql);
+        } else {
+            header("Location: /seniman.php");
+            exit();
+        }
     } else {
         header('Location: /seniman.php');
     }
@@ -181,12 +183,12 @@ if ($userAuth['status'] == 'error') {
                                                 <!-- <a href="/seniman/riwayat.php" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a> -->
                                             <?php } ?>
                                             <?php if ($perpanjangan['status'] == 'diajukan') { ?>
-                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses(<?php echo $perpanjangan['id_perpanjangan'] ?>)">Proses
+                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses(<?php echo $perpanjangan['id_seniman'] ?>)">Proses
                                                 </button>
                                             <?php } else if ($perpanjangan['status'] == 'proses') { ?>
-                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju(<?php echo $perpanjangan['id_perpanjangan'] ?>)">Terima
+                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju(<?php echo $perpanjangan['id_seniman'] ?>)">Terima
                                                 </button>
-                                                <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak(<?php echo $perpanjangan['id_perpanjangan'] ?>)">Tolak
+                                                <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak(<?php echo $perpanjangan['id_seniman'] ?>)">Tolak
                                                 </button>
                                             <?php } ?>
                                         </div>
@@ -214,7 +216,8 @@ if ($userAuth['status'] == 'error') {
                     <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
                         <input type="hidden" name="_method" value="PUT">
                         <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
-                        <input type="hidden" name="id_perpanjangan" id="inpSenimanP">
+                        <input type="hidden" name="id_perpanjangan" value="<?php echo $id ?>">
+                        <input type="hidden" name="id_seniman" id="inpSenimanP">
                         <input type="hidden" name="keterangan" value="proses">
                         <button type="submit" class="btn btn-tambah">Proses</button>
                     </form>
@@ -240,6 +243,7 @@ if ($userAuth['status'] == 'error') {
                     <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
                         <input type="hidden" name="_method" value="PUT">
                         <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_perpanjangan" value="<?php echo $id ?>">
                         <input type="hidden" name="id_seniman" id="inpSenimanS">
                         <input type="hidden" name="keterangan" value="diterima">
                         <input type="hidden" name="desc" value="perpanjangan">
@@ -255,26 +259,26 @@ if ($userAuth['status'] == 'error') {
     <div class="modal fade" id="modalTolak" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Tolak Pengajuan</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" style="text-align: left;">
-                    <label for="catatan" class="form-label">Alasan penolakan</label>
-                    <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alasan Penolakan" style="height: 100px;"></textarea>
-                </div>
-                <div class="modal-footer">
+                <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Tolak Pengajuan</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" style="text-align: left;">
+                        <label for="catatan" class="form-label">Alasan penolakan</label>
+                        <textarea class="form-control" name="catatan" id="alamat_seniman" placeholder="Masukkan Alasan Penolakan" style="height: 100px;"></textarea>
+                    </div>
+                    <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
                         <input type="hidden" name="_method" value="PUT">
                         <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                        <input type="hidden" name="id_perpanjangan" value="<?php echo $id ?>">
                         <input type="hidden" name="id_seniman" id="inpSenimanT">
-                        <input type="hidden" name="catatan" value="terserah">
                         <input type="hidden" name="keterangan" value="ditolak">
                         <input type="hidden" name="desc" value="perpanjangan">
                         <button type="submit" class="btn btn-tolak">Tolak</button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

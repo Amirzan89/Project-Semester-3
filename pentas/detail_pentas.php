@@ -23,7 +23,12 @@ if ($userAuth['status'] == 'error') {
   if (isset($_GET['id_pentas']) && !empty($_GET['id_pentas'])) {
     $id  = $_GET['id_pentas'];
     $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, kode_verifikasi, DATE_FORMAT(tgl_advis, '%d %M %Y') AS tgl_advis, tempat_advis, status, catatan FROM surat_advis WHERE id_advis = '$id' LIMIT 1");
-    $pentas = mysqli_fetch_assoc($sql);
+    if (mysqli_num_rows($sql) > 0) {
+      $pentas = mysqli_fetch_assoc($sql);
+  } else {
+      header("Location: /seniman.php");
+      exit();
+  }
   } else {
     header('Location: /pentas.php');
   }

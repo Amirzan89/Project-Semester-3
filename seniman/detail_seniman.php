@@ -23,7 +23,12 @@ if ($userAuth['status'] == 'error') {
     if (isset($_GET['id_seniman']) && !empty($_GET['id_seniman'])) {
         $id = $_GET['id_seniman'];
         $sql = mysqli_query($conn, "SELECT id_seniman, nik, nomor_induk, nama_seniman, jenis_kelamin, tempat_lahir, nama_kategori AS kategori, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota, kecamatan, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE id_seniman = '$id'");
-        $seniman = mysqli_fetch_assoc($sql);
+        if (mysqli_num_rows($sql) > 0) {
+            $seniman = mysqli_fetch_assoc($sql);
+        } else {
+            header("Location: /seniman.php");
+            exit();
+        }
     } else {
         header('Location: /seniman.php');
     }

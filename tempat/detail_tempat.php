@@ -23,7 +23,12 @@ if ($userAuth['status'] == 'error') {
     if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
         $id  = $_GET['id_tempat'];
         $sql  = mysqli_query($conn, "SELECT * FROM list_tempat WHERE `id_tempat` = '" . $id . "'");
-        $tempat = mysqli_fetch_assoc($sql);
+        if (mysqli_num_rows($sql) > 0) {
+            $tempat = mysqli_fetch_assoc($sql);
+        } else {
+            header("Location: /seniman.php");
+            exit();
+        }
     } else {
         header('Location: /tempat/data_tempat.php');
     }

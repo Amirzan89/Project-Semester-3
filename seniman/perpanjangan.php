@@ -170,9 +170,9 @@ if($userAuth['status'] == 'error'){
                       </td>
                       <td>
                       <?php if($seniman['status'] == 'diajukan'){ ?>
-                          <button class="btn btn-lihat" onclick="proses(<?php echo $seniman['id_seniman'] ?>)"><i class="bi bi-eye-fill"></i>   Lihat</button>
+                          <button class="btn btn-lihat" onclick="proses(<?php echo $seniman['id_seniman'] ?>,<?php echo $seniman['id_perpanjangan'] ?>)"><i class="bi bi-eye-fill"></i>   Lihat</button>
                         <?php }else if($seniman['status'] == 'proses'){ ?>
-                          <a href="/seniman/detail_perpanjang.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
+                          <a href="/seniman/detail_perpanjang.php?id_perpanjangan=<?= $seniman['id_perpanjangan'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
                         <?php } ?>
                       </td>
                     </tr>
@@ -339,12 +339,13 @@ if($userAuth['status'] == 'error'){
         }, 250);
       }, 50);
     }
-    function proses(Id) {
+    function proses(IdSeniman, Idperpanjangan) {
       var xhr = new XMLHttpRequest();
       var requestBody = {
         _method: 'PUT',
         id_user: idUser,
-        id_seniman: Id,
+        id_seniman: IdSeniman,
+        id_perpanjangan: Idperpanjangan,
         desc:'perpanjangan',
         keterangan: 'proses',
       };
@@ -357,9 +358,7 @@ if($userAuth['status'] == 'error'){
       xhr.onreadystatechange = function () {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
-// console.log(requestBody);
-            // console.log(xhr.responseText);
-            // window.location.href = "/seniman/detail_perpanjang.php?id_seniman="+Id;
+            window.location.href = "/seniman/detail_perpanjang.php?id_perpanjangan="+Idperpanjangan;
           } else {
             console.log(xhr.responseText);
             try {

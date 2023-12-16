@@ -23,7 +23,12 @@ if ($userAuth['status'] == 'error') {
   if (isset($_GET['id_event']) && !empty($_GET['id_event'])) {
     $id = $_GET['id_event'];
     $sql = mysqli_query($conn, "SELECT id_event, nama_pengirim, status, catatan, events.id_detail, id_event, nama_event, deskripsi, tempat_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, link_pendaftaran FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = '$id'");
-    $events = mysqli_fetch_assoc($sql);
+    if (mysqli_num_rows($sql) > 0) {
+      $events = mysqli_fetch_assoc($sql);
+  } else {
+      header("Location: /seniman.php");
+      exit();
+  }
   } else {
     header('Location: /event.php');
   }

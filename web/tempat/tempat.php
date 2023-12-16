@@ -848,8 +848,6 @@ class TempatWebsite{
     //khusus admin Tempat dan super admin
     public static function prosesSewaTempat($data){
         try{
-            // echo json_encode($data);
-            // exit();
             if(!isset($data['id_user']) || empty($data['id_user'])){
                 echo "<script>alert('ID User harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
@@ -866,6 +864,10 @@ class TempatWebsite{
                 exit();
             }else{
                 if($data['keterangan'] == 'diajukan'){
+                    echo "<script>alert('Keterangan invalid !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }else if(!in_array($data['keterangan'],['proses','diterima','ditolak'])){
                     echo "<script>alert('Keterangan invalid !')</script>";
                     echo "<script>window.history.back();</script>";
                     exit();

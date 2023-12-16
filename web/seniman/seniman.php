@@ -974,6 +974,11 @@ class SenimanWebsite{
                     echo "<script>alert('Keterangan invalid !')</script>";
                     echo "<script>window.history.back();</script>";
                     exit();
+                }else if(!in_array($data['keterangan'],['proses','diterima','ditolak'])){
+                    http_response_code(400);
+                    echo "<script>alert('Keterangan invalid !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
                 }
             }
             //check user
@@ -1550,12 +1555,21 @@ class SenimanWebsite{
                 echo "<script>window.history.back();</script>";
                 exit();
             }
+            if(!isset($data['id_perpanjangan']) || empty($data['id_perpanjangan'])){
+                echo "<script>alert('ID Perpanjangan harus di isi !')</script>";
+                echo "<script>window.history.back();</script>";
+                exit();
+            }
             if(!isset($data['keterangan']) || empty($data['keterangan'])){
                 echo "<script>alert('Keterangan harus di isi !')</script>";
                 echo "<script>window.history.back();</script>";
                 exit();
             }else{
                 if($data['keterangan'] == 'diajukan'){
+                    echo "<script>alert('Keterangan invalid !')</script>";
+                    echo "<script>window.history.back();</script>";
+                    exit();
+                }else if(!in_array($data['keterangan'],['proses','diterima','ditolak'])){
                     echo "<script>alert('Keterangan invalid !')</script>";
                     echo "<script>window.history.back();</script>";
                     exit();
@@ -1622,9 +1636,9 @@ class SenimanWebsite{
                 exit();
             }
             //check perpanjangan
-            $query = "SELECT status FROM perpanjangan WHERE id_seniman = ?";
+            $query = "SELECT status FROM perpanjangan WHERE id_perpanjangan = ?";
             $stmt[2] = self::$con->prepare($query);
-            $stmt[2]->bind_param('s', $data['id_seniman']);
+            $stmt[2]->bind_param('s', $data['id_perpanjangan']);
             $stmt[2]->execute();
             $statusPDB = '';
             $stmt[2]->bind_result($statusPDB);
@@ -1668,27 +1682,28 @@ class SenimanWebsite{
             // }
             //update data
             $redirect = '/perpanjangan.php';
-            if($data['keterangan'] == 'proses'){
-                if(isset($data['catatan']) || !empty($data['catatan'])){
-                    $data['catatan'] = '';
+            if($data['keterangan'] != 'diterima'){
+                if($data['keterangan'] == 'proses'){
+                    if(isset($data['catatan']) || !empty($data['catatan'])){
+                        $data['catatan'] = '';
+                    }
+                    $status = 'proses';
+                    $query = "UPDATE perpanjangan SET kode_verifikasi = ?, status = ?, catatan = ? WHERE id_perpanjangan = ?";
+                    $stmt[7] = self::$con->prepare($query);
+                    $code = '';
+                    $stmt[7]->bind_param("sssi", $code, $status, $data['catatan'], $data['id_perpanjangan']);
+                }else if($data['keterangan'] == 'ditolak'){
+                    if(!isset($data['catatan']) || empty($data['catatan'])){
+                        echo "<script>alert('Catatan harus di isi !')</script>";
+                        echo "<script>window.history.back();</script>";
+                        exit();
+                    }
+                    $status = 'ditolak';
+                    $query = "UPDATE perpanjangan SET kode_verifikasi = ?, status = ?, catatan = ? WHERE id_perpanjangan = ?";
+                    $stmt[7] = self::$con->prepare($query);
+                    $code = '';
+                    $stmt[7]->bind_param("sssi", $code, $status, $data['catatan'], $data['id_perpanjangan']);
                 }
-                $status = 'proses';
-                $query = "UPDATE perpanjangan SET kode_verifikasi = ?, status = ?, catatan = ? WHERE id_seniman = ?";
-                $stmt[7] = self::$con->prepare($query);
-                $code = '';
-                $stmt[7]->bind_param("sssi", $code, $status, $data['catatan'], $data['id_seniman']);
-            }else if($data['keterangan'] == 'ditolak'){
-                if(!isset($data['catatan']) || empty($data['catatan'])){
-                    echo "<script>alert('Catatan harus di isi !')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
-                }
-                $status = 'ditolak';
-                $query = "UPDATE perpanjangan SET kode_verifikasi = ?, status = ?, catatan = ? WHERE id_seniman = ?";
-                $stmt[7] = self::$con->prepare($query);
-                $code = '';
-                $stmt[7]->bind_param("sssi", $code, $status, $data['catatan'], $data['id_seniman']);
-            }
                 $stmt[7]->execute();
                 if ($stmt[7]->affected_rows > 0) {
                     $stmt[7]->close();
@@ -1701,53 +1716,55 @@ class SenimanWebsite{
                     echo "<script>window.location.href = '/seniman". $redirect . "'; </script>";
                     exit();
                 }
-            
-            if($data['keterangan'] == 'diterima'){
-                if(isset($data['catatan']) || !empty($data['catatan'])){
-                    $data['catatan'] = '';
-                }
-                //tambah histori
-                $query = "INSERT INTO histori_nis (nis, tahun, id_seniman) VALUES (?, ?, ?)";
-                $stmt[4] = self::$con->prepare($query);
-                $tahun = explode("/", $nomorIndukDB);
-                $tahun = end($tahun);
-                $stmt[4]->bind_param("sss", $nomorIndukDB, $tahun, $data['id_seniman']);
-                $stmt[4]->execute();
-                if (!$stmt[4]->affected_rows > 0) {
-                    $stmt[4]->close();
-                    echo "<script>alert('Error tambah data histori nomor induk !')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
-                }
-                //hapus data perpanjangan
-                $query = "DELETE FROM perpanjangan WHERE id_seniman = ?";
-                $stmt[5] = self::$con->prepare($query);
-                $stmt[5]->bind_param('s', $data['id_seniman']);
-                if (!$stmt[5]->execute()) {
+            }else{
+                // exit();
+                if($data['keterangan'] == 'diterima'){
+                    if(isset($data['catatan']) || !empty($data['catatan'])){
+                        $data['catatan'] = '';
+                    }
+                    //tambah histori
+                    $query = "INSERT INTO histori_nis (nis, tahun, id_seniman) VALUES (?, ?, ?)";
+                    $stmt[4] = self::$con->prepare($query);
+                    $tahun = explode("/", $nomorIndukDB);
+                    $tahun = end($tahun);
+                    $stmt[4]->bind_param("sss", $nomorIndukDB, $tahun, $data['id_seniman']);
+                    $stmt[4]->execute();
+                    if (!$stmt[4]->affected_rows > 0) {
+                        $stmt[4]->close();
+                        echo "<script>alert('Error tambah data histori nomor induk !')</script>";
+                        echo "<script>window.history.back();</script>";
+                        exit();
+                    }
+                    //hapus data perpanjangan
+                    $query = "DELETE FROM perpanjangan WHERE id_perpanjangan = ?";
+                    $stmt[5] = self::$con->prepare($query);
+                    $stmt[5]->bind_param('s', $data['id_perpanjangan']);
+                    if (!$stmt[5]->execute()) {
+                        $stmt[5]->close();
+                        echo "<script>alert('Error hapus data perpanjangan seniman')</script>";
+                        echo "<script>window.history.back();</script>";
+                        exit();
+                    }
                     $stmt[5]->close();
-                    echo "<script>alert('Error hapus data perpanjangan seniman')</script>";
-                    echo "<script>window.history.back();</script>";
-                    exit();
-                }
-                $stmt[5]->close();
-                //update nis 
-                $query = "UPDATE seniman SET nomor_induk = ?, kode_verifikasi = ? WHERE id_seniman = ?";
-                $nomorInduk = $this->generateNIS(['kategori'=>$idKategori],'perpanjangan');
-                $stmt[6] = self::$con->prepare($query);
-                $code = substr(uniqid(), 0 ,10);
-                $stmt[6]->bind_param("ssi", $nomorInduk['nis'], $code, $data['id_seniman']);
-                $stmt[6]->execute();
-                if (!$stmt[6]->affected_rows > 0) {
+                    //update nis
+                    $query = "UPDATE seniman SET nomor_induk = ?, kode_verifikasi = ? WHERE id_seniman = ?";
+                    $nomorInduk = $this->generateNIS(['id_kategori'=>$idKategori],'perpanjangan');
+                    $stmt[6] = self::$con->prepare($query);
+                    $code = substr(uniqid(), 0 ,10);
+                    $stmt[6]->bind_param("ssi", $nomorInduk['nis'], $code, $data['id_seniman']);
+                    $stmt[6]->execute();
+                    if (!$stmt[6]->affected_rows > 0) {
+                        $stmt[6]->close();
+                        echo "<script>alert('Status gagal diubah')</script>";
+                        echo "<script>window.location.href = '/seniman". $redirect . "'; </script>";
+                        exit();
+                    }
                     $stmt[6]->close();
-                    echo "<script>alert('Status gagal diubah')</script>";
+                    $redirect = '/perpanjangan.php';
+                    echo "<script>alert('Status berhasil diubah')</script>";
                     echo "<script>window.location.href = '/seniman". $redirect . "'; </script>";
                     exit();
                 }
-                $stmt[6]->close();
-                $redirect = '/perpanjangan.php';
-                echo "<script>alert('Status berhasil diubah')</script>";
-                echo "<script>window.location.href = '/seniman". $redirect . "'; </script>";
-                exit();
             }
         }catch(Exception $e){
             $error = $e->getMessage();

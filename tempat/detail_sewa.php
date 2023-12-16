@@ -24,7 +24,12 @@ if ($userAuth['status'] == 'error') {
     if (isset($_GET['id_sewa']) && !empty($_GET['id_sewa'])) {
         $id  = $_GET['id_sewa'];
         $sql = mysqli_query($conn, "SELECT id_sewa, nik_sewa, nama_peminjam, nama_tempat, deskripsi_sewa_tempat, nama_kegiatan_sewa, jumlah_peserta, instansi, DATE_FORMAT(tgl_awal_peminjaman, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tgl_awal_peminjaman, '%H:%i') AS waktu_awal, kode_pinjam, DATE_FORMAT(tgl_akhir_peminjaman, '%d %M %Y') AS tanggal_akhir, DATE_FORMAT(tgl_akhir_peminjaman, '%H:%i') AS waktu_akhir, status, catatan FROM sewa_tempat WHERE id_sewa = '$id'");
-        $sewa = mysqli_fetch_assoc($sql);
+        if (mysqli_num_rows($sql) > 0) {
+            $sewa = mysqli_fetch_assoc($sql);
+        } else {
+            header("Location: /seniman.php");
+            exit();
+        }
     } else {
         header('Location: /tempat.php');
     }
