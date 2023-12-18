@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../web/koneksi.php');
 require_once(__DIR__ . '/../web/authenticate.php');
 require_once(__DIR__ . '/../env.php');
+require_once(__DIR__ . '/../Date.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -155,9 +156,10 @@ if ($userAuth['status'] == 'error') {
                 </thead>
                 <tbody id="tablePentas">
                   <?php
-                  $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_verifikasi FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
+                  $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE(created_at) AS tanggal, status, catatan, kode_verifikasi FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
                   $no = 1;
-                  while ($pentas = mysqli_fetch_array($query)) {
+                  $pentasData = changeMonth(mysqli_fetch_all($query, MYSQLI_ASSOC));
+                  foreach ($pentasData as $pentas) {
                   ?>
                     <tr>
                       <td><?php echo $no ?></td>

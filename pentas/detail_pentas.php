@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../web/koneksi.php');
 require_once(__DIR__ . '/../web/authenticate.php');
 require_once(__DIR__ . '/../env.php');
+require_once(__DIR__ . '/../Date.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -22,11 +23,12 @@ if ($userAuth['status'] == 'error') {
   $csrf = $GLOBALS['csrf'];
   if (isset($_GET['id_pentas']) && !empty($_GET['id_pentas'])) {
     $id  = $_GET['id_pentas'];
-    $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, kode_verifikasi, DATE_FORMAT(tgl_advis, '%d %M %Y') AS tgl_advis, tempat_advis, status, catatan FROM surat_advis WHERE id_advis = '$id' LIMIT 1");
+    $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, kode_verifikasi, DATE(tgl_advis) AS tanggal, tempat_advis, status, catatan FROM surat_advis WHERE id_advis = '$id' LIMIT 1");
     if (mysqli_num_rows($sql) > 0) {
-      $pentas = mysqli_fetch_assoc($sql);
+      $pentas = changeMonth(mysqli_fetch_all($sql, MYSQLI_ASSOC))[0];
+      // $pentas = mysqli_fetch_assoc($sql);
   } else {
-      header("Location: /seniman.php");
+      header("Location: /pentas.php");
       exit();
   }
   } else {
@@ -153,7 +155,7 @@ if ($userAuth['status'] == 'error') {
                 <br>
                 <div class="col-md-12">
                   <label for="tgl_awal_peminjaman" class="form-label">Tanggal</label>
-                  <input type="text" class="form-control" readonly value="<?php echo $pentas['tgl_advis'] ?>">
+                  <input type="text" class="form-control" readonly value="<?php echo $pentas['tanggal'] ?>">
                 </div>
                 <br>
                 <div class="col-md-12">

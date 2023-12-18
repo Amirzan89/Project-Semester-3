@@ -26,7 +26,7 @@ if ($userAuth['status'] == 'error') {
         if (mysqli_num_rows($sql) > 0) {
             $tempat = mysqli_fetch_assoc($sql);
         } else {
-            header("Location: /seniman.php");
+            header("Location: /tempat.php");
             exit();
         }
     } else {

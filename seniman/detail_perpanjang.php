@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../web/koneksi.php');
 require_once(__DIR__ . '/../web/authenticate.php');
 require_once(__DIR__ . '/../env.php');
+require_once(__DIR__ . '/../Date.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -22,9 +23,9 @@ if ($userAuth['status'] == 'error') {
     $csrf = $GLOBALS['csrf'];
     if (isset($_GET['id_perpanjangan']) && !empty($_GET['id_perpanjangan'])) {
         $id = $_GET['id_perpanjangan'];
-        $sql = mysqli_query($conn, "SELECT seniman.id_seniman, perpanjangan.nik AS nik, nama_seniman, nomor_induk, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE id_perpanjangan = '$id'");
+        $sql = mysqli_query($conn, "SELECT seniman.id_seniman, perpanjangan.nik AS nik, nama_seniman, nomor_induk, DATE(perpanjangan.tgl_pembuatan) AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE id_perpanjangan = '$id'");
         if (mysqli_num_rows($sql) > 0) {
-            $perpanjangan = mysqli_fetch_assoc($sql);
+            $perpanjangan = changeMonth(mysqli_fetch_all($sql, MYSQLI_ASSOC))[0];
         } else {
             header("Location: /seniman.php");
             exit();

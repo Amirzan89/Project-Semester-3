@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../web/koneksi.php');
 require_once(__DIR__ . '/../web/authenticate.php');
 require_once(__DIR__ . '/../env.php');
+require_once(__DIR__ . '/../Date.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -22,9 +23,9 @@ if ($userAuth['status'] == 'error') {
     $csrf = $GLOBALS['csrf'];
     if (isset($_GET['id_seniman']) && !empty($_GET['id_seniman'])) {
         $id = $_GET['id_seniman'];
-        $sql = mysqli_query($conn, "SELECT id_seniman, nik, nomor_induk, nama_seniman, jenis_kelamin, tempat_lahir, nama_kategori AS kategori, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota, kecamatan, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE id_seniman = '$id'");
+        $sql = mysqli_query($conn, "SELECT id_seniman, nik, nomor_induk, nama_seniman, jenis_kelamin, tempat_lahir, nama_kategori AS kategori, DATE(tanggal_lahir) AS tanggal, alamat_seniman, no_telpon, nama_organisasi, jumlah_anggota, kecamatan, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE id_seniman = '$id'");
         if (mysqli_num_rows($sql) > 0) {
-            $seniman = mysqli_fetch_assoc($sql);
+            $seniman = changeMonth(mysqli_fetch_all($sql, MYSQLI_ASSOC))[0];
         } else {
             header("Location: /seniman.php");
             exit();
@@ -161,7 +162,7 @@ if ($userAuth['status'] == 'error') {
                                     <br>
                                     <div class="col-md-4">
                                         <label for="tanggal_lahir" class="form-label">Tanggal lahir</label>
-                                        <input type="text" class="form-control" id="tanggal_lahir" readonly value="<?php echo $seniman['tanggal_lahir'] ?>">
+                                        <input type="text" class="form-control" id="tanggal_lahir" readonly value="<?php echo $seniman['tanggal'] ?>">
                                     </div>
                                     <br>
                                     <div class="col-mb-3 mt-0">

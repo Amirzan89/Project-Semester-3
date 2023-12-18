@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../web/koneksi.php');
 require_once(__DIR__ . '/../web/authenticate.php');
 require_once(__DIR__ . '/../env.php');
+require_once(__DIR__ . '/../Date.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -22,11 +23,11 @@ if ($userAuth['status'] == 'error') {
   $csrf = $GLOBALS['csrf'];
   if (isset($_GET['id_event']) && !empty($_GET['id_event'])) {
     $id = $_GET['id_event'];
-    $sql = mysqli_query($conn, "SELECT id_event, nama_pengirim, status, catatan, events.id_detail, id_event, nama_event, deskripsi, tempat_event, DATE_FORMAT(tanggal_awal, '%d %M %Y') AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, link_pendaftaran FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = '$id'");
+    $sql = mysqli_query($conn, "SELECT id_event, nama_pengirim, status, catatan, events.id_detail, id_event, nama_event, deskripsi, tempat_event, DATE(tanggal_awal) AS tanggal_awal, DATE(tanggal_akhir) AS tanggal_akhir, link_pendaftaran FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE id_event = '$id'");
     if (mysqli_num_rows($sql) > 0) {
-      $events = mysqli_fetch_assoc($sql);
+      $events = changeMonth(mysqli_fetch_all($sql, MYSQLI_ASSOC))[0];
   } else {
-      header("Location: /seniman.php");
+      header("Location: /event.php");
       exit();
   }
   } else {

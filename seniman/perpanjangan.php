@@ -2,6 +2,7 @@
 require_once(__DIR__.'/../web/koneksi.php');
 require_once(__DIR__.'/../web/authenticate.php');
 require_once(__DIR__.'/../env.php');
+require_once(__DIR__.'/../Date.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -153,9 +154,10 @@ if($userAuth['status'] == 'error'){
                   </thead>
                   <tbody>
                   <?php
-                      $query = mysqli_query($conn, "SELECT seniman.id_seniman AS id_seniman, id_perpanjangan, nama_seniman, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'diajukan' OR perpanjangan.status = 'proses' ORDER BY id_perpanjangan DESC");
+                      $query = mysqli_query($conn, "SELECT seniman.id_seniman AS id_seniman, id_perpanjangan, nama_seniman, DATE(perpanjangan.tgl_pembuatan) AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'diajukan' OR perpanjangan.status = 'proses' ORDER BY id_perpanjangan DESC");
                       $no = 1;
-                      while ($seniman = mysqli_fetch_array($query)) {
+                      $senimanData = changeMonth(mysqli_fetch_all($query, MYSQLI_ASSOC));
+                      foreach ($senimanData as $seniman) {
                   ?>
                     <tr>
                       <td><?php echo $no?></td>

@@ -2,6 +2,7 @@
 require_once(__DIR__.'/../web/koneksi.php');
 require_once(__DIR__.'/../web/authenticate.php');
 require_once(__DIR__.'/../env.php');
+require_once(__DIR__.'/../Date.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -24,7 +25,8 @@ if($userAuth['status'] == 'error'){
   if (isset($_GET['id_user']) && !empty($_GET['id_user'])) {
     $id  = $_GET['id_user'];
     $sql  = mysqli_query($conn, "SELECT * FROM users WHERE id_user = '$id'");
-    $users = mysqli_fetch_assoc($sql);
+    $events = changeMonth(mysqli_fetch_all($sql, MYSQLI_ASSOC))[0];
+    // $users = mysqli_fetch_assoc($sql);
   }else{
     header('Location: /admin.php');
   }

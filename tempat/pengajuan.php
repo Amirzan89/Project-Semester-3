@@ -2,6 +2,7 @@
 require_once(__DIR__.'/../web/koneksi.php');
 require_once(__DIR__.'/../web/authenticate.php');
 require_once(__DIR__.'/../env.php');
+require_once(__DIR__.'/../Date.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -153,10 +154,10 @@ if($userAuth['status'] == 'error'){
                                 </thead>
                                 <tbody id="tableSewa">
                                   <?php
-                                    // $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM sewa_tempat WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ".date('m')." AND YEAR(created_at) = ".date('Y')." ORDER BY id_sewa DESC");
                                     $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_sewa DESC");
                                     $no = 1;
-                                    while ($sewa = mysqli_fetch_array($query)) {
+                                    $sewaData = changeMonth(mysqli_fetch_all($query, MYSQLI_ASSOC));
+                                    foreach ($sewaData as $sewa) {
                                   ?>
                                     <tr>
                                         <td><?php echo $no; ?></td>
