@@ -248,70 +248,11 @@ if ($userAuth['status'] == 'error') {
         }
         return '';
       }
-      function getActionButton(status, idPenta) {
+      function getActionButton(status, idAdvis) {
         if (status == 'ditolak' || status == 'diterima') {
-          return `<a href="/pentas/detail_pentas.php?id_pentas=${idPenta}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+          return `<a href="/pentas/detail_pentas.php?id_pentas=${idAdvis}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
         }
         return '';
-      }
-    }
-    function updateTableOld(dataT = '') {
-      while (tablePentas.firstChild) {
-        tablePentas.removeChild(tablePentas.firstChild);
-      }
-      var num = 1;
-      if (dataT != '') {
-        // console.log(dataT);
-        dataT.forEach(function(item) {
-          var row = document.createElement('tr');
-          var td = document.createElement('td');
-          //data
-          td.innerText = num;
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['nomor_induk'];
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['nama_advis'];
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['tanggal'];
-          row.appendChild(td);
-          //status
-          var span = document.createElement('span');
-          var icon = document.createElement('i');
-          if (item['status'] == 'ditolak') {
-            icon.innerText = 'Ditolak';
-            icon.classList.add('bi', 'bi-x-circle-fill');
-            span.appendChild(icon);
-            span.classList.add('badge', 'bg-tolak');
-          } else if (item['status'] == 'diterima') {
-            icon.innerText = 'Diterima';
-            icon.classList.add('bi', 'bi-check-circle-fill');
-            span.appendChild(icon);
-            span.classList.add('badge', 'bg-terima');
-          }
-          var td = document.createElement('td');
-          td.appendChild(span);
-          row.appendChild(td);
-          //kode surat
-          var td = document.createElement('td');
-          td.innerText = item['kode_verifikasi'];
-          row.appendChild(td);
-          //btn
-          var link = document.createElement('a');
-          var icon = document.createElement('i');
-          icon.classList.add('bi', 'bi-eye-fill');
-          icon.innerText = 'Lihat';
-          link.appendChild(icon);
-          link.classList.add('btn', 'btn-lihat');
-          link.setAttribute('href', `/event/detail_event.php?id_event=${item['id_event']}`);
-          var td = document.createElement('td');
-          td.appendChild(link);
-          row.appendChild(td);
-          tablePentas.appendChild(row);
-          num++;
-        });
       }
     }
 
