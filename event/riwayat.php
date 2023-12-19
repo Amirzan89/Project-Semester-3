@@ -144,7 +144,7 @@ if($userAuth['status'] == 'error'){
                     </div>
                   </div>
               </div>
-              <table class="table datatable">
+              <table class="table datatable" id="tableEvent">
                 <thead>
                   <tr>
                   <th scope="col">No</th>
@@ -155,7 +155,7 @@ if($userAuth['status'] == 'error'){
                     <th scope="col">Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="tableEvent">
+                <tbody>
                   <?php
                     $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE(created_at) AS tanggal, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_event DESC");
                     $no = 1;
@@ -205,63 +205,54 @@ if($userAuth['status'] == 'error'){
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script src="<?php echo $tPath; ?>/public/js/popup.js"></script>
+  <!-- Vendor JS Files -->
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
   <script>
     var tableEvent = document.getElementById('tableEvent');
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
     function updateTable(dataT = ''){
-      while (tableEvent.firstChild) {
-        tableEvent.removeChild(tableEvent.firstChild);
-      }
+      var table = $('#tableEvent').DataTable();
+      table.clear().draw();
       var num = 1;
-      if(dataT != ''){
-        dataT.forEach(function (item){
-          var row = document.createElement('tr');
-          var td = document.createElement('td');
-          //data
-          td.innerText = num;
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['nama_pengirim'];
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['nama_event'];
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['tanggal'];
-          row.appendChild(td);
-          //status
-          var span = document.createElement('span');
-          var icon = document.createElement('i');
-          if(item['status'] == 'ditolak'){
-            icon.innerText = 'Ditolak';
-            icon.classList.add('bi','bi-x-circle-fill');
-            span.appendChild(icon);
-            span.classList.add('badge','bg-tolak');
-          }else if(item['status'] == 'diterima'){
-            icon.innerText = 'Diterima';
-            icon.classList.add('bi','bi-check-circle-fill');
-            span.appendChild(icon);
-            span.classList.add('badge','bg-terima');
-          }
-          var td = document.createElement('td');
-          td.appendChild(span);
-          row.appendChild(td);
-          //btn
-          var link = document.createElement('a');
-          var icon = document.createElement('i');
-          icon.classList.add('bi','bi-eye-fill');
-          icon.innerText = 'Lihat';
-          link.appendChild(icon);
-          link.classList.add('btn','btn-lihat');
-          link.setAttribute('href',`/event/detail_event.php?id_event=${item['id_event']}`);
-          var td = document.createElement('td');
-          td.appendChild(link);
-          row.appendChild(td);
-          tableEvent.appendChild(row);
+      if (dataT !== '') {
+        dataT.forEach(function (item) {
+          table.row.add([
+            num,
+            item['nama_pengirim'],
+            item['nama_event'],
+            item['tanggal'],
+            getStatusBadge(item['status']),
+            getActionButton(item['status'], item['id_event'])
+          ]).draw();
           num++;
         });
+      }
+      $('#tableEvent_length').remove();
+      $('#tableEvent_filter').remove();
+      $('#tableEvent_paginate').remove();
+      $('#tableEvent_info').remove();
+      //change info 
+      ////////////////
+
+      function getStatusBadge(status) {
+        if (status == 'ditolak') {
+          return '<span class="badge bg-tolak">Ditolak</span>';
+        } else if (status == 'diterima') {
+          return '<span class="badge bg-terima">Diterima</span>';
+        }
+        return '';
+      }
+      function getActionButton(status, idEvent) {
+        if (status == 'ditolak' || status == 'diterima') {
+          return `<a href="/event/detail_event.php?id_event=${idEvent}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+        }
+        return '';
       }
     }
     function getData(con = null){
@@ -333,10 +324,6 @@ if($userAuth['status'] == 'error'){
       }, 5);
     }
   </script>
-  <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
   <!-- Template Main JS File -->
   <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>

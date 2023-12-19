@@ -77,9 +77,40 @@ $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
           <br>
           <h1>LAYANAN UPLOAD EVENT</h1>
           <p>
-            Dengan adanya layanan ini anda dapat melakukan promosi untuk kegiatan-kegiatan yang akan datang
+            Dengan adanya layanan ini anda dapat melakukan promosi untuk kegiatan atau event yang akan datang
           </p>
         </div>
+      </div>
+    </section>
+
+    <section id="why-us" class="why-us section-bg">
+      <div class="container-fluid" data-aos="fade-up">
+
+        <div class="row">
+
+          <div class="col-lg-6 d-flex flex-column justify-content-center align-items-stretch  order-2 order-lg-1">
+
+            <div class="content">
+              <h3><strong>KETENTUAN</strong></h3>
+            </div>
+            <div class="row">
+              <div class="col-lg-12 pt-4 pt-lg-0 content" data-aos="fade-left" data-aos-delay="100">
+                <p class="fst-italic">
+                <ol>
+                  <li> Pengajuan upload event melalui aplikasi android Nganjuk Elok</li>
+                  <li> Mengisi formulir dengan tepat dan jelas. </li>
+                  <li> Jika sudah mengirimkan formulir dimohon untuk menunggu 1x24 jam untuk di verifikasi oleh admin. </li>
+                  <li> Jika formulir belum diverifikasi dilarang mengirimkan formulir yang sama.</li>
+                </ol>
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="col-lg-5 align-items-stretch order-1 order-lg-2 img" style='background-image: url("../assets/img/LandingPage/hero4.png");' data-aos="zoom-in" data-aos-delay="150">&nbsp;</div>
+        </div>
+
       </div>
     </section>
 

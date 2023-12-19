@@ -141,7 +141,7 @@ if ($userAuth['status'] == 'error') {
                   </div>
                 </div>
               </div>
-              <table class="table datatable">
+              <table class="table datatable" id="tableEvent"> 
                 <thead>
                   <tr>
                     <th>No</th>
@@ -152,7 +152,7 @@ if ($userAuth['status'] == 'error') {
                     <th>Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="tableEvent">
+                <tbody>
                   <?php
                   $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE(created_at) AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC");
                   $no = 1;
@@ -206,73 +206,57 @@ if ($userAuth['status'] == 'error') {
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script src="<?php echo $tPath; ?>/public/js/popup.js"></script>
+  <!-- Vendor JS Files -->
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
   <script>
-    var tableEvent = document.getElementById('tableEvent');
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
-    function updateTable(dataT = '') {
-      while (tableEvent.firstChild) {
-        tableEvent.removeChild(tableEvent.firstChild);
-      }
+    function updateTable(dataT = ''){
+      var table = $('#tableEvent').DataTable();
+      table.clear().draw();
       var num = 1;
-      if (dataT != '') {
-        dataT.forEach(function(item) {
-          var row = document.createElement('tr');
-          var td = document.createElement('td');
-          //data
-          td.innerText = num;
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['nama_pengirim'];
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['nama_event'];
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['tanggal'];
-          row.appendChild(td);
-          //status
-          var span = document.createElement('span');
-          if (item['status'] == 'diajukan') {
-            span.classList.add('badge', 'bg-proses');
-            span.innerText = 'Diajukan';
-          } else if (item['status'] == 'proses') {
-            span.classList.add('badge', 'bg-terima');
-            span.innerText = 'Diproses';
-          }
-          var td = document.createElement('td');
-          td.appendChild(span);
-          row.appendChild(td);
-          //btn
-          if (item['status'] == 'diajukan') {
-            var btn = document.createElement('button');
-            var icon = document.createElement('i');
-            icon.classList.add('bi', 'bi-eye-fill');
-            icon.innerText = 'Lihat';
-            btn.appendChild(icon);
-            btn.classList.add('btn', 'btn-lihat');
-            btn.onclick = function() {
-              proses(`${item['id_event']}`);
-            }
-            var td = document.createElement('td');
-            td.appendChild(btn);
-            row.appendChild(td);
-          } else if (item['status'] == 'proses') {
-            var link = document.createElement('a');
-            var icon = document.createElement('i');
-            icon.classList.add('bi', 'bi-eye-fill');
-            icon.innerText = 'Lihat';
-            link.appendChild(icon);
-            link.classList.add('btn', 'btn-lihat');
-            link.setAttribute('href', `/event/detail_event.php?id_event=${item['id_event']}`);
-            var td = document.createElement('td');
-            td.appendChild(link);
-            row.appendChild(td);
-          }
-          tableEvent.appendChild(row);
+      if (dataT !== '') {
+        let count = 0;
+        dataT.forEach(function (item) {
+          count++;
+          table.row.add([
+            num,
+            item['nama_pengirim'],
+            item['nama_event'],
+            item['tanggal'],
+            getStatusBadge(item['status']),
+            getActionButton(item['status'], item['id_event'])
+          ]).draw();
           num++;
         });
+      }
+      $('#tableEvent_length').remove();
+      $('#tableEvent_filter').remove();
+      $('#tableEvent_paginate').remove();
+      $('#tableEvent_info').remove();
+      //change info 
+      ////////////////
+
+      function getStatusBadge(status) {
+        if (status == 'diajukan') {
+          return '<span class="badge bg-proses">Diajukan</span>';
+        } else if (status == 'proses') {
+          return '<span class="badge bg-terima">Diproses</span>';
+        }
+        return '';
+      }
+      function getActionButton(status, idEvent) {
+        if (status == 'diajukan') {
+          return `<button class="btn btn-lihat" onclick="proses('${idEvent}')"><i class="bi bi-eye-fill"></i> Lihat</button>`;
+        } else if (status == 'proses') {
+          return `<a href="/event/detail_event.php?id_event=${idEvent}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+        }
+        return '';
       }
     }
 
@@ -375,11 +359,6 @@ if ($userAuth['status'] == 'error') {
       }
     }
   </script>
-  <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
   <!-- Template Main JS File -->
   <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
