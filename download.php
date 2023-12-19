@@ -4,6 +4,7 @@ class Download{
     private static $sizeFile = 5 * 1024 * 1024;
     private static $database;
     private static $con;
+    private static $Apk = __DIR__.'/mobile/Nganjuk Elok.apk';
     private static $folderEvent = __DIR__.'/DatabaseMobile/uploads/events';
     private static $folderSeniman = __DIR__.'/DatabaseMobile/data_seniman_mobile/uploads/seniman';
     private static $folderPerpanjangan = __DIR__.'/DatabaseMobile/data_seniman_mobile/uploads/Perpanjangan';
@@ -19,8 +20,44 @@ class Download{
         self::$database = koneksi::getInstance();
         self::$con = self::$database->getConnection();
     }
-    public static function getEvent($data){
-        
+    public function downloadAPK(){
+        try{
+            //download file
+            if (file_exists(self::$Apk)) {
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="' . basename(self::$Apk) . '"');
+                header('Content-Transfer-Encoding: binary');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize(self::$Apk));
+                ob_clean();
+                flush();
+                readfile(self::$Apk);
+                exit();
+            } else {
+                throw new Exception('File tidak ditemukan !');
+            }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson['message'],
+                );
+            }
+            header('Content-Type: application/json');
+            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
+            echo json_encode($responseData);
+            exit();
+        }
     }
     //untuk admin
     public function downloadEvent($data){
@@ -563,6 +600,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $download->downloadPentas($data);
         }else if($data['item'] == 'event'){
             $download->downloadEvent($data);
+        }else if($data['item'] == 'Mobile App'){
+            $download->downloadAPK();
         }else{
             echo "<script>alert('Invalid item')</script>";
             echo "<script>window.history.back();</script>";

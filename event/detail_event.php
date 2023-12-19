@@ -284,8 +284,8 @@ if ($userAuth['status'] == 'error') {
     ?>
   </footer>
   <div id="greenPopup" style="display:none"></div>
-    <div id="redPopup" style="display:none"></div>
-    <script src="<?php  echo $tPath ?>/public/js/popup.js"></script>
+  <div id="redPopup" style="display:none"></div>
+  <script src="<?php  echo $tPath ?>/public/js/popup.js"></script>
   <script>
     var modalProses = document.getElementById('modalProses');
     var modalSetuju = document.getElementById('modalSetuju');

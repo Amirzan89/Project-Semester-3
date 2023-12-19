@@ -2,6 +2,7 @@
 require_once(__DIR__.'/web/koneksi.php');
 require_once(__DIR__.'/web/authenticate.php');
 require_once(__DIR__.'/env.php');
+require_once(__DIR__.'/Date.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -215,8 +216,7 @@ if ($userAuth['status'] == 'error') {
                     <div class="col-lg-3 col-md-4 label">Tanggal Lahir</div>
                     <div class="col-lg-9 col-md-8">
                       <?php
-                      $tanggal = strtotime($userAuth['tanggal_lahir']);
-                      echo date('d F Y', $tanggal);
+                      echo changeMonth([['tanggal'=>$userAuth['tanggal_lahir']]])[0]['tanggal'];
                       ?>
                     </div>
                   </div>

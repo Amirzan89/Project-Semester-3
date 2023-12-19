@@ -86,7 +86,7 @@ if($userAuth['status'] == 'success'){
             masyarakat,
             sehingga masyarakat dapat dengan lebih mudah menikmati layanan kami.</h2>
           <div class="d-flex justify-content-center justify-content-lg-start">
-            <a href="" class="btn-get-started scrollto">Unduh Aplikasi</a>
+            <a href="<?php echo $tPath; ?>/public/Nganjuk Elok.apk" class="btn-get-started scrollto">Unduh Aplikasi</a>
           </div>
         </div>
         <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-in" data-aos-delay="200">
@@ -331,9 +331,7 @@ if($userAuth['status'] == 'success'){
   <!-- End Footer -->
 
   <div id="preloader"></div>
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
-
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <!-- Vendor JS Files -->
   <script src="<?php echo $tPath; ?>/public/assets/vendor/aos/aos.js"></script>
   <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -345,7 +343,6 @@ if($userAuth['status'] == 'success'){
 
   <!-- Template Main JS File -->
   <script src="<?php echo $tPath; ?>/public/assets/js/LandingPage.js"></script>
-  
 </body>
 
 </html>
