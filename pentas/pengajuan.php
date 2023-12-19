@@ -208,85 +208,63 @@ if ($userAuth['status'] == 'error') {
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="<?php echo $tPath; ?>/public/js/popup.js"></script>
+  <!-- Vendor JS Files -->
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
   <script>
-    var tablePentas = document.getElementById('tablePentas');
+    // var tablePentas = document.getElementById('tablePentas');
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
-    function updateTable(dataT = '') {
-      // $jq('#tablePentas').dataTable().fnClearTable(); 
-      // $jq('#tablePentas').DataTable().clear().draw();
-      $('#tablePentas').DataTable().rows().remove().draw();
-      return;
+    function updateTable(dataT = ''){
+      var table = $('#tablePentas').DataTable();
+      table.clear().draw();
       var num = 1;
-      if (dataT != '') {
-        dataT.forEach(function(item) {
-          var row = document.createElement('tr');
-          var td = document.createElement('td');
-          //data
-          td.innerText = num;
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['nomor_induk'];
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['nama_advis'];
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['tanggal'];
-          row.appendChild(td);
-          //status
-          var span = document.createElement('span');
-          if (item['status'] == 'diajukan') {
-            span.classList.add('badge', 'bg-proses');
-            span.innerText = 'Diajukan';
-          } else if (item['status'] == 'proses') {
-            span.classList.add('badge', 'bg-terima');
-            span.innerText = 'Diproses';
-          }
-          var td = document.createElement('td');
-          td.appendChild(span);
-          row.appendChild(td);
-          //btn
-          if (item['status'] == 'diajukan') {
-            var btn = document.createElement('button');
-            var icon = document.createElement('i');
-            icon.classList.add('bi', 'bi-eye-fill');
-            icon.innerText = 'Lihat';
-            btn.appendChild(icon);
-            btn.classList.add('btn', 'btn-lihat');
-            btn.onclick = function() {
-              proses(`${item['id_advis']}`);
-            }
-            var td = document.createElement('td');
-            td.appendChild(btn);
-            row.appendChild(td);
-          } else if (item['status'] == 'proses') {
-            var link = document.createElement('a');
-            var icon = document.createElement('i');
-            icon.classList.add('bi', 'bi-eye-fill');
-            icon.innerText = 'Lihat';
-            link.appendChild(icon);
-            link.classList.add('btn', 'btn-lihat');
-            link.setAttribute('href', `/pentas/detail_pentas.php?id_pentas=${item['id_advis']}`);
-            var td = document.createElement('td');
-            td.appendChild(link);
-            row.appendChild(td);
-          }
-          tablePentas.appendChild(row);
+      if (dataT !== '') {
+        let count = 0;
+        dataT.forEach(function (item) {
+          count++;
+          table.row.add([
+            num,
+            item['nomor_induk'],
+            item['nama_advis'],
+            item['tanggal'],
+            getStatusBadge(item['status']),
+            getActionButton(item['status'], item['id_advis'])
+          ]).draw();
           num++;
         });
+      }
+      $('#tablePentas_length').remove();
+      $('#tablePentas_filter').remove();
+      $('#tablePentas_paginate').remove();
+      $('#tablePentas_info').remove();
+      //change info 
+      ////////////////
+
+      function getStatusBadge(status) {
+        if (status == 'diajukan') {
+          return '<span class="badge bg-proses">Diajukan</span>';
+        } else if (status == 'proses') {
+          return '<span class="badge bg-terima">Diproses</span>';
+        }
+        return '';
+      }
+      function getActionButton(status, idAdvis) {
+        if (status == 'diajukan') {
+          return `<button class="btn btn-lihat" onclick="proses('${idAdvis}')"><i class="bi bi-eye-fill"></i> Lihat</button>`;
+        } else if (status == 'proses') {
+          return `<a href="/pentas/detail_pentas.php?id_pentas=${idAdvis}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+        }
+        return '';
       }
     }
 
     function getData(con = null) {
-      updateTable();
-      return;
       var xhr = new XMLHttpRequest();
       if (con == 'semua') {
         var requestBody = {

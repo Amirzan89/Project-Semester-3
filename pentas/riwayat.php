@@ -142,7 +142,7 @@ if ($userAuth['status'] == 'error') {
                   </div>
                 </div>
               </div>
-              <table class="table datatable">
+              <table class="table datatable" id="tablePentas">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -154,7 +154,7 @@ if ($userAuth['status'] == 'error') {
                     <th>Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="tablePentas">
+                <tbody>
                   <?php
                   $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE(created_at) AS tanggal, status, catatan, kode_verifikasi FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
                   $no = 1;
@@ -204,14 +204,58 @@ if ($userAuth['status'] == 'error') {
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script src="<?php echo $tPath; ?>/public/js/popup.js"></script>
+  <!-- Vendor JS Files -->
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
   <script>
-    var tablePentas = document.getElementById('tablePentas');
-    console.log(tablePentas);
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
 
-    function updateTable(dataT = '') {
+    function updateTable(dataT = ''){
+      var table = $('#tablePentas').DataTable();
+      table.clear().draw();
+      var num = 1;
+      if (dataT !== '') {
+        dataT.forEach(function (item) {
+          table.row.add([
+            num,
+            item['nomor_induk'],
+            item['nama_advis'],
+            item['tanggal'],
+            getStatusBadge(item['status']),
+            item['kode_verifikasi'],
+            getActionButton(item['status'], item['id_advis'])
+          ]).draw();
+          num++;
+        });
+      }
+      $('#tablePentas_length').remove();
+      $('#tablePentas_filter').remove();
+      $('#tablePentas_paginate').remove();
+      $('#tablePentas_info').remove();
+      //change info 
+      ////////////////
+
+      function getStatusBadge(status) {
+        if (status == 'ditolak') {
+          return '<span class="badge bg-tolak">Ditolak</span>';
+        } else if (status == 'diterima') {
+          return '<span class="badge bg-terima">Diterima</span>';
+        }
+        return '';
+      }
+      function getActionButton(status, idPenta) {
+        if (status == 'ditolak' || status == 'diterima') {
+          return `<a href="/pentas/detail_pentas.php?id_pentas=${idPenta}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+        }
+        return '';
+      }
+    }
+    function updateTableOld(dataT = '') {
       while (tablePentas.firstChild) {
         tablePentas.removeChild(tablePentas.firstChild);
       }
@@ -341,11 +385,6 @@ if ($userAuth['status'] == 'error') {
       }, 5);
     }
   </script>
-
-  <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
   <!-- Template Main JS File -->
   <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
