@@ -225,7 +225,7 @@ class User{
                 throw new Exception('Jenis kelamin invalid !');
             }
             if (!isset($data['tempatL']) || empty($data['tempatL'])) {
-                throw new Exception('Jenis kelamin harus di isi !');
+                throw new Exception('Tempat lahir harus di isi !');
             }
             if (!isset($data['tanggalL']) || empty($data['tanggalL'])) {
                 throw new Exception('Tanggal lahir harus di isi !');
