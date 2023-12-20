@@ -462,10 +462,10 @@ class SenimanWebsite{
             //check and get data
             if($data['tanggal'] == 'semua'){
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT seniman.id_seniman, nama_seniman, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'diajukan' OR perpanjangan.status = 'proses' ORDER BY id_seniman DESC";
+                    $query = "SELECT id_perpanjangan, seniman.id_seniman, nama_seniman, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'diajukan' OR perpanjangan.status = 'proses' ORDER BY id_seniman DESC";
                     // $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT seniman.id_seniman, nama_seniman, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'ditolak' OR perpanjangan.status = 'diterima' ORDER BY id_seniman DESC";
+                    $query = "SELECT id_perpanjangan, seniman.id_seniman, nama_seniman, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'ditolak' OR perpanjangan.status = 'diterima' ORDER BY id_seniman DESC";
                     // $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_verifikasi FROM seniman WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'data'){
                     if(!isset($data['kategori']) || empty($data['kategori'])){

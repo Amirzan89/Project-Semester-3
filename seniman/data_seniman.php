@@ -2,7 +2,6 @@
 require_once(__DIR__.'/../web/koneksi.php');
 require_once(__DIR__.'/../web/authenticate.php');
 require_once(__DIR__.'/../env.php');
-require_once(__DIR__.'/../Date.php');
 loadEnv();
 $database = koneksi::getInstance();
 $conn = $database->getConnection();
@@ -191,7 +190,7 @@ if ($userAuth['status'] == 'error') {
                     </div>
                   </div>
               </div>
-              <table class="table datatable">
+              <table class="table datatable" id="tableSeniman">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -202,11 +201,11 @@ if ($userAuth['status'] == 'error') {
                     <th>Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="tableSeniman">
+                <tbody>
                   <?php
                     $query = mysqli_query($conn, "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE(created_at) AS tanggal, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' ORDER BY id_seniman DESC");
                     $no = 1;
-                    $senimanData = changeMonth(mysqli_fetch_all($query, MYSQLI_ASSOC));
+                    $senimanData = mysqli_fetch_all($query, MYSQLI_ASSOC);
                     foreach ($senimanData as $seniman) {
                   ?>
                     <tr>
@@ -272,14 +271,52 @@ if ($userAuth['status'] == 'error') {
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script src="<?php echo $tPath; ?>/public/js/popup.js"></script>
+  <!-- Vendor JS Files -->
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
   <script>
-    var tableSeniman = document.getElementById('tableSeniman');
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var kategoriInput = document.getElementById('inpKategori');
     var inpSenimanDelete = document.getElementById('inpSenimanDelete');
     var tahun;
     function updateTable(dataT = ''){
+      var table = $('#tableSeniman').DataTable();
+      table.clear().draw();
+      var num = 1;
+      if (dataT !== '') {
+        let count = 0;
+        dataT.forEach(function (item) {
+          count++;
+          table.row.add([
+            num,
+            item['nomor_induk'],
+            item['nama_kategori'],
+            item['nama_seniman'],
+            item['no_telpon'],
+            getActionButton(item['status'], item['id_seniman'])
+          ]).draw();
+          num++;
+        });
+      }
+      $('#tableSeniman_length').remove();
+      $('#tableSeniman_filter').remove();
+      $('#tableSeniman_paginate').remove();
+      $('#tableSeniman_info').remove();
+      //change info
+      ////////////////
+
+      function getActionButton(status, idSeniman) {
+          return `
+          <a href="/seniman/detail_seniman.php?id_seniman=${idSeniman}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
+          <a href="/seniman/edit_detail_seniman.php?id_seniman=${idSeniman}" class="btn btn-edit"><i class="bi bi-pencil-fill"></i> Lihat</a>
+          <button class="btn btn-tolak" onclick="openDelete('${idSeniman}')"><i class="bi bi-trash-fill"></i> Lihat</button>`;
+      }
+    }
+    function updateTableOld(dataT = ''){
       while (tableSeniman.firstChild) {
         tableSeniman.removeChild(tableSeniman.firstChild);
       }
@@ -342,6 +379,7 @@ if ($userAuth['status'] == 'error') {
           email: email,
           tanggal:'semua',
           kategori:kategoriInput.value,
+          table:'seniman',
           desc:'data'
         };
       }else if(con == null){ 
@@ -350,6 +388,7 @@ if ($userAuth['status'] == 'error') {
           email: email,
           tanggal:tanggal,
           kategori:kategoriInput.value,
+          table:'seniman',
           desc:'data'
         };
       }
@@ -363,10 +402,9 @@ if ($userAuth['status'] == 'error') {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
             var response = xhr.responseText;
-            updateTable(JSON.parse(response)['data']);
+            updateTable(JSON.parse(response)['data']); 
           } else {
             var response = xhr.responseText;
-            // console.log(response);
             updateTable();
             return;
           }
@@ -413,10 +451,6 @@ if ($userAuth['status'] == 'error') {
       myModal.show();
     }
   </script>
-  <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
   <!-- Template Main JS File -->
   <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>

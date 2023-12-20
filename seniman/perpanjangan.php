@@ -142,7 +142,7 @@ if($userAuth['status'] == 'error'){
                     </div>
                   </div>
               </div>
-              <table class="table datatable">
+              <table class="table datatable" id="tablePerpanjangan">
               <thead>
                   <tr>
                     <th scope="col">No</th>
@@ -174,7 +174,7 @@ if($userAuth['status'] == 'error'){
                       <?php if($seniman['status'] == 'diajukan'){ ?>
                           <button class="btn btn-lihat" onclick="proses(<?php echo $seniman['id_seniman'] ?>,<?php echo $seniman['id_perpanjangan'] ?>)"><i class="bi bi-eye-fill"></i>   Lihat</button>
                         <?php }else if($seniman['status'] == 'proses'){ ?>
-                          <a href="/seniman/detail_perpanjang.php?id_perpanjangan=<?= $seniman['id_perpanjangan'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
+                          <a href="/seniman/detail_perpanjangan.php?id_perpanjangan=<?= $seniman['id_perpanjangan'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
                         <?php } ?>
                       </td>
                     </tr>
@@ -207,70 +207,56 @@ if($userAuth['status'] == 'error'){
   
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script src="<?php echo $tPath; ?>/public/js/popup.js"></script>
+  <!-- Vendor JS Files -->
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
   <script>
-    var tableSeniman = document.getElementById('tableSeniman');
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
     function updateTable(dataT = ''){
-      while (tableSeniman.firstChild) {
-        tableSeniman.removeChild(tableSeniman.firstChild);
-      }
+      var table = $('#tablePerpanjangan').DataTable();
+      table.clear().draw();
       var num = 1;
-      if(dataT != ''){
-        dataT.forEach(function (item){
-          var row = document.createElement('tr');
-          var td = document.createElement('td');
-          //data
-          td.innerText = num;
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['nama_seniman'];
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['tanggal'];
-          row.appendChild(td);
-          //status
-          var span = document.createElement('span');
-          if(item['status'] == 'diajukan'){
-            span.classList.add('badge','bg-proses');
-            span.innerText = 'Diajukan';
-          }else if(item['status'] == 'proses'){
-            span.classList.add('badge','bg-terima');
-            span.innerText = 'Diproses';
-          }
-          var td = document.createElement('td');
-          td.appendChild(span);
-          row.appendChild(td);
-          //btn
-          if(item['status'] == 'diajukan'){
-            var btn = document.createElement('button');
-            var icon = document.createElement('i');
-            icon.classList.add('bi','bi-eye-fill');
-            icon.innerText = 'Lihat';
-            btn.appendChild(icon);
-            btn.classList.add('btn','btn-lihat');
-            btn.onclick = function (){
-              proses(`${item['id_seniman']}`);
-            }
-            var td = document.createElement('td');
-            td.appendChild(btn);
-            row.appendChild(td);
-          }else if(item['status'] == 'proses'){
-            var link = document.createElement('a');
-            var icon = document.createElement('i');
-            icon.classList.add('bi','bi-eye-fill');
-            icon.innerText = 'Lihat';
-            link.appendChild(icon);
-            link.classList.add('btn','btn-lihat');
-            link.setAttribute('href',`/seniman/detail_perpanjang.php?id_seniman=${item['id_seniman']}`);
-            var td = document.createElement('td');
-            td.appendChild(link);
-            row.appendChild(td);
-          }
-          tableSeniman.appendChild(row);
+      if (dataT !== '') {
+        let count = 0;
+        dataT.forEach(function (item) {
+          count++;
+          table.row.add([
+            num,
+            item['nama_seniman'],
+            item['tanggal'],
+            getStatusBadge(item['status']),
+            getActionButton(item['status'], item['id_seniman'],item['id_perpanjangan'])
+          ]).draw();
           num++;
         });
+      }
+      $('#tablePerpanjangan_length').remove();
+      $('#tablePerpanjangan_filter').remove();
+      $('#tablePerpanjangan_paginate').remove();
+      $('#tablePerpanjangan_info').remove();
+      //change info 
+      ////////////////
+
+      function getStatusBadge(status) {
+        if (status == 'diajukan') {
+          return '<span class="badge bg-proses">Diajukan</span>';
+        } else if (status == 'proses') {
+          return '<span class="badge bg-terima">Diproses</span>';
+        }
+        return '';
+      }
+      function getActionButton(status, idSeniman, idPerpanjangan) {
+        if (status == 'diajukan') {
+          return `<button class="btn btn-lihat" onclick="proses('${idSeniman}','${idPerpanjangan}')"><i class="bi bi-eye-fill"></i> Lihat</button>`;
+        } else if (status == 'proses') {
+          return `<a href="/seniman/detail_perpanjangan.php?id_perpanjangan=${idPerpanjangan}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+        }
+        return '';
       }
     }
     function getData(con = null){
@@ -360,7 +346,7 @@ if($userAuth['status'] == 'error'){
       xhr.onreadystatechange = function () {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
-            window.location.href = "/seniman/detail_perpanjang.php?id_perpanjangan="+Idperpanjangan;
+            window.location.href = "/seniman/detail_perpanjangan.php?id_perpanjangan="+Idperpanjangan;
           } else {
             console.log(xhr.responseText);
             try {
@@ -373,10 +359,6 @@ if($userAuth['status'] == 'error'){
       }
     }
   </script>
-  <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
   <!-- Template Main JS File -->
   <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>

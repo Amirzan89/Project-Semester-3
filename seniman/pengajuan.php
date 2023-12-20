@@ -142,8 +142,8 @@ if($userAuth['status'] == 'error'){
                     </div>
                   </div>
               </div>
-              <table class="table datatable">
-              <thead>
+              <table class="table datatable" id="tableSeniman">
+                <thead>
                   <tr>
                     <th scope="col">No</th>
                     <th scope="col">Nama Seniman</th>
@@ -152,7 +152,7 @@ if($userAuth['status'] == 'error'){
                     <th scope="col">Aksi</th>
                   </tr>
                   </thead>
-                  <tbody id="tableSeniman">
+                  <tbody>
                   <?php
                       $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC");
                       $no = 1;
@@ -207,70 +207,56 @@ if($userAuth['status'] == 'error'){
   
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script src="<?php echo $tPath; ?>/public/js/popup.js"></script>
+  <!-- Vendor JS Files -->
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="<?php echo $tPath; ?>/public/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
   <script>
-    var tableSeniman = document.getElementById('tableSeniman');
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
     function updateTable(dataT = ''){
-      while (tableSeniman.firstChild) {
-        tableSeniman.removeChild(tableSeniman.firstChild);
-      }
+      var table = $('#tableSeniman').DataTable();
+      table.clear().draw();
       var num = 1;
-      if(dataT != ''){
-        dataT.forEach(function (item){
-          var row = document.createElement('tr');
-          var td = document.createElement('td');
-          //data
-          td.innerText = num;
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['nama_seniman'];
-          row.appendChild(td);
-          var td = document.createElement('td');
-          td.innerText = item['tanggal'];
-          row.appendChild(td);
-          //status
-          var span = document.createElement('span');
-          if(item['status'] == 'diajukan'){
-            span.classList.add('badge','bg-proses');
-            span.innerText = 'Diajukan';
-          }else if(item['status'] == 'proses'){
-            span.classList.add('badge','bg-terima');
-            span.innerText = 'Diproses';
-          }
-          var td = document.createElement('td');
-          td.appendChild(span);
-          row.appendChild(td);
-          //btn
-          if(item['status'] == 'diajukan'){
-            var btn = document.createElement('button');
-            var icon = document.createElement('i');
-            icon.classList.add('bi','bi-eye-fill');
-            icon.innerText = 'Lihat';
-            btn.appendChild(icon);
-            btn.classList.add('btn','btn-lihat');
-            btn.onclick = function (){
-              proses(`${item['id_seniman']}`);
-            }
-            var td = document.createElement('td');
-            td.appendChild(btn);
-            row.appendChild(td);
-          }else if(item['status'] == 'proses'){
-            var link = document.createElement('a');
-            var icon = document.createElement('i');
-            icon.classList.add('bi','bi-eye-fill');
-            icon.innerText = 'Lihat';
-            link.appendChild(icon);
-            link.classList.add('btn','btn-lihat');
-            link.setAttribute('href',`/seniman/detail_seniman.php?id_seniman=${item['id_seniman']}`);
-            var td = document.createElement('td');
-            td.appendChild(link);
-            row.appendChild(td);
-          }
-          tableSeniman.appendChild(row);
+      if (dataT !== '') {
+        let count = 0;
+        dataT.forEach(function (item) {
+          count++;
+          table.row.add([
+            num,
+            item['nama_seniman'],
+            item['tanggal'],
+            getStatusBadge(item['status']),
+            getActionButton(item['status'], item['id_seniman'])
+          ]).draw();
           num++;
         });
+      }
+      $('#tableSeniman_length').remove();
+      $('#tableSeniman_filter').remove();
+      $('#tableSeniman_paginate').remove();
+      $('#tableSeniman_info').remove();
+      //change info
+      ////////////////
+
+      function getStatusBadge(status) {
+        if (status == 'diajukan') {
+          return '<span class="badge bg-proses">Diajukan</span>';
+        } else if (status == 'proses') {
+          return '<span class="badge bg-terima">Diproses</span>';
+        }
+        return '';
+      }
+      function getActionButton(status, idSeniman) {
+        if (status == 'diajukan') {
+          return `<button class="btn btn-lihat" onclick="proses('${idSeniman}')"><i class="bi bi-eye-fill"></i> Lihat</button>`;
+        } else if (status == 'proses') {
+          return `<a href="/seniman/detail_seniman.php?id_seniman=${idSeniman}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+        }
+        return '';
       }
     }
     function getData(con = null){
@@ -292,8 +278,6 @@ if($userAuth['status'] == 'error'){
         };
       }
       //open the request
-      // console.log(requestBody);
-      // return;
       xhr.open('POST', domain + "/web/seniman/seniman.php")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
@@ -306,8 +290,6 @@ if($userAuth['status'] == 'error'){
             updateTable(JSON.parse(response)['data']);
           } else {
             var response = xhr.responseText;
-            console.log(response);
-            return;
             updateTable();
           }
         }
@@ -375,10 +357,6 @@ if($userAuth['status'] == 'error'){
       }
     }
   </script>
-  <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
 
   <!-- Template Main JS File -->
   <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>

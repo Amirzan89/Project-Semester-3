@@ -283,7 +283,6 @@ if ($userAuth['status'] == 'error') {
             updateTable(JSON.parse(response)['data']);
           } else {
             var response = xhr.responseText;
-            console.log(response);
             updateTable();
             return;
           }
