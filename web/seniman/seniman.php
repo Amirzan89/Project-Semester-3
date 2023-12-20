@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
+require_once(__DIR__ . '/../../Date.php');
 class SenimanWebsite{
     private static $sizeFile = 5 * 1024 * 1024;
     private static $sizeImg = 4 * 1024 * 1024;
@@ -462,19 +463,19 @@ class SenimanWebsite{
             //check and get data
             if($data['tanggal'] == 'semua'){
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_perpanjangan, seniman.id_seniman, nama_seniman, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'diajukan' OR perpanjangan.status = 'proses' ORDER BY id_seniman DESC";
-                    // $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC";
+                    $query = "SELECT id_perpanjangan, seniman.id_seniman, nama_seniman, DATE(perpanjangan.tgl_pembuatan) AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'diajukan' OR perpanjangan.status = 'proses' ORDER BY id_seniman DESC";
+                    // $query = "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_perpanjangan, seniman.id_seniman, nama_seniman, DATE_FORMAT(perpanjangan.tgl_pembuatan, '%d %M %Y') AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'ditolak' OR perpanjangan.status = 'diterima' ORDER BY id_seniman DESC";
-                    // $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_verifikasi FROM seniman WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_seniman DESC";
+                    $query = "SELECT id_perpanjangan, seniman.id_seniman, nama_seniman, DATE(perpanjangan.tgl_pembuatan) AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'ditolak' OR perpanjangan.status = 'diterima' ORDER BY id_seniman DESC";
+                    // $query = "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status, kode_verifikasi FROM seniman WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'data'){
                     if(!isset($data['kategori']) || empty($data['kategori'])){
                         throw new Exception('Kategori Seniman harus di isi !');
                     }
                     if($data['kategori'] == 'semua'){
-                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' ORDER BY id_seniman DESC";
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE(created_at) AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' ORDER BY id_seniman DESC";
                     }else{
-                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND seniman.id_kategori_seniman = ".$data['kategori']." ORDER BY id_seniman DESC";
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE(created_at) AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND seniman.id_kategori_seniman = ".$data['kategori']." ORDER BY id_seniman DESC";
                     }
                 }else{
                     throw new Exception('Deskripsi invalid !');
@@ -482,17 +483,17 @@ class SenimanWebsite{
                 $stmt[1] = self::$con->prepare($query);
             }else{
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                    $query = "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status FROM seniman WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_verifikasi FROM seniman WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                    $query = "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status, catatan, kode_verifikasi FROM seniman WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'data'){
                     if(!isset($data['kategori']) || empty($data['kategori'])){
                         throw new Exception('Kategori Seniman harus di isi !');
                     }
                     if($data['kategori'] == 'semua'){
-                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_verifikasi FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE(created_at) AS tanggal, status, catatan, kode_verifikasi FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
                     }else{
-                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_verifikasi FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND seniman.id_kategori_seniman = ".$data['kategori']." AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE(created_at) AS tanggal, status, catatan, kode_verifikasi FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND seniman.id_kategori_seniman = ".$data['kategori']." AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
                     }
                 }else{
                     throw new Exception('Deskripsi invalid !');
@@ -508,19 +509,20 @@ class SenimanWebsite{
                 throw new Exception('Data seniman tidak ditemukan');
             }
             $result = $stmt[1]->get_result();
-            $eventsData = array();
+            $perpanjanganData = array();
             while ($row = $result->fetch_assoc()) {
-                $eventsData[] = $row;
+                $perpanjanganData[] = $row;
             }
             $stmt[1]->close();
-            if ($eventsData === null) {
+            if ($perpanjanganData === null) {
                 throw new Exception('Data seniman tidak ditemukan');
             }
-            if (empty($eventsData)) {
+            if (empty($perpanjanganData)) {
                 throw new Exception('Data seniman tidak ditemukan');
             }
+            $perpanjanganData = changeMonth($perpanjanganData);
             header('Content-Type: application/json');
-            echo json_encode(['status' => 'success', 'message' => 'Data seniman berhasil didapatkan', 'data' => $eventsData]);
+            echo json_encode(['status' => 'success', 'message' => 'Data seniman berhasil didapatkan', 'data' => $perpanjanganData]);
             exit();
         }catch(Exception $e){
             $error = $e->getMessage();
@@ -571,17 +573,17 @@ class SenimanWebsite{
             //check and get data
             if($data['tanggal'] == 'semua'){
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC";
+                    $query = "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_verifikasi FROM seniman WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_seniman DESC";
+                    $query = "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status, kode_verifikasi FROM seniman WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'data'){
                     if(!isset($data['kategori']) || empty($data['kategori'])){
                         throw new Exception('Kategori Seniman harus di isi !');
                     }
                     if($data['kategori'] == 'semua'){
-                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' ORDER BY id_seniman DESC";
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE(created_at) AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' ORDER BY id_seniman DESC";
                     }else{
-                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND seniman.id_kategori_seniman = ".$data['kategori']." ORDER BY id_seniman DESC";
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE(created_at) AS tanggal, status FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND seniman.id_kategori_seniman = ".$data['kategori']." ORDER BY id_seniman DESC";
                     }
                 }else{
                     throw new Exception('Deskripsi invalid !');
@@ -589,17 +591,17 @@ class SenimanWebsite{
                 $stmt[1] = self::$con->prepare($query);
             }else{
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM seniman WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                    $query = "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status FROM seniman WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_seniman, nama_seniman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_verifikasi FROM seniman WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                    $query = "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status, kode_verifikasi FROM seniman WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
                 }else if($data['desc'] == 'data'){
                     if(!isset($data['kategori']) || empty($data['kategori'])){
                         throw new Exception('Kategori Seniman harus di isi !');
                     }
                     if($data['kategori'] == 'semua'){
-                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_verifikasi FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE(created_at) AS tanggal, status, catatan, kode_verifikasi FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
                     }else{
-                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_verifikasi FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND seniman.id_kategori_seniman = ".$data['kategori']." AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
+                        $query = "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE(created_at) AS tanggal, status, catatan, kode_verifikasi FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' AND seniman.id_kategori_seniman = ".$data['kategori']." AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_seniman DESC";
                     }
                 }else{
                     throw new Exception('Deskripsi invalid !');
@@ -615,19 +617,20 @@ class SenimanWebsite{
                 throw new Exception('Data seniman tidak ditemukan');
             }
             $result = $stmt[1]->get_result();
-            $eventsData = array();
+            $senimanData = array();
             while ($row = $result->fetch_assoc()) {
-                $eventsData[] = $row;
+                $senimanData[] = $row;
             }
             $stmt[1]->close();
-            if ($eventsData === null) {
+            if ($senimanData === null) {
                 throw new Exception('Data seniman tidak ditemukan');
             }
-            if (empty($eventsData)) {
+            if (empty($senimanData)) {
                 throw new Exception('Data seniman tidak ditemukan');
             }
+            $senimanData = changeMonth($senimanData);
             header('Content-Type: application/json');
-            echo json_encode(['status' => 'success', 'message' => 'Data seniman berhasil didapatkan', 'data' => $eventsData]);
+            echo json_encode(['status' => 'success', 'message' => 'Data seniman berhasil didapatkan', 'data' => $senimanData]);
             exit();
         }catch(Exception $e){
             $error = $e->getMessage();

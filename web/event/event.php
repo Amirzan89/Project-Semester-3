@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
+require_once(__DIR__ . '/../../Date.php');
 class EventWebsite{
     private static $database;
     private static $con;
@@ -74,18 +75,18 @@ class EventWebsite{
             //check and get data
             if($data['tanggal'] == 'semua'){
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC";
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE(created_at) AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_event DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_event DESC";
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE(created_at) AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_event DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
                 $stmt[1] = self::$con->prepare($query);
             }else{
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'diajukan 'OR status = 'proses') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_event DESC";
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE(created_at) AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'diajukan 'OR status = 'proses') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_event DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'ditolak 'OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_event DESC";
+                    $query = "SELECT id_event, nama_pengirim, nama_event, DATE(created_at) AS tanggal, status FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE (status = 'ditolak 'OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_event DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
@@ -111,6 +112,7 @@ class EventWebsite{
             if (empty($eventsData)) {
                 throw new Exception('Data event tidak ditemukan');
             }
+            $eventsData = changeMonth($eventsData);
             header('Content-Type: application/json');
             echo json_encode(['status' => 'success', 'message' => 'Data event berhasil didapatkan', 'data' => $eventsData]);
             exit();

@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
+require_once(__DIR__ . '/../../Date.php');
 class TempatWebsite{
     private static $sizeFile = 5 * 1024 * 1024;
     private static $database;
@@ -39,18 +40,18 @@ class TempatWebsite{
             //check and get data
             if($data['tanggal'] == 'semua'){
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_sewa DESC";
+                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE(created_at) AS tanggal, status FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_sewa DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_pinjam FROM sewa_tempat WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_sewa DESC";
+                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE(created_at) AS tanggal, status, kode_pinjam FROM sewa_tempat WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_sewa DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
                 $stmt[1] = self::$con->prepare($query);
             }else{
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM sewa_tempat WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_sewa DESC";
+                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE(created_at) AS tanggal, status FROM sewa_tempat WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_sewa DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_pinjam FROM sewa_tempat WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_sewa DESC";
+                    $query = "SELECT id_sewa, nama_peminjam, nama_tempat, DATE(created_at) AS tanggal, status, kode_pinjam FROM sewa_tempat WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(updated_at) = ? AND YEAR(updated_at) = ? ORDER BY id_sewa DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
@@ -65,19 +66,20 @@ class TempatWebsite{
                 throw new Exception('Data sewa tempat tidak ditemukan');
             }
             $result = $stmt[1]->get_result();
-            $eventsData = array();
+            $sewaData = array();
             while ($row = $result->fetch_assoc()) {
-                $eventsData[] = $row;
+                $sewaData[] = $row;
             }
             $stmt[1]->close();
-            if ($eventsData === null) {
+            if ($sewaData === null) {
                 throw new Exception('Data sewa tempat tidak ditemukan');
             }
-            if (empty($eventsData)) {
+            if (empty($sewaData)) {
                 throw new Exception('Data sewa tempat tidak ditemukan');
             }
+            $sewaData = changeMonth($sewaData);
             header('Content-Type: application/json');
-            echo json_encode(['status' => 'success', 'message' => 'Data sewa tempat berhasil didapatkan', 'data' => $eventsData]);
+            echo json_encode(['status' => 'success', 'message' => 'Data sewa tempat berhasil didapatkan', 'data' => $sewaData]);
             exit();
         }catch(Exception $e){
             $error = $e->getMessage();

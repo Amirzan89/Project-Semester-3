@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . '/../../web/koneksi.php');
+require_once(__DIR__ . '/../../Date.php');
 class PentasWebsite{
     private static $database;
     private static $con;
@@ -38,18 +39,18 @@ class PentasWebsite{
             //check and get data
             if($data['tanggal'] == 'semua'){
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM surat_advis WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_advis DESC";
+                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE(created_at) AS tanggal, status FROM surat_advis WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_advis DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_verifikasi FROM surat_advis WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_advis DESC";
+                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE(created_at) AS tanggal, status, kode_verifikasi FROM surat_advis WHERE status = 'ditolak' OR status = 'diterima' ORDER BY id_advis DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
                 $stmt[1] = self::$con->prepare($query);
             }else{
                 if($data['desc'] == 'pengajuan'){
-                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status FROM surat_advis WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_advis DESC";
+                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE(created_at) AS tanggal, status FROM surat_advis WHERE (status = 'diajukan' OR status = 'proses') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_advis DESC";
                 }else if($data['desc'] == 'riwayat'){
-                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, kode_verifikasi FROM surat_advis WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_advis DESC";
+                    $query = "SELECT id_advis, nomor_induk, nama_advis, DATE(created_at) AS tanggal, status, kode_verifikasi FROM surat_advis WHERE (status = 'ditolak' OR status = 'diterima') AND MONTH(created_at) = ? AND YEAR(created_at) = ? ORDER BY id_advis DESC";
                 }else{
                     throw new Exception('Deskripsi invalid !');
                 }
@@ -64,19 +65,20 @@ class PentasWebsite{
                 throw new Exception('Data pentas tidak ditemukan');
             }
             $result = $stmt[1]->get_result();
-            $eventsData = array();
+            $advisData = array();
             while ($row = $result->fetch_assoc()) {
-                $eventsData[] = $row;
+                $advisData[] = $row;
             }
             $stmt[1]->close();
-            if ($eventsData === null) {
+            if ($advisData === null) {
                 throw new Exception('Data pentas tidak ditemukan');
             }
-            if (empty($eventsData)) {
+            if (empty($advisData)) {
                 throw new Exception('Data pentas tidak ditemukan');
             }
+            $advisData = changeMonth($advisData);
             header('Content-Type: application/json');
-            echo json_encode(['status' => 'success', 'message' => 'Data pentas berhasil didapatkan', 'data' => $eventsData]);
+            echo json_encode(['status' => 'success', 'message' => 'Data pentas berhasil didapatkan', 'data' => $advisData]);
             exit();
         }catch(Exception $e){
             $error = $e->getMessage();
