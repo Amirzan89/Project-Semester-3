@@ -1,6 +1,48 @@
 <?php
 require_once(__DIR__.'/koneksi.php');
 require_once(__DIR__.'/Jwt.php');
+function loadEnv($path = null) {
+    $path = $path ?: __DIR__ . '/../.env';
+
+    if (file_exists($path)) {
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        foreach ($lines as $line) {
+            if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+                list($key, $value) = explode('=', $line, 2);
+                $_ENV[trim($key)] = trim($value);
+                $_SERVER[trim($key)] = trim($value);
+                $_SERVER['LOAD_ENV'] = true;
+            }
+        }
+    }
+}
+
+function createConn() {
+    loadEnv();
+
+    $conn = new \mysqli(
+        'p:' . $_SERVER['DB_HOST'] . ':' . $_SERVER['DB_PORT'],
+        $_SERVER['DB_USERNAME'],
+        $_SERVER['DB_PASSWORD'],
+        $_SERVER['DB_DATABASE']
+    );
+
+    if ($conn->connect_error) {
+        throw new Exception("Tidak bisa membuat koneksi");
+    }
+
+    return $conn;
+}
+
+// Usage example:
+// try {
+//     $conn = createConn();
+//     // Now you can use $conn for database operations
+// } catch (Exception $e) {
+//     echo "Error: " . $e->getMessage();
+// }
+
 $loadEnv = function($path = null){
     if($path == null){
         $path = ".env";
@@ -23,7 +65,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 }
 if(isset($_POST['login'])){
     try{
-        $email = htmlspecialchars($_POST["email"]);
+        $email = $_POST["email"];
         $pass = $_POST["password"];
         $pass = "Admin@1234567890";
         if(!isset($email) || empty($email)){
@@ -39,8 +81,10 @@ if(isset($_POST['login'])){
             echo "<script>window.history.back();</script>";
             exit();
         }else{
-            $db = Koneksi::getInstance();
-            $con = $db->getConnection();
+            // $loadEnv();
+            $con = createConn();
+            // $db = Koneksi::getInstance();
+            // $con = $db->getConnection();
             $query = "SELECT role, password FROM users WHERE BINARY email = ? LIMIT 1";
             $stmt[0] = $con->prepare($query);
             $stmt[0]->bind_param('s', $email);
@@ -75,7 +119,6 @@ if(isset($_POST['login'])){
                         echo json_encode($result);
                         exit();
                     }else{
-                        $loadEnv();
                         $data1 = ['email'=>$email,'number'=>$result['number'],'expire'=>time() + intval($_SERVER['JWT_ACCESS_TOKEN_EXPIRED'])];
                         $encoded = base64_encode(json_encode($data1));
                         header('Content-Type: application/json');

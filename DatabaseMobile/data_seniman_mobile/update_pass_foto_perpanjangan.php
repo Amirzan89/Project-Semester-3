@@ -8,7 +8,7 @@ $id_perpanjangan = str_replace(['"', "'"], '', $_POST['id_perpanjangan']);
 $passFoto = $_FILES['pass_foto'];
 
 // Direktori penyimpanan file
-$uploadDirPassFoto = 'uploads/perpanjangan/pass_foto/';
+$uploadDirPassFoto = __DIR__.'/uploads/perpanjangan/pass_foto/';
 
 
 // Mendapatkan path file lama sebelum update
@@ -28,7 +28,8 @@ if ($row_old_files = mysqli_fetch_assoc($result_old_files)) {
 }
 
 // Mengunggah gambar Pass Foto
-$passFotoFileName = $uploadDirPassFoto . generateUniqueFileName3($passFoto['name'], $uploadDirPassFoto);
+$fotoName = generateUniqueFileName3($passFoto['name'], $uploadDirPassFoto);
+$passFotoFileName = $uploadDirPassFoto . $fotoName;
 move_uploaded_file($passFoto['tmp_name'], $passFotoFileName);
 
 
@@ -37,7 +38,7 @@ function generateUniqueFileName3($originalName, $uploadDirPassFoto) {
     $basename = pathinfo($originalName, PATHINFO_FILENAME);
 
     if (!file_exists($uploadDirPassFoto . $basename . '.' . $extension)) {
-        return $basename . '.' . $extension;
+        return '/'.$basename . '.' . $extension;
     }
 
     $counter = 1;
@@ -45,7 +46,7 @@ function generateUniqueFileName3($originalName, $uploadDirPassFoto) {
         $counter++;
     }
 
-    return $basename . '(' . $counter . ')' . '.' . $extension;
+    return '/'.$basename . '(' . $counter . ')' . '.' . $extension;
 }
 
 // Menyimpan data ke database
@@ -58,7 +59,7 @@ $query = "UPDATE perpanjangan SET status = 'diajukan', pass_foto = ? WHERE id_pe
 $stmt = mysqli_prepare($konek, $query);
 
 // Assuming $passFotoFileName and $id_seniman are strings
-mysqli_stmt_bind_param($stmt, 'ss', $passFotoFileName, $id_perpanjangan);
+mysqli_stmt_bind_param($stmt, 'ss', $fotoName, $id_perpanjangan);
 mysqli_stmt_execute($stmt); // Added a semicolon here
 
 if (mysqli_stmt_error($stmt)) {

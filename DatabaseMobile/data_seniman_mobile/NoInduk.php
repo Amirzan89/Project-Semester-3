@@ -214,7 +214,9 @@ $encryptedNik = base64_encode($nik);
 // Menyimpan data ke database
 $today = date('Y-m-d'); // Mengambil tanggal hari ini
 $nextYear = date('Y') + 1; // Mengambil tahun berikutnya
-$tgl_pembuatan = $today;
+$tgl_pembuatan = $today;// Menyimpan data ke database
+$tgl_berlaku = $nextYear . '-12-31';
+
 date_default_timezone_set('Asia/Jakarta');
 date_default_timezone_set('Asia/Jakarta');
 $created_at = date('Y-m-d H:i:s');

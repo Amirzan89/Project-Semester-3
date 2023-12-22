@@ -8,7 +8,7 @@ $id_seniman = str_replace(['"', "'"], '', $_POST['id_seniman']);
 $suratKeterangan = $_FILES['surat_keterangan'];
 
 // Direktori penyimpanan file
-$uploadDirSurat = 'uploads/seniman/surat_keterangan/';
+$uploadDirSurat = __DIR__.'/uploads/seniman/surat_keterangan/';
 
 
 // Mendapatkan path file lama sebelum update
@@ -32,7 +32,8 @@ if ($row_old_files = mysqli_fetch_assoc($result_old_files)) {
 }
 
 // Mengunggah dokumen PDF Surat Keterangan
-$suratKeteranganFileName = $uploadDirSurat . generateUniqueFileName2($suratKeterangan['name'], $uploadDirSurat);
+$suratName = generateUniqueFileName2($suratKeterangan['name'], $uploadDirSurat);
+$suratKeteranganFileName = $uploadDirSurat . $suratName;
 move_uploaded_file($suratKeterangan['tmp_name'], $suratKeteranganFileName);
 
 function generateUniqueFileName2($originalName, $uploadDirSurat) {
@@ -40,7 +41,7 @@ function generateUniqueFileName2($originalName, $uploadDirSurat) {
     $basename = pathinfo($originalName, PATHINFO_FILENAME);
 
     if (!file_exists($uploadDirSurat . $basename . '.' . $extension)) {
-        return $basename . '.' . $extension;
+        return '/'.$basename . '.' . $extension;
     }
 
     $counter = 1;
@@ -48,7 +49,7 @@ function generateUniqueFileName2($originalName, $uploadDirSurat) {
         $counter++;
     }
 
-    return $basename . '(' . $counter . ')' . '.' . $extension;
+    return '/'.$basename . '(' . $counter . ')' . '.' . $extension;
 }
 
 
@@ -63,7 +64,7 @@ $query = "UPDATE seniman SET status = 'diajukan', surat_keterangan = ? WHERE id_
 $stmt = mysqli_prepare($konek, $query);
 
 // Assuming $suratKeteranganFileName and $id_seniman are strings
-mysqli_stmt_bind_param($stmt, 'ss', $suratKeteranganFileName, $id_seniman);
+mysqli_stmt_bind_param($stmt, 'ss', $suratName, $id_seniman);
 mysqli_stmt_execute($stmt); // Added a semicolon here
 
 if (mysqli_stmt_error($stmt)) {

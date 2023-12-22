@@ -8,7 +8,7 @@ $id_seniman = str_replace(['"', "'"], '', $_POST['id_seniman']);
 $ktpSeniman = $_FILES['ktp_seniman'];
 
 // Direktori penyimpanan file
-$uploadDirKTP = 'uploads/seniman/ktp_seniman/';
+$uploadDirKTP = __DIR__.'/uploads/seniman/ktp_seniman/';
 
 
 // Mendapatkan path file lama sebelum update
@@ -30,7 +30,8 @@ if ($row_old_files = mysqli_fetch_assoc($result_old_files)) {
 
 }
 
-$ktpSenimanFileName = $uploadDirKTP . generateUniqueFileName($ktpSeniman['name'], $uploadDirKTP);
+$ktpName = generateUniqueFileName($ktpSeniman['name'], $uploadDirKTP);
+$ktpSenimanFileName = $uploadDirKTP . $ktpName;
 move_uploaded_file($ktpSeniman['tmp_name'], $ktpSenimanFileName);
 
 
@@ -41,7 +42,7 @@ function generateUniqueFileName($originalName, $uploadDirKTP) {
 
     // Jika nama file belum ada, langsung gunakan nama asli
     if (!file_exists($uploadDirKTP . $basename . '.' . $extension)) {
-        return $basename . '.' . $extension;
+        return '/'.$basename . '.' . $extension;
     }
 
     // Jika nama file sudah ada, tambahkan indeks
@@ -50,7 +51,7 @@ function generateUniqueFileName($originalName, $uploadDirKTP) {
         $counter++;
     }
 
-    return $basename . '(' . $counter . ')' . '.' . $extension;
+    return '/'.$basename . '(' . $counter . ')' . '.' . $extension;
 }
 
 
@@ -64,8 +65,8 @@ $tgl_berlaku = $nextYear . '-12-31';
 $query = "UPDATE seniman SET status = 'diajukan', ktp_seniman = ? WHERE id_seniman = ?";
 $stmt = mysqli_prepare($konek, $query);
 
-// Assuming $ktpSenimanFileName and $id_seniman are strings
-mysqli_stmt_bind_param($stmt, 'ss', $ktpSenimanFileName, $id_seniman);
+// Assuming $ktpSenimanFileName and $id_seniman are strigngs
+mysqli_stmt_bind_param($stmt, 'ss', $ktpName, $id_seniman);
 mysqli_stmt_execute($stmt); // Added a semicolon here
 
 if (mysqli_stmt_error($stmt)) {

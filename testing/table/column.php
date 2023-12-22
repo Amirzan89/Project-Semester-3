@@ -5,7 +5,7 @@ try {
   $database = koneksi::getInstance();
   $conn = $database->getConnection();
 
-  $query = "DESCRIBE `sewa_tempat`";
+  $query = "DESCRIBE `seniman`";
   $result = mysqli_query($conn, $query);
 
   if ($result) {
